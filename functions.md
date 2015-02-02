@@ -16,7 +16,7 @@ The following functions are being considered for the beta release of the City SD
 </tr>
 </thead>
 <tbody>
-<tr>
+
 
 
 
@@ -68,3 +68,5 @@ The following functions are being considered for the beta release of the City SD
 | 44  | new_mansales()          | List of manufactured housing given a location                                    | Location                      | JSON   | 13       |
 | 45  | construct_spending()    | List of construction spending given a location                                   | Location                      | JSON   | 13       |
 
+</tbody>
+</table>
