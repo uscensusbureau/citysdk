@@ -8,69 +8,378 @@ nav: functions
 
 The following functions are being considered for the beta release of the City SDK. 
 
-<table class="table-code">
-<thead>
-<tr>
-<th>SDK Function </th>
-<th>Output Return</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-
-
-</tr>
-
-</tbody>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-031e">No.</th>
+    <th class="tg-031e">Function Name</th>
+    <th class="tg-031e">Output return</th>
+    <th class="tg-031e">Input</th>
+    <th class="tg-031e">Format</th>
+    <th class="tg-031e">Use Case</th>
+  </tr>
+  <tr>
+    <td class="tg-031e">1</td>
+    <td class="tg-031e">grants()</td>
+    <td class="tg-031e">List of available grants</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">1</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">2</td>
+    <td class="tg-031e">loans()</td>
+    <td class="tg-031e">List of low-cost loans</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">1</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">3</td>
+    <td class="tg-031e">counseling_centers()</td>
+    <td class="tg-031e">List of free counseling centers</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">1</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">4</td>
+    <td class="tg-031e">resource_centers()</td>
+    <td class="tg-031e">List of public resource centers</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">1</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">5</td>
+    <td class="tg-031e">sr_programs()</td>
+    <td class="tg-031e">List of statewide and regional programs</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">1</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">6</td>
+    <td class="tg-031e">ct_programs()</td>
+    <td class="tg-031e">List of city/ town programs</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">1</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">7</td>
+    <td class="tg-031e">avg_hhincome()</td>
+    <td class="tg-031e">Avergage household income data</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">2</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">8</td>
+    <td class="tg-031e">sold_homes()</td>
+    <td class="tg-031e">List of sold homes given a location and timeframe (i.e. past 0-6mo, past 6-12mo)</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">2</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">9</td>
+    <td class="tg-031e">homesforsale()</td>
+    <td class="tg-031e">List of home addresses currently for sale</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">2</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">10</td>
+    <td class="tg-031e">avg_homesqft()</td>
+    <td class="tg-031e">Average square footage of homes</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">2</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">11</td>
+    <td class="tg-031e">home_programs()</td>
+    <td class="tg-031e">List of homebuying programs</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">2</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">12</td>
+    <td class="tg-031e">fed_laws()</td>
+    <td class="tg-031e">List of Federal laws</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">3</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">13</td>
+    <td class="tg-031e">county_laws()</td>
+    <td class="tg-031e">List of county laws</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">3</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">14</td>
+    <td class="tg-031e">city_laws()</td>
+    <td class="tg-031e">List of city laws</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">3</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">15</td>
+    <td class="tg-031e">tax_benefit()</td>
+    <td class="tg-031e">Tax benefit information</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">3</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">16</td>
+    <td class="tg-031e">buyer_rights()</td>
+    <td class="tg-031e">Information on rights as a buyer</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">3</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">17</td>
+    <td class="tg-031e">bus_stops()</td>
+    <td class="tg-031e">List of nearby bus stops</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">4</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">18</td>
+    <td class="tg-031e">bike_stations()</td>
+    <td class="tg-031e">List of nearby bicycle stations</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">4</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">19</td>
+    <td class="tg-031e">rail_stations()</td>
+    <td class="tg-031e">List of nearby rail stations given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">4</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">20</td>
+    <td class="tg-031e">train_stations()</td>
+    <td class="tg-031e">List of nearby train stations</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">4</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">21</td>
+    <td class="tg-031e">transport_distance()</td>
+    <td class="tg-031e">Distance from transportation mode to housing community</td>
+    <td class="tg-031e">Location; Transportation mode</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">4</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">22</td>
+    <td class="tg-031e">crime_incidents()</td>
+    <td class="tg-031e">List of crime incidents given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">4</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">23</td>
+    <td class="tg-031e">healthcare_facilities()</td>
+    <td class="tg-031e">List of healthcare facilities (i.e. hospitals, urgent care, pharmacy, etc.)</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">5</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">24</td>
+    <td class="tg-031e">hcare_reviews()</td>
+    <td class="tg-031e">List of online reviews (i.e. Yelp, Google)</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">5</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">25</td>
+    <td class="tg-031e">senior_communities()</td>
+    <td class="tg-031e">List of nearby senior communities</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">6</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">26</td>
+    <td class="tg-031e">sc_monthlycost()</td>
+    <td class="tg-031e">Monthly cost of senior community</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">6</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">27</td>
+    <td class="tg-031e">senior_assist()</td>
+    <td class="tg-031e">Yes/No based on living assistance eligibility of senior community</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">6</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">28</td>
+    <td class="tg-031e">ada_access()</td>
+    <td class="tg-031e">Yes/No based on ADA-accessibility of senior community</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">7</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">29</td>
+    <td class="tg-031e">ada_homes()</td>
+    <td class="tg-031e">List of nearby ADA-accessible homes</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">7</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">30</td>
+    <td class="tg-031e">avg_age()</td>
+    <td class="tg-031e">Average age</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">7</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">31</td>
+    <td class="tg-031e">rental_vouch()</td>
+    <td class="tg-031e">Yes/No based on rental voucher acceptance</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">8</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">32</td>
+    <td class="tg-031e">housing_avail()</td>
+    <td class="tg-031e">Occupancy/ availability metric</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">8</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">33</td>
+    <td class="tg-031e">rent2own()</td>
+    <td class="tg-031e">List of rent to own statistics (property and/ or owners)</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">9</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">34</td>
+    <td class="tg-031e">job_stats()</td>
+    <td class="tg-031e">List of job statistics (e.g. industry, employment rate, etc.)</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">10</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">35</td>
+    <td class="tg-031e">transport_modes()</td>
+    <td class="tg-031e">List of available transportation modes (i.e. bus stop, rail station, etc.)</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">10</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">36</td>
+    <td class="tg-031e">avg_workdist()</td>
+    <td class="tg-031e">List of average distance to work</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">11</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">37</td>
+    <td class="tg-031e">crime_incidents()</td>
+    <td class="tg-031e">List of crime incidents given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">12</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">38</td>
+    <td class="tg-031e">walk_score()</td>
+    <td class="tg-031e">Walk score</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">12</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">39</td>
+    <td class="tg-031e">sex_offenders()</td>
+    <td class="tg-031e">List of sex offenders</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">12</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">40</td>
+    <td class="tg-031e">street_lights()</td>
+    <td class="tg-031e">List of street lights</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">12</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">41</td>
+    <td class="tg-031e">building_permits()</td>
+    <td class="tg-031e">List of building permits given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">13</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">42</td>
+    <td class="tg-031e">new_resconstruction()</td>
+    <td class="tg-031e">List of new residential construction given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">13</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">43</td>
+    <td class="tg-031e">new_ressales()</td>
+    <td class="tg-031e">List of new residential sales given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">13</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">44</td>
+    <td class="tg-031e">new_mansales()</td>
+    <td class="tg-031e">List of manufactured housing given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">13</td>
+  </tr>
+  <tr>
+    <td class="tg-031e">45</td>
+    <td class="tg-031e">construct_spending()</td>
+    <td class="tg-031e">List of construction spending given a location</td>
+    <td class="tg-031e">Location</td>
+    <td class="tg-031e">JSON</td>
+    <td class="tg-031e">13</td>
+  </tr>
 </table>
-
-
-
-| No. | Function Name           | Output return                                                                    | Input                         | Format | Use Case |
-|-----|-------------------------|----------------------------------------------------------------------------------|-------------------------------|--------|----------|
-| 1   | grants()                | List of available grants                                                         | Location                      | JSON   | 1        |
-| 2   | loans()                 | List of low-cost loans                                                           | Location                      | JSON   | 1        |
-| 3   | counseling_centers()    | List of free counseling centers                                                  | Location                      | JSON   | 1        |
-| 4   | resource_centers()      | List of public resource centers                                                  | Location                      | JSON   | 1        |
-| 5   | sr_programs()           | List of statewide and regional programs                                          | Location                      | JSON   | 1        |
-| 6   | ct_programs()           | List of city/ town programs                                                      | Location                      | JSON   | 1        |
-| 7   | avg_hhincome()          | Avergage household income data                                                   | Location                      | JSON   | 2        |
-| 8   | sold_homes()            | List of sold homes given a location and timeframe (i.e. past 0-6mo, past 6-12mo) | Location                      | JSON   | 2        |
-| 9   | homesforsale()          | List of home addresses currently for sale                                        | Location                      | JSON   | 2        |
-| 10  | avg_homesqft()          | Average square footage of homes                                                  | Location                      | JSON   | 2        |
-| 11  | home_programs()         | List of homebuying programs                                                      | Location                      | JSON   | 2        |
-| 12  | fed_laws()              | List of Federal laws                                                             | Location                      | JSON   | 3        |
-| 13  | county_laws()           | List of county laws                                                              | Location                      | JSON   | 3        |
-| 14  | city_laws()             | List of city laws                                                                | Location                      | JSON   | 3        |
-| 15  | tax_benefit()           | Tax benefit information                                                          | Location                      | JSON   | 3        |
-| 16  | buyer_rights()          | Information on rights as a buyer                                                 | Location                      | JSON   | 3        |
-| 17  | bus_stops()             | List of nearby bus stops                                                         | Location                      | JSON   | 4        |
-| 18  | bike_stations()         | List of nearby bicycle stations                                                  | Location                      | JSON   | 4        |
-| 19  | rail_stations()         | List of nearby rail stations given a location                                    | Location                      | JSON   | 4        |
-| 20  | train_stations()        | List of nearby train stations                                                    | Location                      | JSON   | 4        |
-| 21  | transport_distance()    | Distance from transportation mode to housing community                           | Location; Transportation mode | JSON   | 4        |
-| 22  | crime_incidents()       | List of crime incidents given a location                                         | Location                      | JSON   | 4        |
-| 23  | healthcare_facilities() | List of healthcare facilities (i.e. hospitals, urgent care, pharmacy, etc.)      | Location                      | JSON   | 5        |
-| 24  | hcare_reviews()         | List of online reviews (i.e. Yelp, Google)                                       | Location                      | JSON   | 5        |
-| 25  | senior_communities()    | List of nearby senior communities                                                | Location                      | JSON   | 6        |
-| 26  | sc_monthlycost()        | Monthly cost of senior community                                                 | Location                      | JSON   | 6        |
-| 27  | senior_assist()         | Yes/No based on living assistance eligibility of senior community                | Location                      | JSON   | 6        |
-| 28  | ada_access()            | Yes/No based on ADA-accessibility of senior community                            | Location                      | JSON   | 7        |
-| 29  | ada_homes()             | List of nearby ADA-accessible homes                                              | Location                      | JSON   | 7        |
-| 30  | avg_age()               | Average age                                                                      | Location                      | JSON   | 7        |
-| 31  | rental_vouch()          | Yes/No based on rental voucher acceptance                                        | Location                      | JSON   | 8        |
-| 32  | housing_avail()         | Occupancy/ availability metric                                                   | Location                      | JSON   | 8        |
-| 33  | rent2own()              | List of rent to own statistics (property and/ or owners)                         | Location                      | JSON   | 9        |
-| 34  | job_stats()             | List of job statistics (e.g. industry, employment rate, etc.)                    | Location                      | JSON   | 10       |
-| 35  | transport_modes()       | List of available transportation modes (i.e. bus stop, rail station, etc.)       | Location                      | JSON   | 10       |
-| 36  | avg_workdist()          | List of average distance to work                                                 | Location                      | JSON   | 11       |
-| 37  | crime_incidents()       | List of crime incidents given a location                                         | Location                      | JSON   | 12       |
-| 38  | walk_score()            | Walk score                                                                       | Location                      | JSON   | 12       |
-| 39  | sex_offenders()         | List of sex offenders                                                            | Location                      | JSON   | 12       |
-| 40  | street_lights()         | List of street lights                                                            | Location                      | JSON   | 12       |
-| 41  | building_permits()      | List of building permits given a location                                        | Location                      | JSON   | 13       |
-| 42  | new_resconstruction()   | List of new residential construction given a location                            | Location                      | JSON   | 13       |
-| 43  | new_ressales()          | List of new residential sales given a location                                   | Location                      | JSON   | 13       |
-| 44  | new_mansales()          | List of manufactured housing given a location                                    | Location                      | JSON   | 13       |
-| 45  | construct_spending()    | List of construction spending given a location                                   | Location                      | JSON   | 13       |
-
