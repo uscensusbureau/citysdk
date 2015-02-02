@@ -15,4 +15,4 @@ defaults:
       organization-name: "US Census Bureau"
       organization-url: "http://census.gov"
       organization-email: jeffrey.meisel@census.gov
-      source-code-policy.url: https://github.com/uscensusbureau/citysdk/blob/gh-pages/LICENSE.md
+      source-code-policy: https://github.com/uscensusbureau/citysdk/blob/gh-pages/LICENSE.md
