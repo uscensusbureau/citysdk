@@ -11,7 +11,7 @@ said Penny Pritzker, US Secretary of Commerce, "is to attempt three or four majo
 <br />
 
 ## About ##
-This project was nspired by our friends in the EU who created a [City SDK for Europe](http://www.citysdk.eu/).
+This project was inspired by our friends in the EU who created a [City SDK for Europe](http://www.citysdk.eu/).
 
 This project is led by the US Census Bureau in collaboration with other federal and local government entities, as well as private industry. 
 
