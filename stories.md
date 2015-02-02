@@ -13,8 +13,7 @@ This project utilizes an agile process to prioritize a set of user stories that 
 
 
 ## How to Submit a User Story ##
-![Submit User Stories](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/submit-user-story.png)
-
+![submit a user story](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/submit-user-story.png)
 
 ----------
 
