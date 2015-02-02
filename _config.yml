@@ -1,0 +1,18 @@
+name: CitySDK Project
+markdown: kramdown
+highlighter: pygments
+safe: true
+baseurl: /citysdk
+exclude: ['.ruby-version', 'node_modules', 'package.json', 'bower.json']
+sass:
+  sass_dir: static/_sass
+
+defaults:
+  -
+    scope:
+      path: "" # an empty string here means all files in the project
+    values:
+      organization-name: "US Census Bureau"
+      organization-url: "http://census.gov"
+      organization-email: jeffrey.meisel@census.gov
+      source-code-policy.url: 

@@ -1,0 +1,978 @@
+@import "normalize.css";
+@import "fonts.css";
+
+/*
+Normalize the box model - Thanks, Paul Irish!
+==============================================
+*/
+*,
+*:before,
+*:after {
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+ }
+
+/* ==========================================================================
+   Global Styles
+   ========================================================================== */
+
+body, html {
+    min-height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: "Avenir Next", Arial, sans-serif;
+    line-height: 1.375;
+    color: #101820; /* CFPB black */
+
+    /* Improve default text rendering, handling of kerning pairs and ligatures */
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    word-wrap: break-word;
+    overflow-wrap: break-word; /* New CSS3 syntax supported by Chrome */
+}
+
+html {
+    position:relative;
+}
+
+body {
+    padding-bottom: 20em; /* Making room for absolutely-positioned footer */
+}
+/* IE7 and older can't resize px-based text */
+
+p, 
+blockquote, 
+q, 
+pre, 
+address, 
+hr, 
+code, 
+samp, 
+dl, 
+ol, 
+ul, 
+form, 
+table, 
+fieldset, 
+menu, 
+img {
+
+    margin:0;
+    margin-bottom: 1.375em;
+}
+
+h1 {
+    margin-top: .5em;
+    margin-bottom: .5em;
+    font: 400 2.125em/1.23529411764706 "Avenir Next", Arial, sans-serif;
+    font-weight: normal;
+}
+
+h2 {
+    margin: 0;
+    margin-bottom: 1em;
+    font: 400 1.625em/1.23076923076923 "Avenir Next", Arial, sans-serif;
+    font-weight: normal;
+}
+
+h3 {
+    margin: 2em 0 1em 0;
+    font: 400 1.375em/1.27272727272727 "Avenir Next", Arial, sans-serif;
+    font-weight: normal;
+}
+
+h3:first-child {
+    margin-top: 0;
+    margin-bottom: .75em;
+}
+
+h4 {
+    margin: 0;
+    margin-bottom: 1em;
+    font: 500 1.125em/1.22222222222222 "Avenir Next Medium", Arial, sans-serif;
+    font-weight: 500;
+}
+
+h5 {
+    margin: 3em 0 1.25em 0;
+    font: 600 0.875em/1.57142857142857 "Avenir Next Demi", Arial, sans-serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+h6 {
+    margin: 0;
+    margin-bottom: 1em;
+    font: 600 0.75em/1.83333333333333 "Avenir Next Demi", Arial, sans-serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+p  {
+    margin: .75em 0;
+    font-size: 1em;
+    line-height: 1.375em;
+}
+
+ul, blockquote, pre, td, th, label {
+    margin: 0;
+    font-size: 1em;
+    line-height: 1.57142857142857em;
+    margin-bottom: 1.375em;
+}
+
+ol {
+    line-height: 1.57142857142857em;
+}
+
+small, p.small {
+    margin: 0;
+    margin-bottom: 1.7142857142857142857142857142857em;
+    /* 12px / 24px */
+    font-size: 0.75em;
+    line-height: 1.7142857142857142857142857142857;
+}
+
+strong, b, dt {
+    font-family: "Avenir Next Demi", Arial, sans-serif;
+}
+
+dfn {
+    font-style: italic;
+}
+
+var, address {
+    font-style: normal;
+}
+
+sub, sup {
+    font-size: 75%;
+    line-height: 0;
+     /* Positions 'sub' and 'sup' without affecting line-height */
+     position: relative;
+     vertical-align: baseline;
+}
+
+sup {
+     /* Move superscripted text up */
+    top: -0.5em;
+}
+
+sub {
+    /* Move subscripted text down */
+    bottom: -0.25em;
+}
+
+
+/* CODE */
+pre, code {
+    background-color: #f1f2f2;
+    border: 1px solid #e3e4e5;
+    border-radius: 0.250em;
+    overflow-x: auto;
+    padding: 0.125em 0.250em;
+    white-space: nowrap;
+}
+
+pre, code, kbd, samp {
+    font-size: .75em;
+    line-height: 1.375;
+    margin-bottom: 1.375em;
+    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+}
+
+pre {
+    white-space: pre-wrap;
+    margin-bottom: 1.5em;
+}
+
+
+.intro {
+    font-size: 1em;
+}
+
+
+/* TABLES */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 1.375em;
+    font-size: 0.875em;
+}
+
+.table-code code {
+    background-color: #ffffff;
+    border: 1px solid #e3e4e5;
+    border-radius: 0.250em;
+    overflow-x: auto;
+    padding: 0.125em 0.250em;
+    white-space: pre-wrap;
+}
+
+th {
+    text-align: left;
+    font-family: "Avenir Next Demi", Arial, sans-serif;
+    background-color: #dbedd4;
+}
+
+tr, th, td {
+    padding: 10px 15px;
+    line-height: 1.5em;
+}
+
+td:code {
+    background-color: transparent;
+    white-space: nowrap;
+}
+
+tr:nth-child(even) {
+    background-color: #F1F2F2;
+}
+
+tr:nth-child(odd) {
+    background-color: #F8F8F8;
+}
+
+table.fullwidth tr:nth-child(odd) {
+    background-color: transparent;
+}
+
+table.fullwidth tr:nth-child(even) {
+    background-color: transparent;
+}
+
+.field-table td:nth-child(1) {
+}
+
+.field-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.field-table code {
+    background-color: #ffffff;
+    border: 1px solid #e3e4e5;
+    border-radius: 0.250em;
+    overflow-x: auto;
+    padding: 0.125em 0.250em;
+    white-space: nowrap;
+}
+
+/* LISTS */
+ul, ol {
+    padding: 0;
+    list-style-position: outside;
+    margin-left: 3%;
+}
+
+li ul, li ol {
+    margin-left: 1.375em;
+}
+
+dl dd {
+    margin-left: 1.375em;
+}
+
+dt {
+    font-family: "Avenir Next Demi", Arial, sans-serif;
+}
+
+/* LINKS */
+a {
+    border-bottom: 1px dotted #0072CE;
+    color: #0072CE;
+    text-decoration: none;
+}
+
+a:visited {
+    border-bottom: 1px solid #005E5D;
+    color: #005E5D;
+    text-decoration: none;
+}
+
+a:hover {
+    border-bottom: 1px solid #7eb8dd;
+    color: #7eb8dd;
+    text-decoration: none;
+}
+
+a:focus {
+    border-bottom: 1px solid #0072ce;
+    outline: thin dotted;
+    color: #0072ce;
+    text-decoration: none;
+}
+
+a:active {
+    border-bottom: 1px solid #002D72;
+    color: #002D72;
+    text-decoration: none;
+}
+
+a.call-to-action {
+    font-family: "Avenir Next", Arial, sans-serif;
+}
+
+a.action-arrow {
+    font-family: "Avenir Next Demi", Arial, sans-serif;
+    font-style: normal;
+    font-size: 1em;
+}
+
+a.action-arrow .icon-right {
+    position: relative;
+}
+
+a.action-arrow i {
+    text-decoration: none;
+}
+
+.icon-right:before {
+    content: "\f054";
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    font-size: .7em;
+}
+
+
+/* NAVIGATION */
+
+ nav a {
+    display: block;
+    padding: 10px;
+    -webkit-transition: .4s;
+       -moz-transition: .4s;
+            transition: .4s;
+}
+
+nav a,
+nav a:link,
+nav a:visited {
+    border-bottom: none;
+    color: #75787b;
+}
+
+nav li:hover {
+    color: #75787b;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    border-bottom: 1px solid #d0d0ce;
+    padding-left: 0;
+}
+
+nav li:active {
+    color: #75787b;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    border-bottom: 1px solid #d0d0ce;
+    padding-left: 0;
+}
+
+
+nav ul {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #d0d0ce;
+}
+
+nav li {
+    list-style: none;
+    border-bottom: 1px solid #d0d0ce;
+    font-size: 1.125em;
+    padding-left: 4px;
+}
+
+#overview a.overview {
+    color: #101820;
+    border-bottom: none;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    margin-left: -4px;
+}
+
+#basics a.basics {
+    color: #101820;
+    border-bottom: none;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    margin-left: -4px;
+}
+
+#console a.console {
+    color: #101820;
+    border-bottom: none;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    margin-left: -4px;
+}
+
+#queries a.queries {
+    color: #101820;
+    border-bottom: none;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    margin-left: -4px;
+}
+
+#fields a.fields {
+    color: #101820;
+    border-bottom: none;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    margin-left: -4px;
+}
+
+#contribute a.contribute {
+    color: #101820;
+    border-bottom: none;
+    border-left: 4px solid #2CB34A;
+    background-color: transparent;
+    margin-left: -4px;
+}
+
+.page-title a,
+.page-title a:link,
+.page-title a:visited {
+    border-bottom: none;
+    text-decoration: none;
+    color: #75787B;
+}
+
+/* REPO LIST */
+
+.repo-list {
+    margin: 0;
+}
+
+ul.repo-list {
+    padding: 1em 0 1em 0;
+}
+
+.repo-list li {
+    list-style: none;
+}
+
+.repo-list p {
+    margin: 0;
+    font-size: 0.875em;
+}
+
+.repo-list img {
+    margin: 0;
+}
+
+.repo-list h4 {
+    margin: 0;
+}
+
+
+ul.repo-list.no-padding {
+    padding: 0;
+}
+
+/* IE-SPECIFIC STYLES */
+
+/* column grid */
+.g1,.g2,.g3 { display: block; position: relative; margin-left: 1%; margin-right: 1%; }
+/* 1 column grid */
+.g1,.g2,.g3 { width: 90.0%; }
+
+.wrap {
+        max-width: 960px;
+        min-width: 320px; 
+}
+
+body {
+        padding-bottom: 12em;
+    }
+
+/* offset the fixed position header for jump links */
+.anchor {
+    display: block; 
+    height: 4.375em; 
+    margin-top: -4.375em;
+    visibility: hidden;
+}
+
+.header {
+    border-bottom: 4px solid #2CB34A;
+    width: 100%;
+    background-color: #fff;
+    position: fixed;
+    top: 0;
+    z-index: 99999;
+
+}
+
+.header h1 {
+    color: #75787B;
+    margin-top: 1.375em;
+    font-size: 1.375em;
+    line-height: 1;
+    margin-bottom: 1.375em;
+    margin-left: 0;
+    float: left;
+}
+
+.header h1 span {
+    font-family: "Avenir Next Demi", Arial, sans-serif;
+    font-weight: bold;
+}
+
+.header .logo {
+    float: right;
+    width: 210px;
+    display: block;
+    margin: 1.25em 1em;
+}
+
+.page-title {
+    margin: .5em 0em .5em 0em;
+}
+
+.page-title br {
+    display: block;
+}
+
+.intro {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 1.375em; 
+}
+
+aside {
+        position: absolute;
+        width: 13.75em;
+        margin-right: 0;
+        margin-left: 0;
+        margin-top: 6.75em;
+        color: #75787B;
+    }
+
+nav {
+        text-align: left;
+    }
+
+.main-content {
+    width: 66%;
+    float: right;
+    margin-bottom: 7.5em;
+    margin-top: 8em;
+    margin-left: 0;
+}
+
+.main-content ul, ol {
+    padding: 0;
+    list-style-position: inside;
+}
+
+.content { /* only here to keep footer sticky */
+    margin-top: 0;
+    /*margin-left: 1em;*/
+    /*margin-right: 1em;*/
+    overflow: hidden;
+}
+
+/* REPO LIST*/
+
+    .repo-list li {
+        list-style: none;
+        display: table-cell;
+        vertical-align:middle;
+        padding: 1em;
+        background-color: #E7E7E6;
+        border-left: 1px solid #BABBBD;
+    }
+
+    .repo-list li:first-child {
+        border-left: none;
+    }
+
+    .repo-list h4 {
+        margin-bottom: .25em;
+    }
+
+footer {
+    padding: 2em 0;
+    border-top: 2px solid #BABBBD;
+    background: #F1F2F2;
+    font-family: "Avenir Next", Arial, sans-serif;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+
+.footer section {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: .5em;
+    margin-left: .5em;
+}
+
+.footer-links {
+    float:left;
+    margin: 0 .5em .5em 1em;
+}
+
+.footer-oss {
+        width: 67%;
+        float: right;
+    }
+
+.footer-links ul {
+    list-style: none;
+    margin: 1em .5em 1em .25em;
+}
+
+.footer h4 {
+    margin-top: 1.5em;
+    margin-bottom: .5em;
+    margin-left: .25em;
+    font-size: 16px;
+    line-height: 1.5em;
+    text-transform: uppercase;
+}
+
+.footer p {
+    font-size: 0.875em;
+    line-height: 1.42857142857143;
+    margin: .75em 0;
+    margin-left: .25em;
+}
+
+footer a,
+footer a:link,
+footer a:visited {
+    border-bottom: 1px dotted;
+}
+
+footer a:hover {
+    border-bottom: 1px dotted #0072CE;
+}
+
+.wrap {
+    margin: 0 auto;
+    }
+
+
+.mobile-warning {
+        display:none;
+        background-color: #f6d9d3;
+        padding: .85em;
+        margin: .5em 0;
+        font-size: .75em;
+    }   
+
+
+/* ALIGNMENT */
+.alignleft {
+    display: inline;
+    float: left;
+    margin-right: 1.5em;
+}
+.alignright {
+    display: inline;
+    float: right;
+    margin-left: 1.5em;
+}
+.aligncenter {
+    clear: both;
+    display: block;
+    margin: 0 auto;
+}
+
+/* FORMS */
+
+form {
+    margin: 0;
+}
+
+fieldset {
+    border: 0;
+    padding: 0;
+}
+
+textarea {
+    overflow: auto;
+    vertical-align: top;
+}
+
+
+legend {
+    *margin-left: -.75em;
+}
+
+button, input, select, textarea {
+    vertical-align: baseline;
+    /* IE7 and older */
+    *vertical-align: middle;
+}
+
+button, input {
+    line-height: normal;
+    *overflow: visible;
+}
+
+button, input[type="button"], input[type="reset"], input[type="submit"] {
+    cursor: pointer;
+    -webkit-appearance: button;
+}
+
+input[type="checkbox"], input[type="radio"]{
+    box-sizing: border-box;
+}
+
+input[type="search"] {
+    -webkit-appearance: textfield;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+}
+
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+button:: -moz-focus-inner, input::-moz-focus-inner {
+    border:0;
+    padding:0;
+}
+
+
+/* QUOTES */
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+    content: "";
+    content: none;
+}
+
+blockquote, q, cite {
+}
+
+blockquote {
+    border-left: 4px solid #BABBBD;
+    color: #75787b;
+    padding-left: 1.5em;
+}
+
+blockquote > p {
+    padding: 0;
+}
+
+/* MEDIA */
+
+figure {
+    margin: 0;
+}
+
+img, object, embed, video {
+    /* fluid images disabled */
+    /*max-width: 100%;
+    _width: 100%;*/
+}
+
+img {
+    border: 0;
+    float: right;
+    /* improve IE's resizing of images */
+    -ms-interpolation-mode: bicubic;
+}
+
+svg:not(:root) {
+    /* corrects IE9 overflow */
+    overflow: hidden;
+}
+
+/* ABBREVIATION */
+abbr[title],  dfn[title] {
+    border-bottom: 1px dotted #333;
+    cursor: help;
+}
+
+
+/* MARKED/INSERTED/DELETED AND SELECTED TEXT */
+ins,  mark {
+    text-decoration: none;
+}
+mark {
+    background: #c47529;
+}
+ins {
+    background: #d49855;
+}
+del {
+    text-decoration: line-through;
+}
+
+/* Selected text */
+::-moz-selection {
+    background: #0072ce;
+    color: #fff;
+    text-shadow: none;
+}
+
+ /* Selected text */
+::selection {
+    background: #0072ce;
+     color: #fff;
+     text-shadow: none;
+}
+
+/* MICRO CLEARFIX HACK */
+.cf:before,  .cf:after {
+    content: "";
+    display: table;
+}
+ /* For modern browsers */
+.cf:after {
+    clear: both;
+}
+.cf {
+    /* For IE 6/7 (trigger hasLayout) */
+    zoom: 1;
+}
+
+/* Image replacement */
+.ir {
+    background-color: transparent;
+    border:0;
+    overflow: hidden;
+    /* IE 6/7 fallback */
+    *text-indent: -9999px;
+}
+
+.ir before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 150%;
+}
+
+/* Hide from both screenreaders and browsers: h5bp.com/u */
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+/* Hide only visually, but have it available for screenreaders: h5bp.com/v */
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+/* Extends the .visuallyhidden class to allow the element to be focusable
+ * when navigated to via the keyboard: h5bp.com/p */
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+/* Hide visually and from screenreaders, but maintain layout */
+.invisible {
+    visibility: hidden;
+}
+
+
+/* PRINT */
+@media print {
+    * {
+        background: transparent !important;
+        color: black !important; /*prints faster and cheaper */
+        text-shadow: none !important;
+        filter: none !important;
+        -ms-filter: none !important;
+    }
+    a, a:visited {
+        color: #444 !important;
+        text-decoration: underline;
+    }
+    a[href]:after {content: " (" attr(href) ")"}
+    abbr[title]:after {content: " (" attr(title) ")"}
+    .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {content: ""}  /* Don't print links for images, javascript or internal links */
+    pre, blockquote {border: 1px solid #999; page-break-inside: avoid; }
+    thead {display: table-header-group; } /* Repeat header row at top of each printed page */
+    tr, img {page-break-inside: avoid; }
+    img {max-width: 100% !important; }
+    @page {margin: 0.5cm}
+    p, h2, h3 {orphans: 3; widows: 3}
+    h2, h3{page-break-after: avoid}
+}
+
+.expandable {
+  margin-bottom: 5px;
+  font-family: "Avenir Next", Arial, sans-serif;
+}
+
+.expandable a {
+    border-bottom: none;
+    color: #0072CE;
+}
+
+.expandable-header {
+  padding-bottom: .5em;
+  cursor: pointer;
+  color: #0072CE;
+  position: relative;
+}
+
+.expandable-content {
+  padding: 0;
+}
+
+.expandable:hover {
+}
+
+.open {}
+
+
+.expandable h4 {
+  display: inline;
+  font-size: 1em;
+  line-height: 1.25em;
+  text-transform: none;
+}
+
+.expandable-button {
+  font-size: 1em;
+  line-height: 1.25em;
+}
+
+.expandable-button:before {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  -webkit-font-smoothing: antialiased;
+  content: "\f055";
+  margin-left: 8px;
+  line-height: 1.25em;
+}
+
+.open .expandable-button:before {
+  content: "\f056";
+
+/* custom class as .hidden is already used in the guide */
+.expandable-hidden {
+  display: block;
+}
