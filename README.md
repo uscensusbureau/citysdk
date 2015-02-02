@@ -1,4 +1,4 @@
-Template Developer Hub 
+City SDK
 ====================
 
 *Note - The Github pages site for the City SDK was initially forked, then a new repo created based on [CFPB's outstanding API documentation](https://github.com/cfpb/api).  Thanks to the CFPB [eRegs](https://github.com/cfpb/regulations-core) and [HMDA](https://github.com/cfpb/api) teams and their documentation work for starting us off with a great codebase.
