@@ -6,6 +6,10 @@ nav: basics
 
 ### User Stories
 
+To contribute a use story, submit an Issue on the City SDK project page in Github and select the "User Story" label.  Link to Issues:  https://github.com/uscensusbureau/citysdk/issues
+
+![Submit User Stories](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/timeline.png)
+
 The following user stories have been documented to drive prioritization for SDK functions and guides.
 
 <table class="table-code">
