@@ -8,7 +8,7 @@ nav: basics
 
 This project utilizes an agile process to prioritize a set of user stories that will be completed each sprint.  Contributions are welcome from the community on which User Stories would be most impactful to include in the SDK.  User Stories should be written from the perspective of a citizen or "user" that lives in a city and wants to utilize a service.  
 
-Submit user stories here: https://github.com/uscensusbureau/citysdk
+Submit user stories and feature requests here: [City SDK Issue Tracker](http://www.citysdk.eu/).
 
 Example:
 
