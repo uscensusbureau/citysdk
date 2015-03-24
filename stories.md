@@ -19,5 +19,10 @@ Example:
 
 
 ## How to Submit a User Story ##
-![submit a user story](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/submit-user-story.png)
 
+1. Go to the [City SDK GitHub issues page](https://github.com/uscensusbureau/citysdk/issues) and click _New issue_.
+2. Enter _[type] User Story: [name]_ as the issue title.
+3. In the box that says _Leave a comment_, type the user story.
+4. Click _Submit new issue_.
+
+![submit a user story](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/submit-user-story.png)
