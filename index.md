@@ -9,6 +9,8 @@ layout: default
 The goal of the City SDK project is to streamline the creation of open data apps for cities.  The areas of focus are:  helper functions, GeoJSON support, interoperability, visualization, and open-source.
 ![Focus Areas](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/FocusAreas.png)
 
+<br>
+<br/>
 
 ## Next Meet Up ##
 ![Meet Up](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/meetup.jpg)
