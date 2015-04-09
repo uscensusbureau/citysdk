@@ -11,6 +11,8 @@ The goal of the City SDK project is to streamline the creation of open data apps
 
 <br>
 <br/>
+<br>
+<br/>
 
 ## Next Meet Up ##
 ![Meet Up](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/meetup.jpg)
