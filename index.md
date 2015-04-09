@@ -17,7 +17,7 @@ The goal of the City SDK project is to streamline the creation of open data apps
 <br/>
 
 ## Next Meet Up ##
-![Meet Up](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/meetup.jpg)
+![Meet Up](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/static/img/meetup.png)
 
 We're excited to host the first [Civic Leaders Meet Up at 18F](http://www.meetup.com/citysdk/events/221401120/) on Wednesday April 15th!  Web conference info will be provided to accommodate remote attendees.
 
