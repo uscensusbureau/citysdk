@@ -9,11 +9,14 @@
     <script src="../libraries/vendor/jqvmap/jquery.vmap.js" type="text/javascript"></script>
     <script src="../libraries/vendor/jqvmap/maps/jquery.vmap.usa.js" type="text/javascript"></script>
     <script src="../../js/citysdk.js" type="text/javascript"></script>
+    <script src="../../js/citysdk.census.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         var apiKey = prompt("Please enter your Census API key", "API Key");
 
-        var sdk = new CitySDK(apiKey);
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+        census.enable(apiKey);
 
         jQuery(document).ready(function() {
             jQuery('#vmap').css("width", window.innerWidth);
@@ -29,13 +32,13 @@
                                    "level": "state",
                                     "variables": ["income", "poverty", "B16006_007E", "B01003_001E"]};
 
-                    sdk.APIRequest(request, function(response) {
+                    census.APIRequest(request, function(response) {
                         var message = 'You clicked "'
                                 + region
                                 + '" which has the code: '
                                 + code.toUpperCase()
-                                + "\n\n" + sdk.aliases.income.description + ": " + Number(response.data.income).toLocaleString('en')
-                                + "\n\n" + sdk.aliases.poverty.description + ": " + response.data.poverty
+                                + "\n\n" + census.aliases.income.description + ": " + Number(response.data.income).toLocaleString('en')
+                                + "\n\n" + census.aliases.poverty.description + ": " + response.data.poverty
                                 + "\n\n" + "Spanish only speakers: " + Number(response.data.B16006_007E).toLocaleString('en')
                                 + "\n\n" + "Population: " + Number(response.data.B01003_001E).toLocaleString('en')
                                 + "\n\n" + "Percent only spanish speaking: " + ((response.data.B16006_007E / response.data.B01003_001E) * 100).toFixed(3) + "%";

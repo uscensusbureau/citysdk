@@ -2,9 +2,6 @@
 <html>
 <head>
     <title></title>
-    <script src="../../js/vendor/jquery/jquery-2.1.3.min.js"></script>
-    <script src="../../js/citysdk.js"></script>
-
     <style>
         .container {
             padding-left: 1em;
@@ -26,6 +23,8 @@
     <h2>Contents</h2>
     <ul>
         <li><a href="./#instantiating">Instantiating the SDK</a></li>
+        <li><a href="./#censusModule">The Census Module</a>
+        <ul>
         <li><a href="./#requestingvariables">Requesting Variables</a>
             <ul>
                 <li><a href="./#variablerequeststructure">Structuring the Request</a></li>
@@ -33,6 +32,7 @@
                 <li><a href="./#statecode">By State Code</a></li>
                 <li><a href="./#sdkcallvariable">The SDK Call</a></li>
                 <li><a href="./#sdkresponsevariable">The Response</a></li>
+                <li><a href="./#sdksublevelvariable">Requesting Sublevels</a></li>
             </ul>
         </li>
         <li><a href="./#variables">Variables</a>
@@ -41,24 +41,44 @@
                 <li><a href="./#unaliasedvariables">Unaliased</a></li>
             </ul>
         </li>
+            </ul></li>
     </ul>
 
     <h2>Examples</h2>
     <ul>
         <li><a href="populationAndIncome">Population and Income by State</a>*</li>
+        <li><a href="sublevelExample">Sublevel Example</a>*</li>
+        <li><a href="sublevelExample2">Sublevel Example 2</a>*</li>
         <p>*You will need a Census API key to use these examples</p>
     </ul>
 
 
     <h2 id="instantiating">Instantiating the SDK <small class="toplink"><a href="./#top">top</a></small></h2>
     <div class="container">
-        <p>The first step to using the CitySDK is to instantiate the object. To do this, you will need a Census API key (<a href="http://api.census.gov">available here</a>).</p>
+        <p>The first step to using the CitySDK is to instantiate the object.</p>
         <p>Creating a new SDK object is easy. Look at the code below.</p>
         <pre>
-            var sdk = new CitySDK(YOUR_API_KEY_STRING);
+            var sdk = new CitySDK();
         </pre>
     </div>
 
+    <h2 id="censusmodule">The Census Module <small class="toplink"><a href="./#top">top</a></small></h2>
+    <p>Each API's functionality is compartmentalized into modules. To use an API's functionality, simply add that modules script to your head and enable it. For the Census API, you will need a Census API key (<a href="http://api.census.gov">available here</a>).</p>
+    <p>Importing the module:</p>
+    <pre>
+        &lt;head&gt;
+            &lt;script src="jquery/jquery-2.1.3.min.js" type="text/javascript"&gt;&lt;/script&gt;
+            &lt;script src="citysdk.js" type="text/javascript"&gt;&lt;/script&gt; &lt;!-- Import the core --&gt;
+            &lt;script src="citysdk.census.js" type="text/javascript"&gt;&lt;/script&gt; &lt;!-- Import a module --&gt;
+        &lt;/head&gt;
+    </pre>
+    <p>Enabling the module:</p>
+    <pre>
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+        census.enable(apiKey);
+    </pre>
+    <div class="container">
     <h2 id="requestingvariables">Requesting Variables <small class="toplink"><a href="./#top">top</a></small></h2>
     <div class="container">
         <h2 id="variablerequeststructure">Structuring the Request</h2>
@@ -116,13 +136,15 @@
              After the SDK has gathered the required variables, it will call the callback and pass it a response object.</p>
             <p>Here's an example:</p>
             <pre>
-                 var sdk = new CitySDK(YOUR_API_KEY_STRING);
+                 var sdk = new CitySDK();
+                 var census = sdk.modules.census;
+                 census.enable(CENSUS_API_KEY);
 
                  var request = {"state": "NY",
                                 "level": "state",
                                 "variables": ["income", "poverty", "B16006_007E", "B01003_001E"]};
 
-                 sdk.APIRequest(request, function(response) { console.log(response); });
+                 census.APIRequest(request, function(response) { console.log(response); });
             </pre>
             <p>Notice the requested variables "B16006_007E" and "B01003_001E"? These are <em>unaliased</em> variables. See the section on variables for more information.</p>
         </div>
@@ -149,6 +171,47 @@
             <p>This is the object that will be passed to the callback of the <em>APIRequest()</em> call. The numbers for "tract", "blockGroup", "state", and "county" are FIPS codes, which is how the U.S. Census designates geographies.</p>
             <p>Note that the "variables" property has been replaced with a "data" object, having properties for each variable.</p>
         </div>
+        <h2 id="sdksublevelvariable">Sublevel Calls</h2>
+        <div class="container">
+            <p>The SDK supports a "sublevel" tag that indicates you would like the information for all entities contained within the currently specified level. When you request sublevels, the "data" property of the response becomes an array of objects instead of simply an object.</p>
+            <p>For instance, if you want all counties in a state, you would request state level and specify "sublevel" as true. See the example code below.</p>
+            <pre>
+                 var request = {
+                                "state":"DE",
+                                "level":"state",
+                                "sublevel":"true",
+                                "variables": [
+                                    "income",
+                                    "population"
+                                ]};
+            </pre>
+            <p>This request would generate the following response:</p>
+            <pre>
+                {
+                    "level" : "state",
+                    "sublevel" : "true",
+                    "year" : 2013,
+                    "state" : "10",
+                    "county" : "001",
+                    "tract" : "040900",
+                    "blockGroup" : "1",
+                    "data" : [{
+                            "name" : "Kent County, Delaware",
+                            "income" : "27207",
+                            "population" : "165030"
+                        }, {
+                            "name" : "New Castle County, Delaware",
+                            "income" : "31855",
+                            "population" : "542784"
+                        }, {
+                            "name" : "Sussex County, Delaware",
+                            "income" : "25703",
+                            "population" : "200632"
+                        }
+                    ]
+                }
+            </pre>
+        </div>
     </div>
 
     <h2 id="variables">Variables <small class="toplink"><a href="./#top">top</a></small></h2>
@@ -171,6 +234,7 @@
             <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.
             </p><p>See <a href="./#sdkcallvariable">The SDK Call</a> for an example that uses raw variable names.</p>
         </div>
+    </div>
     </div>
 
 </body>
