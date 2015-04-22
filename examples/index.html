@@ -14,7 +14,7 @@
 </head>
 <body>
     <h1 id="top">Welcome to the CitySDK example page!</h1>
-    <p><small>Last updated: 3/30/2015</small></p>
+    <p><small>Last updated: 04/21/2015</small></p>
     <div class="container">
         <p>This page will make a variety of calls to the CitySDK, and walk you through the process of using it.</p>
         <p>Please note that the CitySDK is dependent upon jQuery.</p>
@@ -49,6 +49,7 @@
         <li><a href="populationAndIncome">Population and Income by State</a>*</li>
         <li><a href="sublevelExample">Sublevel Example</a>*</li>
         <li><a href="sublevelExample2">Sublevel Example 2</a>*</li>
+        <li><a href="bingMapsExample">Bing Maps Example</a>*</li>
         <p>*You will need a Census API key to use these examples</p>
     </ul>
 
@@ -211,6 +212,107 @@
                     ]
                 }
             </pre>
+            <h3>The Container option</h3>
+            <div class="container">
+                <p>If you enable sublevel, the default behavior is to grab your specified level's components. For example, if you specify "tracts" with sublevel, you will get a list of all block groups.</p>
+                <p>If, however, you want all entities of your specified level in another entity, you can specify the "container" property. That is, with sublevel enabled, the container property signals the sdk to get all LEVEL within CONTAINER</p>
+                <p>Here's an example request and response:</p>
+                <pre>
+                    var request = {
+                                "state":"DE",
+                                "level":"county",
+                                "sublevel":"true",
+                                "container": "state",
+                                "variables": [
+                                    "income",
+                                    "population"
+                                ]};
+                </pre>
+                <p>Which would generate the following response:</p>
+                <pre>
+                {
+                    "level" : "state",
+                    "sublevel" : "true",
+                    "year" : 2013,
+                    "state" : "10",
+                    "county" : "001",
+                    "tract" : "040900",
+                    "blockGroup" : "1",
+                    "data" : [{
+                            "name" : "Kent County, Delaware",
+                            "income" : "27207",
+                            "population" : "165030"
+                        }, {
+                            "name" : "New Castle County, Delaware",
+                            "income" : "31855",
+                            "population" : "542784"
+                        }, {
+                            "name" : "Sussex County, Delaware",
+                            "income" : "25703",
+                            "population" : "200632"
+                        }
+                    ]
+                }
+                </pre>
+                <p>Another example, to get all tracts within a state:</p>
+                <pre>
+                    var request = {
+                                "state":"RI",
+                                "level":"tract",
+                                "sublevel":"true",
+                                "container": "state",
+                                "variables": [
+                                    "income",
+                                    "population"
+                                ]};
+                </pre>
+                <p>The response would be:</p>
+                <pre>
+                    {
+                        "level" : "tract",
+                        "sublevel" : true,
+                        "container" : "state",
+                        "year" : 2013,
+                        "state" : "44",
+                        "county" : "007",
+                        "blockGroup" : "1",
+                        "data" : [{
+                                "name" : "Census Tract 301, Bristol County, Rhode Island",
+                                "state" : "44",
+                                "county" : "001",
+                                "tract" : "030100",
+                                "income" : "130820",
+                                "population" : "4975"
+                            }, {
+                                "name" : "Census Tract 302, Bristol County, Rhode Island",
+                                "state" : "44",
+                                "county" : "001",
+                                "tract" : "030200",
+                                "income" : "103000",
+                                "population" : "3141"
+                            },
+
+                            ...
+
+                            , {
+                                "name" : "Census Tract 9901, Washington County, Rhode Island",
+                                "state" : "44",
+                                "county" : "009",
+                                "tract" : "990100",
+                                "income" : null,
+                                "population" : "0"
+                            }, {
+                                "name" : "Census Tract 9902, Washington County, Rhode Island",
+                                "state" : "44",
+                                "county" : "009",
+                                "tract" : "990200",
+                                "income" : null,
+                                "population" : "0"
+                            }
+                        ]
+                    }
+                </pre>
+            </div>
         </div>
     </div>
 
@@ -222,12 +324,9 @@
             <p>Aliased variable are specified by a string and return the most appropriate variable.</p>
             <p>Available Aliases:</p>
             <ul>
-                <li>"income"</li>
-                <li>"poverty"</li>
-                <li>"age"</li>
-                <li>"population"</li>
+                <li>income</li><li>income_per_capita</li><li>poverty</li><li>poverty_married</li><li>poverty_married_with_children</li><li>poverty_single_father</li><li>poverty_single_mother</li><li>age</li><li>median_male_age</li><li>median_female_age</li><li>population</li><li>commute_time</li><li>commute_time_solo_automobile</li><li>commute_time_carpool</li><li>commute_time_public_transport</li><li>commute_time_walked</li><li>commute_time_other</li>
             </ul>
-            <p>To find out more about each alias, check out the associated object in the <em>CitySDK.aliases</em> object.</p>
+            <p>To find out more about each alias, check out the associated object in the <em>CitySDK.prototype.modules.census.aliases</em> object.</p>
         </div>
         <h3 id="unaliasedvariables">Unaliased</h3>
         <div class="contianer">

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GeoRequest Example</title>
+    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="../libraries/vendor/jquery/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="../../js/citysdk.js"></script>
+    <script type="text/javascript" src="../../js/citysdk.census.js"></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+    </script>
+    <script>
+        var map;
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+        census.GEOJSON_FILE_ROOT = "../../geojson/";
+
+        var variables = [];
+        var level = "place";
+
+        function initialize() {
+            var mapOptions = {
+                center: { lat: 38.91732, lng: -77.2211},
+                zoom: 10
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'),
+                    mapOptions);
+
+            map.data.setStyle({
+                fillColor: 'blue'
+            });
+
+            // global infowindow
+            var infowindow = new google.maps.InfoWindow();
+
+            // When the user clicks, open an infowindow
+            map.data.addListener('click', function(event) {
+                var myHTML = "<h3>" +
+                ((level == "blockGroup") ? "Block Group: " : (level == "tract") ? "Tract: " : "")
+                + event.feature.getProperty("NAME") + "</h3><div style='width:150px; text-align: center;'>";
+                for(var i = 0; i < variables.length; i++) {
+                    myHTML += "<br/><b>" + variables[i] + "</b>: " + event.feature.getProperty(variables[i]);
+                }
+
+                switch(level) {
+                    case "blockGroup":
+                        myHTML += "<br/><b>Tract: </b>" + event.feature.getProperty("TRACTCE");
+                    case "tract":
+                        myHTML+= "<br/><b>County: </b>" + event.feature.getProperty("COUNTYFP");
+                }
+
+                myHTML += "</div>";
+
+                infowindow.setContent(myHTML);
+                infowindow.setPosition(event.latLng);
+                infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+                infowindow.open(map);
+            });
+
+            var censusKey =  prompt("Please enter your Census API key", "API Key");
+            census.enable(censusKey);
+
+            $('#clear').click(clear);
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+
+
+        function checkLoading() {
+            if(census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT == 0) {
+                $('#loading').empty();
+                $('#loading').css('display','none');
+                return;
+            } else if (census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT > 0){
+                window.setTimeout(checkLoading, 1500);
+            }
+        }
+
+        function toggleVar(variable) {
+            var position = window.jQuery.inArray(variable, variables);
+            if(position >= 0) {
+                variables.splice(position, 1);
+                $('#' + variable + "Button").addClass("off");
+            } else {
+                variables.push(variable);
+                $("#" + variable + "Button").removeClass("off");
+            }
+        }
+
+        function setLevel(newlevel) {
+            if(newlevel == level) {
+                return;
+            }
+
+            var levels = ["blockGroup", "tract", "place"];
+            levels.forEach(function(x) {
+                if(newlevel != x) {
+                    $("#" + x).addClass("off");
+                }
+            });
+            $("#" + newlevel).removeClass("off");
+
+            level = newlevel;
+        }
+
+        function clear() {
+            map.data.forEach(function(feature) {
+                map.data.remove(feature);
+            });
+        }
+
+        function loadCity(city) {
+            var reqLevel = level;
+            if(city == "Montgomery_County_MD" && level == "place") {
+                reqLevel = "county";
+            }
+
+            map.panTo(new google.maps.LatLng(census.geoCities[city][0], census.geoCities[city][1]));
+
+            $('#loading').append('<img src="loading.gif"/><br/>Loading features...');
+            $('#loading').css('display', 'block');
+
+            //BEGIN CITYSDK REQUEST
+            var request = {
+                "lat": census.geoCities[city][0],
+                "lng": census.geoCities[city][1],
+                "level": reqLevel,
+                "variables": variables
+            }
+
+            census.GEORequest(request, function(geojson) {
+                checkLoading();
+                map.data.addGeoJson(geojson);
+            });
+            //END CITYSDK REQUEST
+        }
+    </script>
+</head>
+<body>
+<div id="map-canvas"></div>
+<div id="control-panel">
+    <div class="button" onclick="loadCity('Washington_DC')">
+        Washington, D.C.
+    </div>
+    <div class="button" onclick="loadCity('Seattle_WA')">
+        Seattle, WA
+    </div>
+    <div class="button" onclick="loadCity('San_Francisco_CA')">
+        San Francisco, CA
+    </div>
+    <div class="button" onclick="loadCity('Portland_OR')">
+        Portland, OR
+    </div>
+    <div class="button" onclick="loadCity('NYC_NY')">
+        New York City, NY
+    </div>
+    <div class="button" onclick="loadCity('Montgomery_County_MD')">
+        Montgomery County, MD
+    </div>
+    <div class="button" onclick="loadCity('Fargo_ND')">
+        Fargo, ND
+    </div>
+    <div class="button" onclick="loadCity('Chicago_IL')">
+        Chicago, IL
+    </div>
+    <div class="button" onclick="loadCity('Boston_MA')">
+        Boston, MA
+    </div>
+    <div class="button" onclick="loadCity('Austin_TX')">
+        Austin, TX
+    </div>
+    <div class="button" onclick="loadCity('Asheville_NC')">
+        Asheville, NC
+    </div>
+</div>
+<div id="time-panel">
+    <div>
+        <div class="button off" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
+        <div class="button off" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
+        <div class="button off" id="populationButton" onclick="toggleVar('population')">Population</div>
+        <div class="button off" id="commute_timeButton" onclick="toggleVar('commute_time')">Total Commute Time</div>
+        <div class="button off" id="median_male_ageButton" onclick="toggleVar('median_male_age')">Median Male Age</div>
+        <div class="button off" id="median_female_ageButton" onclick="toggleVar('median_female_age')">Median Female Age</div>
+    </div>
+</div>
+<div id="time-panel-2">
+    <div>
+        <div class="button off" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
+        <div class="button off" id="tract" onclick="setLevel('tract')">Tracts</div>
+        <div class="button" id="place" onclick="setLevel('place')">Place</div>
+        <div class="button" id="clear" style="margin-right: 0.75em;">
+            Clear
+        </div>
+    </div>
+</div>
+<div id="loading">
+</div>
+</body>
+</html>

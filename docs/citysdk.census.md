@@ -1,4 +1,4 @@
-# Census Module
+# Global
 
 
 
@@ -31,7 +31,7 @@ Converts co-ordinates to Census FIPS via the Geocoder API
 
 
 
-### acs5SummaryRequest(request, callback) 
+### acsSummaryRequest(request, callback) 
 
 Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
 
@@ -57,7 +57,7 @@ Processes a data request by looking at a JSON requestJSON Requests should incl
 
 ### GEORequest(request, callback) 
 
-Get a city's geography by name, as well as requested variablesExample request:{     "name": "New York City",     "level": "tract",     "variables": [         "income",         "population"     ]}The response will be geoJSON of the requested city, with variable results attached as properties.
+Get a city's geography by name, as well as requested variables. Currently supported locations:Asheville, NCAustin, TXBoston, MAChicago, ILFargo, NDMontgomery County, MD (Using the co-ordinates for Gaithersburg, MD)NYC, NYPortland, ORSan Francisco, CASeattle, WAWashington, DCExample request:{     "level": "place",     "lat": 30.2500,     "lng": -97.7500,     "variables": [         "income",         "population"     ]}level - The level data should be request for from the ACS5 (if any variables specified)geolevel - The level geographies should be split. Options are: blockGroup, place, tract. *For Montgomery County, MD, there is no "place" tag but instead "county"lat/lng - Coordinatesvariables - Optional variables to acquire from the ACS5 based uponThe response will be geoJSON of the requested city, with variable results attached as properties.
 
 **Parameters**
 
