@@ -14,7 +14,7 @@ Through our City SDK, we are aiming to provide a user-friendly “toolbox” for
 
 ## Features
 
-- A translation which leverages GEO’s latitude / longitude to FIPS-code conversion service
+- A latitude / longitude to FIPS-code translation service
 - The ability to request GeoJSON (locations currently limited to partner events for the [National Day of Civic Hacking](http://hackforchange.org/)) - an open source geographic shapefile / boundary format - right along with a location's data
 - A modular architecture which makes mashing Census data up with third-party data a snap
 - Pull nested Census geographies using your own / custom boundaries (C/O: [Terraformer.io](http://terraformer.io/))
