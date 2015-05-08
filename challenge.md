@@ -4,7 +4,3 @@ The U.S. Census Bureau is participating in this year’s National Day of Civic H
 
 ###Add Your Project to the ChallengePost #censusSDK gallery
 <a href="http://challengepost.com/software/built-with/censussdk">
-
-
-
-
