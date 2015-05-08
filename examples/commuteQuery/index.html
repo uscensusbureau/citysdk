@@ -55,8 +55,7 @@
                     break;
             }
 
-            var variables = ["population",
-                             "commute_time",
+            var variables = ["commute_time",
                              "commute_time_solo_automobile",
                              "commute_time_carpool",
                              "commute_time_public_transport",
@@ -76,7 +75,6 @@
 
             var entry = "";
             var currentObject;
-
             census.APIRequest(request, function(response) {
                 response.data.sort(SortByAveragedProperty);
                 var output = $("#output");
@@ -88,7 +86,7 @@
                     var val;
 
                     if($("#normalize").is(':checked')) {
-                        val = (currentObject[$("#property option:selected").val()]/currentObject.population).toFixed(2);
+                        val = (currentObject[$("#property option:selected").val() + "_normalized"]);
                     } else {
                         val = (currentObject[$("#property option:selected").val()]);
                     }
@@ -133,7 +131,7 @@ Level:
             <th>Lat (N)</th>
             <th>Lng (E)</th>
         </tr>
-        <tr onclick="loadCoords(38.9047,-77,0164)">
+        <tr onclick="loadCoords(38.9047,-77.0164)">
             <td>Washington DC</td>
             <td>38.9047</td>
             <td>-77.0164</td>

@@ -30,6 +30,18 @@ Makes an AJAX call (using jsonp)
 
 **Returns**: `object`, Returns a standard ajax promise
 
+### CitySDK.postRequest(url, data) 
+
+Make an AJAX call (using POST)
+
+**Parameters**
+
+**url**: , Make an AJAX call (using POST)
+
+**data**: , Make an AJAX call (using POST)
+
+**Returns**: `*`
+
 
 
 * * *

@@ -17,7 +17,58 @@ Checks to see if a string is in the aliases dictionary and returns the appropria
 **Returns**: `string`, Variable string
 
 
-### latLngToFIPS(lat, lng, callback) 
+### isNormalizable(alias) 
+
+Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
+
+**Parameters**
+
+**alias**: , Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
+
+**Returns**: `boolean`
+
+
+### parseRequestStateCode(request) 
+
+Parses the state code in a request object, converting two letter state codes to lat/lng
+
+**Parameters**
+
+**request**: , Object representing an api request
+
+
+
+### parseRequestLatLng(request) 
+
+Checks the request object for lat/lng latitude/longitude and x/y fields and moves them to the appropriate locationsfor processing by the module
+
+**Parameters**
+
+**request**: , Object representing an api request
+
+
+
+## Class: ESRItoGEO
+Converts ESRI JSON to GeoJSON
+
+
+## Class: GEOtoESRI
+Converts geoJSON to ESRI Json
+
+### GEOtoESRI.getACSVariableDictionary(api, year, callback) 
+
+Downloads an ACS API's entire dictionary of variables from the Census
+
+**Parameters**
+
+**api**: , Downloads an ACS API's entire dictionary of variables from the Census
+
+**year**: , Downloads an ACS API's entire dictionary of variables from the Census
+
+**callback**: , Downloads an ACS API's entire dictionary of variables from the Census
+
+
+### GEOtoESRI.latLngToFIPS(lat, lng, callback) 
 
 Converts co-ordinates to Census FIPS via the Geocoder API
 
@@ -30,8 +81,7 @@ Converts co-ordinates to Census FIPS via the Geocoder API
 **callback**: `function`, Callback function
 
 
-
-### acsSummaryRequest(request, callback) 
+### GEOtoESRI.acsSummaryRequest(request, callback) 
 
 Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
 
@@ -42,8 +92,18 @@ Makes a request to the ACS5 Summary API. Should be used via APIRequest and not o
 **callback**: `function`, Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
 
 
+### GEOtoESRI.tigerwebRequest(request, callback) 
 
-### APIRequest(request, callback) 
+Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4326
+
+**Parameters**
+
+**request**: , Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4326
+
+**callback**: , Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4326
+
+
+### GEOtoESRI.APIRequest(request, callback) 
 
 Processes a data request by looking at a JSON requestJSON Requests should include:"year" - Year of the request. See acs5years object for available years. Defaults to 2013 if not specified."lat" - Latitude of the requested location (either specified as x, lat, or latitude) NORTH"lng" - Longitude of the requested location (either specified as y, lng, or longitude) EAST"sublevel" - Defaults to "false". If set to "true", it will return the group of sublevels from the specified level."level" - Level of the request. Options are: blockGroup, tract, county, state, us. Will default to blockGroup."variables" - Array of variables either by alias or specific nameexampleRequest = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup"      "variables": [          "income"      ]  };  exampleResponse = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup",      "state": "11",      "county": "001",      "tract": "004701",      "blockGroup": "2",      "data": {          "income": 33210      }  };  A response where you set sublevel to "true" will have an array in the data field instead of an object.  Another example request:  {     "state": "NY",     "level": "state",     "variables": [         "income",         "population"     ]
 
@@ -54,10 +114,9 @@ Processes a data request by looking at a JSON requestJSON Requests should incl
 **callback**: `function`, A callback, which accepts a response parameter
 
 
+### GEOtoESRI.GEORequest(request, callback) 
 
-### GEORequest(request, callback) 
-
-Get a city's geography by name, as well as requested variables. Currently supported locations:Asheville, NCAustin, TXBoston, MAChicago, ILFargo, NDMontgomery County, MD (Using the co-ordinates for Gaithersburg, MD)NYC, NYPortland, ORSan Francisco, CASeattle, WAWashington, DCExample request:{     "level": "place",     "lat": 30.2500,     "lng": -97.7500,     "variables": [         "income",         "population"     ]}level - The level data should be request for from the ACS5 (if any variables specified)geolevel - The level geographies should be split. Options are: blockGroup, place, tract. *For Montgomery County, MD, there is no "place" tag but instead "county"lat/lng - Coordinatesvariables - Optional variables to acquire from the ACS5 based uponThe response will be geoJSON of the requested city, with variable results attached as properties.
+Example request.{     "lat": latitude,     "lng": longitude,     "sublevel": <optional> true/false,     "container": <optional> place/county/state/tract     "level": place/county/state/blockGroup/tract     "variables": []     "containerGeometry": <optional> Must have sublevel true and container flags, this value should be ESRI json and                         marks the boundaries of the query region. You can convery geojson to ESRI via                         CensusModule.prototype.GEOtoESRI}
 
 **Parameters**
 

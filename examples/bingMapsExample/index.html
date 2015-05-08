@@ -43,12 +43,13 @@
 
             var request = {
                 "state": "DC",
-                "fips": 1150000,
                 "level": "tract",
                 "variables": [
                     "income",
                     "population"
-                ]
+                ],
+                sublevel: true,
+                container: "county"
             };
 
             census.GEORequest(request, loadGeoJSON);

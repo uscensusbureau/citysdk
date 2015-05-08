@@ -46,3 +46,18 @@ CitySDK.prototype.jsonpRequest = function(url) {
         url: url
     });
 };
+
+/**
+ * Make an AJAX call (using POST)
+ * @param url
+ * @param data
+ * @returns {*}
+ */
+CitySDK.prototype.postRequest = function(url, data) {
+    return $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+        dataType: "text"
+    });
+};

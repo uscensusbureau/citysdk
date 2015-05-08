@@ -14,7 +14,7 @@
 </head>
 <body>
     <h1 id="top">Welcome to the CitySDK example page!</h1>
-    <p><small>Last updated: 04/21/2015</small></p>
+    <p><small>Last updated: 05/07/2015</small></p>
     <div class="container">
         <p>This page will make a variety of calls to the CitySDK, and walk you through the process of using it.</p>
         <p>Please note that the CitySDK is dependent upon jQuery.</p>
@@ -35,6 +35,12 @@
                 <li><a href="./#sdksublevelvariable">Requesting Sublevels</a></li>
             </ul>
         </li>
+        <li><a href="./#requestinggeography">Requesting Geography</a>
+            <ul>
+                <li><a href="./#geographyrequeststructure">Structure of the Request</a></li>
+                <li><a href="./#geographysdkcall">The SDK Call</a></li>
+            </ul>
+        </li>
         <li><a href="./#variables">Variables</a>
             <ul>
                 <li><a href="./#aliasedvariables">Aliased</a></li>
@@ -46,10 +52,17 @@
 
     <h2>Examples</h2>
     <ul>
+        <p>Census Module</p>
         <li><a href="populationAndIncome">Population and Income by State</a>*</li>
         <li><a href="sublevelExample">Sublevel Example</a>*</li>
         <li><a href="sublevelExample2">Sublevel Example 2</a>*</li>
         <li><a href="bingMapsExample">Bing Maps Example</a>*</li>
+        <li><a href="commuteQuery">Commute Query</a>*</li>
+        <li><a href="geoRequest">GeoRequest</a>*</li>
+        <li><a href="bingMapsExample">Bing Maps Example</a></li>
+        <p>Farmer's Market Module</p>
+        <li><a href="farmersMarket">Farmers Market Locator</a></li>
+        <br/><br/>
         <p>*You will need a Census API key to use these examples</p>
     </ul>
 
@@ -104,7 +117,7 @@
                     We could have also specified this using "y" or "latitude" properties. </li>
                 <li>The "lng" property specifies the longitude of the location (East).  We could also specify this using an "x" or "longitude"  property.</li>
                 <li>The "level" property specifies the level of data we should return, based on Census Bureau geographies.
-                    Available geographies are: "us", "state", "county", "tract", "blockGroup".</li>
+                    Available geographies are: "us", "place", "state", "county", "tract", "blockGroup".</li>
                 <li>Then, we have the "variables" property which contains an array of variables we are requesting.
                     Note here that "income" is an <em>aliased</em> variable. We'll talk about that a little more down the page.</li>
             </ul>
@@ -316,12 +329,110 @@
         </div>
     </div>
 
+    <h2 id="requestinggeography">Requesting Geography <small class="toplink"><a href="./#top">top</a></small></h2>
+    <div class="container">
+        <h3 id="geographyrequeststructure">Structure of the Request</h3>
+        <p>The Census module supports requesting geographies from the Census's TigerWeb service. The structure of the request is exactly the same as requesting a variable, but will instead
+         return GeoJSON of the requested feature. If you specify variables, it will also acquire the data for those variables and attach it to the GeoJSON feature's properties property.</p>
+        <p>Example request:</p>
+        <pre>
+                {
+                    "level" : "state",
+                    "state" : "AL",
+                }
+        </pre>
+        <p>Would return the GeoJSON for the boundaries of the State of Alabama. Let's instead get all counties in Alabama, along with each tract's population. This request would look like:</p>
+        <pre>
+                {
+                    "level" : "county",
+                    "sublevel": true,
+                    "container": "state",
+                    "state" : "AL",
+
+                    "variables": [
+                        "population"
+                    ]
+                }
+        </pre>
+        <p>This would return GeoJSON with features that look like this (notice the "population" information is attached to the properties"):</p>
+        <pre>
+            {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[-87.16407000027621, 32.487321999906996], ..., [-87.16407000027621, 32.487321999906996]]],
+                    "bbox" : [-87.47307999982678, 32.04720200006074, -86.80686700000517, 32.72953199986972]
+                },
+                "properties" : {
+                    "MTFCC" : "G4020",
+                    "OID" : 27590110063905,
+                    "GEOID" : "01047",
+                    "STATE" : "01",
+                    "COUNTY" : "047",
+                    "COUNTYNS" : "00161549",
+                    "BASENAME" : "Dallas",
+                    "NAME" : "Dallas County",
+                    "LSADC" : "06",
+                    "FUNCSTAT" : "A",
+                    "COUNTYCC" : "H1",
+                    "AREALAND" : 2534807336,
+                    "AREAWATER" : 39134779,
+                    "OBJECTID" : 3165,
+                    "CENTLAT" : "+32.3258494",
+                    "CENTLON" : "-087.1065227",
+                    "INTPTLAT" : "+32.3335397",
+                    "INTPTLON" : "-087.1143556",
+                    "name" : "Dallas County, Alabama",
+                    "state" : "01",
+                    "county" : "047",
+                    "population" : "43091"
+                },
+                "id" : 3165,
+                "bbox" : [-87.47307999982678, 32.04720200006074, -86.80686700000517, 32.72953199986972]
+            }
+        </pre>
+        <p>You can also request place (aka City) boundaries, or use cities as the "container":</p>
+        <pre>
+
+            //Get the boundaries for Albuquerque
+            {
+                    "lat": 35.1107,
+                    "lng": -106.6100,
+                    "level" : "place",
+            }
+
+            //Get all the tracts in Albuquerque
+            {
+                    "lat": 35.1107,
+                    "lng": -106.6100,
+                    "level" : "tract",
+                    "container": "place",
+                    "sublevel": true
+            }
+        </pre>
+        <h3 id="geographysdkcall">The SDK Call</h3>
+        <p>Once you have your request object, you can send the call using the <i>GEORequest()</i> function, like so:</p>
+        <pre>
+            var request = {
+                    "lat": 35.1107,
+                    "lng": -106.6100,
+                    "level" : "place",
+            };
+
+            sdk.modules.census.GEORequest(request, function(response) {
+                //do something with the response here
+            });
+        </pre>
+        <h4>A Note about "place" as a Container</h4>
+        <p>City boundaries rarely align exactly with Census geographies, thus, when a "place" is your container it will return any geography that touches those boundaries (rather than those that lie entirely within). You will have "extra" geography.</p>
+    </div>
+
     <h2 id="variables">Variables <small class="toplink"><a href="./#top">top</a></small></h2>
     <div class="container">
         <p>When requesting a variable, you may specify either an unaliased variable or an aliased variable (if available). Currently, all variables reference the Census ACS5 API.</p>
         <h3 id="aliasedvariables">Aliased</h3>
         <div class="container">
-            <p>Aliased variable are specified by a string and return the most appropriate variable.</p>
+            <p>Aliased variable are specified by a string and return the most appropriate variable. Some variables are marked as "normalizable" which will generate a *VARIABLE_NAME*_normalized variable in the return along with the regular variable.</variable_name></p>
             <p>Available Aliases:</p>
             <ul>
                 <li>income</li><li>income_per_capita</li><li>poverty</li><li>poverty_married</li><li>poverty_married_with_children</li><li>poverty_single_father</li><li>poverty_single_mother</li><li>age</li><li>median_male_age</li><li>median_female_age</li><li>population</li><li>commute_time</li><li>commute_time_solo_automobile</li><li>commute_time_carpool</li><li>commute_time_public_transport</li><li>commute_time_walked</li><li>commute_time_other</li>

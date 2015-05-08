@@ -13,7 +13,20 @@
         var map;
         var sdk = new CitySDK();
         var census = sdk.modules.census;
-        census.GEOJSON_FILE_ROOT = "../../geojson/";
+
+        var geoCities = {
+            "Asheville_NC": [35.5800, -82.5558],
+            "Austin_TX": [30.2500, -97.7500],
+            "Boston_MA": [42.3601, -71.0589],
+            "Chicago_IL": [41.8369, -87.6847],
+            "Fargo_ND": [46.8772, -96.7894],
+            "Montgomery_County_MD": [39.1319, -77.2264],
+            "NYC_NY": [40.7127, -74.0059],
+            "Portland_OR": [45.5200, -122.6819],
+            "San_Francisco_CA": [37.7833, -122.4167],
+            "Seattle_WA": [47.6097, -122.3331],
+            "Washington_DC": [38.9047, -77.0164]
+        };
 
         var variables = [];
         var level = "place";
@@ -44,9 +57,9 @@
 
                 switch(level) {
                     case "blockGroup":
-                        myHTML += "<br/><b>Tract: </b>" + event.feature.getProperty("TRACTCE");
+                        myHTML += "<br/><b>Tract: </b>" + event.feature.getProperty("TRACT");
                     case "tract":
-                        myHTML+= "<br/><b>County: </b>" + event.feature.getProperty("COUNTYFP");
+                        myHTML+= "<br/><b>County: </b>" + event.feature.getProperty("COUNTY");
                 }
 
                 myHTML += "</div>";
@@ -115,19 +128,23 @@
                 reqLevel = "county";
             }
 
-            map.panTo(new google.maps.LatLng(census.geoCities[city][0], census.geoCities[city][1]));
+            map.panTo(new google.maps.LatLng(geoCities[city][0], geoCities[city][1]));
 
             $('#loading').append('<img src="loading.gif"/><br/>Loading features...');
             $('#loading').css('display', 'block');
 
             //BEGIN CITYSDK REQUEST
             var request = {
-                "lat": census.geoCities[city][0],
-                "lng": census.geoCities[city][1],
+                "lat": geoCities[city][0],
+                "lng": geoCities[city][1],
                 "level": reqLevel,
                 "variables": variables
-            }
+            };
 
+            if(reqLevel == "tract" || reqLevel == "blockGroup") {
+                request.sublevel = true;
+                request.container = (city == "Montgomery_County_MD") ? "county" : "place";
+            }
             census.GEORequest(request, function(geojson) {
                 checkLoading();
                 map.data.addGeoJson(geojson);
