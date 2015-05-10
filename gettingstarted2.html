@@ -75,16 +75,17 @@ layout: default
 <div class="jumbotron">
     <div class="container">
         <h1>Getting Started</h1>
-        <p>The goal of the City SDK project is to streamline the creation of open data apps for cities. </p>
-        <p>You'll need a Census API key to fully enjoy our samples.</p>
-        <p>You can get one <a href="http://www.census.gov/developers/" target="_blank">here</a>, and when you have one, enter it <a href="#" onclick="getApiKey()">here!</a></p>
     </div>
 </div>
 
 <div class="container">
     <!-- Example row of columns -->
 
-            <h2>Modularity</h2>
+            <h2>Obtain Census Developer Key</h2>
+            <p>You'll need a Census API key to fully enjoy our samples.</p>
+            <p>You can get one <a href="http://www.census.gov/developers/" target="_blank">here</a>, and when you have one, enter it <a href="#" onclick="getApiKey()">here!</a></p>
+
+            
             <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
             <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
 
@@ -98,7 +99,7 @@ layout: default
             <p>Let's show you what the Census module can already do. If you entered your Census API key above, the examples below should be ready to go.</p>
             <p>Our google map to the right looks kind of plain. Let's draw some things on it.</p>
             <p>The code below will load the boundaries of Maryland onto the map:</p>
-            <textarea id="example1" rows="4" cols="50" style="width:100%; height:230px;">
+            <textarea id="example1" rows="4" cols="50" style="width:50%; height:230px;">
                 var request = {
                     "state": "MD",
                     "level": "state"
@@ -110,7 +111,7 @@ layout: default
 
                 census.GEORequest(request, callback);
             </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example1')" role="button">Run This &raquo;</a></p>
+            <p><a class="btn btn-primary btn-lg" style="width: 50%;" href="javascript:void(0)" onclick="runExample('example1')" role="button">Run This &raquo;</a></p>
             <p>Looks good! But let's break the state down into counties. Edit the code above, and add the line <pre>"sublevel": true,</pre> just before the line that says <pre>"state": "MD",</pre>. This should make the request object look like:</p>
             <pre>
                 var request = {
@@ -122,7 +123,7 @@ layout: default
             <p>Once it looks like that, run the example again!</p>
 
 
-            <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 6.5rem;"></div>
+            <div id="map-canvas" style="width: 50%; height: 500px; position: relative; top: 6.5rem;"></div>
             <p style="margin-top: 7rem;">Now that you have a hang on this basic request, keep tinkering with the example. Try changing the state, level (try out "place" for incorporated cities!), or specifying a container! You can even specify latitude and longitude. Here's another example that will load all the Census tracts in Myrtle Beach, S.C.*</p>
             <pre>
                 var request = {
@@ -144,7 +145,7 @@ layout: default
 
 
             <h3>&nbsp;</h3>
-            <textarea id="example2" rows="4" cols="50" style="width:100%; height:230px;">
+            <textarea id="example2" rows="4" cols="50" style="width:50%; height:230px;">
                 var request = {
                     "lat": 40.7127,
                     "lng": -74.0059,
@@ -163,21 +164,21 @@ layout: default
 
                 census.APIRequest(request, callback);
             </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example2')" role="button">Run This &raquo;</a></p>
+            <p><a class="btn btn-primary btn-lg" style="width: 50%;" href="javascript:void(0)" onclick="runExample('example2')" role="button">Run This &raquo;</a></p>
 
 
             <h3>&nbsp;</h3>
-            <pre id="example2output" style="width:100%; height: 230px; overflow: auto;"></pre>
+            <pre id="example2output" style="width:50%; height: 230px; overflow: auto;"></pre>
 
 
 
             <h3>&nbsp;</h3>
-            <pre id="example3output" style="width:100%; height: 280px; overflow: auto; margin-top: 60px;"></pre>
+            <pre id="example3output" style="width:50%; height: 280px; overflow: auto; margin-top: 60px;"></pre>
  
- 
+
             <h3>Unifying multiple APIs</h3>
             <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
-            <textarea id="example3" rows="4" cols="50" style="width:100%; height:230px;">
+            <textarea id="example3" rows="4" cols="50" style="width:50%; height:230px;">
                 var request = {
                     "zip": 10012
                 };
@@ -189,7 +190,7 @@ layout: default
 
                 farmersMarket.search(request, callback);
             </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">&laquo; Run This</a></p>
+            <p><a class="btn btn-primary btn-lg" style="width: 50%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">&laquo; Run This</a></p>
  
 
     <div class="jumbotron">
