@@ -3,7 +3,7 @@ layout: default
 title: Contribute
 nav: contribute
 ---
-### Open source contributing
+## Open Source ##
 
 The project is in the public domain, and we encourage you to [contribute to it on GitHub](https://github.com/uscensusbureau/citysdk) by improving on it or making your own apps and tools.
 
