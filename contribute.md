@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Challenge
+title: Contribute
 nav: contribute
 ---
 
@@ -40,4 +40,3 @@ nav: contribute
 
 </div>
 </body>
-</html>
