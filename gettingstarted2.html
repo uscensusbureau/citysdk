@@ -74,29 +74,26 @@ layout: default
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
     <div class="container">
-        <h1>CitySDK Showcase</h1>
-        <p>The goal of the City SDK project is to streamline the creation of open data apps for cities. The areas of focus are: helper functions, GeoJSON support, interoperability, visualization, and open-source.</p>
-        <p><a class="btn btn-primary btn-lg" href="http://uscensusbureau.github.io/citysdk/index.html" role="button">Learn more about CitySDK &raquo;</a></p>
-        <p>This page is a showcase of current features. You'll need a Census API key to fully enjoy our samples.</p>
+        <h1>Getting Started</h1>
+        <p>The goal of the City SDK project is to streamline the creation of open data apps for cities. </p>
+        <p>You'll need a Census API key to fully enjoy our samples.</p>
         <p>You can get one <a href="http://www.census.gov/developers/" target="_blank">here</a>, and when you have one, enter it <a href="#" onclick="getApiKey()">here!</a></p>
     </div>
 </div>
 
 <div class="container">
     <!-- Example row of columns -->
-    <div class="row">
-        <div class="col-md-6">
+
             <h2>Modularity</h2>
             <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
             <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
-        </div>
-        <div class="col-md-6">
+
+
             <h2>Community</h2>
             <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an open-source project hosted on GitHub, open and ready for community participation.</p>
             <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.</p>
-    </div>
-    <div class="row top-buffer">
-        <div class="col-md-6">
+
+
             <h1>The Census Module</h1>
             <p>Let's show you what the Census module can already do. If you entered your Census API key above, the examples below should be ready to go.</p>
             <p>Our google map to the right looks kind of plain. Let's draw some things on it.</p>
@@ -123,8 +120,8 @@ layout: default
                 };
             </pre>
             <p>Once it looks like that, run the example again!</p>
-        </div>
-        <div class="col-md-6">
+
+
             <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 6.5rem;"></div>
             <p style="margin-top: 7rem;">Now that you have a hang on this basic request, keep tinkering with the example. Try changing the state, level (try out "place" for incorporated cities!), or specifying a container! You can even specify latitude and longitude. Here's another example that will load all the Census tracts in Myrtle Beach, S.C.*</p>
             <pre>
@@ -137,18 +134,15 @@ layout: default
                 };
             </pre>
             <p>*City boundaries rarely align perfectly with Census geography boundaries, so when you get all "x" within a City, it will sometimes extend outside of the boundaries of the city proper.</p>
-        </div>
-    </div>
 
-    <div class="row top-buffer">
-        <div class="col-md-4">
+
             <h3>Let's try getting some data</h3>
             <p>You can request data from the Census's API by specifying variables in your request. You can find more details about variable names and codes on our github examples.</p>
             <p>Try it out with the code on the right!</p>
             <p>Try tinkering with the example to add sublevels, or query by a city, to see what happens.</p>
             <p>You can use the same "variables" format tags when requesting geography data. Doing this will request the data for each geographical feature, and attach the data to the "properties" tag of that feature.</p>
-        </div>
-        <div class="col-md-4">
+
+
             <h3>&nbsp;</h3>
             <textarea id="example2" rows="4" cols="50" style="width:100%; height:230px;">
                 var request = {
@@ -170,19 +164,17 @@ layout: default
                 census.APIRequest(request, callback);
             </textarea>
             <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example2')" role="button">Run This &raquo;</a></p>
-        </div>
-        <div class="col-md-4">
+
+
             <h3>&nbsp;</h3>
             <pre id="example2output" style="width:100%; height: 230px; overflow: auto;"></pre>
-        </div>
-    </div>
 
-    <div class="row top-buffer">
-        <div class="col-md-4">
+
+
             <h3>&nbsp;</h3>
             <pre id="example3output" style="width:100%; height: 280px; overflow: auto; margin-top: 60px;"></pre>
-        </div>
-        <div class="col-md-8">
+ 
+ 
             <h3>Unifying multiple APIs</h3>
             <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
             <textarea id="example3" rows="4" cols="50" style="width:100%; height:230px;">
@@ -198,8 +190,7 @@ layout: default
                 farmersMarket.search(request, callback);
             </textarea>
             <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">&laquo; Run This</a></p>
-        </div>
-    </div>
+ 
 
     <div class="jumbotron">
         <div class="container">
