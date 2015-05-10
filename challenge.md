@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Challenge
-nav: basics
+nav: challenge
 ---
 
 ##City SDK National Challenge

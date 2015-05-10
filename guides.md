@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Guides
-nav: basics
+nav: guides
 ---
 
 ### Guides
