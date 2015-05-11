@@ -19,4 +19,5 @@ Through our City SDK, we are aiming to provide a user-friendly “toolbox” for
 - The ability to request GeoJSON - an open source geographic shapefile / boundary format - for any state, county, tract, blockgroup or incorporated place right along with that location's data
 - A modular architecture which makes mashing Census data up with third-party data a snap
 - Pull nested Census geographies using your own / custom boundaries (C/O: [Terraformer.io](http://terraformer.io/))
+- Interactive documentation and ability to help discover ACS variables easier (alias glossary) 
 - More [coming soon](https://waffle.io/uscensusbureau/citysdk)! (you may also add to our issues using the #user stories label to make feature requests)
