@@ -14,8 +14,9 @@ Through our City SDK, we are aiming to provide a user-friendly “toolbox” for
 
 ## Features
 
-- A latitude / longitude to FIPS-code translation service
-- The ability to request GeoJSON (locations currently limited to partner events for the [National Day of Civic Hacking](http://hackforchange.org/)) - an open source geographic shapefile / boundary format - right along with a location's data
+- Abstraction of Census geographies - grab data by latitude and longitude through our FIPS-code translation service
+- The ability to request Census ACS data via variable code or our alias dictionary for common requests
+- The ability to request GeoJSON - an open source geographic shapefile / boundary format - for any state, county, tract, blockgroup or incorporated place right along with that location's data
 - A modular architecture which makes mashing Census data up with third-party data a snap
 - Pull nested Census geographies using your own / custom boundaries (C/O: [Terraformer.io](http://terraformer.io/))
 - More [coming soon](https://waffle.io/uscensusbureau/citysdk)! (you may also add to our issues using the #user stories label to make feature requests)
