@@ -14,7 +14,10 @@ published: true
 
     <title>Getting Started</title>
 
-    <script src="https://rawgit.com/uscensusbureau/citysdk/master/examples/libraries/vendor/jquery/jquery-2.1.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
     </script>
@@ -64,6 +67,12 @@ published: true
             }
         );
     </script>
+
+    <style>
+        .top-buffer {
+            margin-top: 3rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -76,122 +85,139 @@ published: true
 </div>
 
 <div class="container">
-    <!-- Example row of columns -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Modularity</h2>
+                    <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
+                    <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
+                </div>
 
-            <h2>Obtain Census Developer Key</h2>
-            <p>You'll need a Census API key to fully enjoy our samples.</p>
-            <p>You can get one <a href="http://www.census.gov/developers/" target="_blank">here</a>, and when you have one, click the button below and enter it.</p>
-            <p><a class="btn btn-primary btn-lg" style="width: 50%" href="#" onclick="getApiKey()" role="button">Run This &raquo;</a></p>
+                <div class="col-md-6">
+                    <h2>Community</h2>
+                    <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an open-source project hosted on GitHub, open and ready for community participation.</p>
+                    <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.</p>
+                </div>
+            </div>
 
-            
-            <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
-            <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
-
-
-            <h2>Community</h2>
-            <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an open-source project hosted on GitHub, open and ready for community participation.</p>
-            <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.</p>
-
-
-            <h1>The Census Module</h1>
-            <p>Let's show you what the Census module can already do. If you entered your Census API key above, the examples below should be ready to go.</p>
-            <p>Our google map to the right looks kind of plain. Let's draw some things on it.</p>
-            <p>The code below will load the boundaries of Maryland onto the map:</p>
-            <textarea id="example1" rows="4" cols="50" style="width:50%; height:230px;">
-                var request = {
-                    "state": "MD",
-                    "level": "state"
-                };
-
-                var callback = function(response) {
-                    map.data.addGeoJson(response);
-                };
-
-                census.GEORequest(request, callback);
-            </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 50%;" href="javascript:void(0)" onclick="runExample('example1')" role="button">Run This &raquo;</a></p>
-            <p>Looks good! But let's break the state down into counties. Edit the code above, and add the line <pre>"sublevel": true,</pre> just before the line that says <pre>"state": "MD",</pre>. This should make the request object look like:</p>
-            <pre>
-                var request = {
-                    "sublevel": true,
-                    "state": "MD",
-                    "level": "state"
-                };
-            </pre>
-            <p>Once it looks like that, run the example again!</p>
+            <h2>Obtaining a Census Developer Key</h2>
+            <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the left to get one, and then enter it with the button on the right.</p>
+            <div class="col-md-6">
+                <a class="btn btn-info btn-lg" style="width: 100%" href="http://www.census.gov/developers/" target="_blank" role="button">Get a Census API Key</a>
+            </div>
+            <div class="col-md-6">
+                <a class="btn btn-info btn-lg" style="width: 100%" href="javascript:void(0)" onclick="getApiKey()" role="button">Enter your Census API Key</a>
+            </div>
 
 
-            <div id="map-canvas" style="width: 50%; height: 500px; position: relative; top: 6.5rem;"></div>
-            <p style="margin-top: 7rem;">Now that you have a hang on this basic request, keep tinkering with the example. Try changing the state, level (try out "place" for incorporated cities!), or specifying a container! You can even specify latitude and longitude. Here's another example that will load all the Census tracts in Myrtle Beach, S.C.*</p>
-            <pre>
-                var request = {
-                    "lat": 33.7167,
-                    "lng": -78.8833,
-                    "sublevel": true,
-                    "level": "tract",
-                    "container": "place"
-                };
-            </pre>
-            <p>*City boundaries rarely align perfectly with Census geography boundaries, so when you get all "x" within a City, it will sometimes extend outside of the boundaries of the city proper.</p>
+            <div class="row top-buffer">
+                <div class="col-md-6">
+                    <h1>The Census Module</h1>
+                    <p>Let's show you what the Census module can already do. If you entered your Census API key above, the examples below should be ready to go.</p>
+                    <p>Our google map to the right looks kind of plain. Let's draw some things on it.</p>
+                    <p>The code below will load the boundaries of Maryland onto the map:</p>
+                    <textarea id="example1" rows="4" cols="50" style="width:100%; height:230px;">
+                        var request = {
+                            "state": "MD",
+                            "level": "state"
+                        };
 
+                        var callback = function(response) {
+                            map.data.addGeoJson(response);
+                        };
 
-            <h3>Let's try getting some data</h3>
-            <p>You can request data from the Census's API by specifying variables in your request. You can find more details about variable names and codes on our github examples.</p>
-            <p>Try it out with the code on the right!</p>
-            <p>Try tinkering with the example to add sublevels, or query by a city, to see what happens.</p>
-            <p>You can use the same "variables" format tags when requesting geography data. Doing this will request the data for each geographical feature, and attach the data to the "properties" tag of that feature.</p>
+                        census.GEORequest(request, callback);
+                    </textarea>
+                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example1')" role="button">Run This &raquo;</a></p>
+                    <p>Looks good! But let's break the state down into counties. Edit the code above, and add the line <pre>"sublevel": true,</pre> just before the line that says <pre>"state": "MD",</pre>. This should make the request object look like:</p>
+                    <pre>
+                        var request = {
+                            "sublevel": true,
+                            "state": "MD",
+                            "level": "state"
+                        };
+                    </pre>
+                    <p>Once it looks like that, run the example again!</p>
+                </div>
 
+                <div class="col-md-6">
+                <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 6.5rem;"></div>
+                    <p style="margin-top: 7rem;">Now that you have a hang on this basic request, keep tinkering with the example. Try changing the state, level (try out "place" for incorporated cities!), or specifying a container! You can even specify latitude and longitude. Here's another example that will load all the Census tracts in Myrtle Beach, S.C.*</p>
+                    <pre>
+                        var request = {
+                            "lat": 33.7167,
+                            "lng": -78.8833,
+                            "sublevel": true,
+                            "level": "tract",
+                            "container": "place"
+                        };
+                    </pre>
+                    <p style="font-size: smaller; font-style: italic;">*City boundaries rarely align perfectly with Census geography boundaries, so when you get all "x" within a City, it will sometimes extend outside of the boundaries of the city proper.</p>
+                </div>
+            </div>
 
-            <h3>&nbsp;</h3>
-            <textarea id="example2" rows="4" cols="50" style="width:50%; height:230px;">
-                var request = {
-                    "lat": 40.7127,
-                    "lng": -74.0059,
-                    "level": "state",
-                    "variables": [
-                        "income",
-                        "population",
-                        "median_male_age"
-                    ]
-                };
+            <div class="row top-buffer">
+                <div class="col-md-4">
+                    <h3>Let's try getting some data</h3>
+                    <p>You can request data from the Census's API by specifying variables in your request. You can find more details about variable names and codes on our github examples.</p>
+                    <p>Try it out with the code on the right!</p>
+                    <p>Try tinkering with the example to add sublevels, or query by a city, to see what happens.</p>
+                    <p>You can use the same "variables" format tags when requesting geography data. Doing this will request the data for each geographical feature, and attach the data to the "properties" tag of that feature.</p>
+                </div>
 
-                var callback = function(response) {
-                    $('#example2output').empty();
-                    $('#example2output').append(JSON.stringify(response, null, 4));
-                };
+                <div class="col-md-4">
+                    <h3>&nbsp;</h3>
+                    <textarea id="example2" rows="4" cols="50" style="width:100%; height:230px;">
+                        var request = {
+                            "lat": 40.7127,
+                            "lng": -74.0059,
+                            "level": "state",
+                            "variables": [
+                                "income",
+                                "population",
+                                "median_male_age"
+                            ]
+                        };
 
-                census.APIRequest(request, callback);
-            </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 50%;" href="javascript:void(0)" onclick="runExample('example2')" role="button">Run This &raquo;</a></p>
+                        var callback = function(response) {
+                            $('#example2output').empty();
+                            $('#example2output').append(JSON.stringify(response, null, 4));
+                        };
 
+                        census.APIRequest(request, callback);
+                    </textarea>
+                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example2')" role="button">Run This &raquo;</a></p>
+                </div>
 
-            <h3>&nbsp;</h3>
-            <pre id="example2output" style="width:50%; height: 230px; overflow: auto;"></pre>
+                <div class="col-md-4">
+                    <h3>&nbsp;</h3>
+                    <pre id="example2output" style="width:100%; height: 230px; overflow: auto;"></pre>
+                </div>
+            </div>
 
+            <div class="row top-buffer">
+                <h3>Unifying multiple APIs</h3>
+                <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
+                <div class="col-md-6">
+                    <textarea id="example3" rows="4" cols="50" style="width:100%; height:230px;">
+                        var request = {
+                        "zip": 10012
+                        };
 
+                        var callback = function(response) {
+                        $('#example3output').empty();
+                        $('#example3output').append(JSON.stringify(response, null, 4));
+                        };
 
-            <h3>&nbsp;</h3>
-            <pre id="example3output" style="width:50%; height: 280px; overflow: auto; margin-top: 60px;"></pre>
- 
+                        farmersMarket.search(request, callback);
+                    </textarea>
+                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">Run This &raquo;</a></p>
+                </div>
 
-            <h3>Unifying multiple APIs</h3>
-            <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
-            <textarea id="example3" rows="4" cols="50" style="width:50%; height:230px;">
-                var request = {
-                    "zip": 10012
-                };
+                <div class="col-md-6">
+                    <pre id="example3output" style="width:100%; height: 280px; overflow: auto;"></pre>
+                </div>
 
-                var callback = function(response) {
-                $('#example3output').empty();
-                $('#example3output').append(JSON.stringify(response, null, 4));
-                };
-
-                farmersMarket.search(request, callback);
-            </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 50%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">&laquo; Run This</a></p>
- 
-
-
+            </div>
 </div> <!-- /container -->
 </body>
 </html>
