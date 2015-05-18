@@ -218,27 +218,29 @@ published: true
         <ul>
             <p><strong>Location Options</strong></p>
             <p>To specify a location, you must use <strong>lat</strong> and <strong>lng</strong>, or <strong>zip</strong>, or <strong>state</strong>. At least one of these must be specified.</p>
-            <li><strong>lat</strong> - <emph>Number</emph> - The latitude of the requested location (North). Also supported: <strong>latitude</strong>, <strong>y</strong></li>
-            <li><strong>lng</strong> - <emph>Number</emph> - The longitude of the requested location (East). Also supported: <strong>longitude</strong>, <strong>x</strong></li>
-            <li><strong>zip</strong> - <emph>String</emph> - The 5-digit zip code of the location. Note that USPS zip code areas do not align precisely with Census geographies, so
+            <li><strong>lat</strong> - <em>Number</em> - The latitude of the requested location (North). Also supported: <strong>latitude</strong>, <strong>y</strong></li>
+            <li><strong>lng</strong> - <em>Number</em> - The longitude of the requested location (East). Also supported: <strong>longitude</strong>, <strong>x</strong></li>
+            <li><strong>zip</strong> - <em>String</em> - The 5-digit zip code of the location. Note that USPS zip code areas do not align precisely with Census geographies, so
                 when high accuracy is required it is recommended to use latitude and longitude. Specified as a string because certain zip codes begin with zeroes.</li>
-            <li><strong>state</strong> - <emph>String</emph> - The 2-letter USPS state code. It will be converted into the latitude and longitude of that state's capital.</li>
+            <li><strong>state</strong> - <em>String</em> - The 2-letter USPS state code. It will be converted into the latitude and longitude of that state's capital.</li>
+            <br/>
             <p><strong>Level Options</strong></p>
-            <li><strong>level</strong> - <emph>String</emph> - At what level to request the data. These are based on census geographies. Supported options are: "blockGroup",
+            <li><strong>level</strong> - <em>String</em> - At what level to request the data. These are based on census geographies. Supported options are: "blockGroup",
                 "tract", "county", "state", "us", and "place". Note that the "place" tag currently only supports incorporated places.</li>
-            <li><strong>sublevel</strong> - <emph>Boolean</emph> - <emph><small>Optional</small></emph> Whether or not to return based upon sublevels. See <a href="#sublevelRequests">sublevel requests</a> for more information.
+            <li><strong>sublevel</strong> - <em>Boolean</em> - <em><small>Optional</small></em> Whether or not to return based upon sublevels. See <a href="#sublevelRequests">sublevel requests</a> for more information.
                 Defaults to false.</li>
-            <li><strong>container</strong> - <emph>String</emph> - <emph><small>Optional, GeoJSON request only</small></emph> - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your
+            <li><strong>container</strong> - <em>String</em> - <em><small>Optional, GeoJSON request only</small></em> - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your
                 level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that place's geographical boundaries.</li>
-            <li><strong>containerGeometry</strong> - <emph>Object</emph> - <emph><small>Optional, GeoJSON request only</small></emph> - Specifies the bounding geometry for a GeoJSON request. The format
-            of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's <emph>GEOtoESRI()</emph> method. The boundary can be any arbitrary closed region or regions.</li>
+            <li><strong>containerGeometry</strong> - <em>Object</em> - <em><small>Optional, GeoJSON request only</small></em> - Specifies the bounding geometry for a GeoJSON request. The format
+            of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's <em>GEOtoESRI()</em> method. The boundary can be any arbitrary closed region or regions.</li>
+            <br/>
             <p><strong>Data Options</strong></p>
-            <li><strong>api</strong> - <emph>String</emph> - <emph><small>Optional</small></emph> - Specifies the API to use. Supported options are: "acs1", "acs3", and "acs5". The default is "acs5".</li>
-            <li><strong>year</strong> - <emph>Number</emph> - <emph><small>Optional</small></emph> - Specifies the year of the API to use. Supported years per API vary, please see the <emph>acsyears</emph> object
+            <li><strong>api</strong> - <em>String</em> - <em><small>Optional</small></em> - Specifies the API to use. Supported options are: "acs1", "acs3", and "acs5". The default is "acs5".</li>
+            <li><strong>year</strong> - <em>Number</em> - <em><small>Optional</small></em> - Specifies the year of the API to use. Supported years per API vary, please see the <em>acsyears</em> object
             of the Census module for details. Defaults to 2013.</li>
-            <li><strong>variables</strong> - <emph>Array</emph> - <emph><small>Optional</small></emph> - An array of strings specifying which variables to query. One can specify an aliased variable (see <a href="#variableAliases"> variable aliases</a>)
+            <li><strong>variables</strong> - <em>Array</em> - <em><small>Optional</small></em> - An array of strings specifying which variables to query. One can specify an aliased variable (see <a href="#variableAliases"> variable aliases</a>)
                 or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the Census's developer
-            portal or via the SDK's <emph>getACSVariableDictionary</emph> method.</li>
+            portal or via the SDK's <em>getACSVariableDictionary</em> method.</li>
         </ul>
     </div>
 </div>
