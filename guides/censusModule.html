@@ -29,15 +29,15 @@ published: true
     <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="http://" target="_blank">grab a Census API key</a> before you get started.</p>
     <h3>Contents</h3>
     <ul>
-        <li>Importing the Module</li>
-        <li>Requesting Variables</li>
-        <li>Sublevel Requests</li>
-        <li>Variable Aliases</li>
-        <li>The Request in Detail</li>
-        <li>Requesting GeoJSON</li>
-        <li>Requesting GeoJSON with Data</li>
+        <li><a href="#importingTheModule">Importing the Module</a></li>
+        <li><a href="#requestingVariables">Requesting Variables</a></li>
+        <li><a href="#sublevelRequests">Sublevel Requests</a></li>
+        <li><a href="#variableAliases">Variable Aliases</a></li>
+        <li><a href="#theRequestObjectInDetail">The Request Object in Detail</a></li>
+        <li><a href="#requestingGeojson">Requesting GeoJSON</a></li>
+        <li><a href="#requestingGeojsonWithData">Requesting GeoJSON with Data</a></li>
     </ul>
-    <div class="row">
+    <div class="row" id="importingTheModule">
         <h3>Importing the Module</h3>
         <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
         core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your &lt;head&gt; tag, like so:</p>
@@ -61,7 +61,7 @@ published: true
         <p>Once the module is enabled, you're all set to start using functionality. The following sections will show you how to make some common calls.</p>
     </div>
 
-    <div class="row">
+    <div class="row" id="requestingVariables">
         <h3>Requesting Variables</h3>
         <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to access is the ACS 5-year. To request a variable, pass a
         JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" and "population" for Washington D.C.</p>
@@ -123,15 +123,15 @@ published: true
         </ul>
     </div>
 
-    <div class="row">
+    <div class="row" id="sublevelRequests">
         <h3>Sublevel Requests</h3>
         <p>Finding data at a single location is all well and good - but what if you want the data for all counties in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
         <p>By specifying the tag "sublevel" as true, the SDK will request data for each entity in the level's container relationship. These relationships are:</p>
         <ul>
             <li>Sublevel on "us" returns data for all states in the U.S.</li>
-            <li>Sublevel on "state" returns data for all counties in that state.</li>
-            <li>Sublevel on "county" returns data for all tracts in that county.</li>
-            <li>Sublevel on "tract" returns data for all block groups in that tract.</li>
+            <li>Sublevel on "state" returns data for all counties in that state</li>
+            <li>Sublevel on "county" returns data for all tracts in that county</li>
+            <li>Sublevel on "tract" returns data for all block groups in that tract</li>
         </ul>
         <p>Let's look at an example request that will get all counties in Delaware.</p>
         <pre>
@@ -191,7 +191,7 @@ published: true
         entity, any relevant FIPS codes, and the data you requested.</p>
     </div>
 
-    <div class="row">
+    <div class="row" id="variableAliases">
         <h3>Variable Aliases</h3>
         <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.</p>
         <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census module supports some aliased variables.</p>
@@ -204,9 +204,17 @@ published: true
         <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.</p>
     </div>
 
-    <div class="row">
-        <h3>The Request in Detail</h3>
+    <div class="row" id="theRequestObjectInDetail">
+        <h3>The Request Object in Detail</h3>
         <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the available options.</p>
+    </div>
+
+    <div class="row" id="requestingGeojson">
+        <h3>Requesting GeoJSON</h3>
+    </div>
+
+    <div class="row" id="requestingGeojsonWithData">
+        <h3>Requesting GeoJSON with Data</h3>
     </div>
 </div>
 </body>
