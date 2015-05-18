@@ -27,6 +27,16 @@ published: true
 
 <div class="container">
     <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="http://" target="_blank">grab a Census API key</a> before you get started.</p>
+    <h3>Contents</h3>
+    <ul>
+        <li>Importing the Module</li>
+        <li>Requesting Variables</li>
+        <li>Sublevel Requests</li>
+        <li>Variable Aliases</li>
+        <li>The Request in Detail</li>
+        <li>Requesting GeoJSON</li>
+        <li>Requesting GeoJSON with Data</li>
+    </ul>
     <div class="row">
         <h3>Importing the Module</h3>
         <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
@@ -70,7 +80,7 @@ published: true
                 console.log(response);
             });
         </pre>
-        <p>First, let's break down the request object piece by piece.</p>
+        <p>Let's break down the request object piece by piece.</p>
         <ul>
             <li><strong>lat</strong> - <em>Number</em> - This tag specifies the latitude of the location in which we are interested. You can also specify this as "latitude" or "y".</li>
             <li><strong>lng</strong> - <em>Number</em> - This tag specifies the longitude of the location in which we are interested. You can also specify this as "longitude" or "x".</li>
@@ -81,7 +91,7 @@ published: true
         </ul>
         <p>We'll dive into the request object in detail later on. But first, let's look at what the response from this call looks like.</p>
         <p>The response to all requests in the Census module is a JSON object containing the request parameters and an extra property called <em>data</em>. The data property is an object with
-        properties consisting of the requested variables.</p>
+        properties consisting of the requested variables. Here's the response to the request we made:</p>
         <pre>
             {
                   "year": "2013",
@@ -116,6 +126,87 @@ published: true
     <div class="row">
         <h3>Sublevel Requests</h3>
         <p>Finding data at a single location is all well and good - but what if you want the data for all counties in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
+        <p>By specifying the tag "sublevel" as true, the SDK will request data for each entity in the level's container relationship. These relationships are:</p>
+        <ul>
+            <li>Sublevel on "us" returns data for all states in the U.S.</li>
+            <li>Sublevel on "state" returns data for all counties in that state.</li>
+            <li>Sublevel on "county" returns data for all tracts in that county.</li>
+            <li>Sublevel on "tract" returns data for all block groups in that tract.</li>
+        </ul>
+        <p>Let's look at an example request that will get all counties in Delaware.</p>
+        <pre>
+            var request = {
+                            "state":"DE",
+                            "level":"state",
+                            "sublevel":"true",
+                            "variables": [
+                                "income",
+                                "population"
+                           ]};
+        </pre>
+        <p>You'll notice that instead of specifying <strong>lat, lng</strong> we've instead specified <strong>state</strong> with a
+        two-letter USPS state code. This is shorthand for specifying the capital of a state's co-ordinates. Therefore, we're actually
+        giving the request the co-ordinates for Dover, Delaware. This shorthand is useful when you're grabbing data at the state level.</p>
+        <p>Here's what the response looks like:</p>
+        <pre>
+            {
+                "level" : "state",
+                "sublevel" : true,
+                "variables" : ["income", "population"],
+                "year" : 2013,
+                "api" : "acs5",
+                "lat" : 39.1619,
+                "lng" : -75.5267,
+                "state" : "10",
+                "county" : "001",
+                "tract" : "040900",
+                "blockGroup" : "1",
+                "place" : "21200",
+                "place_name" : "Dover city",
+                "data" : [{
+                        "name" : "Kent County, Delaware",
+                        "state" : "10",
+                        "county" : "001",
+                        "income" : "64414",
+                        "population" : "165030"
+                    }, {
+                        "name" : "New Castle County, Delaware",
+                        "state" : "10",
+                        "county" : "003",
+                        "income" : "79954",
+                        "population" : "542784"
+                    }, {
+                        "name" : "Sussex County, Delaware",
+                        "state" : "10",
+                        "county" : "005",
+                        "income" : "61308",
+                        "population" : "200632"
+                    }
+                ]
+            }
+
+        </pre>
+        <p>It looks a lot like our other response, except in this case <em>data</em> is an array of objects rather than a simple object.
+        Anytime the sublevel tag is set to true, the data property will become an array of objects. Each of these objects contain the name of the
+        entity, any relevant FIPS codes, and the data you requested.</p>
+    </div>
+
+    <div class="row">
+        <h3>Variable Aliases</h3>
+        <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.</p>
+        <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census module supports some aliased variables.</p>
+        <p>Aliased variable are specified by a string and return the most appropriate variable.
+           Some variables are marked as "normalizable" which will generate a *VARIABLE_NAME*_normalized variable in the return along with the regular variable.</variable_name></p>
+        <p>Available Aliases:</p>
+        <ul>
+            <li>income</li><li>income_per_capita</li><li>poverty</li><li>poverty_married</li><li>poverty_married_with_children</li><li>poverty_single_father</li><li>poverty_single_mother</li><li>age</li><li>median_male_age</li><li>median_female_age</li><li>population</li><li>commute_time</li><li>commute_time_solo_automobile</li><li>commute_time_carpool</li><li>commute_time_public_transport</li><li>commute_time_walked</li><li>commute_time_other</li>
+        </ul>
+        <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.</p>
+    </div>
+
+    <div class="row">
+        <h3>The Request in Detail</h3>
+        <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the available options.</p>
     </div>
 </div>
 </body>
