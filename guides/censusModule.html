@@ -206,10 +206,144 @@ published: true
 
     <div class="row" id="requestingGeojson">
         <h3>Requesting GeoJSON</h3>
+        <p>The Census module can acquire GeoJSON for any supported level from the Census's TigerWeb ArcGIS API. To do this, we will submit our request using a different method: <em>GEORequest()</em>. This method
+        takes the request object and a callback. The response is GeoJSON.</p>
+        <p>The following code will get us the GeoJSON for the state of Maryland and attach it directly to a Google Map layer:</p>
+        <pre>
+            var request = {
+                state: "MD",
+                level: "state"
+            };
+
+            census.GEORequest(request, function(response) {
+                map.data.addGeoJson(response);
+            });
+        </pre>
+        <p>In our callback for this example we place our response directly into a Google Map. But what does the response actually look like?</p>
+        <pre>
+     {
+        "type" : "FeatureCollection",
+        "features" : [{
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[-77.45880799987472, 39.22026999988172], [-77.45866099956163, 39.220504000079075],  ...   [-77.45883800001197, 39.22021899972628], [-77.45880799987472, 39.22026999988172]]],
+                    "bbox" : [-79.48765100023856, 37.886604999729734, -74.98628199981302, 39.723037000341044]
+                },
+                "properties" : {
+                    "MTFCC" : "G4000",
+                    "OID" : 27490140608205,
+                    "GEOID" : "24",
+                    "STATE" : "24",
+                    "STATENS" : "01714934",
+                    "BASENAME" : "Maryland",
+                    "NAME" : "Maryland",
+                    "LSADC" : "00",
+                    "FUNCSTAT" : "A",
+                    "AREALAND" : 25147565848,
+                    "AREAWATER" : 6983450341,
+                    "REGION" : "3",
+                    "DIVISION" : "5",
+                    "STUSAB" : "MD",
+                    "OBJECTID" : 35,
+                    "CENTLAT" : "+38.9463607",
+                    "CENTLON" : "-076.6789663",
+                    "INTPTLAT" : "+38.9466584",
+                    "INTPTLON" : "-076.6744939"
+                },
+                "id" : 35,
+                "bbox" : [-79.48765100023856, 37.886604999729734, -74.98628199981302, 39.723037000341044]
+            }
+        ]
+    }
+
+        </pre>
+        <p>Our response is GeoJSON! (We've trimmed some of the coordinates to fit it on this page!) Additionally, in the properties object we have various fields from the Census's server. Check out <a href="http://tigerweb.geo.census.gov/" target="_blank">TigerWeb</a> for more information
+        on these variables.</p>
+        <p>We've got GeoJSON for a state - that's all well and good. But what if we want to break this down smaller? Let's get all the counties in Delaware:</p>
+        <pre>
+            var request = {
+                state: "DE",
+                level: "state",
+                sublevel: true
+            };
+
+            census.GEORequest(request, callback);
+        </pre>
+        <p>Easy! We just attached the sublevel tag just like when we were requesting data. However, what if we want to get all of the tracts in Delaware? Regularly, the sublevel tag will only
+        break a state into counties. To get more complicated hierarchies we'll need to use the <strong>container</strong> tag. Check out below:</p>
+        <pre>
+            var request = {
+                state: "DE",
+                level: "tract",
+                container: "state",
+                sublevel: true
+            };
+        </pre>
+        <p>Note that our level has changed to "tract" and we've specified a container - "state". Our response GeoJSON will now have all tracts within the boundaries of Delaware. Be careful - the larger your
+        container and the smaller the level the longer the request will take. Requesting all the block groups in Texas will take a little while.</p>
     </div>
 
     <div class="row" id="requestingGeojsonWithData">
         <h3>Requesting GeoJSON with Data</h3>
+        <p>We can now get all the geography we could ever need. But what about data? Surely we don't want to have to make a <em>GEORequest()</em> call AND a <em>APIRequest()</em> call and unify the data ourselves, right?
+        Right. We'd never let you down like that. You can request variables right alongside your GeoJSON. The variable data will be attached to each feature's properties tag.</p>
+        <p>For example, let's get the income for every block group in New York City:</p>
+        <pre>
+            var request = {
+                zip: "10001",
+                level: "blockGroup",
+                sublevel: true,
+                container: "place",
+
+                variables: [
+                    "income"
+                ]
+
+            };
+
+            census.GEORequest(request, callback);
+        </pre>
+        <p>This request will give us a very large GeoJSON object, so we're only going to show you a single feature:</p>
+        <pre>
+            {
+                "type" : "Feature",
+                "geometry" : {
+                    "type" : "Polygon",
+                    "coordinates" : [[[-74.2815229999206, 40.473995999901874], ...  [-74.2815229999206, 40.473995999901874]]],
+                    "bbox" : [-74.2815229999206, 40.46651399997253, -74.24858499981055, 40.4871199997387]
+                },
+                "properties" : {
+                    "MTFCC" : "G5030",
+                    "OID" : 20890422860930,
+                    "GEOID" : "340230074021",
+                    "STATE" : "34",
+                    "COUNTY" : "023",
+                    "TRACT" : "007402",
+                    "BLKGRP" : "1",
+                    "BASENAME" : "1",
+                    "NAME" : "Block Group 1",
+                    "LSADC" : "BG",
+                    "FUNCSTAT" : "S",
+                    "AREALAND" : 1074516,
+                    "AREAWATER" : 1075297,
+                    "OBJECTID" : 155166,
+                    "CENTLAT" : "+40.4766966",
+                    "CENTLON" : "-074.2663034",
+                    "INTPTLAT" : "+40.4771254",
+                    "INTPTLON" : "-074.2699765",
+                    "income": "70781"
+                },
+                "id" : 155166,
+                "bbox" : [-74.2815229999206, 40.46651399997253, -74.24858499981055, 40.4871199997387]
+            }
+        </pre>
+        <p>You'll notice that the feature has an extra property - "income" - the variable we requested! This will happen for every feature in the feature collection. No need to unify data and geography on your own!</p>
+        <p>A special note about using the "container" tag. Sometimes a container's boundaries surround multiple Census geography boundaries - in this instance, NYC spans multiple
+        New York state counties. Due to the way the ACS API works, we can only retrieve part of the block group's data at once. Because of this, we must make supplemental requests to the
+        API to fill in data that we are missing. You can track how many of these requests are in flight using the <em>SUPPLEMENTAL_REQUESTS_IN_FLIGHT</em> variable in the Census module. When this
+        number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the return of some data. These requests are typically quick as they do not require any
+        geocoding. Please see the GeoRequest example in the CitySDK github repository for an example of how to interact with the supplemental requests variable.</p>
     </div>
 
     <div class="row" id="theRequestObjectInDetail">
