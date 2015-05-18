@@ -1,0 +1,83 @@
+---
+layout: default
+published: true
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>City SDK Guides: Census Module</title>
+
+</head>
+
+<body>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> Census Module Guide</i>
+    </div>
+</div>
+
+<div class="container">
+    <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="http://" target="_blank">grab a Census API key</a> before you get started.</p>
+    <div class="row">
+        <h3>Importing the Module</h3>
+        <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
+        core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your &lt;head&gt; tag, like so:</p>
+        <pre>
+            &lt;head&gt;
+                &lt;title&gt;CitySDK - Example&lt;/title&gt;
+
+                &lt;script src=&quot;libraries/vendor/jquery/jquery-2.1.3.min.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+                &lt;script src=&quot;js/citysdk.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+                &lt;script src=&quot;js/citysdk.census.js&quot; text=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+
+            &lt;/head&gt;
+        </pre>
+        <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <em>.enable()</em> function on the module, passing to it your API key as a string.</p>
+        <pre>
+            var sdk = new CitySDK();
+            var censusModule = sdk.modules.census;
+
+            censusModule.enable("CensusAPIKeyHere");
+        </pre>
+        <p>Once the module is enabled, you're all set to start using functionality. The following sections will show you how to make some common calls.</p>
+    </div>
+
+    <div class="row">
+        <h3>Requesting Variables</h3>
+        <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to access is the ACS 5-year. To request a variable, pass a
+        JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" for Washington D.C.</p>
+        <pre>
+            var request = {
+                "lat": 38.9047,
+                "lng": -77.0164,
+                "level": "state",
+                "variables": [
+                    "income"
+                ]
+            };
+
+            census.APIRequest(request, function(response) {
+                console.log(response);
+            });
+        </pre>
+        <p>First, let's break down the request object piece by piece.</p>
+        <ul>
+            <li><strong>lat</strong> - <em>Number</em> - This tag specifies the latitude of the location in which we are interested. You can also specify this as "latitude" or "y".</li>
+            <li><strong>lng</strong> - <em>Number</em> - This tag specifies the longitude of the location in which we are interested. You can also specify this as "longitude" or "x".</li>
+            <li><strong>level</strong> - <em>String</em> - This tag specifies the "level" of data to request. Supported levels are based off of Census geographies, the SDK supporting: "blockGroup", "tract", "county", "state", "us", and "place".
+            Please note, that the "place" level currently only supports incorporated places. If we changed our level to "blockGroup" instead of state, we would get information for a much smaller geographic region.</li>
+            <li><strong>variables</strong> - <em>Array</em> - This is an optional array of strings which specify the variables from the ACS to request. This example uses an alias (see aliases below), but you could also request
+            raw ACS variables like "B01003_001E". You can find a list of all ACS variables on the Census's developer site, or by calling the Census module's <em>getACSVariableDictionary()</em> function.</li>
+        </ul>
+    </div>
+</div>
+</body>
