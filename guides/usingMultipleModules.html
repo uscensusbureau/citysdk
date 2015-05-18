@@ -49,7 +49,7 @@ published: true
                 function() {
                     var mapOptions = {
                         center: { lat: 37, lng: -120},
-                        zoom: 5
+                        zoom: 6
                     };
                     map = new google.maps.Map(document.getElementById('map-canvas'),
                             mapOptions);
@@ -76,9 +76,27 @@ published: true
 
                     //Attach a listener for when a user clicks on a boundary
                     map.data.addListener('click', function(event) {
-                        popup.setContent("Clicked!");
-                        popup.setPosition(event.latLng);
-                        popup.open(map);
+                        var lat = event.feature.getProperty("CENTLAT");
+                        var lng = event.feature.getProperty("CENTLON");
+                        var name = event.feature.getProperty("NAME");
+
+                        var request = {
+                            "lat": lat,
+                            "lng": lng
+                        };
+
+                        farmersMarket.search(request, function(response) {
+                            var html = "<h3>" + name + "</h3><br/>";
+                            html+= "<ul>";
+                            response.results.forEach(function (market) {
+                                html+= "<li>" + market.marketname + "</li>";
+                            });
+                            html+= "</ul>";
+
+                            popup.setContent(html);
+                            popup.setPosition(event.latLng);
+                            popup.open(map);
+                        });
                     });
                 }
         );
@@ -144,7 +162,7 @@ published: true
                 function() {
                     var mapOptions = {
                         center: { lat: 37, lng: -120},
-                        zoom: 5
+                        zoom: 6
                     };
                     map = new google.maps.Map(document.getElementById('map-canvas'),
                             mapOptions);
@@ -191,6 +209,38 @@ published: true
                 });
         </pre>
         <p>If we refresh our application, we should be able to click on counties and get a popup. Of course, it doesn't show any information yet, but we'll handle that in the next section.</p>
+    </div>
+    <div class="row">
+        <h3>Adding Farmer's Market Data</h3>
+        <p>Let's use the USDA's Farmer's Market module to populate our popup with data about each county's markets. We'll do this by grabbing the county's latitude and longitude from the GeoJSON
+        and making the request to the USDA with those coordinates. In our callback, we'll put the data into the popup. Here's how we changed the onClick listener:</p>
+        <pre>
+            map.data.addListener('click', function(event) {
+                        var lat = event.feature.getProperty("CENTLAT");
+                        var lng = event.feature.getProperty("CENTLON");
+                        var name = event.feature.getProperty("NAME");
+
+                        var request = {
+                            "lat": lat,
+                            "lng": lng
+                        };
+
+                        farmersMarket.search(request, function(response) {
+                            var html = "<h3>" + name + "</h3><br/>";
+                            html+= "<ul>";
+                            response.results.forEach(function (market) {
+                                html+= "<li>" + market.marketname + "</li>";
+                            });
+                            html+= "</ul>";
+
+                            popup.setContent(html);
+                            popup.setPosition(event.latLng);
+                            popup.open(map);
+                        });
+                    });
+        </pre>
+        <p>When a user clicks, we grab the center latitude and longitude from that county, as well as the county's name, and create a request object with that. We then issue a request to
+        the Farmer's market module. In the callback, we construct an HTML list of Farmer's markets in that county, and place that HTML inside of the pop-up.</p>
     </div>
     <div class="row">
         <h3>The Completed Application</h3>
