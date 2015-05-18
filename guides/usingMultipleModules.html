@@ -1,0 +1,83 @@
+---
+layout: default
+published: true
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>City SDK Guides: Using Multiple Modules</title>
+
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+    </script>
+
+    <script src="https://rawgit.com/uscensusbureau/citysdk/master/js/citysdk.js"></script>
+    <script src="https://rawgit.com/uscensusbureau/citysdk/master/js/citysdk.census.js"></script>
+    <script src="https://rawgit.com/uscensusbureau/citysdk/master/js/citysdk.farmersMarket.js"></script>
+
+    <script>
+        var apiKey, map;
+
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+        var farmersMarket = sdk.modules.farmersMarket;
+
+        //We won't need API keys for just Geography.
+        census.enable("");
+
+        function clearMap() {
+            map.data.forEach(function(feature) {
+                map.data.remove(feature);
+            });
+        };
+
+        function runExample(id) {
+            clearMap();
+            var textarea = $('#' + id);
+
+            eval(textarea.val());
+        };
+
+        $(document).ready(
+                function() {
+                    var mapOptions = {
+                        center: { lat: 38.91732, lng: -77.2211},
+                        zoom: 7
+                    };
+                    map = new google.maps.Map(document.getElementById('map-canvas'),
+                            mapOptions);
+
+                    map.data.setStyle({
+                        fillColor: 'blue'
+                    });
+
+                }
+        );
+    </script>
+
+</head>
+
+<body>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> Using Multiple Modules Guide</i>
+    </div>
+</div>
+
+<div class="container">
+    <p>This page will guide you through creating an application that unifies data from multiple modules</p>
+    <div class="row">
+        <p>Let's check out the finished product:</p>
+        <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 6.5rem;"></div>
+    </div>
+</div>
+</body>
