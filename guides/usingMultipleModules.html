@@ -226,12 +226,12 @@ published: true
                         };
 
                         farmersMarket.search(request, function(response) {
-                            var html = "<h3>" + name + "</h3><br/>";
-                            html+= "<ul>";
+                            var html = "&lt;h3&gt;" + name + "&lt;/h3&gt;&lt;br/&gt;";
+                            html+= "&lt;ul&gt;";
                             response.results.forEach(function (market) {
-                                html+= "<li>" + market.marketname + "</li>";
+                                html+= "&lt;li&gt;" + market.marketname + "&lt;/li&gt;";
                             });
-                            html+= "</ul>";
+                            html+= "&lt;/ul&gt;";
 
                             popup.setContent(html);
                             popup.setPosition(event.latLng);
