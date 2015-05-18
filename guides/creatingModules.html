@@ -1,0 +1,73 @@
+---
+layout: default
+published: true
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>City SDK Guides: Creating a Module</title>
+
+</head>
+
+<body>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> Creating a Module Guide</i>
+    </div>
+</div>
+
+<div class="container">
+<p>This page will guide you through creating your own module to interact with the CitySDK.</p>
+
+    <div class="row">
+        <h3>CORS Support</h3>
+        <p>The CitySDK is a JavaScript SDK which means to access data on other domains, that domain must either support CORS headers or JSONP requests. Before starting work on a module,
+        please ensure the API you wish to work with supports one of those options.</p>
+        <p>You can learn more about CORS <a href="http://enable-cors.org/" target="_blank">here</a>.</p>
+        <p>You can test your API's CORS support <a href="http://test-cors.org/" target="_blank">here</a>.</p>
+    </div>
+
+    <div class="row">
+        <h3>Getting Started</h3>
+        <p>For this guide, we'll be constructing a module for the Energy Information Agency's API. The first step is to decide on a name for your module, we're going to go with <em>citysdk.eia.js</em> - it easily tells users what
+        this module interfaces with.</p>
+        <p>Next, we'll open up <em>citysdk.moduleTemplate.js</em> from the CitySDK github repository to use as our basis. Let's go ahead and save it as our chosen filename.</p>
+        <p>On line 10 of the template we can see the definition of the template module object. Let's rename it to fit with our API.</p>
+        <pre>
+            //Module object definition. Every module should have an "enabled" property and an "enable"  function.
+            function EIAModule() {
+                this.enabled = false;
+            };
+        </pre>
+        <p>We've renamed the object to EIAModule - a solid choice. Next, let's update line 15 so it is attaching the function to the appropriate object.</p>
+        <pre>
+            //Enable function. Stores the API key for this module and sets it as enabled
+            EIAModule.prototype.enable = function(apiKey) {
+                this.apiKey = apiKey;
+                this.enabled = true;
+            };
+        </pre>
+        <p>If your API does not require an API key, you can remove that parameter from the function as well as the variable definition as your user's won't be needing it.</p>
+        <p>Last but not least, update line 7 - this line is the most important as it registers the module with the CitySDK core.</p>
+        <pre>
+            //Attach a new module object to the CitySDK prototype.
+            //It is advised to keep the filenames and module property names the same
+            CitySDK.prototype.modules.eia = new EIAModule();
+        </pre>
+        <p>Perfect! We're all set to start implementing our code.</p>
+    </div>
+
+    <div class="row">
+        
+    </div>
+</div>
+</body>
