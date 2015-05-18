@@ -67,7 +67,33 @@ published: true
     </div>
 
     <div class="row">
-        
+        <h3>GET, POST, and JSONP requests</h3>
+        <p>The CitySDK has three core methods for accessing data from another website. The first is <em>ajaxRequest()</em> which takes a single parameter - the URL for the request, and
+        returns a standard AJAX promise. The second is <em>jsonpRequest()</em> which also takes a single parameter and returns a standard promise, but uses jQuery's built in JSONP callback
+        functionality to handle the data response. Last is the <em>postRequest()</em> function which takes two parameters: the URL and the data. Data is usually a JSON object, but can vary
+        depending on the URL you are accessing. It also returns a standard promise.</p>
+        <p>The EIA's API supports CORS, so we'll use GET requests. Let's start fleshing out the method our user's will use to get the data.</p>
+        <pre>
+            EIAModule.prototype.categoryRequest = function(request, callback) {
+                var apiKeyPattern = /({apiKey})/;
+                var categoryPattern = /({category})/;
+
+                var categoryURL = "http://api.eia.gov/category/?api_key={apiKey}&category_id={category}";
+
+                categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
+                categoryURL = categoryURL.replace(categoryPattern, request.category);
+
+                CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
+                    response = $.parseJSON(response);
+                    callback(response);
+                });
+
+            };
+        </pre>
+        <p>Here's our simple function which performs a GET request on the EIA's category API. We've used regular expressions to insert the user's request data into the URL, but you could also
+        piece it together using string concatenation.</p>
+        <p>Notice we access the instance of the SDK by using <em>CitySDK.prototype.sdkInstance</em> - when the SDK is instantiated it places a reference to itself here, so that all modules can
+        access the same instance. We then use this to make a GET request to the URL, parse the response as JSON, and call the callback function on that JSON.</p>
     </div>
 </div>
 </body>
