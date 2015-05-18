@@ -49,7 +49,7 @@ published: true
                 function() {
                     var mapOptions = {
                         center: { lat: 37, lng: -120},
-                        zoom: 7
+                        zoom: 5
                     };
                     map = new google.maps.Map(document.getElementById('map-canvas'),
                             mapOptions);
@@ -58,6 +58,7 @@ published: true
                         fillColor: 'blue'
                     });
 
+                    //County boundary request
                     var countyRequest = {
                         state: "CA",
                         level: "county",
@@ -65,8 +66,19 @@ published: true
                         container: "state"
                     };
 
+                    //Request the boundaries and attach them to the map
                     census.GEORequest(countyRequest, function(response) {
                         map.data.addGeoJson(response);
+                    });
+
+                    //Create a popup
+                    var popup = new google.maps.InfoWindow();
+
+                    //Attach a listener for when a user clicks on a boundary
+                    map.data.addListener('click', function(event) {
+                        popup.setContent("Clicked!");
+                        popup.setPosition(event.latLng);
+                        popup.open(map);
                     });
                 }
         );
@@ -132,7 +144,7 @@ published: true
                 function() {
                     var mapOptions = {
                         center: { lat: 37, lng: -120},
-                        zoom: 7
+                        zoom: 5
                     };
                     map = new google.maps.Map(document.getElementById('map-canvas'),
                             mapOptions);
@@ -164,6 +176,21 @@ published: true
         </pre>
         <p>In our SDK call we create a callback that will draw all of the GeoJSON on our map. If we refresh our application, we should have a Google Map showing California and all of its
         counties' boundaries.</p>
+    </div>
+    <div class="row">
+        <h3>Adding a pop-up</h3>
+        <p>To display our Farmer's Market data, we'll need to have a pop-up appear when user's click on a county. Let's add some code to handle this. We can place it directly after our county boundary
+        loading code.</p>
+        <pre>
+                var popup = new google.maps.InfoWindow();
+
+                map.data.addListener('click', function(event) {
+                    popup.setContent("Clicked!");
+                    popup.setPosition(event.latLng);
+                    popup.open(map);
+                });
+        </pre>
+        <p>If we refresh our application, we should be able to click on counties and get a popup. Of course, it doesn't show any information yet, but we'll handle that in the next section.</p>
     </div>
     <div class="row">
         <h3>The Completed Application</h3>
