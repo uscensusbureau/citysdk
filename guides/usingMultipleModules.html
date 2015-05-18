@@ -246,6 +246,88 @@ published: true
         <h3>The Completed Application</h3>
         <p>Let's check out the finished product:</p>
         <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 1rem;"></div>
+        <p>And here's the full JavaScript source:</p>
+        <pre>
+            &lt;script&gt;
+                var apiKey, map;
+
+                var sdk = new CitySDK();
+                var census = sdk.modules.census;
+                var farmersMarket = sdk.modules.farmersMarket;
+
+                //We won't need API keys for just Geography.
+                census.enable("");
+
+                function clearMap() {
+                    map.data.forEach(function(feature) {
+                        map.data.remove(feature);
+                    });
+                };
+
+                function runExample(id) {
+                    clearMap();
+                    var textarea = $('#' + id);
+
+                    eval(textarea.val());
+                };
+
+                $(document).ready(
+                        function() {
+                            var mapOptions = {
+                                center: { lat: 37, lng: -120},
+                                zoom: 6
+                            };
+                            map = new google.maps.Map(document.getElementById('map-canvas'),
+                                    mapOptions);
+
+                            map.data.setStyle({
+                                fillColor: 'blue'
+                            });
+
+                            //County boundary request
+                            var countyRequest = {
+                                state: "CA",
+                                level: "county",
+                                sublevel: true,
+                                container: "state"
+                            };
+
+                            //Request the boundaries and attach them to the map
+                            census.GEORequest(countyRequest, function(response) {
+                                map.data.addGeoJson(response);
+                            });
+
+                            //Create a popup
+                            var popup = new google.maps.InfoWindow();
+
+                            //Attach a listener for when a user clicks on a boundary
+                            map.data.addListener('click', function(event) {
+                                var lat = event.feature.getProperty("CENTLAT");
+                                var lng = event.feature.getProperty("CENTLON");
+                                var name = event.feature.getProperty("NAME");
+
+                                var request = {
+                                    "lat": lat,
+                                    "lng": lng
+                                };
+
+                                farmersMarket.search(request, function(response) {
+                                    var html = "&lt;h3&gt;" + name + "&lt;/h3&gt;&lt;br/&gt;";
+                                    html+= "&lt;ul&gt;";
+                                    response.results.forEach(function (market) {
+                                        html+= "&lt;li&gt;" + market.marketname + "&lt;/li&gt;";
+                                    });
+                                    html+= "&lt;/ul&gt;";
+
+                                    popup.setContent(html);
+                                    popup.setPosition(event.latLng);
+                                    popup.open(map);
+                                });
+                            });
+                        }
+                );
+            &lt;/script&gt;
+        </pre>
         <br/>
     </div>
 </div>
