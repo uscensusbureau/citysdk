@@ -41,7 +41,7 @@ published: true
 
             &lt;/head&gt;
         </pre>
-        <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <em>.enable()</em> function on the module, passing to it your API key as a string.</p>
+        <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <em>enable()</em> function on the module, passing to it your API key as a string.</p>
         <pre>
             var sdk = new CitySDK();
             var censusModule = sdk.modules.census;
@@ -54,14 +54,15 @@ published: true
     <div class="row">
         <h3>Requesting Variables</h3>
         <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to access is the ACS 5-year. To request a variable, pass a
-        JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" for Washington D.C.</p>
+        JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" and "population" for Washington D.C.</p>
         <pre>
             var request = {
                 "lat": 38.9047,
                 "lng": -77.0164,
                 "level": "state",
                 "variables": [
-                    "income"
+                    "income",
+                    "population"
                 ]
             };
 
@@ -78,6 +79,43 @@ published: true
             <li><strong>variables</strong> - <em>Array</em> - This is an optional array of strings which specify the variables from the ACS to request. This example uses an alias (see aliases below), but you could also request
             raw ACS variables like "B01003_001E". You can find a list of all ACS variables on the Census's developer site, or by calling the Census module's <em>getACSVariableDictionary()</em> function.</li>
         </ul>
+        <p>We'll dive into the request object in detail later on. But first, let's look at what the response from this call looks like.</p>
+        <p>The response to all requests in the Census module is a JSON object containing the request parameters and an extra property called <em>data</em>. The data property is an object with
+        properties consisting of the requested variables.</p>
+        <pre>
+            {
+                  "year": "2013",
+                  "lat": 38.9047,
+                  "lng": -77.0164,
+                  "level": "blockGroup",
+                  "state": "11",
+                  "county": "001",
+                  "tract": "004701",
+                  "blockGroup": "2",
+                  "api": "acs5",
+                  "place": "50000",
+                  "place_name": "Washington city"
+                  "data": {
+                      "income": 79665,
+                      "population": 619371
+                  }
+            }
+        </pre>
+        <p>You can see we got a lot of data back. Let's step through each property.</p>
+        <ul>
+            <li><strong>lat, lng, level</strong> - These properties are whatever you specified in your request.</li>
+            <li><strong>year</strong> - This is the year of the ACS the module queried. ACS1, ACS3, and ACS5 support different years, so ensure you are requesting data for a year that is supported.</li>
+            <li><strong>state, county, tract, blockGroup, place</strong> - These numbers are FIPS codes - how the Census
+            categorizes its geographies. You won't typically need these, but they are provided in case you do.</li>
+            <li><strong>api</strong> - This specifies the API the SDK used to acquire the data. You can specify this in your request. Check out the full-detail request object further on.</li>
+            <li><strong>place_name</strong> - If your requested location lies within an incorporated place, the name of the place will be given to you.</li>
+            <li><strong>data</strong> - This property is an object containing properties corresponding to the requested variables.</li>
+        </ul>
+    </div>
+
+    <div class="row">
+        <h3>Sublevel Requests</h3>
+        <p>Finding data at a single location is all well and good - but what if you want the data for all counties in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
     </div>
 </div>
 </body>
