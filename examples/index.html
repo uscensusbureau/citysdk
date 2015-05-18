@@ -14,7 +14,7 @@
 </head>
 <body>
     <h1 id="top">Welcome to the CitySDK example page!</h1>
-    <p><small>Last updated: 05/07/2015</small></p>
+    <p><small>Last updated: 05/15/2015</small></p>
     <div class="container">
         <p>This page will make a variety of calls to the CitySDK, and walk you through the process of using it.</p>
         <p>Please note that the CitySDK is dependent upon jQuery.</p>
@@ -30,6 +30,7 @@
                 <li><a href="./#variablerequeststructure">Structuring the Request</a></li>
                 <li><a href="./#latlng">By Lat/Lng</a></li>
                 <li><a href="./#statecode">By State Code</a></li>
+                <li><a href="./#zipcode">By ZIP Code</a></li>
                 <li><a href="./#sdkcallvariable">The SDK Call</a></li>
                 <li><a href="./#sdkresponsevariable">The Response</a></li>
                 <li><a href="./#sdksublevelvariable">Requesting Sublevels</a></li>
@@ -59,9 +60,13 @@
         <li><a href="bingMapsExample">Bing Maps Example</a>*</li>
         <li><a href="commuteQuery">Commute Query</a>*</li>
         <li><a href="geoRequest">GeoRequest</a>*</li>
-        <li><a href="bingMapsExample">Bing Maps Example</a></li>
+        <li><a href="zipCodeExample">Zip Code Example</a>*</li>
         <p>Farmer's Market Module</p>
         <li><a href="farmersMarket">Farmers Market Locator</a></li>
+        <p>EIA Module</p>
+        <li><a href="eiaBrowser">EIA Dataset Explorer</a></li>
+        <p>Socrata Module</p>
+        <li><a href="socrataExample">City of Chicago Employee Data</a></li>
         <br/><br/>
         <p>*You will need a Census API key to use these examples</p>
     </ul>
@@ -143,6 +148,28 @@
                     We've included two variables this time.</li>
             </ul>
         </div>
+            <h3 id="zipcode">By ZIP Code</h3>
+            <div class="container">
+                <p>Here's an example of a JSON object that requests the "income" <em>and</em> "population" variables for a popular zip code.</p>
+                <p>Some ZIP codes don't correspond to geography (i.e. for a PO Box only zip code) - in these instances, null will be set for the lat/lng and the request will fail.</p>
+            <pre>
+                var request = {
+                    "zip": 90210,
+                    "level": "tract",
+                    "variables": [
+                        "income",
+                        "population"
+                    ]
+                };
+            </pre>
+                <p>Let's break down this request piece by piece.</p>
+                <ul>
+                    <li>The "zip" tag specifies the 5 digit ZIP code. This will be converted into lat/lng and used to request the data as in the lat/lng section</li>
+                    <li>The "level" property specifies the level of data we should return, based on Census Bureau geographies.</li>
+                    <li>Then, we have the "variables" property which contains an array of variables we are requesting.
+                        We've included two variables this time.</li>
+                </ul>
+            </div>
         </div>
         <h2 id="sdkcallvariable">The SDK Call</h2>
         <div class="container">

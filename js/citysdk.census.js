@@ -374,6 +374,38 @@ CensusModule.prototype.latLngToFIPS = function(lat, lng, callback) {
     });
 };
 
+/**
+ * Converts a ZIP code to Lat/Lng and calls the callback on it.
+ * @param zip {Number} 5 digit Zip code
+ * @param callback
+ */
+CensusModule.prototype.ZIPtoLatLng = function(zip, callback) {
+    var zipPattern = /({zip})/;
+
+    var tigerURL = "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/2/query?where=ZCTA5%3D{zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson";
+
+    tigerURL = tigerURL.replace(zipPattern, zip);
+
+    var request = CitySDK.prototype.sdkInstance.ajaxRequest(tigerURL);
+
+    request.done(function(response) {
+        response = $.parseJSON(response);
+        var returnValue = {
+            "lat": null,
+            "lng": null
+        };
+
+        if("features" in response) {
+            if(response.features.length > 0) {
+                returnValue.lat = response.features[0].attributes.CENTLAT;
+                returnValue.lng = response.features[0].attributes.CENTLON;
+            }
+        }
+
+        callback(returnValue);
+    })
+};
+
 
 /**
  * Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
@@ -560,6 +592,21 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
     };
 
     this.parseRequestStateCode(request);
+
+    //Check for zip code
+    if("zip" in request) {
+        //We have zip code - but do we have lat/lng?
+        if(!("lat" in request) || !("lng" in request)) {
+            //We have the zip but no lat/lng - parse it and re-call
+            this.ZIPtoLatLng(request.zip, function(response) {
+                request.lat = response.lat;
+                request.lng = response.lng;
+                CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+                return;
+            });
+        }
+    }
+
     this.parseRequestLatLng(request);
 
     var mapserverPattern = /({mapserver})/;
@@ -738,6 +785,20 @@ CensusModule.prototype.APIRequest = function(request, callback) {
             } else {
                 request.sublevel = false;
             }
+        }
+    }
+
+    //Check for zip code
+    if("zip" in request) {
+        //We have zip code - but do we have lat/lng?
+        if(!("lat" in request) || !("lng" in request)) {
+            //We have the zip but no lat/lng - parse it and re-call
+            this.ZIPtoLatLng(request.zip, function(response) {
+                request.lat = response.lat;
+                request.lng = response.lng;
+                CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
+                return;
+            });
         }
     }
 

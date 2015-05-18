@@ -10,7 +10,7 @@ Source code can be found in the js directory.
 
 ## Intro
 
-Through our City SDK, we are aiming to provide a user-friendly “toolbox” for civic hackers to connect local and national public data. The creation of the SDK came out of the desire to make it easier to use the Census API for common tasks that our developer community asked for. We have been engaging developers around the country for the past two years and have observed how they use the API and have built the most commonly needed functionalities built ‘on top’ of our API right into the SDK, saving the developer from having to do it herself. 
+Through our City SDK, we are aiming to provide a user-friendly toolbox for civic hackers to connect local and national public data. The creation of the SDK came out of the desire to make it easier to use the Census API for common tasks that our developer community asked for. We have been engaging developers around the country for the past two years and have observed how they use the API and have built the most commonly needed functionalities built on top of our API right into the SDK, saving the developer from having to do it herself. 
 
 ## Features
 
@@ -21,3 +21,11 @@ Through our City SDK, we are aiming to provide a user-friendly “toolbox” for
 - Pull nested Census geographies using your own / custom boundaries (C/O: [Terraformer.io](http://terraformer.io/))
 - Interactive documentation and ability to help discover ACS variables easier (alias glossary) 
 - More [coming soon](https://waffle.io/uscensusbureau/citysdk)! (you may also add to our issues using the #user stories label to make feature requests)
+
+
+
+
+
+
+
+

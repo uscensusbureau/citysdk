@@ -81,6 +81,17 @@ Converts co-ordinates to Census FIPS via the Geocoder API
 **callback**: `function`, Callback function
 
 
+### GEOtoESRI.ZIPtoLatLng(zip, callback) 
+
+Converts a ZIP code to Lat/Lng and calls the callback on it.
+
+**Parameters**
+
+**zip**: `Number`, 5 digit Zip code
+
+**callback**: , Converts a ZIP code to Lat/Lng and calls the callback on it.
+
+
 ### GEOtoESRI.acsSummaryRequest(request, callback) 
 
 Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
