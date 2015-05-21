@@ -13,14 +13,13 @@ Source code can be found in the js directory.
 Through our City SDK, we are aiming to provide a user-friendly toolbox for civic hackers to connect local and national public data. The creation of the SDK came out of the desire to make it easier to use the Census API for common tasks that our developer community asked for. We have been engaging developers around the country for the past two years and have observed how they use the API and have built the most commonly needed functionalities built on top of our API right into the SDK, saving the developer from having to do it herself. 
 
 ## Features
-
-- Abstraction of Census geographies - grab data by latitude and longitude through our FIPS-code translation service
-- The ability to request Census ACS data via variable code or our alias dictionary for common requests
-- The ability to request GeoJSON - an open source geographic shapefile / boundary format - for any state, county, tract, blockgroup or incorporated place right along with that location's data
+- Never have to figure out what your FIPS code is again! Just pass in lat/longs, we handle the translation. Only have ZIP codes? No problem, we translate those too. 
+- Get values (currently American Community Survey (ACS) 5-yr 2013 only) and Census geographic boundaries (currently GeoJSON only: down to ‘block-group’ level) in the same call.
 - A modular architecture which makes mashing Census data up with third-party data a snap
-- Pull nested Census geographies using your own / custom boundaries (C/O: [Terraformer.io](http://terraformer.io/))
-- Interactive documentation and ability to help discover ACS variables easier (alias glossary) 
-- More [coming soon](https://waffle.io/uscensusbureau/citysdk)! (you may also add to our issues using the #user stories label to make feature requests)
+- Pull down Census Bureau geographic boundaries by sending your own custom geography in the request (currently GeoJSON support only, [Terraformer.io](http://terraformer.io/))
+- A showcase of examples to help you get started.
+- We’ve provided a starting list of aliases for some of our most popular variables (currently ACS 5-yr 2013 only) 
+- More coming soon! (you may also add to our issues using the #user stories label to make feature requests)
 
 
 
