@@ -34,6 +34,10 @@ published: true
             census.enable(apiKey);
         };
 
+        function requestApiKey() {
+            window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=400,height=200,scrollbars=yes');
+        };
+
         function clearMap() {
             map.data.forEach(function(feature) {
                 map.data.remove(feature);
@@ -102,7 +106,7 @@ published: true
             <h2>Obtaining a Census Developer Key</h2>
             <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the left to get one, and then enter it with the button on the right.</p>
             <div class="col-md-6">
-                <a class="btn btn-info btn-lg" style="width: 100%" href="http://www.census.gov/developers/" target="_blank" role="button">Get a Census API Key</a>
+                <a class="btn btn-info btn-lg" style="width: 100%" href="javascript:void(0)" onclick="requestApiKey()" role="button">Get a Census API Key</a>
             </div>
             <div class="col-md-6">
                 <a class="btn btn-info btn-lg" style="width: 100%" href="javascript:void(0)" onclick="getApiKey()" role="button">Enter your Census API Key</a>
