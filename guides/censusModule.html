@@ -14,6 +14,11 @@ published: true
 
     <title>City SDK Guides: Census Module</title>
 
+    <script>
+        function requestApiKey() {
+            window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
+        };
+    </script>
 </head>
 
 <body>
@@ -26,7 +31,7 @@ published: true
 </div>
 
 <div class="container">
-    <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="http://" target="_blank">grab a Census API key</a> before you get started.</p>
+    <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
     <h3>Contents</h3>
     <ul>
         <li><a href="#importingTheModule">Importing the Module</a></li>
