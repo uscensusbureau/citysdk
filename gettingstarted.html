@@ -41,6 +41,10 @@ published: true
         };
 
         function runExample(id) {
+            if(!census.enabled) {
+                alert("Please enter your API key first!");
+                return;
+            }
             clearMap();
             var textarea = $('#' + id);
 
