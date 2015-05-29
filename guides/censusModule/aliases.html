@@ -9,7 +9,7 @@ published: true
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <title>CitySDK Guides: Census Module - Aliases</title>
@@ -27,17 +27,25 @@ published: true
             var sdk = new CitySDK();
             var census = sdk.modules.census;
 
+            var rowCount = 1;
+
             Object.keys(census.aliases).forEach(function(alias) {
+                rowCount++;
                 var row = $('<div class="row"></div>');
+
+                if(rowCount % 2 == 0) {
+                    row.addClass('even');
+                }
+
                 var alias_column = $('<div class="col-md-3"></div>');
                 var normalizable_column = $('<div class="col-md-1"></div>');
                 var api_column = $('<div class="col-md-1"></div>');
-                var api_variable_column = $('<div class="col-md-2"></div>');
-                var description_column = $('<div class="col-md-5"></div>');
+                var api_variable_column = $('<div class="col-md-1"></div>');
+                var description_column = $('<div class="col-md-6"></div>');
 
                 alias_column.append(alias);
                 api_column.append(census.aliases[alias].api);
-                if(census.aliases[alias].normalize) {
+                if(census.isNormalizable(alias)) {
                     normalizable_column.append("Yes");
                 }
                 api_variable_column.append(census.aliases[alias].variable);
@@ -57,6 +65,12 @@ published: true
             buildTable();
         });
     </script>
+
+    <style>
+        .even {
+            background-color: #e8e8e8;
+        }
+    </style>
 </head>
 
 <body>
@@ -73,19 +87,19 @@ published: true
     <div id="variableTable">
         <div class="row">
             <div class="col-md-3">
-                Alias Name
+                <strong>Alias Name</strong>
             </div>
             <div class="col-md-1">
-                Normalizable
+                <strong>Normalizable</strong>
             </div>
             <div class="col-md-1">
-                API
+                <strong>API</strong>
             </div>
-            <div class="col-md-2">
-                Variable
+            <div class="col-md-1">
+                <strong>Variable</strong>
             </div>
-            <div class="col-md-5">
-                Description
+            <div class="col-md-6">
+                <strong>Description</strong>
             </div>
         </div>
     </div>
