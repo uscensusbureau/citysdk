@@ -31,7 +31,7 @@ published: true
 
             Object.keys(census.aliases).forEach(function(alias) {
                 rowCount++;
-                var row = $('<div class="row"></div>');
+                var row = $('<div class="row extra-padding"></div>');
 
                 if(rowCount % 2 == 0) {
                     row.addClass('even');
@@ -70,6 +70,11 @@ published: true
         .even {
             background-color: #e8e8e8;
         }
+
+        .extra-padding {
+            padding-top: 0.25em;
+            padding-bottom: 0.5em;
+        }
     </style>
 </head>
 
@@ -83,7 +88,7 @@ published: true
 </div>
 
 <div class="container">
-    <p>Here you will find a table of aliases available in the Census module.</p>
+    <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
     <div id="variableTable">
         <div class="row">
             <div class="col-md-3">
