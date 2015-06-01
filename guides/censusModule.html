@@ -95,7 +95,7 @@ published: true
             raw ACS variables like "B01003_001E". You can find a list of all ACS variables on the Census's developer site, or by calling the Census module's <em>getACSVariableDictionary()</em> function.</li>
         </ul>
         <p>We'll dive into the request object in detail later on. But first, let's look at what the response from this call looks like.</p>
-        <p>The response to all requests in the Census module is a JSON object containing the request parameters and an extra property called <em>data</em>. The data property is an object with
+        <p>The response to all requests in the Census module is a JSON object containing the request parameters and an extra property called <em>data</em>. The data property is an array of objects with
         properties consisting of the requested variables. Here's the response to the request we made:</p>
         <pre>
             {
@@ -110,10 +110,10 @@ published: true
                   "api": "acs5",
                   "place": "50000",
                   "place_name": "Washington city"
-                  "data": {
+                  "data": [{
                       "income": 79665,
                       "population": 619371
-                  }
+                  }]
             }
         </pre>
         <p>You can see we got a lot of data back. Let's step through each property.</p>
@@ -124,7 +124,7 @@ published: true
             categorizes its geographies. You won't typically need these, but they are provided in case you do.</li>
             <li><strong>api</strong> - This specifies the API the SDK used to acquire the data. You can specify this in your request. Check out the full-detail request object further on.</li>
             <li><strong>place_name</strong> - If your requested location lies within an incorporated place, the name of the place will be given to you.</li>
-            <li><strong>data</strong> - This property is an object containing properties corresponding to the requested variables.</li>
+            <li><strong>data</strong> - This property is an array of objects containing properties corresponding to the requested variables.</li>
         </ul>
     </div>
 
@@ -191,8 +191,7 @@ published: true
             }
 
         </pre>
-        <p>It looks a lot like our other response, except in this case <em>data</em> is an array of objects rather than a simple object.
-        Anytime the sublevel tag is set to true, the data property will become an array of objects. Each of these objects contain the name of the
+        <p>It looks a lot like our other response, except in this case <em>data</em> now has multiple objects rather than a single object. Each of these objects contain the name of the
         entity, any relevant FIPS codes, and the data you requested.</p>
     </div>
 
@@ -202,10 +201,7 @@ published: true
         <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census module supports some aliased variables.</p>
         <p>Aliased variable are specified by a string and return the most appropriate variable.
            Some variables are marked as "normalizable" which will generate a *VARIABLE_NAME*_normalized variable in the return along with the regular variable.</variable_name></p>
-        <p>Available Aliases:</p>
-        <ul>
-            <li>income</li><li>income_per_capita</li><li>poverty</li><li>poverty_married</li><li>poverty_married_with_children</li><li>poverty_single_father</li><li>poverty_single_mother</li><li>age</li><li>median_male_age</li><li>median_female_age</li><li>population</li><li>commute_time</li><li>commute_time_solo_automobile</li><li>commute_time_carpool</li><li>commute_time_public_transport</li><li>commute_time_walked</li><li>commute_time_other</li>
-        </ul>
+        <p>Available aliases can be found <a href="./censusModule/aliases.html">here</a>.</p>
         <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.</p>
     </div>
 
@@ -369,7 +365,9 @@ published: true
             <li><strong>sublevel</strong> - <em>Boolean</em> - <em><small>Optional</small></em> Whether or not to return based upon sublevels. See <a href="#sublevelRequests">sublevel requests</a> for more information.
                 Defaults to false.</li>
             <li><strong>container</strong> - <em>String</em> - <em><small>Optional, GeoJSON request only</small></em> - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your
-                level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that place's geographical boundaries.</li>
+                level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that place's geographical boundaries. Supported options are: "tract", "county", "state", "place", "geometry", and "geometry_within". Note that for the
+                "geometry" and "geometry" within tags you must specify the containerGeometry. "geometry" will return any entities that intersect the given geometry (including if they intersect but extend beyond the perimeter) whereas "geometry_within" will only
+            return entities that are entirely contained within the containerGeometry specified.</li>
             <li><strong>containerGeometry</strong> - <em>Object</em> - <em><small>Optional, GeoJSON request only</small></em> - Specifies the bounding geometry for a GeoJSON request. The format
             of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's <em>GEOtoESRI()</em> method. The boundary can be any arbitrary closed region or regions.</li>
             <br/>
