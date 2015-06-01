@@ -37,11 +37,11 @@
                                 + region
                                 + '" which has the code: '
                                 + code.toUpperCase()
-                                + "\n\n" + census.aliases.income.description + ": " + Number(response.data.income).toLocaleString('en')
-                                + "\n\n" + census.aliases.poverty.description + ": " + response.data.poverty
-                                + "\n\n" + "Spanish only speakers: " + Number(response.data.B16006_007E).toLocaleString('en')
-                                + "\n\n" + "Population: " + Number(response.data.B01003_001E).toLocaleString('en')
-                                + "\n\n" + "Percent only spanish speaking: " + ((response.data.B16006_007E / response.data.B01003_001E) * 100).toFixed(3) + "%";
+                                + "\n\n" + census.aliases.income.description + ": " + Number(response.data[0].income).toLocaleString('en')
+                                + "\n\n" + census.aliases.poverty.description + ": " + response.data[0].poverty
+                                + "\n\n" + "Spanish only speakers: " + Number(response.data[0].B16006_007E).toLocaleString('en')
+                                + "\n\n" + "Population: " + Number(response.data[0].B01003_001E).toLocaleString('en')
+                                + "\n\n" + "Percent only spanish speaking: " + ((response.data[0].B16006_007E / response.data[0].B01003_001E) * 100).toFixed(3) + "%";
 
                         alert(message);
                     });

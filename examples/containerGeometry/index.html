@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CitySDK Container Geometry Example</title>
+
+    <script src="../libraries/vendor/jquery/jquery-2.1.3.min.js"></script>
+
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+    </script>
+
+    <script src="../../js/citysdk.js"></script>
+    <script src="../../js/citysdk.census.js"></script>
+
+    <script>
+        var apiKey, map;
+
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+
+        var mode = "geometry";
+
+        var triangleGeojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    -76.62139892578125,
+                                    39.28967134685658
+                                ],
+                                [
+                                    -77.080078125,
+                                    38.89530825492018
+                                ],
+                                [
+                                    -76.48681640625,
+                                    38.96795115401593
+                                ],
+                                [
+                                    -76.62139892578125,
+                                    39.28967134685658
+                                ]
+                            ]
+                        ]
+                    }
+                }
+            ]
+        };
+
+        function getApiKey() {
+            apiKey = prompt("Enter your Census API Key","API Key");
+            census.enable(apiKey);
+        };
+
+        function clearMap() {
+            map.data.forEach(function(feature) {
+                map.data.remove(feature);
+            });
+        };
+
+        $(document).ready(
+                function() {
+                    getApiKey();
+
+                    var mapOptions = {
+                        center: { lat: 38.91732, lng: -77.2211},
+                        zoom: 7
+                    };
+                    map = new google.maps.Map(document.getElementById('map-canvas'),
+                            mapOptions);
+
+                    map.data.setStyle({
+                        fillColor: 'blue'
+                    });
+
+                    map.data.addGeoJson(triangleGeojson);
+
+                    var infowindow = new google.maps.InfoWindow();
+
+                    map.data.addListener('click', function(event) {
+                        infowindow.setContent(
+                                "<h2>" + event.feature.getProperty("NAME") + "</h2><p>Median age: " +
+                                         event.feature.getProperty("age") + "<br/>Population: " +
+                                         event.feature.getProperty("population") + "<br/>Median income: " +
+                                         event.feature.getProperty("income")
+                                        + "</p>"
+                        );
+                        infowindow.setPosition(event.latLng);
+                        infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+                        infowindow.open(map);
+                    });
+                }
+        );
+
+        function go(x) {
+            var request = {
+                variables: [
+                    "age",
+                    "population",
+                    "income"
+                ],
+
+                level: x,
+                sublevel: true,
+                container: mode,
+                containerGeometry: census.GEOtoESRI(triangleGeojson)[0].geometry
+            };
+
+            census.GEORequest(request, function(response) {
+                clearMap();
+                map.data.addGeoJson(response);
+            });
+        }
+
+        function showTriangle() {
+            clearMap();
+            map.data.addGeoJson(triangleGeojson);
+        }
+
+        function setContainer(x) {
+            mode = x;
+        }
+    </script>
+</head>
+
+<body>
+    <div id="map-canvas" style="width: 500px; height: 500px;"></div>
+    <input type="submit" value="Clear and Draw Triangle" onclick="showTriangle()"/>
+    <input type="submit" value="Get Block Groups" onclick="go('blockGroup')"/>
+    <input type="submit" value="Get Places" onclick="go('place')"/>
+    <input type="submit" value="Get Tracts" onclick="go('tract')"/>
+    <input type="submit" value="Get Counties" onclick="go('county')"/>
+    <input type="submit" value="Get States" onclick="go('state')"/>
+<br/>
+<input type="submit" value="Set container 'geometry'" onclick="setContainer('geometry')"/>
+    <input type="submit" value="Set container 'geometry_within'" onclick="setContainer('geometry_within')"/>
+<br/>
+'geometry' grabs anything that is within or touches the boundary.
+<br/>
+'geometry_within' grabs anything that is entirely contained within the boundary.
+
+</body>
+</html>

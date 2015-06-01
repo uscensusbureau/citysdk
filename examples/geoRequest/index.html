@@ -145,6 +145,7 @@
                 request.sublevel = true;
                 request.container = (city == "Montgomery_County_MD") ? "county" : "place";
             }
+
             census.GEORequest(request, function(geojson) {
                 checkLoading();
                 map.data.addGeoJson(geojson);

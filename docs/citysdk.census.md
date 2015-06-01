@@ -81,6 +81,21 @@ Converts co-ordinates to Census FIPS via the Geocoder API
 **callback**: `function`, Callback function
 
 
+### GEOtoESRI.addressToFIPS(street, city, state, callback) 
+
+Converts a street address to Census FIPS via the Geocoder APIReturns an array of matched addresses.
+
+**Parameters**
+
+**street**: , Street Address
+
+**city**: , City
+
+**state**: , State (2-Letter USPS Code)
+
+**callback**: , Callback function
+
+
 ### GEOtoESRI.ZIPtoLatLng(zip, callback) 
 
 Converts a ZIP code to Lat/Lng and calls the callback on it.
@@ -116,7 +131,7 @@ Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4
 
 ### GEOtoESRI.APIRequest(request, callback) 
 
-Processes a data request by looking at a JSON requestJSON Requests should include:"year" - Year of the request. See acs5years object for available years. Defaults to 2013 if not specified."lat" - Latitude of the requested location (either specified as x, lat, or latitude) NORTH"lng" - Longitude of the requested location (either specified as y, lng, or longitude) EAST"sublevel" - Defaults to "false". If set to "true", it will return the group of sublevels from the specified level."level" - Level of the request. Options are: blockGroup, tract, county, state, us. Will default to blockGroup."variables" - Array of variables either by alias or specific nameexampleRequest = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup"      "variables": [          "income"      ]  };  exampleResponse = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup",      "state": "11",      "county": "001",      "tract": "004701",      "blockGroup": "2",      "data": {          "income": 33210      }  };  A response where you set sublevel to "true" will have an array in the data field instead of an object.  Another example request:  {     "state": "NY",     "level": "state",     "variables": [         "income",         "population"     ]
+Processes a data request by looking at a JSON requestJSON Requests should include:"year" - Year of the request. See acs5years object for available years. Defaults to 2013 if not specified."lat" - Latitude of the requested location (either specified as x, lat, or latitude) NORTH"lng" - Longitude of the requested location (either specified as y, lng, or longitude) EAST"sublevel" - Defaults to "false". If set to "true", it will return the group of sublevels from the specified level."level" - Level of the request. Options are: blockGroup, tract, county, state, us. Will default to blockGroup."variables" - Array of variables either by alias or specific nameexampleRequest = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup"      "variables": [          "income"      ]  };  exampleResponse = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup",      "state": "11",      "county": "001",      "tract": "004701",      "blockGroup": "2",      "data": {          "income": 33210      }  };  A response where you set sublevel to "true" will have an array in the data field instead of an object.  Another example request:  {     "state": "NY",     "level": "state",     "variables": [         "income",         "population"     ]  }  You could also send an address object to specify location  {     "address": {         "street": "18 F Street NW"         "city": "Washington",         "state": "DC"      }      "level": "blockGroup",      "variables": [         "population"      ]  }
 
 **Parameters**
 

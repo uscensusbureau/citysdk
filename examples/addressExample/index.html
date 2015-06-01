@@ -18,10 +18,17 @@
         });
 
         function submit() {
-            var zip = $('#zipcode');
+            var street = $('#street');
+            var city = $('#city');
+            var state = $('#state');
 
             var request = {
-                zip: zip.val(),
+                address: {
+                    street: street.val(),
+                    city: city.val(),
+                    state: state.val()
+                },
+
                 variables: [
                     "income",
                     "population"
@@ -31,18 +38,21 @@
             census.APIRequest(request, function(response) {
                 var output = $('#output');
                 output.empty();
-                output.append("ZIP: " + response.zip + "<br/>");
                 output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
                 output.append("Median Income: " + response.data[0].income + "<br/>");
                 output.append("Population: " + response.data[0].population + " </br>");
+                output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
+                output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
             });
         }
     </script>
 </head>
 <body>
 <div>
-    <h2>Population and Income by Zip</h2>
-    <input type="text" id="zipcode"/>
+    <h2>Population and Income by Address</h2>
+    Street Address: <input type="text" id="street" value="18 F Street NW"/><br/>
+    City: <input type="text" id="city" value="Washington"/><br/>
+    State: <input type="text" id="state" value="DC"/><br/>
     <select id="level">
         <option value="tract" selected>Tract</option>
         <option value="state">State</option>
