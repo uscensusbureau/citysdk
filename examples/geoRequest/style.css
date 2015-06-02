@@ -15,7 +15,7 @@ html, body {
 #control-panel {
     z-index: 1;
 
-    position: absolute;
+    position: relative;
     top:        5px;
     right:      100px;
 }
@@ -23,7 +23,7 @@ html, body {
 #time-panel {
     z-index: 1;
 
-    position: absolute;
+    position: relative;
     top:        22px;
     right:      99px;
 }
@@ -38,7 +38,7 @@ html, body {
 #time-panel-2 {
     z-index: 1;
 
-    position: absolute;
+    position: relative;
     top:        44px;
     right:      99px;
 }
@@ -93,7 +93,7 @@ html, body {
 #timeline-panel {
     z-index: 1;
 
-    position: absolute;
+    position: relative;
     top:        44px;
     right:      100px;
 

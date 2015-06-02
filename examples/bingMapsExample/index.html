@@ -1,6 +1,17 @@
+---
+layout: default
+published: true
+---
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
     <title>CitySDK Bing Maps Example</title>
 
     <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
@@ -113,7 +124,15 @@
         }
     </script>
 </head>
-<body onload="GetMap();" style="margin: none;">
-    <div id='mapDiv' style="position:absolute; top: 0; left: 0; width:100%; height: 100%;"></div>
+
+<body onload="GetMap();">
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK Bing Maps</i>
+    </div>
+</div>
+<div class="container">
+    <div id='mapDiv' style="position:relative; top: 0; left: 0; width:100%; height: 100%;"></div>
+    </div>
 </body>
 </html>

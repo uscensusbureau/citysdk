@@ -1,6 +1,17 @@
+---
+layout: default
+published: true
+---
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
     <title>Zip Code Example</title>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release0.6/js/citysdk.js"></script>
@@ -40,6 +51,12 @@
     </script>
 </head>
 <body>
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK Zip Code Example</i>
+    </div>
+</div>
+<div class="container">
 <div>
     <h2>Population and Income by Zip</h2>
     <input type="text" id="zipcode"/>
@@ -55,5 +72,6 @@
 <pre id="output">
 
 </pre>
+    </div>
 </body>
 </html>

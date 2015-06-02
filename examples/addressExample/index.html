@@ -68,9 +68,30 @@ published: true
 <div class="container">
 <div>
     <h2>Population and Income by Address</h2>
-    Street Address: <input type="text" id="street" value="18 F Street NW"/><br/>
-    City: <input type="text" id="city" value="Washington"/><br/>
-    State: <input type="text" id="state" value="DC"/><br/>
+    <div class="row">
+        <div class="col-md-2">
+            Street Address:
+        </div>
+        <div class="col-md-10">
+            <input type="text" id="street" value="18 F Street NW"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            City:
+        </div>
+        <div class="col-md-10">
+            <input type="text" id="city" value="Washington"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            State:
+        </div>
+        <div class="col-md-10">
+            <input type="text" id="state" value="DC"/>
+        </div>
+    </div>
     <select id="level">
         <option value="tract" selected>Tract</option>
         <option value="state">State</option>

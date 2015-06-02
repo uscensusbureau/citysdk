@@ -1,6 +1,17 @@
+---
+layout: default
+published: true
+---
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
     <title>CitySDK - Commute Query</title>
 
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
@@ -101,6 +112,12 @@
     </script>
 </head>
 <body>
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK Commute Query Example</i>
+    </div>
+</div>
+<div class="container">
 <p>Enter your census API key here <input type="text" id="api"/></p>
 <p>Enter coordinates here:</p>
 <p>Latitude:&nbsp;&nbsp;&nbsp;&nbsp;<input id="lat" type="text"/>&deg; N<br/>Longitude: <input id="lng" type="text"/>&deg; E</p>
@@ -161,5 +178,6 @@ Level:
 <br/>
 <p>Output:</p>
 <pre id="output"></pre>
+    </div>
 </body>
 </html>
