@@ -1,0 +1,170 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family:    Arial, Helvetica, sans-serif;
+}
+#map-canvas {
+    height: 100%;
+    width:  100%;
+    margin: 0;
+    padding: 0;
+    z-index: 0;
+}
+
+#control-panel {
+    z-index: 1;
+
+    position: absolute;
+    top:        5px;
+    right:      100px;
+}
+
+#time-panel {
+    z-index: 1;
+
+    position: absolute;
+    top:        22px;
+    right:      99px;
+}
+
+#time-panel div {
+    padding:    2px;
+    font-size:  75%;
+
+    float:      right;
+}
+
+#time-panel-2 {
+    z-index: 1;
+
+    position: absolute;
+    top:        44px;
+    right:      99px;
+}
+
+
+
+#time-panel-2 div {
+    padding:    2px;
+    font-size:  75%;
+
+    float:      right;
+}
+
+#loading {
+    z-index: 1;
+    display: none;
+    width:    226px;
+    height:   100px;
+
+    margin-left: -113px;
+    margin-top: -50px;
+
+    position: fixed;
+    top:        50%;
+    left:      50%;
+
+    font-size:  larger;
+    background: white;
+
+    text-align: center;
+
+    border-radius: 5px;
+
+    padding-left:   0.5em;
+    padding-right:  0.5em;
+    padding-top:    25px;
+    border:     1px solid #b0b0b0;
+    box-shadow: 1px 1px 2px #888888;
+}
+
+#loading img {
+    margin-bottom: 0.5em;
+}
+
+#loading div {
+    padding:    2px;
+    font-size:  75%;
+
+    float:      right;
+}
+
+#timeline-panel {
+    z-index: 1;
+
+    position: absolute;
+    top:        44px;
+    right:      100px;
+
+    background-color:   white;
+    border:     1px solid #b0b0b0;
+
+    box-shadow: 1px 1px 2px #888888;
+}
+
+#timeline-panel div {
+    padding:    2px;
+    font-size:  100%;
+
+    float:      right;
+    text-align: center;
+}
+
+#timeline-panel p {
+    font-size:  75%;
+    font-family:   Courier;
+}
+
+#control-panel div {
+    padding:    2px;
+    font-size:  57%;
+
+    float:      right;
+}
+
+.button {
+    text-align: center;
+    cursor:     pointer;
+    background-color:   white;
+    border:     1px solid #b0b0b0;
+    margin-left:    3px;
+
+    box-shadow: 1px 1px 2px #888888;
+}
+
+.button:hover {
+    background-color: #e8e8e8;
+}
+
+.disable {
+    background-color: #e8e8e8;
+    color:            darkgrey;
+    cursor:           not-allowed;
+}
+
+.off {
+    background-color: #cccccc;
+    color:            darkgrey;
+}
+
+#progressBar {
+    margin-left:    auto;
+    margin-right:   auto;
+    width: 126px;
+    height: 5px;
+    border: 1px solid #dddddd;
+    background-color: #54995e;
+}
+
+#progressBar div {
+    height: 100%;
+    color: #fff;
+    text-align: right;
+    line-height: 3px; /* same as #progressBar height if we want text middle aligned */
+    width: 0;
+    position: relative;
+    left:   3px;
+    top:    -2px;
+    background-color: #efefef;
+}
