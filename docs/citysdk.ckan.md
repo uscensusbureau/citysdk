@@ -19,6 +19,8 @@ Example of CKAN DataStore API use:
         https://catalog.opendata.city/api/action/datastore_search_sql?sql=SELECT%20*%20FROM%20%22e4491e0c-ba09-4cb2-97c1-d466e3e976a5%22%20LIMIT%205
 
 
+
+
 **request**
 
 The following is an example request object:
@@ -55,6 +57,7 @@ Select the columns name, streetAddress and postalCode:
 
 
 
+
 **callback**
 
 The following is an example callback object:
@@ -74,6 +77,8 @@ The following is an example callback object:
                 });
             }
         };
+
+
 
 
 **response**
