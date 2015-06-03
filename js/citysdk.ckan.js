@@ -9,10 +9,9 @@ CitySDK.prototype.modules.ckan = new CkanModule();
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
 function CkanModule() {
     this.enabled = false;
-    this.applicationToken = null;
 };
 
-//Enable function. No API key required
+//Enable function.
 CkanModule.prototype.enable = function() {
     this.enabled = true;
 };
