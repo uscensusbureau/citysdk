@@ -17,36 +17,72 @@ CkanModule.prototype.enable = function() {
     this.enabled = true;
 };
 
-CkanModule.prototype.request = function(request, callback) {
+/**
+ * Sends a SQL query to a CKAN server.
+ * The DataStore extension must be installed to utilise this.
+ *
+ * var request = {
+ *     "url": 'catalog.opendata.city',
+ *     "Select": '"name","streetAddress","postalCode"',
+ *     "From": '"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"',
+ *     "Limit": '2'
+ * }
+ *
+ * Response:
+ * {
+ *     "success": true,
+ *     "result": {
+ *         "records": [
+ *             {
+ *                 "postalCode": "10001",
+ *                 "streetAddress": "441 WEST 26 STREET",
+ *                 "name": "Hudson Guild Ccc"
+ *             },
+ *             {
+ *                 "postalCode": "10001",
+ *                 "streetAddress": "459 WEST 26 STREET",
+ *                 "name": "Hudson Guild Children's Center"
+ *             }
+ *         ],
+ *         "fields": [
+ *             {
+ *                 "type": "text",
+ *                 "id": "name"
+ *             },
+ *             {
+ *                 "type": "text",
+ *                 "id": "streetAddress"
+ *             },
+ *             {
+ *                 "type": "numeric",
+ *                 "id": "postalCode"
+ *             }
+ *         ],
+ *         "sql": "SELECT \"name\",\"streetAddress\",\"postalCode\" FROM \"e4491e0c-ba09-4cb2-97c1-d466e3e976a5\" LIMIT 2 "
+ *     }
+ * }
+ *
+ * @param request
+ * @param callback
+ */
+CkanModule.prototype.search = function(request, callback) {
     var urlPattern = /({url})/;
-    var resourcePattern = /({resource})/;
-    var selectPattern = /({select})/;
 
-    var ckanURL = "https://{url}/api/action/datastore_search_sql?sql=SELECT%20{select}%20FROM%20\"{resource}\"";
+    var ckanURL = "https://{url}/api/action/datastore_search_sql?sql=";
 
     ckanURL = ckanURL.replace(urlPattern, request.url);
-    ckanURL = ckanURL.replace(resourcePattern, request.resource);
 
-    if (request.select != null) {
-        ckanURL = ckanURL.replace(selectPattern, encodeURIComponent(request.select));
-    }
-    else {
-        ckanURL = ckanURL.replace(selectPattern, "*");
-    }
-
-    if (request.where != null) {
-        ckanURL = ckanURL + "%20WHERE%20" + encodeURIComponent(request.where);
-    }
-
-    if (request.orderBy != null) {
-        ckanURL = ckanURL + "%20ORDER%20BY%20" + encodeURIComponent(request.orderBy);
-    }
-
-    if (request.limit != null) {
-        ckanURL = ckanURL + "%20LIMIT%20" + encodeURIComponent(request.limit);
-    }
-    else {
-        ckanURL = ckanURL + "%20LIMIT%201000";
+    for (var key in request) {
+        if (request.hasOwnProperty(key)) {
+            if (key != "url") {
+                if (key.toLowerCase() == "from") {  //Trim then add double quotes to resource id
+                    ckanURL += encodeURIComponent(key) + '%20"' + encodeURIComponent(request[key].replace(/['"]+/g, '')) + '"%20'
+                }
+                else {
+                    ckanURL += encodeURIComponent(key) + '%20' + encodeURIComponent(request[key]) + '%20';
+                }
+            }
+        }
     }
 
     CitySDK.prototype.sdkInstance.ajaxRequest(ckanURL).done(

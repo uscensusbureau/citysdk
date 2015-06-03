@@ -16,31 +16,35 @@
 
         function submit() {
             var request = {
-                "url": "catalog.opendata.city",
-                "resource": "e4491e0c-ba09-4cb2-97c1-d466e3e976a5"
-            }
-
-            var where = $('#where');
-            if (where.val().length > 0) {
-                request.where = where.val();
+                "url": "catalog.opendata.city"
             }
 
             var select = $('#select');
             if (select.val().length > 0) {
-                request.select = select.val();
+                request["SELECT"] = select.val();
+            }
+
+            var from = $('#from');
+            if (from.val().length > 0) {
+                request["FROM"] = from.val();
+            }
+
+            var where = $('#where');
+            if (where.val().length > 0) {
+                request["WHERE"] = where.val();
             }
 
             var orderBy = $('#orderBy');
             if (orderBy.val().length > 0) {
-                request.orderBy = orderBy.val();
+                request["ORDER BY"] = orderBy.val();
             }
 
             var limit = $('#limit');
             if (limit.val().length > 0) {
-                request.limit = limit.val();
+                request["LIMIT"] = limit.val();
             }
 
-            ckan.request(request, function(response) {
+            var callback = function(response) {
                 var output = $('#output');
                 output.empty();
 
@@ -54,7 +58,9 @@
                         output.append("<br/>");
                     });
                 }
-            });
+            };
+
+            ckan.search(request, callback);
         }
     </script>
 </head>
@@ -63,10 +69,11 @@
     <h2>New York City Day Care Center Locations</h2>
     <p>Fields: name, HOUSENUM, STREETNAME, postalCode, streetAddress, BIN, BBL, addressLocality, loc, longitude, latitude, URL</p>
     <p>Try out some clauses (leave blank to ignore):</p>
-    <p>Select: <input id="select" style="width: 200px;" type="text"/> (i.e. "name","streetAddress","postalCode") Default * </p>
+    <p>Select: <input id="select" style="width: 200px;" type="text" value='*'/> (i.e. "name","streetAddress","postalCode")</p>
+    <p>From: <input id="from" style="width: 200px;" type="text" value='"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"'/> (i.e. "e4491e0c-ba09-4cb2-97c1-d466e3e976a5")</p>
     <p>Where: <input id="where" style="width: 200px;" type="text"/> (i.e. "postalCode" = '10001' or "postalCode" = '10012')</p>
     <p>Order By: <input id="orderBy" style="width: 200px;" type="text"/> (i.e. "postalCode")</p>
-    <p>Limit: <input id="limit" style="width: 200px;" type="text"/> (i.e. 25) Default 1000</p>
+    <p>Limit: <input id="limit" style="width: 200px;" type="text" value='25'/> (i.e. 25)</p>
     <input type="submit" onclick="submit()" value="Query"/>
 </div>
 <pre id="output">
