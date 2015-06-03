@@ -9,7 +9,9 @@
 ### search(request, callback) 
 
 Sends a SQL query to a CKAN server.
+
 The DataStore extension must be installed to utilise this.
+
 The underlying SQL engine is PostgreSQL.
 
 Example of CKAN DataStore API use:
@@ -19,7 +21,7 @@ Example of CKAN DataStore API use:
 
 **request**
 
-The following is a example request object:
+The following is an example request object:
 
         var request = {
             "url": 'catalog.opendata.city',
@@ -54,7 +56,8 @@ Select the columns name, streetAddress and postalCode:
 
 
 **callback**
-The following is a example callback object:
+
+The following is an example callback object:
 
         var callback = function(response) {
             var output = $('#output');
@@ -74,9 +77,11 @@ The following is a example callback object:
 
 
 **response**
+
 Returns a dictionary with the following keys:
 
 records – list of matching results
+
 fields – fields/columns and their extra metadata
 
 Example response:
