@@ -71,6 +71,8 @@ CkanModule.prototype.search = function(request, callback) {
 
     ckanURL = ckanURL.replace(urlPattern, request.url);
 
+    var limit = false;
+
     for (var key in request) {
         if (request.hasOwnProperty(key)) {
             if (key != "url") {
@@ -80,8 +82,13 @@ CkanModule.prototype.search = function(request, callback) {
                 else {
                     ckanURL += encodeURIComponent(key) + '%20' + encodeURIComponent(request[key]) + '%20';
                 }
+                if (key.toLowerCase() == "limit") { limit = true }
             }
         }
+    }
+
+    if (!limit) {
+        ckanURL += 'Limit%201000';  //Limit results to 1000 records by default
     }
 
     CitySDK.prototype.sdkInstance.ajaxRequest(ckanURL).done(
