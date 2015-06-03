@@ -69,11 +69,11 @@
     <h2>New York City Day Care Center Locations</h2>
     <p>Fields: name, HOUSENUM, STREETNAME, postalCode, streetAddress, BIN, BBL, addressLocality, loc, longitude, latitude, URL</p>
     <p>Try out some clauses (leave blank to ignore):</p>
-    <p>Select: <input id="select" style="width: 200px;" type="text" value='*'/> (i.e. "name","streetAddress","postalCode")</p>
-    <p>From: <input id="from" style="width: 200px;" type="text" value='"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"'/> (i.e. "e4491e0c-ba09-4cb2-97c1-d466e3e976a5")</p>
-    <p>Where: <input id="where" style="width: 200px;" type="text"/> (i.e. "postalCode" = '10001' or "postalCode" = '10012')</p>
-    <p>Order By: <input id="orderBy" style="width: 200px;" type="text"/> (i.e. "postalCode")</p>
-    <p>Limit: <input id="limit" style="width: 200px;" type="text" value='25'/> (i.e. 25)</p>
+    <p>Select: <input id="select" style="width: 200px;" type="text" value='*'/> (e.g. distinct "name","streetAddress","postalCode")</p>
+    <p>From: <input id="from" style="width: 200px;" type="text" value='"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"'/> (e.g. "e4491e0c-ba09-4cb2-97c1-d466e3e976a5")</p>
+    <p>Where: <input id="where" style="width: 500px;" type="text"/> (e.g. "postalCode" in ('10001', '10012') or "name" ilike '%monte%')</p>
+    <p>Order By: <input id="orderBy" style="width: 200px;" type="text"/> (e.g. "postalCode", "name")</p>
+    <p>Limit: <input id="limit" style="width: 200px;" type="text" value='50'/> (e.g. 50)</p>
     <input type="submit" onclick="submit()" value="Query"/>
 </div>
 <pre id="output">
