@@ -10,7 +10,7 @@
 
 Sends a SQL query to a CKAN server.
 
-The DataStore extension must be installed to utilise this.
+The DataStore extension must be installed on the CKAN server to utilise this.
 
 The underlying SQL engine is PostgreSQL.
 
