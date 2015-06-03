@@ -5,14 +5,18 @@ var crimeMarkers = [];
 var loadingCount = 0;
 
 $(document).ready(function() {
+    //Initialize the SDK and create references to our Socrata and Census modules
     sdk = new CitySDK();
     census = sdk.modules.census;
     socrata = sdk.modules.socrata;
 
+    //Enable the modules - Socrata doesn't require an API key
     socrata.enable();
     census.enable(censusKey);
 
-    //Enable tooltips
+    //Enable tooltips - these pop up when a user hover's over a
+    //variables "?" - it gets the descriptions from the Census moudule's aliases
+    //object
     var checkboxes = $("input:checkbox");
     var questionLinks = $(".questionLink");
     checkboxes.each(function(i) {
@@ -21,6 +25,7 @@ $(document).ready(function() {
 
     $('[data-toggle="tooltip"]').tooltip();
 
+    //Enable the date picker for start and end dates
     $('#startdate input').datepicker({
         todayBtn: true,
         todayHighlight: true,
@@ -32,9 +37,12 @@ $(document).ready(function() {
         todayHighlight: true
     });
 
+    //When users change dates we should update the crime types to only display
+    //crimes which were committed in that date range
     $('#startdate input').change(updateCrimeTypes);
     $('#enddate input').change(updateCrimeTypes);
 
+    //Map options for our google map
     var mapOptions = {
         center: {
             lat: 41.8369,
@@ -42,38 +50,49 @@ $(document).ready(function() {
         },
         zoom: 11
     };
+
+    //Initialize the google map
     map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
 
+    //Set the default geoJSON style
     map.data.setStyle({
         fillColor: 'blue',
         fillOpacity: 0.15
     });
 
+    //Info window used for popups
     infowindow = new google.maps.InfoWindow();
 
+    //We're all set, update our crime types and draw the default boundaries
     updateCrimeTypes();
     updateBoundaries();
 });
 
+//Displays the loading image
 function loadingOn() {
     $('#loading').css('display', 'block');
 }
 
+//Hides the loading image
 function loadingOff() {
     $('#loading').css('display', 'none');
 }
 
+//Removes all the GeoJSON from the map
 function clearBoundaries() {
     for (var i = 0; i < boundaries.length; i++) {
       map.data.remove(boundaries[i]);
     }
 }
 
+//Creates the request to the Census module for GeoJSON and variable data
 function updateBoundaries() {
+    //Turn on the loading screen and increment our loading counter (incase we also request crimes at the same time)
     loadingOn();
     loadingCount++;
 
+    //Construct our request object - lat/lng for Chicago, default to place level with no variables
     var request = {
         lat: 41.8369,
         lng: -87.6847,
@@ -81,6 +100,7 @@ function updateBoundaries() {
         variables: []
     }
 
+    //Grab the user's boundary selection
     var boundary_selection = $('#boundary').find(":selected").val();
 
     //If we don't want city boundaries, we need to set a container and sublevel tag
@@ -93,21 +113,32 @@ function updateBoundaries() {
     //Let's check for our variables
     var checkboxes = $("input:checked");
 
+    //For each checkbox, add it's "value" to the variable array. These are all aliases
+    //from the CitySDK census module
+    //Check http://uscensusbureau.github.io/citysdk/guides/censusModule/aliases.html for more info
     checkboxes.each(function(i) {
         request.variables.push(checkboxes[i].value);
     });
 
+    //Store a copy of the variables the user requested - we use this to iterate
+    //over them when we display the pop-up
     variables = request.variables;
 
     //We now have a complete request, let's get the boundaries and data
     census.GEORequest(request, function(geojson) {
+        //Remove previous json
         clearBoundaries();
+
+        //Add new geojson
         boundaries = map.data.addGeoJson(geojson);
 
+        //Decrement the load counter, and if it is 0, turn off the loading screen
         loadingCount--;
         if(loadingCount == 0) loadingOff();
     });
 
+    //Add a listener so when a user clicks within a boundary we show them the
+    //requested information
     map.data.addListener('click', function(event) {
         var content = "<h3>" + event.feature.getProperty("NAME") + "</h3><div>";
         for(var i = 0; i < variables.length; i++) {
@@ -124,6 +155,7 @@ function updateBoundaries() {
 
 //Updates the crime type selector using the date range we're interested in
 function updateCrimeTypes() {
+    //Make the socrata request object
     var socrataRequest = {
         url: socrataURL,
         dataset: crimeDataset,
@@ -132,8 +164,11 @@ function updateCrimeTypes() {
         where: "date>'" + getTime("start") + "' and date<'" + getTime("end") + "'"
     };
 
+    //Send the socrata request, and make a new list of options
     socrata.request(socrataRequest, function(x) {
         var typeSelector = $('#primary_type');
+        typeSelector.empty();
+        typeSelector.append('<option value="all">All</option>');
         var newOption;
         x.forEach(function(typeObject) {
             newOption = $('<option>' + typeObject.primary_type + '</option>').val(typeObject.primary_type);
@@ -163,6 +198,7 @@ function formatTime(string) {
     return date;
 };
 
+//Removes all crimes from the map
 function clearCrimes() {
     crimeMarkers.forEach(function (crime) {
         crime.setMap(null);
@@ -171,7 +207,9 @@ function clearCrimes() {
     crimeMarkers = [];
 };
 
+//Plots all crimes on the map
 function plotCrimes() {
+    //Throw up the loading screen and increment the counter
     loadingCount++;
     loadingOn();
 
@@ -179,6 +217,7 @@ function plotCrimes() {
     //We start with only our date range in our where request
     var whereStatement = "date>'" + getTime("start") + "' and date<'" + getTime("end") + "'";
 
+    //Grab the type of crime the user is interested in
     var type_selection = $('#primary_type').find(":selected").val();
 
     //Let's customize our where statement
@@ -186,12 +225,14 @@ function plotCrimes() {
         whereStatement += " and primary_type='" + type_selection + "'"
     }
 
+    //Grab the arrest result the user is interested in
     var arrest_selection = $('#arrest').find(":selected").val();
 
     if(arrest_selection != 'all') {
         whereStatement += " and arrest='" + arrest_selection + "'";
     }
 
+    //Construct our request object
     var socrataRequest = {
         url: socrataURL,
         dataset: crimeDataset,
@@ -199,11 +240,13 @@ function plotCrimes() {
         where: whereStatement
     };
 
+    //Send the request
     socrata.request(socrataRequest, function(response) {
         response.forEach(function(crime) {
             //Create a new marker and put it on the map
             var crimeLatLng = new google.maps.LatLng(crime.latitude,crime.longitude);
 
+            //Set the content for the pop up window when clicked
             var content_string = "<strong>Case Number</strong>: " + crime.case_number + "<br/>" +
                                  "<strong>Date</strong>: " + formatTime(crime.date) + "<br/>" +
                                  "<strong>Primary Type</strong>: " + crime.primary_type + "<br/>"+
@@ -211,6 +254,7 @@ function plotCrimes() {
                                  "<strong>Description</strong>: " + crime.description + "<br/>"+
                                  "<strong>Arrest</strong>: " + crime.arrest + "<br/>";
 
+            //Create the marker
             var marker = new google.maps.Marker( {
                                                       position: crimeLatLng,
                                                       map: map,
@@ -229,6 +273,8 @@ function plotCrimes() {
             crimeMarkers.push(marker);
         });
 
+
+        //Decrement the counter and turn off the loading screen if we're done
         loadingCount--;
         if(loadingCount == 0) loadingOff();
     });
