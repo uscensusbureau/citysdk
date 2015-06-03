@@ -12,7 +12,9 @@ Sends a SQL query to a CKAN server.
 
 The DataStore extension must be installed on the CKAN server to utilise this.
 
-The underlying SQL engine is PostgreSQL.
+The underlying SQL engine is PostgreSQL, so you have full access to all the capabilities of a true, object-relational database (e.g. real joins, distinct, count, like, etc.)
+
+To ensure that performance doesn't suffer though, a default LIMIT of 1,000 rows is set unless LIMIT is explicitly specified.
 
 Example of CKAN DataStore API use:
 
