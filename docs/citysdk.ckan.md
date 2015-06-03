@@ -32,9 +32,11 @@ The following is an example request object:
             "Limit": '5'
         }
 
+A dataset's resource_id should be used in the SQL From clause
+
 See http://docs.ckan.org/en/ckan-2.2/datastore.html for more info
 
-More Examples
+More Examples:
 
 New York City Day Care Center Locations in either postal code 10001 or 10012:
 
