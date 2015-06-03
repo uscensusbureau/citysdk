@@ -735,17 +735,17 @@ CensusModule.prototype.aliases = {
     },
     "education_masters": {
         "api": "acs",
-        "variable": "B15003_021E",
+        "variable": "B15003_023E",
         "description": "The number of persons age 25 and over who hold a Master's degree"
     },
     "education_professional": {
         "api": "acs",
-        "variable": "B15003_021E",
+        "variable": "B15003_024E",
         "description": "The number of persons age 25 and over who hold a Profesisonal degree"
     },
     "education_doctorate": {
         "api": "acs",
-        "variable": "B15003_021E",
+        "variable": "B15003_025E",
         "description": "The number of persons age 25 and over who hold a Doctoral degree"
     }
 };
