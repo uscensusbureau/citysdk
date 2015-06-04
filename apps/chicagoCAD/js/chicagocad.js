@@ -182,28 +182,28 @@ function updateBoundaries() {
                                 return {
                                     fillColor: "black",
                                     fillOpacity: 1,
-                                    strokeWeight: 0
+                                    strokeWeight: 0.1
                                 };
                         }
 
                         return {
                             fillColor: getChoroplethColor(opacity),
                             fillOpacity: 1.0,
-                            strokeWeight: 0
+                            strokeWeight: 0.1
                         };
                     } else {
                         if(isNaN(opacity) || opacity < 0) {
                                 return {
                                     fillColor: "blue",
                                     fillOpacity: 0,
-                                    strokeWeight: 0
+                                    strokeWeight: 0.1
                                 };
                         }
 
                         return {
                             fillColor: "blue",
                             fillOpacity: opacity,
-                            strokeWeight: 0
+                            strokeWeight: 0.1
                         };
                     }
 
