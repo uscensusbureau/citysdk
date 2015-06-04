@@ -76,12 +76,7 @@ CkanModule.prototype.search = function(request, callback) {
     for (var key in request) {
         if (request.hasOwnProperty(key)) {
             if (key != "url") {
-                if (key.toLowerCase() == "from") {  //Trim then add double quotes to resource id
-                    ckanURL += encodeURIComponent(key) + '%20"' + encodeURIComponent(request[key].replace(/['"]+/g, '')) + '"%20'
-                }
-                else {
-                    ckanURL += encodeURIComponent(key) + '%20' + encodeURIComponent(request[key]) + '%20';
-                }
+                ckanURL += encodeURIComponent(key) + '%20' + encodeURIComponent(request[key]) + '%20';
                 if (key.toLowerCase() == "limit") { limit = true }
             }
         }

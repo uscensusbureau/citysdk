@@ -49,14 +49,17 @@
                 output.empty();
 
                 if (response.success) {
+                    output.append("<table>");
                     response.result.records.forEach(function(entry) {
+                        output.append("<tr>");
                         for (var property in entry) {
                             if (entry.hasOwnProperty(property)) {
-                                output.append("<b>" + property + "</b>: " + entry[property] + "; ");
+                                output.append("<td><b>" + property + "</b>: " + entry[property] + "; </td>");
                             }
                         }
-                        output.append("<br/>");
+                        output.append("</tr>");
                     });
+                    output.append("</table>");
                 }
             };
 
