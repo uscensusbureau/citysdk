@@ -231,7 +231,6 @@ function updateBoundaries() {
 
         infowindow.setContent(content);
         infowindow.setPosition(event.latLng);
-        infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
         infowindow.open(map);
     });
 };
@@ -311,7 +310,7 @@ function showChoroplethLegend() {
 
     var legendDivs = $('#legend').children('div');
     var mode = $("input[type=radio]:checked").val();
-    
+
     legendDivs.each(function(i) {
         if(mode == 'color') {
             console.log(legendDivs[i].id);
