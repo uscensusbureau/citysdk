@@ -231,7 +231,6 @@ function updateBoundaries() {
 
         infowindow.setContent(content);
         infowindow.setPosition(event.latLng);
-        infowindow.setOptions({pixelOffset: new google.maps.Size(0,-50)});
         infowindow.open(map);
     });
 };
