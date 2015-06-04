@@ -41,6 +41,7 @@ $(document).ready(function() {
     //crimes which were committed in that date range
     $('#startdate input').change(updateCrimeTypes);
     $('#enddate input').change(updateCrimeTypes);
+    $('input:checkbox').change(updateChoroplethOptions);
 
     //Map options for our google map
     var mapOptions = {
@@ -111,7 +112,7 @@ function updateBoundaries() {
     }
 
     //Let's check for our variables
-    var checkboxes = $("input:checked");
+    var checkboxes = $("input[type=checkbox]:checked");
 
     //For each checkbox, add it's "value" to the variable array. These are all aliases
     //from the CitySDK census module
@@ -129,8 +130,90 @@ function updateBoundaries() {
         //Remove previous json
         clearBoundaries();
 
+        //Check to see if we have choropleth enabled
+        var choropleth_variable = $('#choropleth_variable').find(":selected").val();
+
+        //If we don't want city boundaries, we need to set a container and sublevel tag
+        if(choropleth_variable != 'none') {
+            var maxValue = Number.MIN_VALUE;
+            var minValue = Number.MAX_VALUE;
+
+            //Parse and find the maximum value and the lowest value
+            geojson.features.forEach(function(feature) {
+                if(feature.properties[choropleth_variable] != null && feature.properties.AREALAND > 0 && (feature.properties.AREAWATER/feature.properties.AREALAND) < 0.98) {
+                    maxValue = Math.max(maxValue, Number(feature.properties[choropleth_variable]));
+                    minValue = Math.min(minValue, Number(feature.properties[choropleth_variable]));
+                }
+            });
+
+            //Now we have the max and minimum values. If they're different, we
+            //can calibrate the opacity - the lowest value corresponds to 0, and the
+            //highest value corresponds to 1. We will gradient between them.
+            if(maxValue != minValue && maxValue != Number.MIN_VALUE && minValue != Number.MAX_VALUE) {
+                var range = maxValue - minValue;
+
+                //Our opacity formula is:
+                //              feature.variable - minValue
+                //  opacity = _______________________________
+                //                         range
+                //
+                geojson.features.forEach(function(feature) {
+                    feature.properties.choroplethOpacity = (Number(feature.properties[choropleth_variable]) - minValue)/range;
+                });
+            } else {
+                //For some reason the max value and the min value are the same
+                //can't build a choropleth off of that, so we disable it
+                choropleth_variable = 'none';
+            }
+        }
+
         //Add new geojson
         boundaries = map.data.addGeoJson(geojson);
+
+        //If we have choropleth enabled
+        if(choropleth_variable != 'none') {
+            showChoroplethLegend();
+            map.data.setStyle(
+                function(feature) {
+                    var opacity = feature.getProperty('choroplethOpacity');
+
+                    if($("input[type=radio]:checked").val() == 'color') {
+                        if(isNaN(opacity) || opacity < 0) {
+                                return {
+                                    fillColor: "black",
+                                    fillOpacity: 1
+                                };
+                        }
+
+                        return {
+                            fillColor: getChoroplethColor(opacity),
+                            fillOpacity: 1.0
+                        };
+                    } else {
+                        if(isNaN(opacity) || opacity < 0) {
+                                return {
+                                    fillColor: "blue",
+                                    fillOpacity: 0
+                                };
+                        }
+
+                        return {
+                            fillColor: "blue",
+                            fillOpacity: opacity
+                        };
+                    }
+
+
+                }
+            );
+        } else {
+            //Set the default geoJSON style
+            hideChoroplethLegend();
+            map.data.setStyle({
+                fillColor: 'blue',
+                fillOpacity: 0.15
+            });
+        }
 
         //Decrement the load counter, and if it is 0, turn off the loading screen
         loadingCount--;
@@ -151,6 +234,31 @@ function updateBoundaries() {
         infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
         infowindow.open(map);
     });
+};
+
+function getChoroplethColor(input) {
+    var percentage = input * 100;
+    if(percentage < 10) {
+        return "#ffffff";
+    } else if(percentage < 20) {
+        return "#e2ebfb";
+    } else if(percentage < 30) {
+        return "#c2d4f6";
+    } else if(percentage < 40) {
+        return "#b0cbff";
+    } else if(percentage < 50) {
+        return "#96baff";
+    } else if(percentage < 60) {
+        return "#78a6ff";
+    } else if(percentage < 70) {
+        return "#5f94fc";
+    } else if(percentage < 80) {
+        return "#4483fc";
+    } else if(percentage < 90) {
+        return "#2a72ff";
+    } else {
+        return "#0057ff";
+    }
 };
 
 //Updates the crime type selector using the date range we're interested in
@@ -175,6 +283,48 @@ function updateCrimeTypes() {
             typeSelector.append(newOption);
         });
     });
+};
+
+//Updates the options for the choropleth based upon selected variables
+function updateChoroplethOptions() {
+    //Select dom
+    var select = $('#choropleth_variable');
+
+    select.empty();
+    select.append($('<option value="none">None</option>'));
+
+    //Let's check for our variables
+    var checkboxes = $("input[type=checkbox]:checked");
+
+    //For each checkbox, add it's "value" to the variable array. These are all aliases
+    //from the CitySDK census module
+    //Check http://uscensusbureau.github.io/citysdk/guides/censusModule/aliases.html for more info
+    checkboxes.each(function(i) {
+        select.append($('<option value="' + checkboxes[i].value + '">' + $(':input[value="' + checkboxes[i].value + '"]').attr("label")  + '</option>'));
+    });
+};
+
+function showChoroplethLegend() {
+    var legend = $('#legend');
+
+    legend.css('display', 'block');
+
+    var legendDivs = $('#legend').children('div');
+    var mode = $("input[type=radio]:checked").val();
+    
+    legendDivs.each(function(i) {
+        if(mode == 'color') {
+            console.log(legendDivs[i].id);
+            $('#' + legendDivs[i].id).css('background-color', getChoroplethColor(legendDivs[i].id/100));
+        } else {
+            $('#' + legendDivs[i].id).css('background-color', 'rgba(0,0,255,' + legendDivs[i].id/100 + ')');
+        }
+    });
+};
+
+function hideChoroplethLegend() {
+    var legend = $('#legend');
+    legend.css('display', 'none');
 };
 
 //Grabs the date and converts it to the proper formatting. We got from MM/DD/YYYY to YYYY-MM-DD

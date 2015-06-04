@@ -47,6 +47,38 @@
         <div class="col-md-6" style="position:relative;">
             <div id="map-canvas" style="width:100%; height:800px;"></div>
             <div id="loading" style="position:absolute; top:350px; left: 250px; background-color: white; text-align: center; width: 100px; height:100px; border-radius: 5px; padding-top: 25px;">Loading...<br/><img src="loading.gif"/></div>
+            <div id="legend" style="position:absolute; display:none; top:5px; left: 25px; background-color: white; text-align: center; width: 80px; border-radius: 5px;">
+                <div id="05" class="row">
+                    0-10%
+                </div>
+                <div id="15"class="row">
+                    10-20%
+                </div>
+                <div id="25"class="row">
+                    20-30%
+                </div>
+                <div id="35"class="row">
+                    30-40%
+                </div>
+                <div id="45"class="row">
+                    40-50%
+                </div>
+                <div id="55"class="row">
+                    50-60%
+                </div>
+                <div id="65"class="row">
+                    60-70%
+                </div>
+                <div id="75"class="row">
+                    70-80%
+                </div>
+                <div id="85"class="row">
+                    80-90%
+                </div>
+                <div id="95" class="row">
+                    90-100%
+                </div>
+            </div>
         </div>
         <div class="col-md-6">
             <div class="row">
@@ -77,7 +109,7 @@
                     Crime type:
                 </div>
                 <div class="col-md-9">
-                    <select id="primary_type">
+                    <select id="primary_type" style="width: 100%;">
                         <option value="all">All</option>
                     </select>
                 </div>
@@ -87,7 +119,7 @@
                     Arrest type:
                 </div>
                 <div class="col-md-9">
-                    <select id="arrest">
+                    <select id="arrest" style="width: 100%;">
                         <option value="all">Either</option>
                         <option value="true">Arrest</option>
                         <option value="false">No Arrest</option>
@@ -187,13 +219,38 @@
                                 <input type="checkbox" label="Population, GED" value="education_ged"/> Population, GED <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
                             </div>
                         </div>
-                        <div class="row row-spacer">
-                            <div class="col-md-6">
-                                <p><a class="btn btn-info btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="updateBoundaries()" role="button">Update Data</a></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><a class="btn btn-info btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="clearBoundaries()" role="button">Clear Boundaries</a></p>
-                            </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-spacer" style="margin-top: 1em; margin-bottom: 1em;">
+                <div class="col-md-4">
+                    Build Choropleth<a href="javascript:void(0)"  data-toggle="tooltip" title="Change the color of each boundary location based upon the value for the selected variable versus other boundary locations. Darker color means a higher number."><sup>?</sup></a> for:
+                </div>
+                <div class="col-md-8">
+                    <select id="choropleth_variable" style="width: 100%;">
+                        <option value="none">None</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-4">
+                    Choropleth mode<a href="javascript:void(0)"  data-toggle="tooltip" title="Change how the choropleth is drawn on the map"><sup>?</sup></a>:
+                </div>
+                <div class="col-md-4">
+                    <input type="radio" name="choroplethMode" value="color" checked> Color<a href="javascript:void(0)"  data-toggle="tooltip" title="Color choropleth. White is the lowest value, Darker blue is higher. Black is no data."><sup>?</sup></a>
+                </div>
+                <div class="col-md-4">
+                    <input type="radio" name="choroplethMode" value="opacity"> Opacity<a href="javascript:void(0)"  data-toggle="tooltip" title="Opacity choropleth. Darker is higher valued."><sup>?</sup></a>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-12">
+                    <div class="row row-spacer">
+                        <div class="col-md-6">
+                            <p><a class="btn btn-info btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="updateBoundaries()" role="button">Update Data</a></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><a class="btn btn-info btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="clearBoundaries()" role="button">Clear Boundaries</a></p>
                         </div>
                     </div>
                 </div>
