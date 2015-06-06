@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New York City Day Care Center Locations</title>
+    <script src="../libraries/vendor/jquery/jquery-2.1.3.min.js" type="text/javascript"></script>
+    <script src="../../js/citysdk.js" type="text/javascript"></script>
+    <script src="../../js/citysdk.ckan.js" type="text/javascript"></script>
+
+    <script>
+        var sdk, ckan;
+
+        $(document).ready(function() {
+            sdk = new CitySDK();
+            ckan = sdk.modules.ckan;
+        });
+
+        function submit() {
+            var request = {
+                "url": "catalog.opendata.city"
+            }
+
+            var select = $('#select');
+            if (select.val().length > 0) {
+                request["SELECT"] = select.val();
+            }
+
+            var from = $('#from');
+            if (from.val().length > 0) {
+                request["FROM"] = from.val();
+            }
+
+            var where = $('#where');
+            if (where.val().length > 0) {
+                request["WHERE"] = where.val();
+            }
+
+            var orderBy = $('#orderBy');
+            if (orderBy.val().length > 0) {
+                request["ORDER BY"] = orderBy.val();
+            }
+
+            var limit = $('#limit');
+            if (limit.val().length > 0) {
+                request["LIMIT"] = limit.val();
+            }
+
+            var callback = function(response) {
+                var output = $('#output');
+                output.empty();
+
+                if (response.success) {
+                    output.append("<table>");
+                    response.result.records.forEach(function(entry) {
+                        output.append("<tr>");
+                        for (var property in entry) {
+                            if (entry.hasOwnProperty(property)) {
+                                output.append("<td><b>" + property + "</b>: " + entry[property] + "; </td>");
+                            }
+                        }
+                        output.append("</tr>");
+                    });
+                    output.append("</table>");
+                }
+            };
+
+            ckan.search(request, callback);
+        }
+    </script>
+</head>
+<body>
+<div>
+    <h2>New York City Day Care Center Locations</h2>
+    <p>Execute SQL queries on the CKAN DataStore. This allows a user to search data in a resource or even <b>connect multiple resources with join expressions</b>.</br> The underlying SQL engine is the <a href="http://www.postgresql.org/docs/9.1/interactive/queries.html">PostgreSQL engine</a>, so you have <b>full access to the power of its SELECT clause</b>.</br>However, there is an enforced timeout on SQL queries to avoid an unintended DOS and results are limited to 1,000 rows at a time unless LIMIT is explicitly specified.</p>
+    <p>Fields: name, HOUSENUM, STREETNAME, postalCode, streetAddress, BIN, BBL, addressLocality, loc, longitude, latitude, URL</p>
+    <p>Try out some clauses (leave blank to ignore):</p>
+    <p>Select: <input id="select" style="width: 300px;" type="text" value='*'/> (e.g. distinct "name","streetAddress","postalCode")</p>
+    <p>From: <input id="from" style="width: 300px;" type="text" value='"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"'/> (e.g. "e4491e0c-ba09-4cb2-97c1-d466e3e976a5")</p>
+    <p>Where: <input id="where" style="width: 450px;" type="text"/> (e.g. "postalCode" in ('10001', '10012') or "name" ilike '%monte%')</p>
+    <p>Order By: <input id="orderBy" style="width: 200px;" type="text"/> (e.g. "postalCode", "name")</p>
+    <p>Limit: <input id="limit" style="width: 100px;" type="text" value='50'/> (e.g. 50)</p>
+    <input type="submit" onclick="submit()" value="Query"/>
+</div>
+<pre id="output">
+
+</pre>
+</body>
+</html>
