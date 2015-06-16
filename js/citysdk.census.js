@@ -99,6 +99,46 @@ CensusModule.prototype.stateCapitals = {
 };
 
 /**
+ * Bounding box to allow users to request all geographies within the US, as there is no US boundary map server
+**/
+var usBoundingBox = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -49.5703125,
+                            41.77131167976407
+                        ],
+                        [
+                            -152.2265625,
+                            77.23507365492472
+                        ],
+                        [
+                            -221.1328125,
+                            19.973348786110602
+                        ],
+                        [
+                            -135.703125,
+                            -16.97274101999901
+                        ],
+                        [
+                            -49.5703125,
+                            41.77131167976407
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+};
+
+/**
  * Dictionary of aliases, string alias -> object with variable and description
  * @type {object} Object with properties of aliased variable, each having an object specifying the api, true variable, and description
  */
@@ -1165,15 +1205,60 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
     //This will ensure our coordinates come out properly
     var spatialReferenceCode = 4326;
 
-    //Dictionary of map server codes
-    var mapServers = {
-        "state": 84,
-        "county": 86,
-        "tract": 8,
-        "blockGroup": 10,
-        "blocks": 12,
-        "place": 28
+    var servers = {
+        current: {
+            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/{mapserver}/query",
+            mapServers: {
+                "state": 84,
+                "county": 86,
+                "tract": 8,
+                "blockGroup": 10,
+                "blocks": 12,
+                "place": 28
+            }
+        },
+        acs2014: {
+            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/MapServer/{mapserver}/query",
+            mapServers: {
+                "state": 82,
+                "county": 84,
+                "tract": 8,
+                "blockGroup": 10,
+                "place": 26
+            }
+        },
+        acs2013: {
+            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2013/MapServer/{mapserver}/query",
+            mapServers: {
+                "state": 82,
+                "county": 84,
+                "tract": 8,
+                "blockGroup": 10,
+                "place": 26
+            }
+        },
+        census2010: {
+            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2010/MapServer/{mapserver}/query",
+            mapServers: {
+                "state": 98,
+                "county": 100,
+                "tract": 14,
+                "blockGroup": 16,
+                "blocks": 18,
+                "place": 34
+            }
+        }
     };
+
+    var server = "current";
+    if("mapServer" in request) {
+        server = request.mapServer;
+    } else {
+        request.mapServer = "current";
+    }
+
+    //Dictionary of map server codes
+    var mapServers = servers[server].mapServers;
 
     this.parseRequestStateCode(request);
 
@@ -1222,7 +1307,8 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
         inSR: spatialReferenceCode
     };
 
-    tigerURL = "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/{mapserver}/query";
+    tigerURL = servers[server].url;
+
     if("container" in request && "sublevel" in request) {
         if(!request.sublevel) {
             //They submitted a sublevel flag but it's false... remove the unnecessary flags and re-request
@@ -1243,9 +1329,12 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
                 function(response) {
                     var json = $.parseJSON(response);
                     var features = json.features;
-
                     //Grab our container ESRI geography, attach it to our request, and call this function again.
-                    request.containerGeometry = features[0].geometry;
+                    if(request.container == "us") {
+                        request.containerGeometry = CitySDK.prototype.sdkInstance.modules.census.GEOtoESRI(usBoundingBox)[0].geometry;
+                    } else {
+                        request.containerGeometry = features[0].geometry;
+                    }
                     CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
                 }
             );
@@ -1277,6 +1366,9 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
         //Make the container equal to the level, and the sublevel
         request.container = request.level;
         switch(request.level) {
+            case "us":
+                request.level = "state";
+                break;
             case "state":
                 request.level = "county";
                 break;
@@ -1600,8 +1692,15 @@ CensusModule.prototype.GEORequest = function(request, callback) {
     if("data" in request || !("variables" in request)) {
         //We have a data object for the request (or there isn't any requested), now we can get the geoJSON for the area
         CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, function(response) {
+            if(!("totals" in response)) {
+                response.totals = {};
+                request.variables.forEach(function(v) {
+                    response.totals[v] = 0;
+                })
+            }
             //If we have data, let's attach it to the geoJSON
             if("data" in request) {
+                var totals = response.totals;
                 var features = response.features;
                 var data = request.data;
                 var variables = request.variables;
@@ -1641,6 +1740,7 @@ CensusModule.prototype.GEORequest = function(request, callback) {
                             for (var property in resp.data[0]) {
                                 if (resp.data[0].hasOwnProperty(property)) {
                                     features[resp.featuresIndex].properties[property] = resp.data[0][property];
+                                    if(jQuery.inArray(property, variables) >= 0) totals[property] = Number(totals[property]) + (!isNaN(resp.data[0][property])) ? Number(resp.data[0][property]) : 0;
                                 }
                             }
                         });
@@ -1650,6 +1750,7 @@ CensusModule.prototype.GEORequest = function(request, callback) {
                         for (var property in matchedFeature) {
                             if (matchedFeature.hasOwnProperty(property)) {
                                 features[i].properties[property] = matchedFeature[property];
+                                if(jQuery.inArray(property, variables) >= 0) totals[property] = Number(totals[property]) + (!isNaN(matchedFeature[property])) ? Number(matchedFeature[property]) : 0;
                             }
                         }
                     } else {
