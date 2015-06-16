@@ -101,6 +101,8 @@ published: true
 
 
     $(function(){
+        visible("location_coords");
+
         // Instantiate census object.
         var sdk = new CitySDK();
         census = sdk.modules.census;
@@ -172,15 +174,28 @@ published: true
 
 <div class="container">
     <div class="row">
-        <p>Census API key:</td><td><input type="text" size="40" id="apikey" value=''/></p>
+        <p>Census API key: <input type="text" size="40" id="apikey" value=''/></p>
     </div>
-    <h3>Specify Location</h3>
+    <div class="row" id="call_row">
+        <div class="col-md-2">
+            <p>Specify location by:</p>
+        </div>
+        <div class="col-md-6">
+            <input type="radio" name="location_radios" value="location_coords" onclick="visible('location_coords')" checked> Coordinates<br/>
+            <input type="radio" name="location_radios" value="location_zip" onclick="visible('location_zip')"> Zip Code<br/>
+            <input type="radio" name="location_radios" value="location_state" onclick="visible('location_state')"> State Code<br/>
+            <input type="radio" name="location_radios" value="location_address" onclick="visible('location_address')"> Address
+        </div>
+        <div class="col-md-4">
+            <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="submit()" role="button">Update Data</a></p>
+        </div>
+    </div>
     <div class="row" id="location_coords">
         <div class="col-md-2">
-            <div class="row">
+            <div class="row" style="padding-left: 15px;">
                 <p>lat:</p>
             </div>
-            <div class="row">
+            <div class="row" style="padding-left: 15px;">
                 <p>lng:</p>
             </div>
         </div>
@@ -193,10 +208,10 @@ published: true
             </div>
         </div>
         <div class="col-md-4">
-            <div class="row">
+            <div class="row"  style="padding-left: 15px;">
                 <p>Number - The latitude of the requested location (North). Also supported: latitude, y</p>
             </div>
-            <div class="row">
+            <div class="row" style="padding-left: 15px;">
                 <p>Number - The longitude of the requested location (East). Also supported: longitude, x</p>
             </div>
         </div>
@@ -225,13 +240,13 @@ published: true
     </div>
     <div class="row" id="location_address">
         <div class="col-md-2">
-            <div class="row">
+            <div class="row" style="padding-left: 15px;">
                 <p>Street:</p>
             </div>
-            <div class="row">
+            <div class="row" style="padding-left: 15px;">
                 <p>City:</p>
             </div>
-            <div class="row">
+            <div class="row" style="padding-left: 15px;">
                 <p>State:</p>
             </div>
         </div>
@@ -285,7 +300,7 @@ published: true
             <p>sublevel:</p>
         </div>
         <div class="col-md-6">
-            <input class="reqparam form-control" type="checkbox" value='1' id='sublevel' name='sublevel'>
+            <input class="reqparam" type="checkbox" value='1' id='sublevel' name='sublevel'>
         </div>
         <div class="col-md-4">
             <p>Boolean - Optional Whether or not to return based upon sublevels. See sublevel requests for more information. Defaults to false.</p>
@@ -314,8 +329,8 @@ published: true
             <p>CitySDK call:</p>
         </div>
         <div class="col-md-6">
-            <input type="radio" class="form-control" name="CitySDKcall" value="APIRequest"> APIRequest<br/>
-            <input type="radio" class="form-control" name="CitySDKcall" value="GEORequest" checked> GEORequest
+            <input type="radio" name="CitySDKcall" value="APIRequest"> APIRequest<br/>
+            <input type="radio" name="CitySDKcall" value="GEORequest" checked> GEORequest
         </div>
         <div class="col-md-4">
             <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="submit()" role="button">Update Data</a></p>
@@ -326,6 +341,6 @@ published: true
     <pre id="cenreq"></pre>
 
     <p>Output:</p>
-    <textarea rows="10" cols="100" id="output"></textarea>
+    <pre id="output"></pre>
 </div>
 </body>
