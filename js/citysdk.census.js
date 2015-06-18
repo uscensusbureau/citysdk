@@ -1694,9 +1694,6 @@ CensusModule.prototype.GEORequest = function(request, callback) {
         CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, function(response) {
             if(!("totals" in response)) {
                 response.totals = {};
-                request.variables.forEach(function(v) {
-                    response.totals[v] = 0;
-                })
             }
             //If we have data, let's attach it to the geoJSON
             if("data" in request) {
