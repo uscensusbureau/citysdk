@@ -339,30 +339,30 @@ $(function () {
         ]
     }];
 
-         var $container = $('#container'),
-        $buttons = $('#filters button');
+    var $container = $('#container'),
+    $buttons = $('#filters button');
 
-      var source = $("#item-tpl").html();
+    var source = $("#item-tpl").html();
       
-      var template = Handlebars.compile(source);
+    var template = Handlebars.compile(source);
 
-      _(data).each(function (item) {
+    _(data).each(function (item) {
           $container.append(template(item));
       });
 
-      $container.isotope({
+    $container.isotope({
           itemSelector: '.item'
       });
       // get Isotope instance
-      var isotope = $container.data('isotope');
+    var isotope = $container.data('isotope');
       // add even classes to every other visible item, in current order
-      function addEvenClasses() {
+    function addEvenClasses() {
           isotope.$filteredAtoms.each(function (i, elem) {
               $(elem)[(i % 2 ? 'addClass' : 'removeClass')]('even')
           });
-      }
+    }
 
-      $buttons.click(function () {
+    $buttons.click(function () {
           $button = $(this);
 
           if ($button.data('filter') === '*') {
@@ -384,13 +384,9 @@ $(function () {
               filter: filters
           });
           addEvenClasses();
-      });
+    });
 
-      $('#shuffle').click(function () {
-          $container.isotope('shuffle');
-          addEvenClasses();
-      });
-    }
+
 
 });
 </script>
