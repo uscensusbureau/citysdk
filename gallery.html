@@ -12,8 +12,156 @@ nav: gallery
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>City SDK Gallery</title>
+<script src="https://cdn.rawgit.com/uscensusbureau/citysdk/master/examples/libraries/vendor/jquery/jquery-2.1.3.min.js"></script>
+  <script src="http://isotope.metafizzy.co/v1/jquery.isotope.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
 
     <title>City SDK Gallery</title>
+
+<style>
+body {
+    font-family:'Helvetica Neue', Arial, sans-serif;
+}
+.button {
+    display: inline-block;
+    padding: 10px 18px;
+    margin-bottom: 10px;
+    background: #EEE;
+    border: none;
+    border-radius: 7px;
+    background-image: linear-gradient(to bottom, hsla(0, 0%, 0%, 0), hsla(0, 0%, 0%, 0.2));
+    color: #222;
+    font-family: sans-serif;
+    font-size: 16px;
+    text-shadow: 0 1px white;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: #8CF;
+    text-shadow: 0 1px hsla(0, 0%, 100%, 0.5);
+    color: #222;
+}
+.button:active, .button.is-checked {
+    background-color: #28F;
+}
+.button.is-checked {
+    color: white;
+    text-shadow: 0 -1px hsla(0, 0%, 0%, 0.8);
+}
+.button:active {
+    box-shadow: inset 0 1px 10px hsla(0, 0%, 0%, 0.8);
+}
+/* ---- button-group ---- */
+ .button-group:after {
+    content:'';
+    display: block;
+    clear: both;
+}
+.button-group .button {
+    float: left;
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 1px;
+}
+.button-group .button:first-child {
+    border-radius: 0.5em 0 0 0.5em;
+}
+.button-group .button:last-child {
+    border-radius: 0 0.5em 0.5em 0;
+}
+
+#container {
+    border: 0px solid;
+    padding: 3px;
+}
+.item {
+    width: 300px;
+    height: 230px;
+    margin: 3px;
+    float: left;
+    padding: 20px;
+    font-size: 12px;
+}
+
+.item .name {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+.item .image {
+   float: left;
+}
+.item .description {
+    float: left;
+    width: 175px;
+    margin-left: 20px;
+}
+
+.item .top-container {
+    overflow: hidden;
+    margin-bottom: 15px;
+    height: 100px;
+}
+
+.item .githubimage {
+    float: left;
+    font-size: 24px;
+}
+.item .links {
+    float: left;
+    margin: 0;
+    margin-left: 10px;
+    width: 238px;
+    font-size: 12px;
+    list-style-type: none;
+    padding: 0;
+}
+
+.item .links li {
+  margin-bottom: 5px;
+}
+
+.dataset {
+    background: hsla(0, 0%, 97%, 1);
+}
+.technology {
+    background: hsla(0, 0%, 97%, 1);
+}
+/* Start: Recommended Isotope styles */
+
+/**** Isotope Filtering ****/
+ .isotope-item {
+    z-index: 2;
+}
+.isotope-hidden.isotope-item {
+    pointer-events: none;
+    z-index: 1;
+}
+/**** Isotope CSS3 transitions ****/
+ .isotope, .isotope .isotope-item {
+    -webkit-transition-duration: 0.8s;
+    -moz-transition-duration: 0.8s;
+    transition-duration: 0.8s;
+}
+.isotope {
+    -webkit-transition-property: height, width;
+    -moz-transition-property: height, width;
+    transition-property: height, width;
+}
+.isotope .isotope-item {
+    -webkit-transition-property: -webkit-transform, opacity;
+    -moz-transition-property: -moz-transform, opacity;
+    transition-property: transform, opacity;
+}
+/**** disabling Isotope CSS3 transitions ****/
+ .isotope.no-transition, .isotope.no-transition .isotope-item, .isotope .isotope-item.no-transition {
+    -webkit-transition-duration: 0s;
+    -moz-transition-duration: 0s;
+    transition-duration: 0s;
+}
+/* End: Recommended Isotope styles */
+</style>
 
 </head>
 
@@ -24,58 +172,233 @@ nav: gallery
     <div class="container">
         <i class="fa fa-picture-o fa-5x" style="padding-top: 3rem;"> Gallery</i>
     </div>
+</div>  
+
+<div class="button-group filters-button-group" id="filters">
+    <button class="button show-all is-checked" data-filter="*">Show All</button>
+    <button class="button" data-filter=".dataset">Browse by Dataset</button>
+    <button class="button" data-filter=".technology">Browse by Technology</button>
 </div>
 
-<div class="container">
-    <div class="row">
-        <h3>Module Gallery</h3>
-        <p>The following modules are currently published in the main CitySDK repository:</p>
-        <div class="row">
-            <div class="col-md-3">
-                <h4>Census Bureau APIs</h4>
-                <p><small><em>citysdk.census.js</em></small></p>
-                <p>Leverage the powerful data of the U.S. Census Bureau by implementing the Census module into your
-                application. Access data from the American Community Survey and integrate it with GeoJSON features from
-                TigerWeb.</p>
-            </div>
-            <div class="col-md-3">
-                <h4>Energy Information Agency</h4>
-                <p><small><em>citysdk.eia.js</em></small></p>
-                <p>Access the extensive datasets of the U.S. Energy Information Agency using this module. Browse various
-                categories and use their data series in your visualizations and analyses.</p>
-            </div>
-            <div class="col-md-3">
-                <h4>USDA Farmer's Market Directory</h4>
-                <p><small><em>citysdk.farmersMarket.js</em></small></p>
-                <p>Discover a world of fresh food near you! By integrating the U.S. Department of Agriculture's National
-                Farmer's Market directory module, you can find markets near any location in the U.S. including details such as
-                products and services offered as well as hours of operation.</p>
-            </div>
-            <div class="col-md-3">
-                <h4>Socrata</h4>
-                <p><small><em>citysdk.socrata.js</em></small></p>
-                <p>Infuse your application with open data, powered by Socrata. Socrata is one of the leading applications
-                municipal, state, and federal agencies use to distribute their data. Using the Socrata module is a snap,
-                making the incorporation of open data into your development a breeze.</p>
-            </div>
-        </div>
-        <p>The following modules are community developed and published:</p>
-        <div class="row">
-            <div class="col-md-3">
-                <h4>ArcGIS</h4>
-                <p><small><em>citysdk.arcgis.js</em></small></p>
-                <p>Compare data from local governments using ArcGIS server. Find over 26,000 datasets from <a href="http://opendata.arcgis.com">ArcGIS Open Data community</a> and <a href="http://catalog.data.gov/dataset?q=&sort=score+desc%2C+name+asc&res_format=Esri+REST&_res_format_limit=0">US Data.gov</a>. Module available on <a href="https://github.com/esridc/citysdk-arcgis">GitHub</a>.</p>
-            </div>
-            <div class="col-md-3">
-                <h4>U.S. Housing and Urban Development</h4>
-                <p><small><em>citysdk.hud.js</em></small></p>
-                <p>Access data on FHA Loans, HUD Insured Properties, Fair Market Rents and dozens of other datasets related to national housing and property issues. CitySDK-HUD is available on <a href="https://github.com/esridc/citysdk-hud">GitHub</a>.</p>
-            </div>            
-        </div>
+<script id="item-tpl" type="text/x-handlebars-template">
+     <div class="item {{type}}"> 
+        <h3 class="name">{{name}}</h3>
+        
+        <div class="top-container">
+             <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
+    
+            <div class="description"> {{description}} </div>
+         </div>
+        
+        <i class="githubimage fa fa-github"></i >
+
+        <ul class="links">
+          {{#each links }} 
+          <li>
+            <a href= "{{url}}">{{title}}</a>
+          </li>
+          {{/each}}
+        </ul>
     </div>
+</script>
+<div id="container">
+
 </div>
 </body>
+
 <script>
+
+$(function () {
+
+   
+    var data = [{
+        type: "dataset",
+        name: "US Census Bureau",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/census.png?raw=true",
+        description: "The Census Bureau's mission is to serve as the leading source of quality data about the nation's people and economy.",
+        links: [{
+            url: "http://uscensusbureau.github.io/citysdk/guides/censusModule.htm",
+            title: "Guide to the Census CitySDK Module"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/guides/censusModule/queryBuilder.html",
+            title: "Demo: Interactive Query Builder"
+        }]
+    }, 
+                {
+        type: "technology",
+        name: "Leaflet",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/leaflet.png?raw=true",
+        description: "Leaflet is an Open-Source JavaScript library for web and mobile friendly interactive maps.  It uses the GeoJSON format which is supported by the CitySDK.",
+        links: [{
+            url: "http://uscensusbureau.github.io/citysdk/examples/leafletNYC/",
+            title: "Demo: Leaflet NYC Boroughs"
+        }]
+    },
+  {
+        type: "dataset",
+        name: "Housing and Urban Development",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/hud.png",
+        description: "Access data on FHA Loans, HUD Insured Properties, Fair Market Rents and dozens of other datasets related to national housing and property issues.",
+        links: [{
+            url: "https://github.com/esridc/citysdk-hud",
+            title: "CitySDK HUD Module"
+        }, {
+            url: "http://esridc.github.io/citysdk-hud/",
+            title: "Demo: Housing Loans in Pittsburgh"
+        }]
+    }, 
+      {
+        type: "dataset",
+        name: "US Department of Agriculture",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/usda.png?raw=true",
+        description: "Discover fresh food near you with the National Farmer's Market directory module.",
+        links: [{
+            url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.farmersMarket.js",
+            title: "CitySDK Farmer's Market Module"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/guides/usingMultipleModules.html",
+            title: "Demo: Farmer's Markets in California"
+        }]
+    },     
+          {
+        type: "dataset",
+        name: "US Department of Energy",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/doe.png?raw=true",
+        description: "Access the extensive datasets of the U.S. Energy Information Agency using this module. Browse various categories and use their data series in your visualizations and analysis.",
+        links: [{
+            url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.eia.js",
+            title: "CitySDK Energy Information Agency Module"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/examples/eiaBrowser/",
+            title: "Demo: Energy Information Agency browser"
+        }]
+    },     
+          {
+        type: "technology",
+        name: "ESRI",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/esri.png?raw=true",
+        description: "Governments, industry leaders, academics, and nongovernmental organizations (NGOs) use ESRI to connect with analytic knowledge they need to make decisions.",
+        links: [{
+            url: "http://esridc.github.io/citysdk-arcgis/",
+            title: "ESRI ArcGIS Module"
+        }, {
+            url: "http://esridc.github.io/citysdk-hud/",
+            title: "Demo: Chart Showing DC School Enrollment"
+        }]
+    },   
+
+              {
+        type: "technology",
+        name: "Socrata",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/socrata.png?raw=true",
+        description: "The Socrata platform is commonly used by municipal, state, and federal agencies use to distribute their data.",
+        links: [{
+            url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.socrata.js",
+            title: "CitySDK Socrata Module"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/examples/socrataExample/",
+            title: "Demo: Chicago Payroll Query"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/apps/chicagoCAD/",
+            title: "Demo: Chicago Crime and Demographics"
+        }]
+    },    
+        {
+        type: "technology",
+        name: "Google Maps",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/googlemaps.png?raw=true",
+        description: "There are several CitySDK examples that utilize Google Maps to create interactive web apps.",
+        links: [{
+            url: "http://uscensusbureau.github.io/citysdk/guides/usingMultipleModules.html",
+            title: "Demo: Farmer's Markets in California"
+        }, {
+            url: "http://esridc.github.io/citysdk-hud/",
+            title: "Demo: Housing Loans in Pittsburgh"
+        }, 
+        ]
+    },
+       {         
+        type: "dataset",
+        name: "Public Spaces for Innovation",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/uofchicago.png",
+        description: "The Data Science for Social Good Fellows at the University of Chicago have created datasets and a tool for community organizers using the CitySDK.",
+        links: [{
+            url: "https://github.com/dssg/innovation-ecosystems",
+            title: "Demo: Innovation Ecosystems"
+             }, 
+        ]
+    },    
+                
+       {         
+        type: "technology",
+        name: "Bing Maps",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/bing.png?raw=true",
+        description: "CitySDK apps can be built with Microsoft Bing's mapping technology.",
+        links: [{
+            url: "http://uscensusbureau.github.io/citysdk/examples/bingMapsExample/",
+            title: "Demo: Using Bing Maps with the CitySDK"
+             }, 
+        ]
+    }];
+
+    function draw(data) {
+         var $container = $('#container'),
+        $buttons = $('#filters button');
+
+      var source = $("#item-tpl").html();
+      
+      var template = Handlebars.compile(source);
+
+      _(data).each(function (item) {
+          $container.append(template(item));
+      });
+
+      $container.isotope({
+          itemSelector: '.item'
+      });
+      // get Isotope instance
+      var isotope = $container.data('isotope');
+      // add even classes to every other visible item, in current order
+      function addEvenClasses() {
+          isotope.$filteredAtoms.each(function (i, elem) {
+              $(elem)[(i % 2 ? 'addClass' : 'removeClass')]('even')
+          });
+      }
+
+      $buttons.click(function () {
+          $button = $(this);
+
+          if ($button.data('filter') === '*') {
+              $button.toggleClass('is-checked');
+              $buttons.not($button).toggleClass('is-checked', false);
+          } else {
+              $button.addClass('is-checked');
+              $buttons.not($button).removeClass('is-checked');
+          }
+
+          var filters = [];
+          // get checked checkboxes values
+          $buttons.filter('.is-checked').each(function () {
+              filters.push($(this).data('filter'));
+          });
+          // ['.dataset', '.technology'] -> '.dataset, .technology'
+          filters = filters.join(', ');
+          $container.isotope({
+              filter: filters
+          });
+          addEvenClasses();
+      });
+
+      $('#shuffle').click(function () {
+          $container.isotope('shuffle');
+          addEvenClasses();
+      });
+    }
+
+   draw(data);
+
+});
+
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
