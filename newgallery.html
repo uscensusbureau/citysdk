@@ -1,23 +1,101 @@
----
-layout: default
-title: NewGallery
-nav: NewGallery
----
-
-<!DOCTYPE html>
-
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title>CitySDK Gallery</title>
+  <link rel="stylesheet" href="/citysdk/static/css/bootstrap.min.css">
+  <script src="/citysdk/static/js/jquery.js"></script>
+  <script src="/citysdk/static/js/bootstrap.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/master/examples/libraries/vendor/jquery/jquery-2.1.3.min.js"></script>
   <script src="http://isotope.metafizzy.co/v1/jquery.isotope.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--[if lt IE 9]>
+  <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 
-    <title>City SDK Gallery</title>
+  <!--[if IE]>
+  <link rel="stylesheet" href="/citysdk/static/css/for-ie-only.css">
+  <![endif]-->
+</head>
+
+<body>
+
+  <header class="header cf" role="banner">
+          <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="font-weight: normal; font-size: 14px;">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand topnav" href="/citysdk">
+                    <img src="/citysdk/static/img/citysdk_horizontal_logo.png" style="height:100%"/>
+                </a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right" style="font-size: 14px;">
+                    <li><a href="/citysdk/gettingstarted.html" class="gettingstarted">Getting Started</a></li>
+        <li><a href="/citysdk/guides.html" class="guides">Guides</a></li>
+                    <li><a href="/citysdk/gallery.html" class="gallery">Gallery</a></li>
+        <li><a href="/citysdk/challenge.html" class="challenge">Challenge</a></li>
+          <li><a href="/citysdk/contribute.html" class="contribute">Contribute</a></li>
+          <li><a href="/citysdk/news.html" class="news">News</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+  </header>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-picture-o fa-5x" style="padding-top: 3rem; padding: 30px;"> Gallery</i>
+    </div>
+</div>  
+
+<div class="button-group filters-button-group" id="filters" style="padding-top: 3rem; padding: 30px;" >
+    <button class="button show-all is-checked" data-filter="*">Show All</button>
+    <button class="button" data-filter=".dataset">Browse by Dataset</button>
+    <button class="button" data-filter=".technology">Browse by Technology</button>
+</div>
+
+<script id="item-tpl" type="text/x-handlebars-template">
+     <div class="item {{type}}"> 
+        <h3 class="name">{{name}}</h3>
+        
+        <div class="top-container">
+             <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
+    
+            <div class="description"> {{description}} </div>
+         </div>
+        
+        <i class="githubimage fa fa-github"></i >
+
+        <ul class="links">
+          {{#each links }} 
+          <li>
+            <a href= "{{url}}">{{title}}</a>
+          </li>
+          {{/each}}
+        </ul>
+    </div>
+</script>
+<div id="gallery">
+
+</div>
+
+
+</body>
 
 <style>
 body {
@@ -73,7 +151,7 @@ body {
 
 #gallery {
     border: 0px solid;
-    padding: 3px;
+    padding: 30px;
 }
 .item {
     width: 300px;
@@ -161,51 +239,6 @@ body {
 }
 /* End: Recommended Isotope styles */
 </style>
-
-</head>
-
-<body>
-
-<!-- Main jumbotron for a primary marketing message or call to action -->
-<div class="jumbotron">
-    <div class="container">
-        <i class="fa fa-picture-o fa-5x" style="padding-top: 3rem;"> Gallery</i>
-    </div>
-</div>  
-
-<div class="button-group filters-button-group" id="filters">
-    <button class="button show-all is-checked" data-filter="*">Show All</button>
-    <button class="button" data-filter=".dataset">Browse by Dataset</button>
-    <button class="button" data-filter=".technology">Browse by Technology</button>
-</div>
-
-<script id="item-tpl" type="text/x-handlebars-template">
-     <div class="item {{type}}"> 
-        <h3 class="name">{{name}}</h3>
-        
-        <div class="top-container">
-             <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
-    
-            <div class="description"> {{description}} </div>
-         </div>
-        
-        <i class="githubimage fa fa-github"></i >
-
-        <ul class="links">
-          {{#each links }} 
-          <li>
-            <a href= "{{url}}">{{title}}</a>
-          </li>
-          {{/each}}
-        </ul>
-    </div>
-</script>
-<div id="gallery">
-
-</div>
-
-
-</body>
 
 <script>
 
