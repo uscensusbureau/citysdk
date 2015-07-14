@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Baltimore Crime and Demographics</title>
+
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
+    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
+    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
+    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.socrata.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
+    <script src="js/baltimorecad.js"></script>
+
+    <script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+    </script>
+
+    <style>
+        .row-spacer {
+            margin-top: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="background: url(skyline.jpg) no-repeat center center; margin-bottom: 2em; color: white; height: 300px; background-size: cover; background-position: -100px, -100px;
+                background-color:black; position:relative;">
+        <div class="container">
+            <h3>Baltimore Crime and Demographics</h3>
+            <p>Visualize Baltimore Crime data versus various demographics. Change the date range, crime types, and arrest options for Crime.</p>
+            <p>Select your boundary types and variables to compare.
+            Click a crime marker to view more data about that crime, or click inside a boundary to view the requested variables for that boundary.</p>
+        </div>
+        <div style="color:white; font-size: 75%; position:absolute; bottom:0; right:0; padding: 0.5em; text-align:right;">
+            Powered by<br/>
+            <a href="http://uscensusbureau.github.io/citysdk/index.html" target="_blank"><img height="50px" src="./citysdk_horizontal_logo.png"/></a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="col-md-6" style="position:relative;">
+            <div id="map-canvas" style="width:100%; height:800px;"></div>
+            <div id="loading" style="position:absolute; top:350px; left: 250px; background-color: white; text-align: center; width: 100px; height:100px; border-radius: 5px; padding-top: 25px;">Loading...<br/><img src="loading.gif"/></div>
+            <div id="legend" style="position:absolute; display:none; top:5px; left: 25px; background-color: white; text-align: center; width: 80px; border-radius: 5px;">
+                <div id="05" class="row">
+                    0-10%
+                </div>
+                <div id="15"class="row">
+                    10-20%
+                </div>
+                <div id="25"class="row">
+                    20-30%
+                </div>
+                <div id="35"class="row">
+                    30-40%
+                </div>
+                <div id="45"class="row">
+                    40-50%
+                </div>
+                <div id="55"class="row">
+                    50-60%
+                </div>
+                <div id="65"class="row">
+                    60-70%
+                </div>
+                <div id="75"class="row">
+                    70-80%
+                </div>
+                <div id="85"class="row">
+                    80-90%
+                </div>
+                <div id="95" class="row">
+                    90-100%
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <h3>Crime Controls</h3>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-3">
+                    Start date:
+                </div>
+                <div class="col-md-9">
+                    <div id='startdate'>
+                        <input type="text" type="text" class="form-control" value="01/01/2015"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-3">
+                    End date:
+                </div>
+                <div class="col-md-9">
+                    <div id='enddate'>
+                        <input type="text" type="text" class="form-control" value="06/12/2015"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-3">
+                    Crime type:
+                </div>
+                <div class="col-md-9">
+                    <select id="primary_type" style="width: 100%;">
+                        <option value="all">All</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-3">
+                    Arrest type:
+                </div>
+                <div class="col-md-9">
+                    <select id="arrest" style="width: 100%;">
+                        <option value="all">Either</option>
+                        <option value="true">Arrest</option>
+                        <option value="false">No Arrest</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-6">
+                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="plotCrimes()" role="button">Plot Crimes</a></p>
+                </div>
+                <div class="col-md-6">
+                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="clearCrimes()" role="button">Clear Crimes</a></p>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <h3>Demographic and Data Controls</h3>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-4">
+                    Show boundaries for:
+                </div>
+                <div class="col-md-8">
+                    <select id="boundary">
+                        <option value="place">Baltimore</option>
+                        <option value="tract">Census Tracts</option>
+                        <option value="blockGroup">Census Block Groups</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-12">
+                    <div class="row">
+                        Include American Community Survey (2013, 5-year) variables:
+                    </div>
+                    <div id="acsVariableSelection">
+                        <div class="row row-spacer">
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Median Household Income" value="income"/> Median Household Income <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Income Per Capita" value="income_per_capita"/> Income Per Capita <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population" value="population"/> Population <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                        </div>
+                        <div class="row row-spacer">
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Median Age" value="age"/> Median Age <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population in Poverty" value="poverty"/> Population in Poverty <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population Unemployed" value="employment_unemployed"/> Population Unemployed <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                        </div>
+                        <div class="row row-spacer">
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Median Contract Rent" value="median_contract_rent"/> Median Contract Rent <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Median Gross Rent" value="median_gross_rent"/> Median Gross Rent <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Median House Construction Year" value="median_house_construction_year"/> Median House Construction Year <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+
+                        </div>
+                        <div class="row row-spacer">
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, High School Diploma" value="education_high_school"/> Population, High School Diploma <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, Associate's Degree" value="education_associates"/> Population, Associate's degree <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, Bachelor's Degree" value="education_bachelors"/> Population, Bachelor's degree <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                        </div>
+                        <div class="row row-spacer">
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, Master's Degree" value="education_masters"/> Population, Master's degree <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, Professional Degree" value="education_professional"/> Population, Professional degree <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, Doctoral Degree" value="education_doctorate"/> Population, Doctoral degree <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                        </div>
+                        <div class="row row-spacer">
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, No Education" value="education_none"/> Population, No Education <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="checkbox" label="Population, GED" value="education_ged"/> Population, GED <a class="questionLink" href="javascript:void(0)"  data-toggle="tooltip" title=""><sup>?</sup></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-spacer" style="margin-top: 1em; margin-bottom: 1em;">
+                <div class="col-md-4">
+                    Build Choropleth<a href="javascript:void(0)"  data-toggle="tooltip" title="Change the color of each boundary location based upon the value for the selected variable versus other boundary locations. Darker color means a higher number."><sup>?</sup></a> for:
+                </div>
+                <div class="col-md-8">
+                    <select id="choropleth_variable" style="width: 100%;">
+                        <option value="none">None</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-4">
+                    Choropleth mode<a href="javascript:void(0)"  data-toggle="tooltip" title="Change how the choropleth is drawn on the map"><sup>?</sup></a>:
+                </div>
+                <div class="col-md-4">
+                    <input type="radio" name="choroplethMode" value="color" checked> Color<a href="javascript:void(0)"  data-toggle="tooltip" title="Color choropleth. White is the lowest value, Darker blue is higher. Black is no data."><sup>?</sup></a>
+                </div>
+                <div class="col-md-4">
+                    <input type="radio" name="choroplethMode" value="opacity"> Opacity<a href="javascript:void(0)"  data-toggle="tooltip" title="Opacity choropleth. Darker is higher valued."><sup>?</sup></a>
+                </div>
+            </div>
+            <div class="row row-spacer">
+                <div class="col-md-12">
+                    <div class="row row-spacer">
+                        <div class="col-md-6">
+                            <p><a class="btn btn-info btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="updateBoundaries()" role="button">Update Data</a></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><a class="btn btn-info btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="clearBoundaries()" role="button">Clear Boundaries</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="background-color: black; padding: 0.5em; color:white; margin-top: 1.5em;">
+        <div class="container">
+            <p style="font-size: smaller;">Population, income, and demographics provided by the <a href="https://www.census.gov">U.S. Census Bureau</a></p>
+            <p style="font-size: smaller;">Crime data provided by the <a href="https://data.baltimorecity.gov/">City of Baltimore</a></p>
+            <p style="font-size: smaller;">Data access powered by <a href="http://uscensusbureau.github.io/citysdk/index.html">CitySDK</a></p>
+        </div>
+    </div>
+</body>
+</html>
