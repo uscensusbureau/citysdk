@@ -1,0 +1,35 @@
+{
+  "name": "citysdk",
+  "version": "1.0.0",
+  "description": "User-Friendly JavaScript SDK for US Census Bureau Data",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "eslint --no-eslintrc -c .eslintrc js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uscensusbureau/citysdk.git"
+  },
+  "keywords": [
+    "citysdk",
+    "us",
+    "census",
+    "bureau",
+    "api",
+    "maps",
+    "geo"
+  ],
+  "author": "US Census",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uscensusbureau/citysdk/issues"
+  },
+  "homepage": "https://github.com/uscensusbureau/citysdk",
+  "devDependencies": {
+    "eslint": "^0.24.1"
+  }
+}
