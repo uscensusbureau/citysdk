@@ -260,7 +260,65 @@ body {
 $(function () {
 
    
-    var data = [{
+    var data = [
+    {
+        type: "technology",
+        name: "Civic Spark",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/civicspark.png?raw=true",
+        description: "The CivicSpark App was created to protype a solution for civic tech leaders and entrepreneurs to more easily find free or low-cost spaces in their local communities to meet, teach, and innovate.",
+        links: [{
+            url: "https://github.com/dssg/innovation-ecosystems",
+            title: "Dataset Collection and Exploration"
+        }, {
+            url: "http://civicspark.co/",
+            title: "Demo: Civic Spark App (prototype)"
+        }]
+    },
+    {
+        type: "technology",
+        name: "Austin Parks Equity",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/austinparkequity.png?raw=true",
+        description: "This is a civic app that aims to help visualize how Austin's park resources are distributed throughout the City of Austin.",
+        links: [{
+            url: "https://github.com/open-austin/Austin_Parks_Equity",
+            title: "Github Repo: Austin Parks Equity"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/guides/censusModule/queryBuilder.html",
+            title: "App: Austin Parks Equity (prototype)"
+        }]
+    },
+        {
+        type: "technology",
+        name: "Hyperlocal",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/hyperlocal.png?raw=true",
+        description: "HyperLocal created an app to help Food Truck operators without a lottery parking spot find customers by locating people who are tweeting about being hungry in real time.",
+        links: [{
+            url: "https://dchackforchange.herokuapp.com/",
+            title: "App: Who's Hungry? (prototype)"
+        }]
+    },
+        {
+        type: "technology",
+        name: "Purshable",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/purshable.png?raw=true",
+        description: "Purshable is a mobile app that will help reduce waste, increase grocer’s profit, and offer the shopper high quality food at a fraction of the cost.",
+        links: [{
+            url: "http://www.purshable.com/",
+            title: "Purshable website"
+        }]
+    },
+        {
+        type: "technology",
+        name: "Accessible Places Finder",
+        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/accessibility.png?raw=true",
+        description: "This app aims to help people with disabilities to easily find a place to live or travel in the state of Minnesota that satisfies the specific accessibility needs of this population group.",
+        links: [{
+            url: "http://website-mnhomefinder.rhcloud.com/accessibilityscore/",
+            title: "App: Accessible Places Finder (prototype)"
+        }]
+    },
+
+    {
         type: "dataset",
         name: "US Census Bureau",
         image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/census.png?raw=true",
@@ -365,19 +423,7 @@ $(function () {
             title: "Demo: Housing Loans in Pittsburgh"
         }, 
         ]
-    },
-       {         
-        type: "dataset",
-        name: "Public Spaces for Innovation",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/uofchicago.png",
-        description: "The Data Science for Social Good Fellows at the University of Chicago have created datasets and a tool for community organizers using the CitySDK.",
-        links: [{
-            url: "https://github.com/dssg/innovation-ecosystems",
-            title: "Demo: Innovation Ecosystems"
-             }, 
-        ]
-    },    
-                
+    },   
        {         
         type: "technology",
         name: "Bing Maps",
