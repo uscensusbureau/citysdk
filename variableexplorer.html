@@ -81,7 +81,7 @@
          </div>
         
 
-        <ul class="link">
+        <ul class="links">
           <li>
             <a href= "{{url}}">{{title}}</a>
           </li>
@@ -224,7 +224,7 @@ body {
 }
 
 
-.item .link {
+.item .links {
     float: left;
     margin: 0;
     margin-left: 2px;
@@ -234,7 +234,7 @@ body {
     padding: 0;
 }
 
-.item .link li {
+.item .links li {
   margin-bottom: 2px;
 }
 
@@ -302,7 +302,7 @@ $(function () {
         type: "social",
         name: "Ancestry",
         description: "Ancestry refers to a person’s ethnic origin, heritage, descent, or roots, which may reflect their place of birth or that of previous generations of their family.",
-        link: [{
+        links: [{
             url: "#ancestry",
             title: "View List of Variables"
         }]
@@ -311,7 +311,7 @@ $(function () {
         type: "economic",
         name: "Employment Status",
         description: "Employment status is key to understanding work and unemployment patterns and the availability of workers.",
-        link: [{
+        links: [{
             url: "#employmentstatus",
             title: "View List of Variables"
         }]
@@ -320,7 +320,7 @@ $(function () {
         type: "demographic",
         name: "Sex and Age",
         description: "Individuals were asked to mark either “male” or “female” to indicate their biological sex. ",
-        link: [{
+        links: [{
             url: "#sexandage",
             title: "View List of Variables"
         }]
@@ -329,7 +329,7 @@ $(function () {
         type: "housing",
         name: "Housing Occupancy",
         description: "A housing unit is classified as occupied if it is the current place of residence of the person or group of people living in it at the time of interview. ",
-        link: [{
+        links: [{
             url: "#housingoccupancy",
             title: "View List of Variables"
         }]
@@ -383,9 +383,9 @@ $(function () {
       });
 
 
-    $link.click(function() {
+    $links.click(function() {
         $('.var_list').hide();       
-        $('.var_list[data-link=' + $(this).data('url') + ']').fadeIn({ width: '200px'}, 300);
+        $('.var_list[data-link=' + $(this).data('links') + ']').fadeIn({ width: '200px'}, 300);
     });
 
 
