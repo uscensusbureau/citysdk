@@ -110,16 +110,16 @@
 
 <div id="sidebar">
 
-    <div class="textWord_about" data-link="ancestry">
+    <div class="var_list" data-link="ancestry">
         <p>ffffffffffffffffffffffffffff</p>
     </div>
-    <div class="textWord_about" data-link="employmentstatus">
+    <div class="var_list" data-link="employmentstatus">
         <p>ffffffffffffffffffffffffffff</p>
     </div>
-    <div class="textWord_about" data-link="sexandage">
+    <div class="var_list" data-link="sexandage">
         <p>ffffffffffffffffffffffffffff</p>
     </div>
-    <div class="textWord_about" data-link="housingoccupancy">
+    <div class="var_list" data-link="housingoccupancy">
         <p>ffffffffffffffffffffffffffff</p>
         <p>ffffffffffffffffffffffffffff</p>
         <p>ffffffffffffffffffffffffffff</p>
@@ -192,11 +192,13 @@ body {
     width: 750px;
 }
 
-#sidebar {
+
+.sidebar .var_list {
     border: 0px solid;
     margin-left: 900px;
     width: 100px;
 }
+
 
 .item {
     width: 160px;
@@ -384,10 +386,10 @@ $(function () {
       });
 
 
-    $('.textWord_about').hide();
+    $('.var_list').hide();
     $('.link').click(function() {
-        $('.textWord_about').hide();       
-        $('.textWord_about[data-link=' + $(this).data('url') + ']').fadeIn({ width: '200px'}, 300);
+        $('.var_list').hide();       
+        $('.var_list[data-link=' + $(this).data('url') + ']').fadeIn({ width: '200px'}, 300);
     });
 
 
