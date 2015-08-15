@@ -91,7 +91,6 @@
     </div>
 </script>
 <div id="gallery">
-
 </div>
 
 
@@ -164,11 +163,13 @@ body {
     border-radius: 0 0.5em 0.5em 0;
 }
 
+
 #gallery {
     border: 0px solid;
     margin-left: 100px;
     width: 750px;
 }
+
 .item {
     width: 160px;
     height: 160px;
@@ -309,7 +310,7 @@ $(function () {
         {
         type: "housing",
         name: "Housing Occupancy",
-        description: "A housing unit is classified as occupied if it is the current place of residence of the person or group of people living in it at the time of interview, or if the occupants are only temporarily absent. ",
+        description: "A housing unit is classified as occupied if it is the current place of residence of the person or group of people living in it at the time of interview. ",
         links: [{
             url: "https://github.com/dssg/innovation-ecosystems",
             title: "List of Variables"
@@ -317,124 +318,6 @@ $(function () {
             url: "http://civicspark.co/",
             title: "Code Snippet"
         }]
-    },
-        {
-        type: "technology",
-        name: "Accessible Places Finder",
-        description: "This app aims to help people with disabilities to easily find a place to live or travel in the state of Minnesota that satisfies the specific accessibility needs of this population group.",
-        links: [{
-            url: "http://website-mnhomefinder.rhcloud.com/accessibilityscore/",
-            title: "App: Accessible Places Finder (prototype)"
-        }]
-    },
-
-    {
-        type: "dataset",
-        name: "US Census Bureau",
-        description: "The Census Bureau's mission is to serve as the leading source of quality data about the nation's people and economy.",
-        links: [{
-            url: "http://uscensusbureau.github.io/citysdk/guides/censusModule.htm",
-            title: "Guide to the Census CitySDK Module"
-        }, {
-            url: "http://uscensusbureau.github.io/citysdk/guides/censusModule/queryBuilder.html",
-            title: "Demo: Interactive Query Builder"
-        }]
-    }, 
-                {
-        type: "technology",
-        name: "Leaflet",
-        description: "Leaflet is an Open-Source JavaScript library for web and mobile friendly interactive maps.  It uses the GeoJSON format.",
-        links: [{
-            url: "http://uscensusbureau.github.io/citysdk/examples/leafletNYC/",
-            title: "Demo: Leaflet NYC Boroughs"
-        }]
-    },
-  {
-        type: "dataset",
-        name: "Housing and Urban Development",
-        description: "Access data on FHA Loans, HUD Insured Properties, Fair Market Rents and dozens of other datasets related to national housing and property issues.",
-        links: [{
-            url: "https://github.com/esridc/citysdk-hud",
-            title: "CitySDK HUD Module"
-        }, {
-            url: "http://esridc.github.io/citysdk-hud/",
-            title: "Demo: Housing Loans in Pittsburgh"
-        }]
-    }, 
-      {
-        type: "dataset",
-        name: "US Department of Agriculture",
-        description: "Discover fresh food near you with the National Farmer's Market directory module.",
-        links: [{
-            url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.farmersMarket.js",
-            title: "CitySDK Farmer's Market Module"
-        }, {
-            url: "http://uscensusbureau.github.io/citysdk/guides/usingMultipleModules.html",
-            title: "Demo: Farmer's Markets in California"
-        }]
-    },     
-          {
-        type: "dataset",
-        name: "US Department of Energy",
-        description: "Access the extensive datasets of the U.S. Energy Information Agency, browse various categories and use their data series in your visualizations.",
-        links: [{
-            url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.eia.js",
-            title: "CitySDK Energy Information Agency Module"
-        }, {
-            url: "http://uscensusbureau.github.io/citysdk/examples/eiaBrowser/",
-            title: "Demo: Energy Information Agency browser"
-        }]
-    },     
-          {
-        type: "technology",
-        name: "ESRI",
-        description: "Governments, industry leaders, academics, and nongovernmental organizations (NGOs) use ESRI to connect with analytic knowledge they need to make decisions.",
-        links: [{
-            url: "http://esridc.github.io/citysdk-arcgis/",
-            title: "ESRI ArcGIS Module"
-        }, {
-            url: "http://esridc.github.io/citysdk-arcgis/chart.html",
-            title: "Demo: Chart Showing DC School Enrollment"
-        }]
-    },   
-
-              {
-        type: "technology",
-        name: "Socrata",
-        description: "The Socrata platform is commonly used by municipal, state, and federal agencies use to distribute their data.",
-        links: [{
-            url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.socrata.js",
-            title: "CitySDK Socrata Module"
-        }, {
-            url: "http://uscensusbureau.github.io/citysdk/examples/socrataExample/",
-            title: "Demo: Chicago Payroll Query"
-        }, {
-            url: "http://uscensusbureau.github.io/citysdk/apps/baltimoreCAD/",
-            title: "Demo: Baltimore Crime and Demographics"
-        }]
-    },    
-        {
-        type: "technology",
-        name: "Google Maps",
-        description: "There are several CitySDK examples that utilize Google Maps to create interactive web apps.",
-        links: [{
-            url: "http://uscensusbureau.github.io/citysdk/guides/usingMultipleModules.html",
-            title: "Demo: Farmer's Markets in California"
-        }, {
-            url: "http://esridc.github.io/citysdk-hud/",
-            title: "Demo: Housing Loans in Pittsburgh"
-        }, 
-        ]
-    },   
-       {         
-        type: "technology",
-        name: "Bing Maps",
-        description: "CitySDK apps can be built with Microsoft Bing's mapping technology.",
-        links: [{
-            url: "http://uscensusbureau.github.io/citysdk/examples/bingMapsExample/",
-            title: "Demo: Using Bing Maps with the CitySDK"
-             }, 
-        ]
     }];
 
          var $gallery = $('#gallery'),
