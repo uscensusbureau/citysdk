@@ -179,6 +179,15 @@ body {
     font-size: 10px;
 }
 
+.corner-stamp {
+    width: 400px;
+    height: 400px;
+    margin: 3px;
+    float: left;
+    padding: 2px;
+    font-size: 10px;
+}
+
 .item .name {
     font-size: 12px;
     margin-bottom: 5px;
@@ -333,10 +342,6 @@ $(function () {
 
       $gallery.isotope({
           itemSelector: '.item',
-          masonry: {
-            columnWidth:120,
-            cornerStampSelector: '.corner-stamp'
-          }
       });
 
    // $(".item").click(function(){
@@ -372,7 +377,7 @@ $(function () {
           // ['.dataset', '.technology'] -> '.dataset, .technology'
           filters = filters.join(', ');
           $gallery.isotope({
-              filter: filters
+              filter: filters + ', .corner-stamp'
           });
           addEvenClasses();
       });
