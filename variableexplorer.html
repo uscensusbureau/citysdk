@@ -65,8 +65,9 @@
 
 <div class="button-group filters-button-group" id="filters" style="padding-top: 3rem; padding: 30px; margin-left: 80px;" >
     <button class="button show-all is-checked" data-filter="*">Show All</button>
-    <button class="button" data-filter=".dataset">Browse by Dataset</button>
-    <button class="button" data-filter=".technology">Browse by Technology</button>
+    <button class="button" data-filter=".dataset">Social</button>
+    <button class="button" data-filter=".technology">Demographic</button>
+    <button class="button" data-filter=".technology">Housing</button>
 </div>
 
 <script id="item-tpl" type="text/x-handlebars-template">
@@ -168,8 +169,8 @@ body {
     width: 700px;
 }
 .item {
-    width: 320px;
-    height: 250px;
+    width: 100px;
+    height: 100px;
     margin: 3px;
     float: left;
     padding: 20px;
@@ -256,16 +257,17 @@ $(function () {
    
     var data = [
     {
-        type: "technology",
+        type: "social",
         name: "Ancestry",
 
-        description: "The CivicSpark App is for civic tech leaders and entrepreneurs to more easily find free or low-cost spaces in their local communities to meet, teach, and innovate.",
+        description: "Ancestry refers to a person’s ethnic origin, heritage, descent, or roots, which may reflect
+their place of birth or that of previous generations of their family. ",
         links: [{
             url: "https://github.com/dssg/innovation-ecosystems",
-            title: "Dataset Collection and Exploration"
+            title: "List of Variables"
         }, {
             url: "http://civicspark.co/",
-            title: "App: Civic Spark (prototype)"
+            title: "Code Snippet"
         }]
     },
     {
