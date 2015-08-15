@@ -65,9 +65,10 @@
 
 <div class="button-group filters-button-group" id="filters" style="padding-top: 3rem; padding: 30px; margin-left: 80px;" >
     <button class="button show-all is-checked" data-filter="*">Show All</button>
-    <button class="button" data-filter=".dataset">Social</button>
-    <button class="button" data-filter=".technology">Demographic</button>
-    <button class="button" data-filter=".technology">Housing</button>
+    <button class="button" data-filter=".social">Social</button>
+    <button class="button" data-filter=".economic">Economic</button>
+    <button class="button" data-filter=".demographic">Demographic</button>
+    <button class="button" data-filter=".housing">Housing</button>
 </div>
 
 <script id="item-tpl" type="text/x-handlebars-template">
@@ -209,12 +210,22 @@ body {
   margin-bottom: 5px;
 }
 
-.dataset {
+.social {
+    background: hsla(204, 70%, 53%, 1);
+    color: white;
+}
+
+.economic {
     background: hsla(0, 0%, 97%, 1);
 }
-.technology {
+.demographic {
     background: hsla(0, 0%, 97%, 1);
 }
+
+.housing {
+    background: hsla(0, 0%, 97%, 1);
+}
+
 /* Start: Recommended Isotope styles */
 
 /**** Isotope Filtering ****/
