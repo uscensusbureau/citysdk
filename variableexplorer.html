@@ -332,8 +332,18 @@ $(function () {
       });
 
       $gallery.isotope({
-          itemSelector: '.item'
+          itemSelector: '.item',
+          masonry: {
+            columnWidth:120,
+            cornerStampSelector: '.corner-stamp'
+          }
       });
+
+   // $(".item").click(function(){
+   //     $(this).toggleClass("big");
+   //     $("#container").isotope("reLayout");
+   // });
+
       // get Isotope instance
       var isotope = $gallery.data('isotope');
       // add even classes to every other visible item, in current order
