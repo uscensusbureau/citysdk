@@ -82,38 +82,17 @@
         
 
         <ul class="links">
+          {{#each links }} 
           <li>
             <a href= "{{url}}">{{title}}</a>
           </li>
+          {{/each}}
         </ul>
     </div>
 </script>
 <div id="gallery">
 </div>
 
-<div class="jumbotron" style="margin-top:1rem;">
-    <div class="container">
-                <h4>Variable List</h4>
-
-    <div class="var_list" data-link="ancestry">
-        <p>ffffffffffffffffffffffffffff</p>
-    </div>
-    <div class="var_list" data-link="employmentstatus">
-        <p>ffffffffffffffffffffffffffff</p>
-    </div>
-    <div class="var_list" data-link="sexandage">
-        <p>ffffffffffffffffffffffffffff</p>
-    </div>
-    <div class="var_list" data-link="housingoccupancy">
-        <p>ffffffffffffffffffffffffffff</p>
-        <p>ffffffffffffffffffffffffffff</p>
-        <p>ffffffffffffffffffffffffffff</p>
-        <p>ffffffffffffffffffffffffffff</p>
-        <p>ffffffffffffffffffffffffffff</p>
-    </div>
-
-        </div>
-</div>
 
     <div class="jumbotron" style="margin-top:1rem;">
         <div class="container">
@@ -128,10 +107,6 @@
                 </ul>
         </div>
     </div>
-
-
-
-
 
 
 </body>
@@ -195,14 +170,12 @@ body {
     width: 750px;
 }
 
-
-
 .item {
     width: 160px;
     height: 160px;
     margin: 3px;
     float: left;
-    padding: 10px;
+    padding: 2px;
     font-size: 10px;
 }
 
@@ -303,8 +276,11 @@ $(function () {
         name: "Ancestry",
         description: "Ancestry refers to a person’s ethnic origin, heritage, descent, or roots, which may reflect their place of birth or that of previous generations of their family.",
         links: [{
-            url: "#ancestry",
-            title: "View List of Variables"
+            url: "https://github.com/dssg/innovation-ecosystems",
+            title: "List of Variables"
+        }, {
+            url: "http://civicspark.co/",
+            title: "Code Snippet"
         }]
     },
     {
@@ -312,8 +288,11 @@ $(function () {
         name: "Employment Status",
         description: "Employment status is key to understanding work and unemployment patterns and the availability of workers.",
         links: [{
-            url: "#employmentstatus",
-            title: "View List of Variables"
+            url: "https://github.com/open-austin/Austin_Parks_Equity",
+            title: "List of Variables"
+        }, {
+            url: "http://uscensusbureau.github.io/citysdk/guides/censusModule/queryBuilder.html",
+            title: "Code Snippet"
         }]
     },
         {
@@ -321,8 +300,11 @@ $(function () {
         name: "Sex and Age",
         description: "Individuals were asked to mark either “male” or “female” to indicate their biological sex. ",
         links: [{
-            url: "#sexandage",
-            title: "View List of Variables"
+            url: "https://github.com/dssg/innovation-ecosystems",
+            title: "List of Variables"
+        }, {
+            url: "http://civicspark.co/",
+            title: "Code Snippet"
         }]
     },
         {
@@ -330,8 +312,11 @@ $(function () {
         name: "Housing Occupancy",
         description: "A housing unit is classified as occupied if it is the current place of residence of the person or group of people living in it at the time of interview. ",
         links: [{
-            url: "#housingoccupancy",
-            title: "View List of Variables"
+            url: "https://github.com/dssg/innovation-ecosystems",
+            title: "List of Variables"
+        }, {
+            url: "http://civicspark.co/",
+            title: "Code Snippet"
         }]
     }];
 
@@ -381,13 +366,6 @@ $(function () {
           });
           addEvenClasses();
       });
-
-
-    $url.click(function() {
-        $('.var_list').hide();       
-        $('.var_list[data-link=' + $(this).data('url') + ']').fadeIn({ width: '200px'}, 300);
-    });
-
 
 
 });
