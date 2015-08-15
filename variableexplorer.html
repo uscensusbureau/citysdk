@@ -74,12 +74,10 @@
         <h3 class="name">{{name}}</h3>
         
         <div class="top-container">
-             <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
     
             <div class="description"> {{description}} </div>
          </div>
         
-        <i class="githubimage fa fa-github"></i >
 
         <ul class="links">
           {{#each links }} 
@@ -182,9 +180,7 @@ body {
     font-size: 16px;
     margin-bottom: 15px;
 }
-.item .image {
-   float: left;
-}
+
 .item .description {
     float: left;
     width: 150px;
@@ -197,10 +193,7 @@ body {
     height: 100px;
 }
 
-.item .githubimage {
-    float: left;
-    font-size: 24px;
-}
+
 .item .links {
     float: left;
     margin: 0;
@@ -278,7 +271,6 @@ $(function () {
     {
         type: "technology",
         name: "Austin Parks Equity",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/austinparkequity.png?raw=true",
         description: "This is a civic app that aims to help visualize how Austin's park resources are distributed throughout the City of Austin.",
         links: [{
             url: "https://github.com/open-austin/Austin_Parks_Equity",
@@ -291,7 +283,6 @@ $(function () {
         {
         type: "technology",
         name: "Hyperlocal",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/hyperlocal.png?raw=true",
         description: "HyperLocal helps Food Truck operators without a lottery parking spot find customers by locating tweets from those who are hungry.",
         links: [{
             url: "https://dchackforchange.herokuapp.com/",
@@ -301,7 +292,6 @@ $(function () {
         {
         type: "technology",
         name: "Purshable",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/purshable.png?raw=true",
         description: "Purshable is a mobile app that will help reduce waste, increase grocer’s profit, and offer the shopper high quality food at a fraction of the cost.",
         links: [{
             url: "http://www.purshable.com/",
@@ -311,7 +301,6 @@ $(function () {
         {
         type: "technology",
         name: "Accessible Places Finder",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/accessibility.png?raw=true",
         description: "This app aims to help people with disabilities to easily find a place to live or travel in the state of Minnesota that satisfies the specific accessibility needs of this population group.",
         links: [{
             url: "http://website-mnhomefinder.rhcloud.com/accessibilityscore/",
@@ -322,7 +311,6 @@ $(function () {
     {
         type: "dataset",
         name: "US Census Bureau",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/census.png?raw=true",
         description: "The Census Bureau's mission is to serve as the leading source of quality data about the nation's people and economy.",
         links: [{
             url: "http://uscensusbureau.github.io/citysdk/guides/censusModule.htm",
@@ -335,7 +323,6 @@ $(function () {
                 {
         type: "technology",
         name: "Leaflet",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/leaflet.png?raw=true",
         description: "Leaflet is an Open-Source JavaScript library for web and mobile friendly interactive maps.  It uses the GeoJSON format.",
         links: [{
             url: "http://uscensusbureau.github.io/citysdk/examples/leafletNYC/",
@@ -345,7 +332,6 @@ $(function () {
   {
         type: "dataset",
         name: "Housing and Urban Development",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/hud.png",
         description: "Access data on FHA Loans, HUD Insured Properties, Fair Market Rents and dozens of other datasets related to national housing and property issues.",
         links: [{
             url: "https://github.com/esridc/citysdk-hud",
@@ -358,7 +344,6 @@ $(function () {
       {
         type: "dataset",
         name: "US Department of Agriculture",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/usda.png?raw=true",
         description: "Discover fresh food near you with the National Farmer's Market directory module.",
         links: [{
             url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.farmersMarket.js",
@@ -371,7 +356,6 @@ $(function () {
           {
         type: "dataset",
         name: "US Department of Energy",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/doe.png?raw=true",
         description: "Access the extensive datasets of the U.S. Energy Information Agency, browse various categories and use their data series in your visualizations.",
         links: [{
             url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.eia.js",
@@ -384,7 +368,6 @@ $(function () {
           {
         type: "technology",
         name: "ESRI",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/esri.png?raw=true",
         description: "Governments, industry leaders, academics, and nongovernmental organizations (NGOs) use ESRI to connect with analytic knowledge they need to make decisions.",
         links: [{
             url: "http://esridc.github.io/citysdk-arcgis/",
@@ -398,7 +381,6 @@ $(function () {
               {
         type: "technology",
         name: "Socrata",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/socrata.png?raw=true",
         description: "The Socrata platform is commonly used by municipal, state, and federal agencies use to distribute their data.",
         links: [{
             url: "https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.socrata.js",
@@ -414,7 +396,6 @@ $(function () {
         {
         type: "technology",
         name: "Google Maps",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/googlemaps.png?raw=true",
         description: "There are several CitySDK examples that utilize Google Maps to create interactive web apps.",
         links: [{
             url: "http://uscensusbureau.github.io/citysdk/guides/usingMultipleModules.html",
@@ -428,7 +409,6 @@ $(function () {
        {         
         type: "technology",
         name: "Bing Maps",
-        image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/bing.png?raw=true",
         description: "CitySDK apps can be built with Microsoft Bing's mapping technology.",
         links: [{
             url: "http://uscensusbureau.github.io/citysdk/examples/bingMapsExample/",
