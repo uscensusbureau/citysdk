@@ -1,5 +1,21 @@
 {
   "name": "citysdk",
-  "version": "1.1",
-  "main": "js/citysdk.js"
+  "version": "1.1.0",
+  "description": "This readme is a work in progress. For an overview of the project, please visit [https://uscensusbureau.github.io/citysdk](https://uscensusbureau.github.io/citysdk)",
+  "main": "js/citysdk.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uscensusbureau/citysdk.git"
+  },
+  "license": "CC0 1.0 Universal",
+  "bugs": {
+    "url": "https://github.com/uscensusbureau/citysdk/issues"
+  }
 }
