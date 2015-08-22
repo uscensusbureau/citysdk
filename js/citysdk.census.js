@@ -676,11 +676,6 @@ CensusModule.prototype.aliases = {
         "variable": "B02001_008E",
         "description": "Population (Two or more races)"
     },
-    "population_native_hawaiian_alone": {
-        "api": "acs",
-        "variable": "B02001_006E",
-        "description": "Population (Native Hawaiian and Other Pacific Islander Alone)"
-    },
     "population_hispanic_origin": {
         "api": "acs",
         "variable": "B03001_003E",
