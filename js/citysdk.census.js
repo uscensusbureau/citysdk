@@ -776,7 +776,7 @@ CensusModule.prototype.aliases = {
     "education_professional": {
         "api": "acs",
         "variable": "B15003_024E",
-        "description": "The number of persons age 25 and over who hold a Profesisonal degree"
+        "description": "The number of persons age 25 and over who hold a Professional degree"
     },
     "education_doctorate": {
         "api": "acs",
