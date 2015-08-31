@@ -31,6 +31,25 @@ published: true
 </div>
 
 <div class="container">
+    
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+        <h3>Guides</h3> 
+          <ul class="nav nav-sidebar">
+            <li><a href="http://uscensusbureau.github.io/citysdk/guides/censusModule.html">How to Use the Census Module</a></li>
+            <li><a href="http://uscensusbureau.github.io/citysdk/guides/usingMultipleModules.html">Using Multiple Modules</a></li>
+            <li><a href="http://uscensusbureau.github.io/citysdk/guides/censusModule/queryBuilder.html">Interactive Query Builder</a></li>
+            <li><a href="http://uscensusbureau.github.io/citysdk/guides/censusModule/aliases.html">Census Module Alias List</a></li>
+            <li><a href="http://uscensusbureau.github.io/citysdk/guides/censusModule/commonRequests.html">Census Module Common Requests</a></li>
+            <li><a href="http://uscensusbureau.github.io/citysdk/guides/creatingModules.html">How to Create a New CitySDK Module</a></li>
+          </ul>
+
+</div>
+
+<div class="col-md-9 column">
+    
+    
     <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
     <h3>Contents</h3>
     <ul>
@@ -379,6 +398,7 @@ published: true
                 or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the Census's developer
             portal or via the SDK's <em>getACSVariableDictionary</em> method.</li>
         </ul>
+        </div>
     </div>
 </div>
 </body>
