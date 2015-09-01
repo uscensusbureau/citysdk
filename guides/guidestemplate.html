@@ -132,47 +132,31 @@ published: true
 
 
         <p>Notice we're not asking for the API key here. The Census module only needs an API key if you are accessing ACS data; thus, since we're only getting geography, we can skip it.</p>
+    </div>    
+	<div class="row">
+        <h3>Step 3. Display the map</h3>
+
         <p>Next, we'll initialize the map inside of a <em>$(document).ready()</em> function.</p>
-        <pre>
-             $(document).ready(
-                function() {
-                    var mapOptions = {
-                        center: { lat: 37, lng: -120},
-                        zoom: 6
-                    };
-                    map = new google.maps.Map(document.getElementById('map-canvas'),
-                            mapOptions);
 
-                    map.data.setStyle({
-                        fillColor: 'blue'
-                    });
+		<!-- Gist that describes how to display the map -->
+		<script src="https://gist.github.com/jmeisel/a703b4f627f774492ec8.js"></script>
 
-                }
-             );
-        </pre>
         <p>Great! Now our application should be displaying a map of California.</p>
     </div>
     <div class="row">
-        <h3>Grabbing the County Geographies</h3>
+        <h3>Step 4. Grabbing the County Geographies</h3>
         <p>Next up, we need to draw the boundaries for all of California's counties. We'll use the Census module to do this.</p>
         <p>Just after the map's initialization inside of the <em>$(document).ready()</em> function, let's add a <em>GEORequest()</em> for all of California's counties.</p>
-        <pre>
-                    var countyRequest = {
-                        state: "CA",
-                        level: "county",
-                        sublevel: true,
-                        container: "state"
-                    };
+        
+		<!-- Gist that describes how to display the map -->
+		<script src="https://gist.github.com/jmeisel/c629f30c8f67aba6c407.js"></script>
 
-                    census.GEORequest(countyRequest, function(response) {
-                        map.data.addGeoJson(response);
-                    });
-        </pre>
+
         <p>In our SDK call we create a callback that will draw all of the GeoJSON on our map. If we refresh our application, we should have a Google Map showing California and all of its
         counties' boundaries.</p>
     </div>
     <div class="row">
-        <h3>Adding a pop-up</h3>
+        <h3>Step 5. Adding a pop-up</h3>
         <p>To display our Farmer's Market data, we'll need to have a pop-up appear when user's click on a county. Let's add some code to handle this. We can place it directly after our county boundary
         loading code.</p>
         <pre>
@@ -186,17 +170,17 @@ published: true
         </pre>
         <p>If we refresh our application, we should be able to click on counties and get a popup. Of course, it doesn't show any information yet, but we'll handle that in the next section.</p>
     </div>
+
     <div class="row">
-        <h3>Adding Farmer's Market Data</h3>
-        <p>Let's use the USDA's Farmer's Market module to populate our popup with data about each county's markets. We'll do this by grabbing the county's latitude and longitude from the GeoJSON
-        and making the request to the USDA with those coordinates. In our callback, we'll put the data into the popup. Here's how we changed the onClick listener:</p>
+        <h3>Step 6. Adding Farmer's Market Data</h3>
+        <p>Let's use the USDA's Farmer's Market module to populate our popup with data about each county's markets. We'll do this by grabbing the county's latitude and longitude from the GeoJSON and making the request to the USDA with those coordinates. In our callback, we'll put the data into the popup. Here's how we changed the onClick listener:</p>
 
 		<!-- Gist that shows how to add Farmer's market data -->
 		<script src="https://gist.github.com/jmeisel/ecd8e192d9194e050c75.js"></script>
 
-        <p>When a user clicks, we grab the center latitude and longitude from that county, as well as the county's name, and create a request object with that. We then issue a request to
-        the Farmer's market module. In the callback, we construct an HTML list of Farmer's markets in that county, and place that HTML inside of the pop-up.</p>
+        <p>When a user clicks, we grab the center latitude and longitude from that county, as well as the county's name, and create a request object with that. We then issue a request to the Farmer's market module. In the callback, we construct an HTML list of Farmer's markets in that county, and place that HTML inside of the pop-up.</p>
     </div>
+
     <div class="row">
         <h3>The Completed Application</h3>
         <p>Let's check out the finished product:</p>
