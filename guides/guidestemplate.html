@@ -105,9 +105,11 @@ published: true
 </head>
 
 <body>
+	<div class="row">
     <h3>Overview</h3> 
     <p>This page will guide you through creating an application that unifies data from multiple modules.</p>
     <p>This application will allow users to click on any county in California and view Farmer's Markets in and near that county.</p>
+    </div>
     <div class="row">
         <h3>Importing the Modules</h3>
         <p>The first step to using multiple modules is importing them. We'll add import statements to our &lt;head&gt; tag for the CitySDK core, and each module. We'll also
@@ -121,24 +123,14 @@ published: true
     <div class="row">
         <h3>Instantiating the SDK, modules, and map</h3>
         <p>Our first step is instantiating the SDK, modules and map. To do this, we'll first need to add the required map-canvas div to the body of our file.</p>
-        <pre>
-            &lt;body&gt;
-                &lt;div id=&quot;map-canvas&quot; style=&quot;width: 200px; height: 200px&quot;&gt;&lt;/div&gt;
-            &lt;/body&gt;
-        </pre>
         <p>This div is used by Google Maps to insert the map. That's all we'll need to do to the HTML of the page. The rest of this application is done in JavaScript.
         We'll be putting it in a &lt;script&gt; tag in our page's &lt;head&gt;, but you could also place it in a JavaScript file.</p>
         <p>First, let's create some global objects to hold our map and module references.</p>
-        <pre>
-            var apiKey, map;
 
-            var sdk = new CitySDK();
-            var census = sdk.modules.census;
-            var farmersMarket = sdk.modules.farmersMarket;
+		<!-- Gist that describes how to instantiate the SDK, modules, and map -->
+        <script src="https://gist.github.com/jmeisel/f6270a77aa8d71a2c91b.js"></script>
 
-            //We won't need API keys for just Geography.
-            census.enable("");
-        </pre>
+
         <p>Notice we're not asking for the API key here. The Census module only needs an API key if you are accessing ACS data; thus, since we're only getting geography, we can skip it.</p>
         <p>Next, we'll initialize the map inside of a <em>$(document).ready()</em> function.</p>
         <pre>
