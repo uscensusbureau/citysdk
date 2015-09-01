@@ -24,20 +24,17 @@
       {% include header.html %}
   </header>
 
-  <div class="wrap">
-    <div class="content">
-
-    <aside>
-    {% include guidesnav.html %}
-    </aside>
-
-    <section class="main-content" role="main">
-      {{ content }}
-    </section>
-
-    </div>
-  </div> <!--wrap-->
-
+<div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+        {% include guidesnav.html %}
+        </div>
+  
+        <div class="col-md-9 column">
+        {{ content }}
+        </div> <!--wrap-->
+      </div>
+</div>
     <footer class="footer cf" role="contentinfo">
       <div class="wrap">
         {% include footer.html %}
