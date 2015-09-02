@@ -31,19 +31,18 @@
 </head>
 
 <body>
-    <div style="background: url(skyline.jpg) no-repeat center center; margin-bottom: 2em; color: white; height: 300px; background-size: cover; background-position: -100px, -100px;
-                background-color:black; position:relative;">
-        <div class="container">
-            <h3>Baltimore Crime and Demographics</h3>
-            <p>Visualize Baltimore Crime data versus various demographics. Change the date range, crime types, and arrest options for Crime.</p>
-            <p>Select your boundary types and variables to compare.
-            Click a crime marker to view more data about that crime, or click inside a boundary to view the requested variables for that boundary.</p>
-        </div>
-        <div style="color:white; font-size: 75%; position:absolute; bottom:0; right:0; padding: 0.5em; text-align:right;">
-            Powered by<br/>
-            <a href="http://uscensusbureau.github.io/citysdk/index.html" target="_blank"><img height="50px" src="./citysdk_horizontal_logo.png"/></a>
-        </div>
+
+    <div class="row">
+            <div class="page-header">
+              <h1>Baltimore Crime and Demographics</hl>
+            </div>
+
+            <div class="btn-group">
+                  <a href="#" class="btn btn-primary" role="button">View the Example</a>          
+                  <a href="http://uscensusbureau.github.io/citysdk/apps/baltimoreCAD/source.html" class="btn btn-default" role="button">Source Code</a>
+            </div>
     </div>
+
     <div class="container">
         <div class="col-md-6" style="position:relative;">
             <div id="map-canvas" style="width:100%; height:800px;"></div>
