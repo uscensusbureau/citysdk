@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: exampleslayout
 published: true
 ---
 
@@ -12,7 +12,7 @@ published: true
     <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>CitySDK - EIA Dataset Browser</title>
+    <title>Energy Information Agency Dataset Browser</title>
 
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
@@ -80,11 +80,18 @@ published: true
     </script>
 </head>
 <body>
-<div class="jumbotron">
-    <div class="container">
-        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK EIA Browser Example</i>
+
+    <div class="row">
+            <div class="page-header">
+              <h1>Energy Information Agency Dataset Browser</hl>
+            </div>
+
+            <div class="btn-group">
+                  <a href="#" class="btn btn-primary" role="button">View the Example</a>          
+                  <a href="http://uscensusbureau.github.io/citysdk/examples/eiaBrowser/source.html" class="btn btn-default" role="button">Source Code</a>
+            </div>
     </div>
-</div>
+
 <div class="container">
 <pre id="output"></pre>
 <pre id="data" name="data"></pre>
