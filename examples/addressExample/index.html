@@ -24,9 +24,6 @@ published: true
         $(document).ready(function() {
             sdk = new CitySDK();
             census = sdk.modules.census;
-
-       //     var apiKey = prompt("Please enter your Census API Key", "API key");
-       //     census.enable(apiKey);
             census.enable("#api");
 
         });

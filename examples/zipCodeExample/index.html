@@ -23,9 +23,7 @@ published: true
         $(document).ready(function() {
             sdk = new CitySDK();
             census = sdk.modules.census;
-
-            var apiKey = prompt("Please enter your Census API Key", "API key");
-            census.enable(apiKey);
+            census.enable("api");
         });
 
         function submit() {
@@ -58,18 +56,28 @@ published: true
             </div>
     </div>
 
+    <div class="btn-group">
+          <a href="#" class="btn btn-primary" role="button">View the Example</a>          
+          <a href="http://uscensusbureau.github.io/citysdk/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source Code</a>
+    </div>
+
+
     <div class="row">
                 <h3>Overview</h3> 
                 <p>This example allows you to enter a zip code and return population and income information that corresponds to the location.  You may specify how granular you want the return value, by choosing Tract, State, County, Block Group, or Incorporated Place.  </p>
     </div>
 
 
-        <div class="btn-group">
-              <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-              <a href="http://uscensusbureau.github.io/citysdk/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source Code</a>
-        </div>
+    <div class="alert alert-dismissable alert-info">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4>
+                    Requires a Census API Key
+                </h4> <strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a>
+            </div>
+    </div>
 
 
+    <p>Enter your census API key here <input type="text" id="api"/></p>
 
     <input type="text" id="zipcode"/>
     <select id="level">
