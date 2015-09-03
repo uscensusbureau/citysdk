@@ -73,12 +73,9 @@ published: true
                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                 <h4>
                     Requires a Census API Key
-                </h4> <strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a>
-            </div>
+                </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+                <p>Enter your Census API key here <input type="text" id="api"/></p>
     </div>
-
-
-    <p>Enter your census API key here <input type="text" id="api"/></p>
 
     <input type="text" id="zipcode"/>
     <select id="level">
@@ -89,12 +86,11 @@ published: true
         <option value="place">Incorporated Place</option>
     </select>
     <input type="submit" onclick="submit()" value="Query"/>
-</div>
 
-       <div class="col-md-7">
-            <pre id="output">
-            </pre>
-        </div>
+   <div class="col-md-7">
+        <pre id="output">
+        </pre>
+    </div>
 
     </div>
 </body>
