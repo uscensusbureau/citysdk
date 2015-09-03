@@ -196,6 +196,41 @@ published: true
         <div id="map-canvas" style="width:750px; height:500px;"></div>
     </div>
 
+    <div>
+        <h4>1. Choose variables of interest</h4> 
+    </div>
+
+    <div class="row">
+            <div>
+                <div class="btn btn-default" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
+                <div class="btn btn-default" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
+                <div class="btn btn-default" id="populationButton" onclick="toggleVar('population')">Population</div>
+                <div class="btn btn-default" id="commute_timeButton" onclick="toggleVar('commute_time')">Total Commute Time</div>
+                <div class="btn btn-default" id="median_male_ageButton" onclick="toggleVar('median_male_age')">Median Male Age</div>
+                <div class="btn btn-default" id="median_female_ageButton" onclick="toggleVar('median_female_age')">Median Female Age</div>
+            </div>
+    </div>
+
+    <div>
+        <h4>2. Retrieve data at the Place (City), Tract, or Block Group level</h4> 
+    </div>
+
+        <div class="row">
+            <div>
+                <div class="btn btn-default" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
+                <div class="btn btn-default" id="tract" onclick="setLevel('tract')">Tracts</div>
+                <div class="btn btn-default" id="place" onclick="setLevel('place')">Place</div>
+                <div class="btn btn-default" id="clear" style="margin-right: 0.75em;">
+                    Clear
+                </div>
+            </div>
+      
+    </div>
+
+      <div>
+        <h4>3. Choose your city</h4> 
+    </div>
+
     <div class="row">
             <div class="btn btn-default" onclick="loadCity('Washington_DC')">
                 Washington, D.C.
@@ -232,28 +267,9 @@ published: true
             </div>
     </div>
 
-    <div class="row">
-            <div>
-                <div class="btn btn-default" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
-                <div class="btn btn-default" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
-                <div class="btn btn-default" id="populationButton" onclick="toggleVar('population')">Population</div>
-                <div class="btn btn-default" id="commute_timeButton" onclick="toggleVar('commute_time')">Total Commute Time</div>
-                <div class="btn btn-default" id="median_male_ageButton" onclick="toggleVar('median_male_age')">Median Male Age</div>
-                <div class="btn btn-default" id="median_female_ageButton" onclick="toggleVar('median_female_age')">Median Female Age</div>
-            </div>
-    </div>
 
-    <div class="row">
-            <div>
-                <div class="btn btn-default" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
-                <div class="btn btn-default" id="tract" onclick="setLevel('tract')">Tracts</div>
-                <div class="btn btn-default" id="place" onclick="setLevel('place')">Place</div>
-                <div class="btn btn-default" id="clear" style="margin-right: 0.75em;">
-                    Clear
-                </div>
-            </div>
-      
-    </div>
+
+
 
 <div id="loading">
 </div>
