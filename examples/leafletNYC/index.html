@@ -13,7 +13,7 @@ published: true
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>NYC Boroughs using Leaflet JS and Custom GeoJSON</title>
+    <title>NYC Boroughs using Leaflet JS</title>
 
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
@@ -145,7 +145,12 @@ published: true
 
     <div class="row">
             <div class="page-header">
-              <h1>NYC Boroughs using Leaflet JS and Custom GeoJSON</hl>
+              <h1>NYC Boroughs using Leaflet JS</hl>
+            </div>
+
+            <div class="row">
+                        <h3>Overview</h3> 
+                        <p>There may be situations where you want Census demographic information (such as income or population), but want to use a custom geographical boundary.  This example shows how you can pass in to the CitySDK custom GeoJSON boundaries, in this case NYC borough shapes, and retrieve information that correlates to the custom geographies.  Because the Census boundaries (such as tracts) won't line up perfectly, you need to specify to "include within" or "cross-boundaries".    </p>
             </div>
 
             <div class="btn-group">
