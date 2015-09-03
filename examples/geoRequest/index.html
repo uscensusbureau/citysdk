@@ -193,63 +193,65 @@ published: true
 
     </div>
 
+<div class="container">
 <div id="map-canvas" style="width:750px; height:500px;"></div>
-<div id="control-panel">
-    <div class="button" onclick="loadCity('Washington_DC')">
-        Washington, D.C.
-    </div>
-    <div class="button" onclick="loadCity('Seattle_WA')">
-        Seattle, WA
-    </div>
-    <div class="button" onclick="loadCity('San_Francisco_CA')">
-        San Francisco, CA
-    </div>
-    <div class="button" onclick="loadCity('Portland_OR')">
-        Portland, OR
-    </div>
-    <div class="button" onclick="loadCity('NYC_NY')">
-        New York City, NY
-    </div>
-    <div class="button" onclick="loadCity('Montgomery_County_MD')">
-        Montgomery County, MD
-    </div>
-    <div class="button" onclick="loadCity('Fargo_ND')">
-        Fargo, ND
-    </div>
-    <div class="button" onclick="loadCity('Chicago_IL')">
-        Chicago, IL
-    </div>
-    <div class="button" onclick="loadCity('Boston_MA')">
-        Boston, MA
-    </div>
-    <div class="button" onclick="loadCity('Austin_TX')">
-        Austin, TX
-    </div>
-    <div class="button" onclick="loadCity('Asheville_NC')">
-        Asheville, NC
-    </div>
-</div>
-<div id="time-panel">
-    <div>
-        <div class="button off" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
-        <div class="button off" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
-        <div class="button off" id="populationButton" onclick="toggleVar('population')">Population</div>
-        <div class="button off" id="commute_timeButton" onclick="toggleVar('commute_time')">Total Commute Time</div>
-        <div class="button off" id="median_male_ageButton" onclick="toggleVar('median_male_age')">Median Male Age</div>
-        <div class="button off" id="median_female_ageButton" onclick="toggleVar('median_female_age')">Median Female Age</div>
-    </div>
-</div>
-<div id="time-panel-2">
-    <div>
-        <div class="button off" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
-        <div class="button off" id="tract" onclick="setLevel('tract')">Tracts</div>
-        <div class="button" id="place" onclick="setLevel('place')">Place</div>
-        <div class="button" id="clear" style="margin-right: 0.75em;">
-            Clear
+    <div id="control-panel">
+        <div class="button" onclick="loadCity('Washington_DC')">
+            Washington, D.C.
+        </div>
+        <div class="button" onclick="loadCity('Seattle_WA')">
+            Seattle, WA
+        </div>
+        <div class="button" onclick="loadCity('San_Francisco_CA')">
+            San Francisco, CA
+        </div>
+        <div class="button" onclick="loadCity('Portland_OR')">
+            Portland, OR
+        </div>
+        <div class="button" onclick="loadCity('NYC_NY')">
+            New York City, NY
+        </div>
+        <div class="button" onclick="loadCity('Montgomery_County_MD')">
+            Montgomery County, MD
+        </div>
+        <div class="button" onclick="loadCity('Fargo_ND')">
+            Fargo, ND
+        </div>
+        <div class="button" onclick="loadCity('Chicago_IL')">
+            Chicago, IL
+        </div>
+        <div class="button" onclick="loadCity('Boston_MA')">
+            Boston, MA
+        </div>
+        <div class="button" onclick="loadCity('Austin_TX')">
+            Austin, TX
+        </div>
+        <div class="button" onclick="loadCity('Asheville_NC')">
+            Asheville, NC
         </div>
     </div>
-</div>
+    <div id="time-panel">
+        <div>
+            <div class="button off" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
+            <div class="button off" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
+            <div class="button off" id="populationButton" onclick="toggleVar('population')">Population</div>
+            <div class="button off" id="commute_timeButton" onclick="toggleVar('commute_time')">Total Commute Time</div>
+            <div class="button off" id="median_male_ageButton" onclick="toggleVar('median_male_age')">Median Male Age</div>
+            <div class="button off" id="median_female_ageButton" onclick="toggleVar('median_female_age')">Median Female Age</div>
+        </div>
+    </div>
+    <div id="time-panel-2">
+        <div>
+            <div class="button off" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
+            <div class="button off" id="tract" onclick="setLevel('tract')">Tracts</div>
+            <div class="button" id="place" onclick="setLevel('place')">Place</div>
+            <div class="button" id="clear" style="margin-right: 0.75em;">
+                Clear
+            </div>
+        </div>
+    </div>
 <div id="loading">
+</div>
 </div>
 </body>
 </html>
