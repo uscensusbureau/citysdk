@@ -167,7 +167,7 @@ published: true
 </head>
 <body>
 
-    <div class="row">
+    <div>
             <div class="page-header">
               <h1>GeoRequests and Supplemental Requests</hl>
             </div>
@@ -176,10 +176,24 @@ published: true
                   <a href="#" class="btn btn-primary" role="button">View the Example</a>          
                   <a href="http://uscensusbureau.github.io/citysdk/examples/geoRequest/source.html" class="btn btn-default" role="button">Source Code</a>
             </div>
+
+            <div>
+                <h3>Overview</h3> 
+                <p>This example demonstrates how to make a GeoRequest for the CitySDK and also a supplemental request.  It's important to consider how the "container" tag works when crafting a GeoRequest. Sometimes a container's boundaries surround multiple Census geography boundaries - for example, NYC spans multiple New York state counties. Due to the way the ACS API works, we can only retrieve part of the block group's data at once. Because of this, we must make supplemental requests to the API to fill in data that we are missing. You can track how many of these requests are in flight using the SUPPLEMENTAL_REQUESTS_IN_FLIGHT variable in the Census module. When this number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the return of some data. These requests are typically quick as they do not require any geocoding. </p>
+            </div>
+
+            <div class="alert alert-dismissable alert-info">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4>
+                    Requires a Census API Key
+                </h4> <strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a>
+            </div>
+
+
+
     </div>
 
-<div class="container" style="position:relative;">
-<div id="map-canvas" style="width:100%; height:800px;"></div>
+<div id="map-canvas" style="width:750px; height:500px;"></div>
 <div id="control-panel">
     <div class="button" onclick="loadCity('Washington_DC')">
         Washington, D.C.
@@ -236,7 +250,6 @@ published: true
     </div>
 </div>
 <div id="loading">
-</div>
 </div>
 </body>
 </html>
