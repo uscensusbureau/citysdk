@@ -118,14 +118,18 @@ published: true
               <h1>Commute Query using Sublevels and Normalized Aliases</hl>
             </div>
 
+
+            <div class="row">
+                <h3>Overview</h3> 
+                <p>This example allows two key concepts used in the Census Module of the CitySDK.  The first concept is specifying sublevels, which allows you to enter a location (such as State) and get values that are one level below (i.e. County).  This is helpful because it's not always obvious how to specify the sublevels when making an API call, as you wouldn't normally memorize county names.   The next key concept is normalized variables.  Some data from the Census American Community Survey (ACS) provide a return value in a special unit of measure that is averaged out across the population.  In this case, Commuting data can be returned in a normalized fashion which equates to "avg minutes of commute per person".</p>
+            </div>
+
             <div class="btn-group">
                   <a href="#" class="btn btn-primary" role="button">View the Example</a>          
                   <a href="http://uscensusbureau.github.io/citysdk/examples/commuteQuery/source.html" class="btn btn-default" role="button">Source Code</a>
             </div>
     </div>
 
-
-<div class="container" style="position:relative;">
 <p>Enter your census API key here <input type="text" id="api"/></p>
 <p>Enter coordinates here:</p>
 <p>Latitude:&nbsp;&nbsp;&nbsp;&nbsp;<input id="lat" type="text"/>&deg; N<br/>Longitude: <input id="lng" type="text"/>&deg; E</p>
