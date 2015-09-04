@@ -81,8 +81,7 @@ published: true
                 infowindow.open(map);
             });
 
-            var censusKey =  prompt("Please enter your Census API key", "API Key");
-            census.enable(censusKey);
+            census.enable("#api");
 
             $('#clear').click(clear);
         }
@@ -184,16 +183,11 @@ published: true
     </div>
 
     <div class="alert alert-dismissable alert-info">
-         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h4>
-            Requires a Census API Key
-        </h4> <strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a>
-    </div>
-
-
-
-    <div class="row">
-        <div id="map-canvas" style="width:750px; height:500px;"></div>
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4>
+                    Requires a Census API Key
+                </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+                <p>Enter your Census API key here <input type="text" id="api"/></p>
     </div>
 
     <div>
@@ -267,6 +261,9 @@ published: true
             </div>
     </div>
 
+    <div class="row">
+        <div id="map-canvas" style="width:750px; height:500px;"></div>
+    </div>
 
 
 
