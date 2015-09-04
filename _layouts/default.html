@@ -1,5 +1,3 @@
----
----
 <!doctype html>
 <html>
 <head>
@@ -20,29 +18,32 @@
 </head>
 <body>
 
-  <header class="header cf" role="banner">
-      {% include header.html %}
-  </header>
+<div class="container">
+     <div class="row clearfix">
+        <div class="col-md-12 column">
+              {% include header.html %}
 
-  <div class="wrap">
-    <div class="content">
-
-    <aside>
-    {% include nav.html %}
-    </aside>
-
-    <section class="main-content" role="main">
-      {{ content }}
-    </section>
-
+        <div class="container-fluid">
+              <div class="row">
+                
+                    <div class="col-md-12 column">
+                    {{ content }}
+                    </div> <!--wrap-->
+              
+        </div>
+        <div class="col-md-12 column">
+              <div class="row">
+                <div class="page-header">
+                            <h4><small>About</small></h4>
+                </div>
+                <div>
+                {% include footer.html %}
+                </div>
+              </div>
+        </div>
     </div>
-  </div> <!--wrap-->
+</div>
 
-    <footer class="footer cf" role="contentinfo">
-      <div class="wrap">
-        {% include footer.html %}
-      </div>
-    </footer>
   <script src="{{ site.baseurl }}/static/js/docs.min.js"></script>
   <script type="text/javascript" src="{{ site.baseurl }}/static/js/expandables.js"></script>
 </body>
