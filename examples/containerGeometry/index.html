@@ -64,8 +64,7 @@ published: true
         };
 
         function getApiKey() {
-            apiKey = prompt("Enter your Census API Key","API Key");
-            census.enable(apiKey);
+            census.enable("#api");
         };
 
         function clearMap() {
@@ -145,16 +144,24 @@ published: true
             <div class="page-header">
               <h1>GeoRequest with Arbitrary Boundaries</hl>
             </div>
+    </div>
 
-            <div class="row">
-                <h3>Overview</h3> 
-                <p>An example demonstrating how to use arbitrary boundaries as your GeoRequest container.</p>
-            </div>
+    <div class="btn-group">
+          <a href="#" class="btn btn-primary" role="button">View the Example</a>          
+          <a href="http://uscensusbureau.github.io/citysdk/examples/containerGeometry/source.html" class="btn btn-default" role="button">Source Code</a>
+    </div>
 
-            <div class="btn-group">
-                  <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-                  <a href="http://uscensusbureau.github.io/citysdk/examples/containerGeometry/source.html" class="btn btn-default" role="button">Source Code</a>
-            </div>
+    <div>
+        <h3>Overview</h3> 
+        <p>An example demonstrating how to use arbitrary boundaries as your GeoRequest container.</p>
+    </div>
+
+    <div class="alert alert-dismissable alert-info">
+                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4>
+                    Requires a Census API Key
+                </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+                <p>Enter your Census API key here <input type="text" id="api"/></p>
     </div>
 
 <div class="container">

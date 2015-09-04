@@ -59,8 +59,7 @@ published: true
         var mode = "geometry";
 
         function getApiKey() {
-            apiKey = prompt("Enter your Census API Key","API Key");
-            census.enable(apiKey);
+            census.enable("#api");
         };
 
         $(document).ready(
@@ -147,17 +146,28 @@ published: true
             <div class="page-header">
               <h1>NYC Boroughs using Leaflet JS</hl>
             </div>
-
-            <div class="row">
-                        <h3>Overview</h3> 
-                        <p>There may be situations where you want Census demographic information (such as income or population), but want to use a custom geographical boundary.  This example shows how you can pass in to the CitySDK custom GeoJSON boundaries, in this case NYC borough shapes, and retrieve information that correlates to the custom geographies.  Because the Census boundaries (such as tracts) won't line up perfectly, you need to specify to "include within" or "cross-boundaries".    </p>
-            </div>
-
-            <div class="btn-group">
-                  <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-                  <a href="http://uscensusbureau.github.io/citysdk/examples/leafletNYC/source.html" class="btn btn-default" role="button">Source Code</a>
-            </div>
     </div>
+
+    <div class="btn-group">
+          <a href="#" class="btn btn-primary" role="button">View the Example</a>          
+          <a href="http://uscensusbureau.github.io/citysdk/examples/leafletNYC/source.html" class="btn btn-default" role="button">Source Code</a>
+    </div>
+
+    <div>
+                <h3>Overview</h3> 
+                <p>There may be situations where you want Census demographic information (such as income or population), but want to use a custom geographical boundary.  This example shows how you can pass in to the CitySDK custom GeoJSON boundaries, in this case NYC borough shapes, and retrieve information that correlates to the custom geographies.  Because the Census boundaries (such as tracts) won't line up perfectly, you need to specify to "include within" or "cross-boundaries".    </p>
+    </div>
+
+
+
+    <div class="alert alert-dismissable alert-info">
+         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        <h4>
+            Requires a Census API Key
+        </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+        <p>Enter your Census API key here <input type="text" id="api"/></p>
+    </div>
+    
 
 <div class="container">
     <div id="map" style="width:750px; height:400px;"></div>
