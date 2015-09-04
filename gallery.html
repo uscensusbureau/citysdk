@@ -1,6 +1,6 @@
 ---
 layout: default
-title: US CitySDK by the US Census Bureau
+title: Gallery
 ---
 <!doctype html>
 <html>
@@ -27,9 +27,15 @@ title: US CitySDK by the US Census Bureau
 
 <body>
 
-<div class="container">
-</div>
+  <header>
 
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+  </header>
 
 <div class="button-group filters-button-group" id="filters" style="padding-top: 3rem; padding: 30px; margin-left: 80px;" >
     <button class="button show-all is-checked" data-filter="*">Show All</button>
@@ -37,31 +43,32 @@ title: US CitySDK by the US Census Bureau
     <button class="button" data-filter=".technology">Browse by Technology</button>
 </div>
 
-    <script id="item-tpl" type="text/x-handlebars-template">
-         <div class="item {{type}}"> 
-            <h3 class="name">{{name}}</h3>
-            
-            <div class="top-container">
-                 <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
+<script id="item-tpl" type="text/x-handlebars-template">
+     <div class="item {{type}}"> 
+        <h3 class="name">{{name}}</h3>
         
-                <div class="description"> {{description}} </div>
-             </div>
-            
-            <i class="githubimage fa fa-github"></i >
-
-            <ul class="links">
-              {{#each links }} 
-              <li>
-                <a href= "{{url}}">{{title}}</a>
-              </li>
-              {{/each}}
-            </ul>
-        </div>
-    </script>
+        <div class="top-container">
+             <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
     
-    <div id="gallery">
+            <div class="description"> {{description}} </div>
+         </div>
+        
+        <i class="githubimage fa fa-github"></i >
 
+        <ul class="links">
+          {{#each links }} 
+          <li>
+            <a href= "{{url}}">{{title}}</a>
+          </li>
+          {{/each}}
+        </ul>
     </div>
+</script>
+
+<div id="gallery">
+
+</div>
+
 
 </body>
 
