@@ -30,21 +30,23 @@ published: true
             </div>
      </div>
 
-    <div class="col-md-9 column">
+    <div>
     
-    <h3>Overview</h3> 
-    <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
-    <h3>Contents</h3>
-    <ul>
-        <li><a href="#importingTheModule">Importing the Module</a></li>
-        <li><a href="#requestingVariables">Requesting Variables</a></li>
-        <li><a href="#sublevelRequests">Sublevel Requests</a></li>
-        <li><a href="#variableAliases">Variable Aliases</a></li>
-        <li><a href="#requestingGeojson">Requesting GeoJSON</a></li>
-        <li><a href="#requestingGeojsonWithData">Requesting GeoJSON with Data</a></li>
-        <li><a href="#theRequestObjectInDetail">The Request Object in Detail</a></li>
-    </ul>
-    <div class="row" id="importingTheModule">
+        <h3>Overview</h3> 
+        <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
+        <h3>Contents</h3>
+        <ul>
+            <li><a href="#importingTheModule">Importing the Module</a></li>
+            <li><a href="#requestingVariables">Requesting Variables</a></li>
+            <li><a href="#sublevelRequests">Sublevel Requests</a></li>
+            <li><a href="#variableAliases">Variable Aliases</a></li>
+            <li><a href="#requestingGeojson">Requesting GeoJSON</a></li>
+            <li><a href="#requestingGeojsonWithData">Requesting GeoJSON with Data</a></li>
+            <li><a href="#theRequestObjectInDetail">The Request Object in Detail</a></li>
+        </ul>
+    </div>
+
+    <div id="importingTheModule">
         <h3>Importing the Module</h3>
         <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
         core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your &lt;head&gt; tag, like so:</p>
@@ -68,7 +70,7 @@ published: true
         <p>Once the module is enabled, you're all set to start using functionality. The following sections will show you how to make some common calls.</p>
     </div>
 
-    <div class="row" id="requestingVariables">
+    <div id="requestingVariables">
         <h3>Requesting Variables</h3>
         <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to access is the ACS 5-year. To request a variable, pass a
         JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" and "population" for Washington D.C.</p>
@@ -130,7 +132,7 @@ published: true
         </ul>
     </div>
 
-    <div class="row" id="sublevelRequests">
+    <div id="sublevelRequests">
         <h3>Sublevel Requests</h3>
         <p>Finding data at a single location is all well and good - but what if you want the data for all counties in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
         <p>By specifying the tag "sublevel" as true, the SDK will request data for each entity in the level's container relationship. These relationships are:</p>
@@ -197,7 +199,7 @@ published: true
         entity, any relevant FIPS codes, and the data you requested.</p>
     </div>
 
-    <div class="row" id="variableAliases">
+    <div id="variableAliases">
         <h3>Variable Aliases</h3>
         <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.</p>
         <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census module supports some aliased variables.</p>
@@ -207,7 +209,7 @@ published: true
         <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.</p>
     </div>
 
-    <div class="row" id="requestingGeojson">
+    <div id="requestingGeojson">
         <h3>Requesting GeoJSON</h3>
         <p>The Census module can acquire GeoJSON for any supported level from the Census's TigerWeb ArcGIS API. To do this, we will submit our request using a different method: <em>GEORequest()</em>. This method
         takes the request object and a callback. The response is GeoJSON.</p>
@@ -287,7 +289,7 @@ published: true
         container and the smaller the level the longer the request will take. Requesting all the block groups in Texas will take a little while.</p>
     </div>
 
-    <div class="row" id="requestingGeojsonWithData">
+    <div id="requestingGeojsonWithData">
         <h3>Requesting GeoJSON with Data</h3>
         <p>We can now get all the geography we could ever need. But what about data? Surely we don't want to have to make a <em>GEORequest()</em> call AND a <em>APIRequest()</em> call and unify the data ourselves, right?
         Right. We'd never let you down like that. You can request variables right alongside your GeoJSON. The variable data will be attached to each feature's properties tag.</p>
@@ -349,7 +351,7 @@ published: true
         geocoding. Please see the GeoRequest example in the CitySDK github repository for an example of how to interact with the supplemental requests variable.</p>
     </div>
 
-    <div class="row" id="theRequestObjectInDetail">
+    <div id="theRequestObjectInDetail">
         <h3>The Request Object in Detail</h3>
         <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the available options.</p>
         <ul>
@@ -381,7 +383,6 @@ published: true
                 or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the Census's developer
             portal or via the SDK's <em>getACSVariableDictionary</em> method.</li>
         </ul>
-        </div>
     </div>
-</div>
+
 </body>
