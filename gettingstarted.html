@@ -1,6 +1,6 @@
 ---
-layout: default
-published: true
+layout: guideslayout
+title: Getting Started
 ---
 
 <!DOCTYPE html>
@@ -30,8 +30,7 @@ published: true
         var farmersMarket = sdk.modules.farmersMarket;
 
         function getApiKey() {
-            apiKey = prompt("Enter your Census API Key","API Key");
-            census.enable(apiKey);
+            census.enable("#api");
         };
 
         function requestApiKey() {
@@ -88,27 +87,28 @@ published: true
      </div>
 
             <div class="row">
-                <div class="col-md-6">
+
                     <h2>Modularity</h2>
                     <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
                     <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
-                </div>
 
-                <div class="col-md-6">
                     <h2>Community</h2>
                     <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an open-source project hosted on GitHub, open and ready for community participation.</p>
-                    <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.</p>
-                </div>
+                    <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.<
+            
+                    <h2>Obtaining a Census Developer Key</h2>
+                    <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the left to get one, and then enter it with the button on the right.</p>
+
             </div>
 
-            <h2>Obtaining a Census Developer Key</h2>
-            <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the left to get one, and then enter it with the button on the right.</p>
-            <div class="col-md-6">
-                <a class="btn btn-info btn-lg" style="width: 100%" href="javascript:void(0)" onclick="requestApiKey()" role="button">Get a Census API Key</a>
-            </div>
-            <div class="col-md-6">
-                <a class="btn btn-info btn-lg" style="width: 100%" href="javascript:void(0)" onclick="getApiKey()" role="button">Enter your Census API Key</a>
-            </div>
+        <div class="alert alert-dismissable alert-info">
+                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4>
+                        Requires a Census API Key
+                    </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+                    <p>Enter your Census API key here <input type="text" id="api"/></p>
+        </div>
+
 
 
             <div class="row top-buffer">
