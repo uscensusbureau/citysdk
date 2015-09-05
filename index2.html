@@ -33,33 +33,40 @@
     <div class="navbar-wrapper">
       <div class="container">
 
-        <nav class="navbar navbar-static-top">
-
-              <div class="container">
-
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand topnav" href="/citysdk">
-                        <img src="/citysdk/static/img/citysdk_horizontal_logo.png" style="height:100%"/>
-                    </a>
-                </div>
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav navbar-right" style="font-size: 14px;">
-                        <li><a href="/citysdk/guides.html" class="guides">Guides</a></li>
-                        <li><a href="/citysdk/examplecode.html" class="examplecode">Example Code</a></li>
-                        <li><a href="/citysdk/gallery.html" class="gallery">Gallery</a></li>
-                        <li><a href="/citysdk/news.html" class="news">News</a></li>
-                        <li><a href="https://github.com/uscensusbureau/citysdk" class="Github"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a></li>
-                    </ul>
-                </div>
-            </nav>
+        <nav class="navbar navbar-inverse navbar-static-top">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">Project name</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li class="dropdown-header">Nav header</li>
+                    <li><a href="#">Separated link</a></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
           </div>
-    
+        </nav>
+
+      </div>
     </div>
 <!-- Carousel
     ================================================== -->
@@ -113,74 +120,33 @@
     </div><!-- /.carousel -->
 
 
-    <div class="row clearfix">
-        <div class="col-md-12 column">
-            <div class="row">
+    <    <!-- Marketing messaging and featurettes
+    ================================================== -->
+    <!-- Wrap the rest of the page in another container to center all the content. -->
 
-                <div class="col-md-3">
-                    <div class="thumbnail">
-                        <img alt="240x160" src="static/img/guides.jpg" />
-                        <div class="Guides">
-                            <h3><small>Guides</small></h3>
-                            <p><small>
-                                Check out the "Getting Started" tutorials, learn how to structure requests, and see what's possible with the CitySDK.  
-                            </small></p>
-                            <p>
-                                <a class="btn btn-primary btn-sm" href="http://uscensusbureau.github.io/citysdk/guides.html">Guides</a> 
-                            </p>
-                        </div>
-                    </div>
-                </div>
+    <div class="container marketing">
 
-                <div class="col-md-3">
-                    <div class="thumbnail">
-                        <img alt="240x160" src="static/img/examples.jpg" />
-                        <div class="Examples">
-                            <h3><small>Code Examples</small></h3>
-                            <p><small>
-                                Jump straight to code examples and begin integrating into open data and mapping capabilities into your own applications.
-                            </small></p>
-                            <p>
-                                <a class="btn btn-primary btn-sm" href="http://uscensusbureau.github.io/citysdk/examplecode.html">Examples</a> 
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="thumbnail">
-                        <img alt="240x160" src="static/img/gallery.jpg" />
-                        <div class="Gallery">
-                            <h3><small>Gallery</small></h3>
-                            <p><small>
-                                Browse integrations from Census, HUD, USDA, Google, Leaflet JS, Microsoft, Socrata, ESRI, and more. 
-                            </small></p>
-                            <p>
-                                <a class="btn btn-primary btn-sm" href="http://uscensusbureau.github.io/citysdk/gallery.html">Gallery</a> 
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="thumbnail">
-                        <img alt="240x160" src="static/img/news.jpg" />
-                        <div class="News">
-                            <h3><small>News</small></h3>
-                            <p><small>
-                                Learn about upcoming hackathons, review case-studies from civic innovators, and read the latest CitySDK articles.
-                            </small></p>
-                            <p>
-                                <a class="btn btn-primary btn-sm" href="http://uscensusbureau.github.io/citysdk/news.html">News</a> 
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
+      <!-- Three columns of text below the carousel -->
+      <div class="row">
+        <div class="col-lg-4">
+          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
+          <h2>Heading</h2>
+          <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+        <div class="col-lg-4">
+          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
+          <h2>Heading</h2>
+          <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+        <div class="col-lg-4">
+          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" width="140" height="140">
+          <h2>Heading</h2>
+          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+        </div><!-- /.col-lg-4 -->
+      </div><!-- /.row -->
 
   </body>
 </html>
