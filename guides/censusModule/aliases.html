@@ -1,0 +1,222 @@
+---
+layout: alias_layout
+published: true
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <link rel="stylesheet" href="../../chosen_v1.4.2/chosen.min.css">
+    <!-- <link rel="stylesheet" href="../../static/bootstrap-multiselect-master/dist/css/bootstrap-multiselect.css"> -->
+
+    <title>CitySDK Guides: Census Module - Aliases</title>
+
+    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
+    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
+    <script src="../../chosen_v1.4.2/chosen.jquery.js"></script>
+    <script src="../../chosen_v1.4.2/chosen.jquery.min.js"></script>
+    <!-- <script src="../../static/bootstrap-multiselect-master/dist/js/bootstrap-multiselect.js"></script> -->
+
+
+    <script>
+        function requestApiKey() {
+            window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
+        };
+
+        function buildTable() {
+            var table = $('#variableTable');
+            var sdk = new CitySDK();
+            var census = sdk.modules.census;
+
+            var rowCount = 1;
+            var alias_list = [];
+
+            Object.keys(census.aliases).forEach(function(alias) {
+                rowCount++;
+                var row = $('<div class="row extra-padding data-row"></div>');
+
+                if(rowCount % 2 == 0) {
+                    row.addClass('even');
+                }
+
+                var alias_column = $('<div class="col-md-3 data-alias" style="word-wrap: break-word;"></div>');
+                var normalizable_column = $('<div class="col-md-1 data-normalizable"></div>');
+                var api_column = $('<div class="col-md-1 data-api"></div>');
+                var api_variable_column = $('<div class="col-md-1 data-variable"></div>');
+                var description_column = $('<div class="col-md-6 data-description" style="padding-left: 1.5em;"></div>');
+
+                alias_column.append(alias);
+                api_column.append(census.aliases[alias].api);
+                if(census.isNormalizable(alias)) {
+                    normalizable_column.append("Yes");
+                }
+                api_variable_column.append(census.aliases[alias].variable);
+                description_column.append(census.aliases[alias].description);
+
+                row.append(alias_column);
+                row.append(normalizable_column);
+                row.append(api_column);
+                row.append(api_variable_column);
+                row.append(description_column);
+
+                table.append(row);
+
+                // Add row data to selector
+                var alias_parts = alias.split("_");
+                for (var index in alias_parts) {
+                    alias_list.push(alias_parts[index]);
+                }
+                alias_list.push(census.aliases[alias].api);
+                alias_list.push("Yes");
+                var variable_parts = census.aliases[alias].variable.split("_");
+                for (var index in variable_parts) {
+                    alias_list.push(variable_parts[index]);
+                }
+                var description_parts = census.aliases[alias].description.split(/(?:-|,| |'|:|\(|\))+/);
+                for (var index in description_parts) {
+                  alias_list.push(description_parts[index].toLowerCase());
+                }
+
+            });
+
+            // Removes duplicate names in selector
+            var unique_names = [];
+            $.each(alias_list, function(i, el){
+                if($.inArray(el, unique_names) === -1) unique_names.push(el);
+            });
+            unique_names.sort();
+
+            for (var index in unique_names) {
+                $("#search-selector").append('<option>' + unique_names[index] + '</option>\n');
+            }
+        };
+
+        $(document).ready(function() {
+            buildTable();
+            jQuery(".chosen").chosen();
+
+            // Hide the rows that do not match the selectors
+            $('#search-selector').chosen().change(function(e, params){
+                var rowCount = 0;
+                $('#variableTable').find('div.data-row').each(function (index) {
+                    var selections = $('#search-selector').val();
+                    // Show all if the selector is empty
+                    if (selections == null) {
+                        $(this).slideDown("slow");
+                        return;
+                    }
+                    // Check selectors
+                    var selectionsMet = 0;
+                    for (var index in selections) {
+                        var word_list = [];
+
+                        var alias = $(this).find('div.data-alias').text();
+                        word_list = alias.split("_");
+                        if ($.inArray(selections[index], word_list) >= 0) {
+                            selectionsMet++;
+                            continue;
+                        }
+
+                        var normalizable = $(this).find('div.data-normalizable').text();
+                        if (normalizable == selections[index]) {
+                            selectionsMet++;
+                            continue;
+                        }
+
+                        var api = $(this).find('div.data-api').text();
+                        if (api == selections[index]) {
+                            selectionsMet++;
+                            continue;
+                        }
+
+                        var variable = $(this).find('div.data-variable').text();
+                        word_list = variable.split("_");
+                        if ($.inArray(selections[index], word_list) >= 0) {
+                            selectionsMet++;
+                            continue;
+                        }
+
+                        var description = $(this).find('div.data-description').text();
+                        word_list = description.split(/(?:-|,| |'|:|\(|\))+/);
+                        for (var index2 in word_list) {
+                            word_list[index2] = word_list[index2].toLowerCase();
+                        }
+                        if ($.inArray(selections[index], word_list) >= 0) {
+                            selectionsMet++;
+                            continue;
+                        }
+
+                    }
+                    // Display row if all selections found
+                    if (selectionsMet == selections.length) {
+                        if(rowCount % 2 == 0) {
+                            $(this).addClass('even');
+                        } else {
+                            $(this).removeClass('even');
+                        }
+                        rowCount++;
+                        $(this).slideDown("slow");
+                    } else {
+                        $(this).slideUp("slow");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .even {
+            background-color: #e8e8e8;
+        }
+
+        .extra-padding {
+            padding-top: 0.25em;
+            padding-bottom: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> Census Module Variable Aliases</i>
+    </div>
+</div>
+
+<div class="container">
+    <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appropriate geographical population.</p>
+    <div>
+        <!-- multiple selector:requires Chosen plugin -->
+        <select id="search-selector" data-placeholder="Search for Names" class="chosen" multiple="true" style="width:400px;">
+        </select>
+    </div>
+    <div id="variableTable">
+        <div class="row">
+            <div class="col-md-3">
+                <strong>Alias Name</strong>
+            </div>
+            <div class="col-md-1">
+                <strong>Normalizable</strong>
+            </div>
+            <div class="col-md-1">
+                <strong>API</strong>
+            </div>
+            <div class="col-md-1">
+                <strong>Variable</strong>
+            </div>
+            <div class="col-md-6">
+                <strong>Description</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
