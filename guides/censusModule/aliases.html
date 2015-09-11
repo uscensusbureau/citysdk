@@ -37,11 +37,11 @@ published: true
                     row.addClass('even');
                 }
 
-                var alias_column = $('<div class="col-md-3" style="word-wrap: break-word;"></div>');
-                var normalizable_column = $('<div class="col-md-1"></div>');
-                var api_column = $('<div class="col-md-1"></div>');
-                var api_variable_column = $('<div class="col-md-1"></div>');
-                var description_column = $('<div class="col-md-3" style="padding-left: 1.5em;"></div>');
+                var alias_column = $('<div class="col-md-2" style="word-wrap: break-word;"></div>');
+                var normalizable_column = $('<div class="col-md-2"></div>');
+                var api_column = $('<div class="col-md-2"></div>');
+                var api_variable_column = $('<div class="col-md-2"></div>');
+                var description_column = $('<div class="col-md-2" style="padding-left: 1.5em;"></div>');
 
                 alias_column.append(alias);
                 api_column.append(census.aliases[alias].api);
@@ -89,7 +89,7 @@ published: true
     <h3>Overview</h3> 
     <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
     <div id="variableTable">
-        <div class="row">
+        <div>
             <div class="col-md-2">
                 <strong>Alias Name</strong>
             </div>
