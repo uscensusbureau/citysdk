@@ -195,12 +195,20 @@ published: true
 
 <body>
 
-<!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="row">
+            <div class="page-header">
+              <h1>Census Module Query Builder</hl>
+            </div>
+     </div>
 
+    <div>
+        <h3>Overview</h3> 
+        <p>This interactive tool will help you craft queries to test out the CitySDK, and make sure you are getting the correct response.</p>
+     </div>
 
 <div class="container">
     Modified from code by <a href="https://github.com/mpaquette1">@mpaquette1</a>, thanks!
-    <div class="row">
+    <div>
         <p>Census API key: <input type="text" size="40" id="apikey" value=''/></p>
     </div>
     <div class="row" id="call_row">
@@ -364,7 +372,7 @@ published: true
         </div>
     </div>
     <div class="row" id="save_row">
-        <div class="col-md-offset-8 col-md-4">
+        <div class="col-md-offset-6 col-md-3">
             <p><a id="saveLink" class="btn btn-primary btn-lg disabled" style="width: 100%; " href="javascript:void(0)" onclick="save()" role="button">Save Variables to CSV File</a></p>
         </div>
     </div>
