@@ -21,13 +21,16 @@ published: true
     function requestApiKey() {
         window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
     };
+
     //Following code borrowed from the Census Request Tester by github @mpaquette1
     var census = null;
     var variablehash = null;
+
     function loadCoords(lat, lng) {
         $("#lat").val(lat);
         $("#lng").val(lng);
     }
+
     function visible(x) {
         var tabs = $("div[id^='" + x.split("_")[0] + "']");
         tabs.each(function(f) {
@@ -35,69 +38,26 @@ published: true
         });
         $('#' + x).css("display", "block");
     };
+
     function submit() {
         var request = buildCensusModuleRequest();
         var req = $('[name="CitySDKcall"]:checked').val();
         var output = $("#output");
         output.empty();
+
         if (req == 'APIRequest')    {
             census.APIRequest(request, function(response) {
-                output.empty();
                 output.append(JSON.stringify(response, null, 4));
             });
         } else  {
             census.GEORequest(request, function(response) {
-                output.empty();
                 output.append(JSON.stringify(response, null, 4));
             });
         }
-        $('#saveLink').removeClass('disabled');
     }
-    function save() {
-        var csvString;
-        csvString = convertOutput();
-        saveToCSVfile(csvString);
-    }
-    function convertOutput() {
-        var textarea = $('#output').text();
-        var JSONObject = JSON.parse(textarea);
-        var csvString = "";
-        var keys;
-        for (var index in JSONObject.data) {
-            if (index == 0) {
-                keys = Object.keys(JSONObject.data[index]);
-                for (var key in keys) {
-                    csvString = csvString + keys[key];
-                    if (key != (keys.length - 1)) {
-                        csvString = csvString + ',';
-                    } else {
-                        csvString = csvString + '\n';
-                    }
-                }
-            }
-            for (var key in keys) {
-                var dataJSONObject = JSONObject.data[index];
-                csvString = csvString + dataJSONObject[keys[key]];
-                if (key != (keys.length - 1)) {
-                    csvString = csvString + ',';
-                } else {
-                    csvString = csvString + '\n';
-                }
-            }
-        }
-        return csvString;
-    };
-    function saveToCSVfile(csvString) {
-        var filename = "citySDK_output.txt";
-        var fileData;
-        fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
-        $('#saveLink')
-                .attr({
-                    'download': filename,
-                    'href': fileData,
-                    'target': '_blank'
-                });
-    }
+
+
+
     function buildCensusModuleRequest(){
         var request = {};
         var lat = $("#lat").val();
@@ -110,10 +70,13 @@ published: true
         var addr_street = $('#address_street').val();
         var addr_city = $('#address_city').val();
         var addr_state = $('#address_state').val();
+
         var variables = [];
         $("#variable option:selected").each(function(n, o){
             variables.push(o.value);
         });
+
+
         request.level = level;
         if (lat > 0) request.lat = lat;
         if (lng < 0) request.lng = lng;
@@ -134,16 +97,22 @@ published: true
         request.variables = variables;
         return (request);
     }
+
+
+
     $(function(){
         visible("location_coords");
+
         // Instantiate census object.
         var sdk = new CitySDK();
         census = sdk.modules.census;
         census.enable($("#apikey").val());
+
         // Fill in states.
         $.each(census.stateCapitals, function(stateabbrev, capitalcoords){
             $('<option>' + stateabbrev + '</option>').appendTo('#state');
         });
+
         // Fill in variables.
         var sortedvariables = [];
         variablehash = census.aliases;
@@ -156,14 +125,17 @@ published: true
                 $('<option>' + alias + '</option>').appendTo('#variable');
             });
         }
+
         // Make parameter changes immediately be reflected in the displayed request.
         $('.reqparam').change(function(){
             $('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
         });
+
         // Set the variable drop-down to show a description.
         $('#variable').change(function(){
             $('#variable_description').html('');
             var newdescription = '';
+
             $("#variable option:selected").each(function(n, opt)  {
                 var newcensusvariable = opt.value;
                 $.each(variablehash, function(aliasname, oAlias){
@@ -177,19 +149,17 @@ published: true
                     }
                 });
             });
+
             $('#variable_description').html(newdescription);
         });
+
         $('#variable_description, td').css({'font-family':'sans-serif', 'font-size':'0.9em'});
-        $('#APIRequest').click(function() {
-           $('#save_row').slideDown('slow');
-        });
-        $('#GEORequest').click(function() {
-            $('#save_row').slideUp('slow');
-        });
-;    });
+    });
+
     </script>
 
     <style>
+
     </style>
 </head>
 
@@ -206,22 +176,22 @@ published: true
         <p>This interactive tool will help you craft queries to test out the CitySDK, and make sure you are getting the correct response.</p>
      </div>
 
-<div class="container">
+<div class="col-md-9 column">
     Modified from code by <a href="https://github.com/mpaquette1">@mpaquette1</a>, thanks!
-    <div>
+    <div class="row">
         <p>Census API key: <input type="text" size="40" id="apikey" value=''/></p>
     </div>
     <div class="row" id="call_row">
         <div class="col-md-2">
             <p>Specify location by:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <input type="radio" name="location_radios" value="location_coords" onclick="visible('location_coords')" checked> Coordinates<br/>
             <input type="radio" name="location_radios" value="location_zip" onclick="visible('location_zip')"> Zip Code<br/>
             <input type="radio" name="location_radios" value="location_state" onclick="visible('location_state')"> State Code<br/>
             <input type="radio" name="location_radios" value="location_address" onclick="visible('location_address')"> Address
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
 
         </div>
     </div>
@@ -234,7 +204,7 @@ published: true
                 <p>lng:</p>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="row">
                 <p><input class="reqparam form-control" id="lat" type="text"/></p>
             </div>
@@ -242,7 +212,7 @@ published: true
                 <p><input class="reqparam form-control" id="lng" type="text"/></p>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="row"  style="padding-left: 15px;">
                 <p>Number - The latitude of the requested location (North). Also supported: latitude, y</p>
             </div>
@@ -255,10 +225,10 @@ published: true
         <div class="col-md-2">
             <p>zip:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <input class="reqparam form-control" id="zip" type="text" size="5"/>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>String - The 5-digit zip code of the location. Note that USPS zip code areas do not align precisely with Census geographies, so when high accuracy is required it is recommended to use latitude and longitude. Specified as a string because certain zip codes begin with zeroes.</p>
         </div>
     </div>
@@ -266,10 +236,10 @@ published: true
         <div class="col-md-2">
             <p>state:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <select class="reqparam form-control" id='state'><option value=""></option></select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>String - The 2-letter USPS state code. It will be converted into the latitude and longitude of that state's capital.</p>
         </div>
     </div>
@@ -285,7 +255,7 @@ published: true
                 <p>State:</p>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <div class="row">
                 <p><input class="reqparam form-control" id="address_street" type="text"/></p>
             </div>
@@ -296,7 +266,7 @@ published: true
                 <p><input class="reqparam form-control" id="address_state" type="text"/></p>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>Object - Represents the address of the requested location.
         </div>
     </div>
@@ -304,11 +274,11 @@ published: true
         <div class="col-md-2">
             <p>variables:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <select  class="reqparam form-control" multiple size="15" id="variable"></select>
             <div id='variable_description'></div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>Array - Optional - An array of strings specifying which variables to query. One can specify an aliased variable (see variable aliases) or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the Census's developer portal or via the SDK's getACSVariableDictionary method.</p>
         </div>
     </div>
@@ -316,7 +286,7 @@ published: true
         <div class="col-md-2">
             <p>level:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <select class="reqparam form-control" id="level">
                 <option value="us">us</option>
                 <option value="state">state</option>
@@ -326,7 +296,7 @@ published: true
                 <option value="place">place</option>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>String - At what level to request the data. These are based on census geographies. Supported options are: "blockGroup", "tract", "county", "state", "us", and "place". Note that the "place" tag currently only supports incorporated places.</p>
         </div>
     </div>
@@ -334,10 +304,10 @@ published: true
         <div class="col-md-2">
             <p>sublevel:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <input class="reqparam" type="checkbox" value='1' id='sublevel' name='sublevel'>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>Boolean - Optional Whether or not to return based upon sublevels. See sublevel requests for more information. Defaults to false.</p>
         </div>
     </div>
@@ -345,7 +315,7 @@ published: true
         <div class="col-md-2">
             <p>container:</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <select class="reqparam form-control" id="container">
                 <option value=""></option>
                 <option value="us">us</option>
@@ -355,7 +325,7 @@ published: true
                 <option value="place">place</option>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <p>String - Optional, GeoJSON request only - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that place's geographical boundaries. The container tag says "get all level within container", a place is the census word for an incorporated city, and sublevel says "get all of that level"</p>
         </div>
     </div>
@@ -363,17 +333,12 @@ published: true
         <div class="col-md-2">
             <p>CitySDK call:</p>
         </div>
+        <div class="col-md-6">
+            <input type="radio" name="CitySDKcall" value="APIRequest"> APIRequest<br/>
+            <input type="radio" name="CitySDKcall" value="GEORequest" checked> GEORequest
+        </div>
         <div class="col-md-4">
-            <input type="radio" id='APIRequest' name="CitySDKcall" value="APIRequest"> APIRequest<br/>
-            <input type="radio" id='GEORequest' name="CitySDKcall" value="GEORequest" checked> GEORequest
-        </div>
-        <div class="col-md-3">
             <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="submit()" role="button">Update Data</a></p>
-        </div>
-    </div>
-    <div class="row" id="save_row">
-        <div class="col-md-offset-6 col-md-3">
-            <p><a id="saveLink" class="btn btn-primary btn-lg disabled" style="width: 100%; " href="javascript:void(0)" onclick="save()" role="button">Save Variables to CSV File</a></p>
         </div>
     </div>
 
@@ -382,5 +347,6 @@ published: true
 
     <p>Output:</p>
     <pre id="output"></pre>
+</div>
 </div>
 </body>
