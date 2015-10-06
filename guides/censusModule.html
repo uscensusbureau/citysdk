@@ -32,6 +32,7 @@ published: true
         <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
         <h3>Contents</h3>
         <ul>
+            <li><a href="#importingTheModule">Theory of Operation</a></li>
             <li><a href="#importingTheModule">Importing the Module</a></li>
             <li><a href="#requestingVariables">Requesting Variables</a></li>
             <li><a href="#sublevelRequests">Sublevel Requests</a></li>
@@ -43,6 +44,30 @@ published: true
     </div>
 
     <div id="importingTheModule">
+        <h3>Theory of Operation</h3>
+        <p>At a high-level, the CitySDK and Census Module work by using a JSON object in order to define key parameters and then simultaneously retrieve data across multiple APIs.  
+        </p>
+        <pre>
+            var request = {
+                "lat": 38.9047,
+                "lng": -77.0164,
+                "level": "state",
+                "variables": [
+                    "income",
+                    "population"
+                ]
+            };
+
+            census.APIRequest(request, function(response) {
+                console.log(response);
+            });
+        </pre>
+        <p>This type of JSON request/response paradigm brings together numerous services, that prior to the CitySDK would need to be called separately and mashed up in a manual fashion as described below.
+        </p>
+        <div>
+              <img class="media-object" src="static/img/oldprocess.jpg" alt="Manual Process">
+        </div>
+
         <h3>Importing the Module</h3>
         <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
         core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your &lt;head&gt; tag, like so:</p>
