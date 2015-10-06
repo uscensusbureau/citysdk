@@ -49,24 +49,24 @@ published: true
         </p>
         <pre>
             var request = {
-                "lat": 38.9047,
-                "lng": -77.0164,
-                "level": "state",
-                "variables": [
-                    "income",
-                    "population"
+                zip: "10001",
+                level: "blockGroup",
+                sublevel: true,
+                container: "place",
+
+                variables: [
+                    "income"
                 ]
+
             };
 
-            census.APIRequest(request, function(response) {
-                console.log(response);
-            });
+            census.GEORequest(request, callback);
         </pre>
+
         <p>This type of JSON request/response paradigm brings together numerous services, that prior to the CitySDK would need to be called separately and mashed up in a manual fashion as described below.
         </p>
-        <div>
-              <img class="media-object" src="static/img/oldprocess.jpg" alt="Manual Process">
-        </div>
+        
+        <h1><img src="static/img/oldprocess.jpg"/></h1>
 
         <h3>Importing the Module</h3>
         <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
