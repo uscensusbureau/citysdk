@@ -59,7 +59,7 @@ published: true
         var mode = "geometry";
 
         function getApiKey() {
-            census.enable("#api");
+            census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
         };
 
         $(document).ready(
@@ -158,16 +158,6 @@ published: true
                 <p>There may be situations where you want Census demographic information (such as income or population), but want to use a custom geographical boundary.  This example shows how you can pass in to the CitySDK custom GeoJSON boundaries, in this case NYC borough shapes, and retrieve information that correlates to the custom geographies.  Because the Census boundaries (such as tracts) won't line up perfectly, you need to specify to "include within" or "cross-boundaries".    </p>
     </div>
 
-
-
-    <div class="alert alert-dismissable alert-info">
-         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        <h4>
-            Requires a Census API Key
-        </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-        <p>Enter your Census API key here <input type="text" id="api"/></p>
-    </div>
-    
 
 <div class="container">
     <div id="map" style="width:750px; height:400px;"></div>
