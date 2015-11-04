@@ -6,10 +6,10 @@ published: true
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <!--<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css"> -->
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <title>Census Module Aliases</title>
@@ -17,31 +17,59 @@ published: true
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
 
+    <script src="https://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+
     <script>
         function requestApiKey() {
             window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
         };
 
+        var data = [];
+        var table;
         function buildTable() {
-            var table = $('#variableTable');
+
+            table = $('#output').DataTable({
+                "autoWidth": true,
+                data: data,
+                columns: [
+                    {data: "alias","defaultContent": "", "width": "20%"},
+                    {data: "normalized","defaultContent": ""},
+                    {data: "api","defaultContent": ""},
+                    {data: "variable","defaultContent": ""},
+                    {data: "description","defaultContent": ""}
+                ]
+            });
+
             var sdk = new CitySDK();
             var census = sdk.modules.census;
 
-            var rowCount = 1;
+            var rowsArray = [];
+           // var table = $('#table-output');
 
             Object.keys(census.aliases).forEach(function(alias) {
-                rowCount++;
-                var row = $('<div class="row extra-padding"></div>');
 
-                if(rowCount % 2 == 0) {
-                    row.addClass('even');
+                var rowJSON = {};
+                rowJSON.alias = "<div style='word-wrap:break-word; width: 250px;'>" + alias + "</div>";
+                if(census.isNormalizable(alias)) {
+                    rowJSON.normalized = "<div style='width: 50px;'>Yes</div>";
+                } else {
+                    rowJSON.normalized = "";
                 }
+                rowJSON.api = census.aliases[alias].api;
+                rowJSON.variable = census.aliases[alias].variable;
+                rowJSON.description = census.aliases[alias].description;
 
-                var alias_column = $('<div class="col-md-2" style="word-wrap: break-word;"></div>');
-                var normalizable_column = $('<div class="col-md-2"></div>');
-                var api_column = $('<div class="col-md-2"></div>');
-                var api_variable_column = $('<div class="col-md-2"></div>');
-                var description_column = $('<div class="col-md-2" style="padding-left: 1.5em;"></div>');
+                rowsArray.push(rowJSON);
+
+                /*
+                var row = $('<tr style="word-wrap: break-word; width: 20%"></tr>');
+
+                var alias_column = $('<td style="word-wrap": "break-word"; "text-wrap":"unrestricted"; "width": "20%"></td>');
+                var normalizable_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
+                var api_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
+                var api_variable_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
+                var description_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
 
                 alias_column.append(alias);
                 api_column.append(census.aliases[alias].api);
@@ -58,7 +86,20 @@ published: true
                 row.append(description_column);
 
                 table.append(row);
+                */
+
             });
+            table.clear();
+            table.rows.add(rowsArray);
+            //console.log(rowsArray);
+            table.draw();
+            table.page("next").draw("page");
+            //$("#output tr td:nth-child(1)").each(function(){
+            //    $(this).html("<div class='col-lg-2' style='word-wrap:break-word;'>" + $(this).html() + "</div>");
+                //$(this).addClass('col-lg-2');
+            //});
+            //$("#output tr th").css("width", "200px");
+            $("#output tr td").css("width", "10px");
         };
 
         $(document).ready(function() {
@@ -67,13 +108,18 @@ published: true
     </script>
 
     <style>
-        .even {
+        /*.even {
             background-color: #e8e8e8;
         }
 
         .extra-padding {
             padding-top: 0.25em;
             padding-bottom: 0.5em;
+        }
+        */
+        #output tbody tr td:nth-child(1) {
+            word-wrap: break-word; !important;
+            width: 10px; !important;
         }
     </style>
 </head>
@@ -82,30 +128,34 @@ published: true
 
     <div class="row">
             <div class="page-header">
-              <h1>Census Module Aliases</hl>
+              <h1>Census Module Aliases</h1>
             </div>
-     </div>
-
-    <h3>Overview</h3> 
-    <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
-    <div id="variableTable">
-        <div>
-            <div class="col-md-2">
-                <strong>Alias Name</strong>
-            </div>
-            <div class="col-md-2">
-                <strong>Normalizable</strong>
-            </div>
-            <div class="col-md-2">
-                <strong>API</strong>
-            </div>
-            <div class="col-md-2">
-                <strong>Variable</strong>
-            </div>
-            <div class="col-md-2">
-                <strong>Description</strong>
-            </div>
-        </div>
     </div>
-</div>
+
+    <h3>Overview</h3>
+    <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
+    <br/>
+
+    <table id="output" class="display" width="100%">
+        <colgroup>
+            <col style="width: 250px;">
+            <col style="width: 50px;">
+            <col style="width: 50px;">
+            <col style="width: 100px;">
+            <col style="width: 250px;">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>Alias Name</th>
+            <th>Normalized</th>
+            <th>API</th>
+            <th>Variable</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <!--<tbody id="table-output">
+        </tbody> -->
+    </table>
+
+
 </body>
