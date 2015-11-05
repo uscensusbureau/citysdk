@@ -12,8 +12,7 @@ published: true
     <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-
-    <title>Population and Income by Address</title>
+    <title>Population and Income by Zipcode</title>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
@@ -24,22 +23,14 @@ published: true
         $(document).ready(function() {
             sdk = new CitySDK();
             census = sdk.modules.census;
-            census.enable("#api");
-
+            census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
         });
 
         function submit() {
-            var street = $('#street');
-            var city = $('#city');
-            var state = $('#state');
+            var zip = $('#zipcode');
 
             var request = {
-                address: {
-                    street: street.val(),
-                    city: city.val(),
-                    state: state.val()
-                },
-
+                zip: zip.val(),
                 variables: [
                     "income",
                     "population"
@@ -49,81 +40,49 @@ published: true
             census.APIRequest(request, function(response) {
                 var output = $('#output');
                 output.empty();
+                output.append("ZIP: " + response.zip + "<br/>");
                 output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
                 output.append("Median Income: " + response.data[0].income + "<br/>");
                 output.append("Population: " + response.data[0].population + " </br>");
-                output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
-                output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
             });
         }
     </script>
 </head>
+
 <body>
+
     <div class="row">
             <div class="page-header">
-              <h1>Population and Income by Address</hl>
+              <h1>Population and Income by Zipcode</hl>
             </div>
-     </div>
+    </div>
 
     <div class="btn-group">
           <a href="#" class="btn btn-primary" role="button">View the Example</a>          
           <a href="http://uscensusbureau.github.io/citysdk/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source Code</a>
     </div>
 
-        <div>
-            <h3>Overview</h3> 
-            <p>This example demonstrates how to make a GeoRequest using an Address.  The return values include lat/lon corresponding to the address, income, and population.  Matching information is also provided to show how an address relates to entities like Census tracts, block groups, and counties.</p>
-        </div>
 
+    <div>
+                <h3>Overview</h3> 
+                <p>This example allows you to enter a zip code and return population and income information that corresponds to the location.  You may specify how granular you want the return value, by choosing Tract, State, County, Block Group, or Incorporated Place.  </p>
+    </div>
 
-        <div class="alert alert-dismissable alert-info">
-                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4>
-                        Requires a Census API Key
-                    </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-                    <p>Enter your Census API key here <input type="text" id="api"/></p>
-        </div>
+    <input type="text" id="zipcode"/>
+    <select id="level">
+        <option value="tract" selected>Tract</option>
+        <option value="state">State</option>
+        <option value="county">County</option>
+        <option value="blockGroup">Block Group</option>
+        <option value="place">Incorporated Place</option>
+    </select>
+    <input type="submit" onclick="submit()" value="Query"/>
 
-        <div class="row">
-            <div class="col-md-2">
-                Street Address:
-            </div>
-            <div class="col-md-7">
-                <input type="text" id="street" value="18 F Street NW"/>
-            </div>
-        </div>
+   <div class="col-md-7">
+        <pre id="output">
+        </pre>
+    </div>
 
-        <div class="row">
-            <div class="col-md-2">
-                City:
-            </div>
-            <div class="col-md-7">
-                <input type="text" id="city" value="Washington"/>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-2">
-                State:
-            </div>
-            <div class="col-md-7">
-                <input type="text" id="state" value="DC"/>
-            </div>
-        </div>
-
-        <select id="level">
-            <option value="tract" selected>Tract</option>
-            <option value="state">State</option>
-            <option value="county">County</option>
-            <option value="blockGroup">Block Group</option>
-            <option value="place">Incorporated Place</option>
-        </select>
-
-        <input type="submit" onclick="submit()" value="Query"/>
-
-        <div class="col-md-7">
-            <pre id="output">
-            </pre>
-        </div>  
-    </body>
+    </div>
+</body>
 </html>
