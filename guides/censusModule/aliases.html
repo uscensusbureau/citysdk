@@ -6,10 +6,10 @@ published: true
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!--<meta charset="utf-8">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <title>Census Module Aliases</title>
@@ -62,44 +62,12 @@ published: true
 
                 rowsArray.push(rowJSON);
 
-                /*
-                var row = $('<tr style="word-wrap: break-word; width: 20%"></tr>');
-
-                var alias_column = $('<td style="word-wrap": "break-word"; "text-wrap":"unrestricted"; "width": "20%"></td>');
-                var normalizable_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
-                var api_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
-                var api_variable_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
-                var description_column = $('<td style="word-wrap: break-word; width: 20%"></td>');
-
-                alias_column.append(alias);
-                api_column.append(census.aliases[alias].api);
-                if(census.isNormalizable(alias)) {
-                    normalizable_column.append("Yes");
-                }
-                api_variable_column.append(census.aliases[alias].variable);
-                description_column.append(census.aliases[alias].description);
-
-                row.append(alias_column);
-                row.append(normalizable_column);
-                row.append(api_column);
-                row.append(api_variable_column);
-                row.append(description_column);
-
-                table.append(row);
-                */
 
             });
             table.clear();
             table.rows.add(rowsArray);
-            //console.log(rowsArray);
             table.draw();
-            table.page("next").draw("page");
-            //$("#output tr td:nth-child(1)").each(function(){
-            //    $(this).html("<div class='col-lg-2' style='word-wrap:break-word;'>" + $(this).html() + "</div>");
-                //$(this).addClass('col-lg-2');
-            //});
-            //$("#output tr th").css("width", "200px");
-            $("#output tr td").css("width", "10px");
+
         };
 
         $(document).ready(function() {
@@ -107,21 +75,6 @@ published: true
         });
     </script>
 
-    <style>
-        /*.even {
-            background-color: #e8e8e8;
-        }
-
-        .extra-padding {
-            padding-top: 0.25em;
-            padding-bottom: 0.5em;
-        }
-        */
-        #output tbody tr td:nth-child(1) {
-            word-wrap: break-word; !important;
-            width: 10px; !important;
-        }
-    </style>
 </head>
 
 <body>
@@ -153,8 +106,6 @@ published: true
             <th>Description</th>
         </tr>
         </thead>
-        <!--<tbody id="table-output">
-        </tbody> -->
     </table>
 
 
