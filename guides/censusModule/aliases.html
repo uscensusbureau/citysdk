@@ -45,20 +45,19 @@ published: true
             var census = sdk.modules.census;
 
             var rowsArray = [];
-           // var table = $('#table-output');
 
             Object.keys(census.aliases).forEach(function(alias) {
 
                 var rowJSON = {};
-                rowJSON.alias = "<div style='word-wrap:break-word; width: 250px;'>" + alias + "</div>";
+                rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 250px;'>" + alias + "</div>";
                 if(census.isNormalizable(alias)) {
-                    rowJSON.normalized = "<div style='width: 50px;'>Yes</div>";
+                    rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
                 } else {
-                    rowJSON.normalized = "&nbsp";
+                    rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
                 }
-                rowJSON.api = census.aliases[alias].api;
-                rowJSON.variable = census.aliases[alias].variable;
-                rowJSON.description = census.aliases[alias].description;
+                rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
+                rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
+                rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
 
                 rowsArray.push(rowJSON);
 
@@ -77,7 +76,7 @@ published: true
     </script>
 
     <style>
-
+        /* Table converts to one column in mobile sized display */
         #output td {
             text-align: left;
             display: block;
@@ -89,13 +88,16 @@ published: true
             width: 250px !important;
             padding-right: 25px;
         }
-
         #output td {
             background-color: white;
         }
-
         #output td:nth-child(1) {
             background-color: #f7f7f7;
+        }
+        #output td > div:before {
+            content: attr(data-th) ": ";
+            display: inline-block;
+            width: 100px;
         }
 
         @media (min-width: 480px) {
@@ -112,9 +114,11 @@ published: true
             #output td {
                 background-color: inherit;
             }
-
             #output td:nth-child(1) {
                 background-color: inherit;
+            }
+            #output td > div:before {
+                display: none;
             }
 
         }
