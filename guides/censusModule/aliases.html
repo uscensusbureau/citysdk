@@ -80,19 +80,23 @@ published: true
         #output td {
             text-align: left;
             display: block;
-            width: 100%;
+            width: 95%;
         }
         #output th {
             text-align: left;
             display: block;
-            width: 250px !important;
+            width: 87% !important;
             padding-right: 25px;
+        }
+        #output th:last-child {
+            margin-bottom: 5px;
         }
         #output td {
             background-color: white;
         }
         #output td:nth-child(1) {
             background-color: #f7f7f7;
+            border-top: thin solid #337ab7;
         }
         #output td > div:before {
             content: attr(data-th) ": ";
@@ -104,7 +108,7 @@ published: true
             #output th, #output td {
                 text-align: inherit;
                 display: table-cell;
-                width: 10%;
+                width: 10% !important;
             }
             #output th:nth-last-child(1), #output td:nth-last-child(1) {
                 text-align: inherit;
@@ -116,6 +120,7 @@ published: true
             }
             #output td:nth-child(1) {
                 background-color: inherit;
+                border-top: thin solid #ddd;
             }
             #output td > div:before {
                 display: none;
@@ -128,28 +133,24 @@ published: true
 <body>
     <div class="row">
             <div class="page-header col-md-12">
-              <h1>Census Module Aliases</h1>
+                <h1>Census Module Aliases</h1>
+
+                <h3>Overview</h3>
+                <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
+                <br/>
+
+                <table id="output" class="display" width="100%">
+
+                    <thead>
+                    <tr>
+                        <th>Alias Name</th>
+                        <th>Normalized</th>
+                        <th>API</th>
+                        <th>Variable</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                </table>
             </div>
     </div>
-
-    <h3>Overview</h3>
-    <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
-    <br/>
-
-    <table id="output" class="display" width="100%">
-        <colgroup>
-
-        </colgroup>
-        <thead>
-        <tr>
-            <th>Alias Name</th>
-            <th>Normalized</th>
-            <th>API</th>
-            <th>Variable</th>
-            <th>Description</th>
-        </tr>
-        </thead>
-    </table>
-
-
 </body>
