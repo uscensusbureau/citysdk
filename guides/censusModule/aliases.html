@@ -54,7 +54,7 @@ published: true
                 if(census.isNormalizable(alias)) {
                     rowJSON.normalized = "<div style='width: 50px;'>Yes</div>";
                 } else {
-                    rowJSON.normalized = "";
+                    rowJSON.normalized = "&nbsp";
                 }
                 rowJSON.api = census.aliases[alias].api;
                 rowJSON.variable = census.aliases[alias].variable;
@@ -67,18 +67,57 @@ published: true
             table.clear();
             table.rows.add(rowsArray);
             table.draw();
-
         };
 
         $(document).ready(function() {
             buildTable();
         });
+
+
     </script>
 
+    <style>
+        #output th, #output td {
+            text-align: left;
+            display: block;
+            width: 100%;
+        }
+        #output th {
+            padding-right: 25px;
+        }
+
+        #output td {
+            background-color: white;
+        }
+
+        #output td:nth-child(1) {
+            background-color: #f7f7f7;
+        }
+
+        @media (min-width: 480px) {
+            #output th, #output td {
+                text-align: inherit;
+                display: table-cell;
+                width: 10%;
+            }
+            #output th:nth-last-child(1), #output td:nth-last-child(1) {
+                text-align: inherit;
+                display: table-cell;
+                width: 50%;
+            }
+            #output td {
+                background-color: inherit;
+            }
+
+            #output td:nth-child(1) {
+                background-color: inherit;
+            }
+
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="row">
             <div class="page-header col-md-12">
               <h1>Census Module Aliases</h1>
@@ -91,11 +130,7 @@ published: true
 
     <table id="output" class="display" width="100%">
         <colgroup>
-            <col style="width: 250px;">
-            <col style="width: 50px;">
-            <col style="width: 50px;">
-            <col style="width: 100px;">
-            <col style="width: 250px;">
+
         </colgroup>
         <thead>
         <tr>
