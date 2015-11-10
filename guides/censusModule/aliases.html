@@ -16,6 +16,7 @@ published: true
 
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
     <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
+    <script src="../../static/js/citysdk.census.decennial.sf.js"></script>
 
     <script src="https://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
@@ -27,10 +28,139 @@ published: true
 
         var data = [];
         var table;
-        function buildTable() {
+        function buildTable(type) {
+            console.log("Launching table: " + type);
+            switch (type) {
+                case 0:
+                    if (typeof(table) != "undefined") {
+                        table.destroy();
+                    }
+                    table = $('#output').DataTable({
+                        "autoWidth": true,
+                        "aaSorting": [],
+                        data: data,
+                        columns: [
+                            {data: "alias","defaultContent": "", "width": "20%"},
+                            {data: "normalized","defaultContent": ""},
+                            {data: "api","defaultContent": ""},
+                            {data: "variable","defaultContent": ""},
+                            {data: "description","defaultContent": ""}
+                        ]
+                    });
+
+                    var sdk = new CitySDK();
+                    var census = sdk.modules.census;
+
+                    var rowsArray = [];
+
+                    Object.keys(census.aliases).forEach(function(alias) {
+
+                        var rowJSON = {};
+                        rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'>" + alias + "</div>";
+                        if(census.isNormalizable(alias)) {
+                            rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
+                        } else {
+                            rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
+                        }
+                        rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
+                        rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
+                        rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
+
+                        rowsArray.push(rowJSON);
+
+
+                    });
+                    table.clear();
+                    table.rows.add(rowsArray);
+                    table.draw();
+                    break;
+                case 1:
+                    if (typeof(table) != "undefined") {
+                        table.destroy();
+                    }
+
+                    $.ajax({
+                        dataType: "json",
+                        url: "http://api.census.gov/data/2012/acs1/variables.json",
+                        //data: data,
+                        success: success
+                    });
+
+                    function success(result) {
+                        drawTable(result, "acs1", "2012")
+                    }
+                    break;
+                case 2:
+                    if (typeof(table) != "undefined") {
+                        table.destroy();
+                    }
+
+                    table = $('#output').DataTable({
+                        "autoWidth": true,
+                        "aaSorting": [],
+                        data: data,
+                        columns: [
+                            {data: "alias","defaultContent": "", "width": "20%"},
+                            {data: "normalized","defaultContent": ""},
+                            {data: "api","defaultContent": ""},
+                            {data: "variable","defaultContent": ""},
+                            {data: "description","defaultContent": ""}
+                        ]
+                    });
+
+                    var sdk = new CitySDK();
+                    var census = sdk.modules.censusDecennial;
+
+                    var rowsArray = [];
+
+                    Object.keys(census.aliases).forEach(function(alias) {
+
+                        var rowJSON = {};
+                        rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'>" + alias + "</div>";
+                        if(census.isNormalizable(alias)) {
+                            rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
+                        } else {
+                            rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
+                        }
+                        rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
+                        rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
+                        rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
+
+                        rowsArray.push(rowJSON);
+
+
+                    });
+                    table.clear();
+                    table.rows.add(rowsArray);
+                    table.draw();
+
+                    break;
+                case 3:
+                    if (typeof(table) != "undefined") {
+                        table.destroy();
+                    }
+
+                    $.ajax({
+                        dataType: "json",
+                        url: "http://api.census.gov/data/1990/sf1/variables.json",
+                        //data: data,
+                        success: success2
+                    });
+
+                    function success2(result) {
+                        drawTable(result, "sf1", "1990")
+                    }
+                    break;
+            }
+
+        };
+
+        function drawTable(result, api, year) {
+            console.log("API:" + api + ", year:" + year);
 
             table = $('#output').DataTable({
                 "autoWidth": true,
+                "aaSorting": [],
                 data: data,
                 columns: [
                     {data: "alias","defaultContent": "", "width": "20%"},
@@ -41,41 +171,39 @@ published: true
                 ]
             });
 
-            var sdk = new CitySDK();
-            var census = sdk.modules.census;
-
             var rowsArray = [];
-
-            Object.keys(census.aliases).forEach(function(alias) {
+            for (var key in result.variables) {
 
                 var rowJSON = {};
-                rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 250px;'>" + alias + "</div>";
-                if(census.isNormalizable(alias)) {
-                    rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
-                } else {
-                    rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
-                }
-                rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
-                rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
-                rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
+                rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'></div>";
+                rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
+                rowJSON.api = "<div data-th='API'>" + api + "</div>";
+                rowJSON.variable = "<div data-th='Variable'>" + key +"</div>";
+                rowJSON.description = "<div data-th='Description'> (" + year + ")" + result.variables[key].label +"</div>";
 
                 rowsArray.push(rowJSON);
-
-
-            });
+                console.log(key);
+            }
             table.clear();
             table.rows.add(rowsArray);
             table.draw();
-        };
+        }
 
         $(document).ready(function() {
-            buildTable();
+            buildTable(0);
         });
 
 
     </script>
 
     <style>
+        /* Drop down style */
+        #table-selector {
+            padding: 5px;
+            border: 1px solid #ccc;
+            height: 34px;
+        }
+
         /* Table converts to one column in mobile sized display */
         #output td {
             text-align: left;
@@ -108,12 +236,12 @@ published: true
             #output th, #output td {
                 text-align: inherit;
                 display: table-cell;
-                width: 10% !important;
+                width: 5% !important;
             }
-            #output th:nth-last-child(1), #output td:nth-last-child(1) {
+            #output th:nth-child(5), #output td:nth-child(5) {
                 text-align: inherit;
                 display: table-cell;
-                width: 50%;
+                width: 30% !important;
             }
             #output td {
                 background-color: inherit;
@@ -137,6 +265,14 @@ published: true
 
                 <h3>Overview</h3>
                 <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
+                <br/>
+                <select id="table-selector" onchange="buildTable(this.selectedIndex)">
+                    <option>American Community Survey Alias List (2012-2014)</option>
+                    <option>American Community Survey Complete List (2012)</option>
+                    <option>Decennial Alias List (1990, 2000, 2010)</option>
+                    <option>Decennial Complete List (1990, 2000, 2010)</option>
+                </select>
+                <br/>
                 <br/>
 
                 <table id="output" class="display" width="100%">
