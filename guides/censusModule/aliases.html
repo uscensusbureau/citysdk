@@ -64,12 +64,100 @@ published: true
                         break;
                     case 2:
 
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2013/acs1/variables.json",
+                            api: "acs1",
+                            year: "2013",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 3:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2014/acs1/variables.json",
+                            api: "acs1",
+                            year: "2014",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 4:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2012/acs3/variables.json",
+                            api: "acs3",
+                            year: "2012",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 5:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2013/acs3/variables.json",
+                            api: "acs3",
+                            year: "2013",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 6:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2010/acs5/variables.json",
+                            api: "acs5",
+                            year: "2010",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 7:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2011/acs5/variables.json",
+                            api: "acs5",
+                            year: "2010",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 8:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2012/acs5/variables.json",
+                            api: "acs5",
+                            year: "2012",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 9:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2013/acs5/variables.json",
+                            api: "acs5",
+                            year: "2013",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 10:
+
                         var sdk = new CitySDK();
                         var census = sdk.modules.censusDecennial;
                         drawAliasTable(census);
 
                         break;
-                    case 3:
+                    case 11:
 
                         $.ajax({
                             dataType: "json",
@@ -80,10 +168,54 @@ published: true
                         });
 
                         break;
+                    case 12:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2000/sf1/variables.json",
+                            api: "sf1",
+                            year: "2000",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 13:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2010/sf1/variables.json",
+                            api: "sf1",
+                            year: "2010",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 14:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/1990/sf3/variables.json",
+                            api: "sf3",
+                            year: "1990",
+                            success: drawTable
+                        });
+
+                        break;
+                    case 15:
+
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2000/sf3/variables.json",
+                            api: "sf3",
+                            year: "2000",
+                            success: drawTable
+                        });
+
+                        break;
                 }
 
             }, (total_rows > 10000) ? 1000: 0);
-            console.log(total_rows);
+            //console.log(total_rows);
 
         };
 
@@ -152,7 +284,7 @@ published: true
                 rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
                 rowJSON.api = "<div data-th='API'>" + this.api + "</div>";
                 rowJSON.variable = "<div data-th='Variable'>" + key +"</div>";
-                rowJSON.description = "<div data-th='Description'> (" + this.year + ")" + result.variables[key].label +"</div>";
+                rowJSON.description = "<div data-th='Description'> (" + this.year + ") " + result.variables[key].label +"</div>";
 
                 rowsArray.push(rowJSON);
 
@@ -180,7 +312,7 @@ published: true
     </script>
 
     <style>
-
+        /* Icon found from loading screen on http://www.sbcounty.gov/cao/budget/ */
         .loading-icon {
             background: url("../../static/img/Loading.gif") no-repeat center;
             background-size: contain;
@@ -266,8 +398,20 @@ published: true
                         <select id="table-selector" onchange="buildTable(this.selectedIndex)" style="margin: auto;">
                             <option>American Community Survey Alias List (2012-14)</option>
                             <option>American Community Survey acs1 List (2012)</option>
+                            <option>American Community Survey acs1 List (2013)</option>
+                            <option>American Community Survey acs1 List (2014)</option>
+                            <option>American Community Survey acs3 List (2012)</option>
+                            <option>American Community Survey acs3 List (2013)</option>
+                            <option>American Community Survey acs5 List (2010)</option>
+                            <option>American Community Survey acs5 List (2011)</option>
+                            <option>American Community Survey acs5 List (2012)</option>
+                            <option>American Community Survey acs5 List (2013)</option>
                             <option>Decennial Alias List (1990, 2000, 2010)</option>
-                            <option>Decennial sf1 List (1990, 2000, 2010)</option>
+                            <option>Decennial sf1 List (1990)</option>
+                            <option>Decennial sf1 List (2000)</option>
+                            <option>Decennial sf1 List (2010)</option>
+                            <option>Decennial sf3 List (1990)</option>
+                            <option>Decennial sf3 List (2000)</option>
                         </select>
                     </div>
                     <div class="col-md-6" style="height: 50px;">
