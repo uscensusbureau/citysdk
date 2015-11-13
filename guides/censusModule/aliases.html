@@ -45,10 +45,16 @@ published: true
 
                 switch (type) {
                     case 0:
+                        var content = "income" + "<br/>" +
+                        "employment" + "<br/>" +
+                        "poverty" + "<br/>" +
+                        "education" + "<br/>" +
+                        "commute" + "<br/>" +
+                        "house/rent" + "<br/>";
 
                         var sdk = new CitySDK();
                         var census = sdk.modules.census;
-                        drawAliasTable(census);
+                        drawAliasTable(census, content);
 
                         break;
                     case 1:
@@ -151,10 +157,16 @@ published: true
 
                         break;
                     case 10:
+                        var content = "population" + "<br/>" +
+                                "age" + "<br/>" +
+                                "race" + "<br/>" +
+                                "married/divorced/widowed" + "<br/>" +
+                                "households" + "<br/>" +
+                                "living" + "<br/>";
 
                         var sdk = new CitySDK();
                         var census = sdk.modules.censusDecennial;
-                        drawAliasTable(census);
+                        drawAliasTable(census, content);
 
                         break;
                     case 11:
@@ -219,7 +231,7 @@ published: true
 
         };
 
-        function drawAliasTable(census) {
+        function drawAliasTable(census, content) {
             table = $('#output').DataTable({
                 "autoWidth": true,
                 "aaSorting": [],
@@ -258,6 +270,14 @@ published: true
 
             $('.loading-icon').fadeOut(500);
             $('#output').fadeIn(500);
+
+            $('input').popover({
+                title: "<span>SUGGESTED CATEGORIES<span style='font-variant: small-caps'>",
+                content: content,
+                html: true,
+                placement:"top",
+                trigger:"focus"
+            });
         }
 
         function drawTable(result) {
@@ -298,6 +318,7 @@ published: true
                 $('.loading-icon').fadeOut(500);
                 $('#output').fadeIn(500);
 
+
             }, (rowsArray.length > 1000) ? 1000 : 0 / 60);
 
 
@@ -307,7 +328,6 @@ published: true
         $(document).ready(function() {
             buildTable(0);
         });
-
 
     </script>
 

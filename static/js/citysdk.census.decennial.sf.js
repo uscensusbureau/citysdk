@@ -826,17 +826,17 @@ CensusModule.prototype.aliases = {
     },
 
     // Race
-    "hispanic_1990": {
+    "race_hispanic_1990": {
         "api": "sf1",
         "variable": "P0080001",
         "description": "Population (Hispanic) in 1990"
     },
-    "asian_1990": {
+    "race_asian_1990": {
         "api": "sf1",
         "variable": "P0060004",
         "description": "Population (Asian) in 1990"
     },
-    "other_1990": {
+    "race_other_1990": {
         "api": "sf1",
         "variable": "P0060005",
         "description": "Population (other - Non-white, black, asian, hispanic, native american, eskimo, aluveian) in 1990"
