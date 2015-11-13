@@ -28,135 +28,108 @@ published: true
 
         var data = [];
         var table;
+        var total_rows = 0;
+
         function buildTable(type) {
             console.log("Launching table: " + type);
-            switch (type) {
-                case 0:
-                    if (typeof(table) != "undefined") {
-                        table.destroy();
-                    }
-                    table = $('#output').DataTable({
-                        "autoWidth": true,
-                        "aaSorting": [],
-                        data: data,
-                        columns: [
-                            {data: "alias","defaultContent": "", "width": "20%"},
-                            {data: "normalized","defaultContent": ""},
-                            {data: "api","defaultContent": ""},
-                            {data: "variable","defaultContent": ""},
-                            {data: "description","defaultContent": ""}
-                        ]
-                    });
 
-                    var sdk = new CitySDK();
-                    var census = sdk.modules.census;
-
-                    var rowsArray = [];
-
-                    Object.keys(census.aliases).forEach(function(alias) {
-
-                        var rowJSON = {};
-                        rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'>" + alias + "</div>";
-                        if(census.isNormalizable(alias)) {
-                            rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
-                        } else {
-                            rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
-                        }
-                        rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
-                        rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
-                        rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
-
-                        rowsArray.push(rowJSON);
+            $('.loading-icon').fadeIn(1000);
+            $('#output').hide();
 
 
-                    });
-                    table.clear();
-                    table.rows.add(rowsArray);
-                    table.draw();
-                    break;
-                case 1:
-                    if (typeof(table) != "undefined") {
-                        table.destroy();
-                    }
+            setTimeout(function() {
+                if (typeof(table) != "undefined") {
+                    table.destroy();
+                }
+                total_rows = 0;
 
-                    $.ajax({
-                        dataType: "json",
-                        url: "http://api.census.gov/data/2012/acs1/variables.json",
-                        //data: data,
-                        success: success
-                    });
+                switch (type) {
+                    case 0:
 
-                    function success(result) {
-                        drawTable(result, "acs1", "2012")
-                    }
-                    break;
-                case 2:
-                    if (typeof(table) != "undefined") {
-                        table.destroy();
-                    }
+                        var sdk = new CitySDK();
+                        var census = sdk.modules.census;
+                        drawAliasTable(census);
 
-                    table = $('#output').DataTable({
-                        "autoWidth": true,
-                        "aaSorting": [],
-                        data: data,
-                        columns: [
-                            {data: "alias","defaultContent": "", "width": "20%"},
-                            {data: "normalized","defaultContent": ""},
-                            {data: "api","defaultContent": ""},
-                            {data: "variable","defaultContent": ""},
-                            {data: "description","defaultContent": ""}
-                        ]
-                    });
+                        break;
+                    case 1:
 
-                    var sdk = new CitySDK();
-                    var census = sdk.modules.censusDecennial;
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/2012/acs1/variables.json",
+                            api: "acs1",
+                            year: "2012",
+                            success: drawTable
+                        });
 
-                    var rowsArray = [];
+                        break;
+                    case 2:
 
-                    Object.keys(census.aliases).forEach(function(alias) {
+                        var sdk = new CitySDK();
+                        var census = sdk.modules.censusDecennial;
+                        drawAliasTable(census);
 
-                        var rowJSON = {};
-                        rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'>" + alias + "</div>";
-                        if(census.isNormalizable(alias)) {
-                            rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
-                        } else {
-                            rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
-                        }
-                        rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
-                        rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
-                        rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
+                        break;
+                    case 3:
 
-                        rowsArray.push(rowJSON);
+                        $.ajax({
+                            dataType: "json",
+                            url: "http://api.census.gov/data/1990/sf1/variables.json",
+                            api: "sf1",
+                            year: "1990",
+                            success: drawTable
+                        });
 
+                        break;
+                }
 
-                    });
-                    table.clear();
-                    table.rows.add(rowsArray);
-                    table.draw();
-
-                    break;
-                case 3:
-                    if (typeof(table) != "undefined") {
-                        table.destroy();
-                    }
-
-                    $.ajax({
-                        dataType: "json",
-                        url: "http://api.census.gov/data/1990/sf1/variables.json",
-                        //data: data,
-                        success: success2
-                    });
-
-                    function success2(result) {
-                        drawTable(result, "sf1", "1990")
-                    }
-                    break;
-            }
+            }, (total_rows > 10000) ? 1000: 0);
+            console.log(total_rows);
 
         };
 
-        function drawTable(result, api, year) {
-            console.log("API:" + api + ", year:" + year);
+        function drawAliasTable(census) {
+            table = $('#output').DataTable({
+                "autoWidth": true,
+                "aaSorting": [],
+                data: data,
+                columns: [
+                    {data: "alias","defaultContent": "", "width": "20%"},
+                    {data: "normalized","defaultContent": ""},
+                    {data: "api","defaultContent": ""},
+                    {data: "variable","defaultContent": ""},
+                    {data: "description","defaultContent": ""}
+                ]
+            });
+
+            var rowsArray = [];
+
+            Object.keys(census.aliases).forEach(function(alias) {
+
+                var rowJSON = {};
+                rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'>" + alias + "</div>";
+                if(census.isNormalizable(alias)) {
+                    rowJSON.normalized = "<div data-th='Normalized' style='width: 50px;'>Yes</div>";
+                } else {
+                    rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
+                }
+                rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
+                rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
+                rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
+
+                rowsArray.push(rowJSON);
+
+                total_rows++;
+            });
+            table.clear();
+            table.rows.add(rowsArray);
+            table.draw();
+
+            $('.loading-icon').fadeOut(500);
+            $('#output').fadeIn(500);
+        }
+
+        function drawTable(result) {
+            console.log("API:" + this.api + ", year:" + this.year);
 
             table = $('#output').DataTable({
                 "autoWidth": true,
@@ -177,17 +150,27 @@ published: true
                 var rowJSON = {};
                 rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'></div>";
                 rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
-                rowJSON.api = "<div data-th='API'>" + api + "</div>";
+                rowJSON.api = "<div data-th='API'>" + this.api + "</div>";
                 rowJSON.variable = "<div data-th='Variable'>" + key +"</div>";
-                rowJSON.description = "<div data-th='Description'> (" + year + ")" + result.variables[key].label +"</div>";
+                rowJSON.description = "<div data-th='Description'> (" + this.year + ")" + result.variables[key].label +"</div>";
 
                 rowsArray.push(rowJSON);
-                console.log(key);
+
+                total_rows++;
             }
             table.clear();
-            table.rows.add(rowsArray);
-            table.draw();
+            setTimeout(function() {
+                table.rows.add(rowsArray);
+                table.draw();
+                
+                $('.loading-icon').fadeOut(500);
+                $('#output').fadeIn(500);
+
+            }, (rowsArray.length > 1000) ? 1000 : 0 / 60);
+
+
         }
+
 
         $(document).ready(function() {
             buildTable(0);
@@ -197,6 +180,17 @@ published: true
     </script>
 
     <style>
+
+        .loading-icon {
+            background: url("../../static/img/Loading.gif") no-repeat center;
+            background-size: contain;
+            width: 100%;
+            height: 50px;
+            margin: auto;
+            display: inline-block;
+        }
+
+
         /* Drop down style */
         #table-selector {
             padding: 5px;
@@ -259,6 +253,7 @@ published: true
 </head>
 
 <body>
+
     <div class="row">
             <div class="page-header col-md-12">
                 <h1>Census Module Aliases</h1>
@@ -266,13 +261,19 @@ published: true
                 <h3>Overview</h3>
                 <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
                 <br/>
-                <select id="table-selector" onchange="buildTable(this.selectedIndex)">
-                    <option>American Community Survey Alias List (2012-2014)</option>
-                    <option>American Community Survey Complete List (2012)</option>
-                    <option>Decennial Alias List (1990, 2000, 2010)</option>
-                    <option>Decennial Complete List (1990, 2000, 2010)</option>
-                </select>
-                <br/>
+                <div class="row">
+                    <div class="col-md-6" style="height: 50px; padding-top: 8px;">
+                        <select id="table-selector" onchange="buildTable(this.selectedIndex)" style="margin: auto;">
+                            <option>American Community Survey Alias List (2012-14)</option>
+                            <option>American Community Survey acs1 List (2012)</option>
+                            <option>Decennial Alias List (1990, 2000, 2010)</option>
+                            <option>Decennial sf1 List (1990, 2000, 2010)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6" style="height: 50px;">
+                        <div class="loading-icon"></div>
+                    </div>
+                </div>
                 <br/>
 
                 <table id="output" class="display" width="100%">
