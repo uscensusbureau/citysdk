@@ -19,175 +19,187 @@ published: true
 <body>
 
     <div class="row">
-            <div class="page-header">
-              <h1>Creating a Module</hl>
+            <div class="page-header col-md-12">
+              <h1>Creating a Module</h1>
             </div>
-     </div>
+    </div>
 
-    <div class="col-md-9 column">    
-    <h3>Overview</h3>     
-    <p>This page will guide you through creating your own module to interact with the CitySDK.</p>
+    <div class="row">
 
-        <div class="row">
-            <h3>CORS Support</h3>
-            <p>The CitySDK is a JavaScript SDK which means to access data on other domains, that domain must either support CORS headers or JSONP requests. Before starting work on a module,
-            please ensure the API you wish to work with supports one of those options.</p>
-            <p>You can learn more about CORS <a href="http://enable-cors.org/" target="_blank">here</a>.</p>
-            <p>You can test your API's CORS support <a href="http://test-cors.org/" target="_blank">here</a>.</p>
-        </div>
 
-        <div class="row">
-            <h3>Getting Started</h3>
-            <p>For this guide, we'll be constructing a module for the Energy Information Agency's API. The first step is to decide on a name for your module, we're going to go with <em>citysdk.eia.js</em> - it easily tells users what
-            this module interfaces with.</p>
-            <p>Next, we'll open up <em>citysdk.moduleTemplate.js</em> from the CitySDK github repository to use as our basis. Let's go ahead and save it as our chosen filename.</p>
-            <p>On line 10 of the template we can see the definition of the template module object. Let's rename it to fit with our API.</p>
-            <pre>
-                //Module object definition. Every module should have an "enabled" property and an "enable"  function.
-                function EIAModule() {
-                    this.enabled = false;
-                };
-            </pre>
-            <p>We've renamed the object to EIAModule - a solid choice. Next, let's update line 15 so it is attaching the function to the appropriate object.</p>
-            <pre>
-                //Enable function. Stores the API key for this module and sets it as enabled
-                EIAModule.prototype.enable = function(apiKey) {
-                    this.apiKey = apiKey;
-                    this.enabled = true;
-                };
-            </pre>
-            <p>If your API does not require an API key, you can remove that parameter from the function as well as the variable definition as your user's won't be needing it.</p>
-            <p>Last but not least, update line 7 - this line is the most important as it registers the module with the CitySDK core.</p>
-            <pre>
-                //Attach a new module object to the CitySDK prototype.
-                //It is advised to keep the filenames and module property names the same
-                CitySDK.prototype.modules.eia = new EIAModule();
-            </pre>
-            <p>Perfect! We're all set to start implementing our code.</p>
-        </div>
+        <div class="col-md-9 column">
+        <h3>Overview</h3>
+        <p>This page will guide you through creating your own module to interact with the CitySDK.</p>
 
-        <div class="row">
-            <h3>GET, POST, and JSONP requests</h3>
-            <p>The CitySDK has three core methods for accessing data from another website. The first is <em>ajaxRequest()</em> which takes a single parameter - the URL for the request, and
-            returns a standard AJAX promise. The second is <em>jsonpRequest()</em> which also takes a single parameter and returns a standard promise, but uses jQuery's built in JSONP callback
-            functionality to handle the data response. Last is the <em>postRequest()</em> function which takes two parameters: the URL and the data. Data is usually a JSON object, but can vary
-            depending on the URL you are accessing. It also returns a standard promise.</p>
-            <p>The EIA's API supports CORS, so we'll use GET requests. Let's start fleshing out the method our user's will use to get the data.</p>
-            <pre>
-                EIAModule.prototype.categoryRequest = function(request, callback) {
-                    var apiKeyPattern = /({apiKey})/;
-                    var categoryPattern = /({category})/;
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>CORS Support</h3>
+                    <p>The CitySDK is a JavaScript SDK which means to access data on other domains, that domain must either support CORS headers or JSONP requests. Before starting work on a module,
+                    please ensure the API you wish to work with supports one of those options.</p>
+                    <p>You can learn more about CORS <a href="http://enable-cors.org/" target="_blank">here</a>.</p>
+                    <p>You can test your API's CORS support <a href="http://test-cors.org/" target="_blank">here</a>.</p>
+                </div>
+            </div>
 
-                    var categoryURL = "http://api.eia.gov/category/?api_key={apiKey}&category_id={category}";
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Getting Started</h3>
+                    <p>For this guide, we'll be constructing a module for the Energy Information Agency's API. The first step is to decide on a name for your module, we're going to go with <em>citysdk.eia.js</em> - it easily tells users what
+                    this module interfaces with.</p>
+                    <p>Next, we'll open up <em>citysdk.moduleTemplate.js</em> from the CitySDK github repository to use as our basis. Let's go ahead and save it as our chosen filename.</p>
+                    <p>On line 10 of the template we can see the definition of the template module object. Let's rename it to fit with our API.</p>
+                    <pre>
+                        //Module object definition. Every module should have an "enabled" property and an "enable"  function.
+                        function EIAModule() {
+                            this.enabled = false;
+                        };
+                    </pre>
+                    <p>We've renamed the object to EIAModule - a solid choice. Next, let's update line 15 so it is attaching the function to the appropriate object.</p>
+                    <pre>
+                        //Enable function. Stores the API key for this module and sets it as enabled
+                        EIAModule.prototype.enable = function(apiKey) {
+                            this.apiKey = apiKey;
+                            this.enabled = true;
+                        };
+                    </pre>
+                    <p>If your API does not require an API key, you can remove that parameter from the function as well as the variable definition as your user's won't be needing it.</p>
+                    <p>Last but not least, update line 7 - this line is the most important as it registers the module with the CitySDK core.</p>
+                    <pre>
+                        //Attach a new module object to the CitySDK prototype.
+                        //It is advised to keep the filenames and module property names the same
+                        CitySDK.prototype.modules.eia = new EIAModule();
+                    </pre>
+                    <p>Perfect! We're all set to start implementing our code.</p>
+                </div>
+            </div>
 
-                    categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
-                    categoryURL = categoryURL.replace(categoryPattern, request.category);
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>GET, POST, and JSONP requests</h3>
+                    <p>The CitySDK has three core methods for accessing data from another website. The first is <em>ajaxRequest()</em> which takes a single parameter - the URL for the request, and
+                        returns a standard AJAX promise. The second is <em>jsonpRequest()</em> which also takes a single parameter and returns a standard promise, but uses jQuery's built in JSONP callback
+                        functionality to handle the data response. Last is the <em>postRequest()</em> function which takes two parameters: the URL and the data. Data is usually a JSON object, but can vary
+                        depending on the URL you are accessing. It also returns a standard promise.</p>
+                    <p>The EIA's API supports CORS, so we'll use GET requests. Let's start fleshing out the method our user's will use to get the data.</p>
+                <pre>
+                    EIAModule.prototype.categoryRequest = function(request, callback) {
+                        var apiKeyPattern = /({apiKey})/;
+                        var categoryPattern = /({category})/;
 
-                    CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
-                        response = $.parseJSON(response);
-                        callback(response);
-                    });
+                        var categoryURL = "http://api.eia.gov/category/?api_key={apiKey}&category_id={category}";
 
-                };
-            </pre>
-            <p>Here's our simple function which performs a GET request on the EIA's category API. We've used regular expressions to insert the user's request data into the URL, but you could also
-            piece it together using string concatenation.</p>
-            <p>Notice we access the instance of the SDK by using <em>CitySDK.prototype.sdkInstance</em> - when the SDK is instantiated it places a reference to itself here, so that all modules can
-            access the same instance. We then use this to make a GET request to the URL, parse the response as JSON, and call the callback function on that JSON.</p>
-        </div>
+                        categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
+                        categoryURL = categoryURL.replace(categoryPattern, request.category);
 
-        <div class="row">
-            <h3>More Features</h3>
-            <p>As you can see, creating a module for the CitySDK is relatively simple - it's all about abstracting the API level interaction to reduce the time for a developer to go from "idea" to "application"
-            and increasing the usability of the API's data by doing so. For more complex examples check out the Census module on our repository. In the meantime, here's the full source for the EIA module:</p>
-            <pre>
-                /**
-                 * This is the CitySDK Module Template's EIA API module.
-                 * This module requires a key from http://www.eia.gov/
-                 */
+                        CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
+                            response = $.parseJSON(response);
+                            callback(response);
+                        });
 
-                //Attach a new module object to the CitySDK prototype.
-                //It is advised to keep the filenames and module property names the same
-                CitySDK.prototype.modules.eia = new EIAModule();
+                    };
+                </pre>
+                    <p>Here's our simple function which performs a GET request on the EIA's category API. We've used regular expressions to insert the user's request data into the URL, but you could also
+                        piece it together using string concatenation.</p>
+                    <p>Notice we access the instance of the SDK by using <em>CitySDK.prototype.sdkInstance</em> - when the SDK is instantiated it places a reference to itself here, so that all modules can
+                        access the same instance. We then use this to make a GET request to the URL, parse the response as JSON, and call the callback function on that JSON.</p>
+                </div>
+            </div>
 
-                //Module object definition. Every module should have an "enabled" property and an "enable"  function.
-                function EIAModule() {
-                    this.enabled = false;
-                };
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>More Features</h3>
+                    <p>As you can see, creating a module for the CitySDK is relatively simple - it's all about abstracting the API level interaction to reduce the time for a developer to go from "idea" to "application"
+                        and increasing the usability of the API's data by doing so. For more complex examples check out the Census module on our repository. In the meantime, here's the full source for the EIA module:</p>
+                <pre>
+                    /**
+                     * This is the CitySDK Module Template's EIA API module.
+                     * This module requires a key from http://www.eia.gov/
+                     */
 
-                //Enable function. Stores the API key for this module and sets it as enabled
-                EIAModule.prototype.enable = function(apiKey) {
-                    this.apiKey = apiKey;
-                    this.enabled = true;
-                };
+                    //Attach a new module object to the CitySDK prototype.
+                    //It is advised to keep the filenames and module property names the same
+                    CitySDK.prototype.modules.eia = new EIAModule();
 
-                /**
-                 * Call which returns category listings from the dataset explorer
-                 *
-                 * Request should specify category. If no category specified, will default to the root list of datasets
-                 * {
-                 *      category: 05
-                 * }
-                 *
-                 * @param request
-                 * @param callback
-                 */
-                EIAModule.prototype.categoryRequest = function(request, callback) {
-                    var apiKeyPattern = /({apiKey})/;
-                    var categoryPattern = /({category})/;
+                    //Module object definition. Every module should have an "enabled" property and an "enable"  function.
+                    function EIAModule() {
+                        this.enabled = false;
+                    };
 
-                    var categoryURL = "http://api.eia.gov/category/?api_key={apiKey}&category_id={category}";
+                    //Enable function. Stores the API key for this module and sets it as enabled
+                    EIAModule.prototype.enable = function(apiKey) {
+                        this.apiKey = apiKey;
+                        this.enabled = true;
+                    };
 
-                    if(!("category" in request)) {
-                        request.category = 371; //Default - root list of all datasets
-                    }
+                    /**
+                     * Call which returns category listings from the dataset explorer
+                     *
+                     * Request should specify category. If no category specified, will default to the root list of datasets
+                     * {
+                     *      category: 05
+                     * }
+                     *
+                     * @param request
+                     * @param callback
+                     */
+                    EIAModule.prototype.categoryRequest = function(request, callback) {
+                        var apiKeyPattern = /({apiKey})/;
+                        var categoryPattern = /({category})/;
 
-                    categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
-                    categoryURL = categoryURL.replace(categoryPattern, request.category);
+                        var categoryURL = "http://api.eia.gov/category/?api_key={apiKey}&category_id={category}";
 
-                    CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
-                        response = $.parseJSON(response);
-                        callback(response);
-                    });
+                        if(!("category" in request)) {
+                            request.category = 371; //Default - root list of all datasets
+                        }
 
-                };
+                        categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
+                        categoryURL = categoryURL.replace(categoryPattern, request.category);
 
-                /**
-                 * Call which returns data from the specified series
-                 *
-                 * Request should specify a series, if not, nothing will happen
-                 *
-                 * {
-                 *      series: "ELEC.GEN.ALL-AL-99.A"
-                 * }
-                 *
-                 * @param request
-                 * @param callback
-                 */
-                EIAModule.prototype.seriesRequest = function(request, callback) {
-                    var apiKeyPattern = /({apiKey})/;
-                    var seriesPattern = /({series})/;
+                        CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
+                            response = $.parseJSON(response);
+                            callback(response);
+                        });
 
-                    var seriesURL = "http://api.eia.gov/series/?api_key={apiKey}&series_id={series}"
+                    };
 
-                    if(!("series" in request)) return;
+                    /**
+                     * Call which returns data from the specified series
+                     *
+                     * Request should specify a series, if not, nothing will happen
+                     *
+                     * {
+                     *      series: "ELEC.GEN.ALL-AL-99.A"
+                     * }
+                     *
+                     * @param request
+                     * @param callback
+                     */
+                    EIAModule.prototype.seriesRequest = function(request, callback) {
+                        var apiKeyPattern = /({apiKey})/;
+                        var seriesPattern = /({series})/;
 
-                    seriesURL = seriesURL.replace(apiKeyPattern, this.apiKey);
-                    seriesURL = seriesURL.replace(seriesPattern, request.series);
+                        var seriesURL = "http://api.eia.gov/series/?api_key={apiKey}&series_id={series}"
 
-                    CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
-                        response = $.parseJSON(response);
-                        callback(response);
-                    });
-                };
+                        if(!("series" in request)) return;
 
-                //After this point the module is all up to you
-                //References to an instance of the SDK should be called as:
-                CitySDK.prototype.sdkInstance;
-                //And references to this module should be called as
-                CitySDK.prototype.modules.eia;
-                //when 'this' is ambiguous
-            </pre>
+                        seriesURL = seriesURL.replace(apiKeyPattern, this.apiKey);
+                        seriesURL = seriesURL.replace(seriesPattern, request.series);
+
+                        CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
+                            response = $.parseJSON(response);
+                            callback(response);
+                        });
+                    };
+
+                    //After this point the module is all up to you
+                    //References to an instance of the SDK should be called as:
+                    CitySDK.prototype.sdkInstance;
+                    //And references to this module should be called as
+                    CitySDK.prototype.modules.eia;
+                    //when 'this' is ambiguous
+                </pre>
+                </div>
+            </div>
         </div>
     </div>
 </body>

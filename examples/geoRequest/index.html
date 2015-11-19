@@ -167,14 +167,17 @@ published: true
 
 <body>
 
-    
-    <div class="page-header">
-      <h1>GeoRequests and Supplemental Requests</hl>
+    <div class="row">
+        <div class="page-header col-md-12">
+          <h1>GeoRequests and Supplemental Requests</h1>
+        </div>
     </div>
 
-    <div class="btn-group">
-          <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-          <a href="http://uscensusbureau.github.io/citysdk/examples/geoRequest/source.html" class="btn btn-default" role="button">Source Code</a>
+    <div class="row">
+        <div class="btn-group col-md-12">
+              <a href="#" class="btn btn-primary" role="button">View the Example</a>
+              <a href="http://uscensusbureau.github.io/citysdk/examples/geoRequest/source.html" class="btn btn-default" role="button">Source Code</a>
+        </div>
     </div>
 
     <div>
@@ -188,7 +191,7 @@ published: true
     </div>
 
     <div class="row">
-            <div>
+            <div class="col-md-12">
                 <div class="btn btn-default" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
                 <div class="btn btn-default" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
                 <div class="btn btn-default" id="populationButton" onclick="toggleVar('population')">Population</div>
@@ -203,7 +206,7 @@ published: true
     </div>
 
         <div class="row">
-            <div>
+            <div class="col-md-12">
                 <div class="btn btn-default" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
                 <div class="btn btn-default" id="tract" onclick="setLevel('tract')">Tracts</div>
                 <div class="btn btn-default" id="place" onclick="setLevel('place')">Place</div>
@@ -219,6 +222,7 @@ published: true
     </div>
 
     <div class="row">
+        <div class="col-md-12">
             <div class="btn btn-default" onclick="loadCity('Washington_DC')">
                 Washington, D.C.
             </div>
@@ -252,13 +256,14 @@ published: true
             <div class="btn btn-default" onclick="loadCity('Asheville_NC')">
                 Asheville, NC
             </div>
+        </div>
     </div>
 
     <div class="row">
-        <div id="map-canvas" style="width:750px; height:500px;"></div>
+        <div class="col-md-12">
+            <div id="map-canvas" style="height:500px; margin-top: 20px"></div>
+        </div>
     </div>
-
-
 
 
 <div id="loading">
