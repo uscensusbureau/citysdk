@@ -82,24 +82,25 @@ title: Getting Started
 <body>
 
     <div class="row">
-        <div class="page-header">
+        <div class="page-header col-md-12">
             <h1>Getting Started</h1>
         </div>
     </div>
 
     <div class="row">
+        <div class="col-md-12">
 
-        <h2>Modularity</h2>
-        <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
-        <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
+            <h2>Modularity</h2>
+            <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population, income, or any other Census data? Load the Census module! Would you rather tell people where the closest Farmers' Market is? There's a module for that.</p>
+            <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on the things you don't need.</p>
 
-        <h2>Community</h2>
-        <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an open-source project hosted on GitHub, open and ready for community participation.</p>
-        <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.<
+            <h2>Community</h2>
+            <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an open-source project hosted on GitHub, open and ready for community participation.</p>
+            <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get started.<
 
-        <h2>Obtaining a Census Developer Key</h2>
-        <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the left to get one, and then enter it with the button on the right.</p>
-
+            <h2>Obtaining a Census Developer Key</h2>
+            <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the left to get one, and then enter it with the button on the right.</p>
+        </div>
     </div>
 
     <div class="alert alert-dismissable alert-info">
@@ -198,40 +199,50 @@ title: Getting Started
     </div>
 
     <div class="row top-buffer">
-        <h3>Unifying multiple APIs</h3>
-        <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
-        <div class="col-md-5">
-                        <textarea id="example3" rows="4" cols="50" style="width:100%; height:230px;">
-        var request = {
-            "zip": 10012
-        };
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Unifying multiple APIs</h3>
+                    <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                <textarea id="example3" rows="4" cols="50" style="width:100%; height:230px;">
+            var request = {
+                "zip": 10012
+            };
 
-        var callback = function(response) {
-            $('#example3output').empty();
-            $('#example3output').append(JSON.stringify(response, null, 4));
-        };
+            var callback = function(response) {
+                $('#example3output').empty();
+                $('#example3output').append(JSON.stringify(response, null, 4));
+            };
 
-        farmersMarket.search(request, callback);
-                        </textarea>
-            <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">Run This &raquo;</a></p>
-        </div>
+            farmersMarket.search(request, callback);
+                    </textarea>
+                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">Run This &raquo;</a></p>
+                </div>
 
-        <div class="col-md-5">
-            <pre id="example3output" style="width:100%; height: 280px; overflow: auto;"></pre>
+                <div class="col-md-6">
+                    <pre id="example3output" style="width:100%; height: 280px; overflow: auto;"></pre>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row top-buffer">
-        <h3>Example Library</h3>
-        <p>The CitySDK has an ever expanding library of examples, containing multiple simple chunks of code you can modify and alter to jump start your development. You can find them on our <a href="https://github.com/uscensusbureau/citysdk" target="_blank">github page</a> under the examples directory.
-            Additionally, the main page in the examples directory contains some more in-depth documentation.</p>
-        <p>Some of our favorite examples are:</p>
-        <ul>
-            <li><strong>GeoRequest</strong> - This example demonstrates how to acquire GeoJSON for cities using their boundaries</li>
-            <li><strong>Commute Query</strong> - Use this example to learn how to use sublevels (and to show your friends that your commute <em>is</em> provably worse than theirs)</li>
-            <li><strong>EIA Browser</strong> - Check out the Energy Information Administration's datasets with this interactive browser</li>
-        </ul>
-        <p>Keep your eyes peeled - we're adding more examples all the time.</p>
+        <div class="col-md-12">
+            <h3>Example Library</h3>
+            <p>The CitySDK has an ever expanding library of examples, containing multiple simple chunks of code you can modify and alter to jump start your development. You can find them on our <a href="https://github.com/uscensusbureau/citysdk" target="_blank">github page</a> under the examples directory.
+                Additionally, the main page in the examples directory contains some more in-depth documentation.</p>
+            <p>Some of our favorite examples are:</p>
+            <ul>
+                <li><strong>GeoRequest</strong> - This example demonstrates how to acquire GeoJSON for cities using their boundaries</li>
+                <li><strong>Commute Query</strong> - Use this example to learn how to use sublevels (and to show your friends that your commute <em>is</em> probably worse than theirs)</li>
+                <li><strong>EIA Browser</strong> - Check out the Energy Information Administration's datasets with this interactive browser</li>
+            </ul>
+            <p>Keep your eyes peeled - we're adding more examples all the time.</p>
+        </div>
     </div>
 </body>
 </html>
