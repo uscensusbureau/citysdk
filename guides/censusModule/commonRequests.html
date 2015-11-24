@@ -1,43 +1,15 @@
 ---
 layout: guideslayout
 published: true
+title: Census Module Common Requests
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Census Module Common Requests</title>
-
-    <style>
-        .even {
-            background-color: #eeeeee;
-        }
-
-        .row {
-            padding: 0.25em;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="row">
-            <div class="page-header">
-              <h1>Census Module Common Requests</hl>
-            </div>
-     </div>
-
-<div class="col-md-9 column">
-    
+<div class="row">
+    <div class="col-md-12">
     <p>The following are some common request objects.</p>
-    <div class="row">
-        <h3>Geocode via Lat/Lng</h3>
+
+        <h2>Geocode via Lat/Lng</h2>
         <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
         <pre>
             var request = {
@@ -67,9 +39,8 @@ published: true
         </pre>
         <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
             codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
-    </div>
-    <div class="row even">
-        <h3>Geocode via Zipcode</h3>
+
+        <h2>Geocode via Zipcode</h2>
         <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
         <pre>
             var request = {
@@ -100,9 +71,8 @@ published: true
         <p>Our response object include the Latitude and Longitude that the SDK used to geocode the zip code you specified. This is the central latitude and longitude of the zip code tabulation area geography for that code.</p>
         <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
             codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
-    </div>
-    <div class="row">
-        <h3>Geocode via State Code</h3>
+
+        <h2>Geocode via State Code</h2>
         <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
         <pre>
             var request = {
@@ -132,9 +102,8 @@ published: true
         <p>Our response object include the Latitude and Longitude that the SDK used to geocode the state code you specified. This is the latitude and longitude of the capital city of that state.</p>
         <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
             codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
-    </div>
-    <div class="row even">
-        <h3>Geocode via Address</h3>
+
+        <h2>Geocode via Address</h2>
         <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
         <pre>
             var request = {
@@ -194,9 +163,8 @@ published: true
         <p>Our response object include the Latitude and Longitude that the SDK used to geocode the address you specified. You can also see the precise address that was matched to the one you specified.</p>
         <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
             codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
-    </div>
-    <div class="row">
-        <h3>GeoJSON request - Single</h3>
+
+        <h2>GeoJSON request - Single</h2>
         <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
         <pre>
             var request = {
@@ -208,9 +176,8 @@ published: true
         </pre>
         <p>The response to this request is a standard GeoJSON featureCollection. You could also change the level to "blockGroup" to get the geography for the block group at your specified location.
         A level of "tract" would get the geography for the tract, and likewise for "county". If you specify a level of "place", and your location is in an incorporated city, you will get the boundaries for that city.</p>
-    </div>
-    <div class="row even">
-        <h3>GeoJSON request - Multiple</h3>
+
+        <h2>GeoJSON request - Multiple</h2>
         <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
         <pre>
             var request = {
@@ -222,9 +189,8 @@ published: true
             census.GEORequest(request, callback);
         </pre>
         <p>The response to this request is a standard GeoJSON featureCollection. The sublevel tag is set to true, which indicates that the request should acquire all the components of the specified level.</p>
-    </div>
-    <div class="row">
-        <h3>GeoJSON request - Multiple - Using Container</h3>
+
+        <h2>GeoJSON request - Multiple - Using Container</h2>
         <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
         <pre>
             var request = {
@@ -238,9 +204,8 @@ published: true
         </pre>
         <p>The response to this request is a standard GeoJSON featureCollection. When the container tag is specified along with the sublevel tag being set to true, the request will return
         all LEVEL within CONTAINER. In this example, we'd get all tracts within Kansas City, MO.</p>
-    </div>
-    <div class="row even">
-        <h3>GeoJSON request - With Data</h3>
+
+        <h2>GeoJSON request - With Data</h2>
         <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
         <pre>
             var request = {
@@ -259,9 +224,8 @@ published: true
         </pre>
         <p>The response to this request is a standard GeoJSON featureCollection. Because the variable array is specified, the SDK will get the requested variables for each feature in the collection
          and attach the data to that feature's property tag.</p>
-    </div>
-    <div class="row">
-        <h3>Basic Request - With Data</h3>
+
+        <h2>Basic Request - With Data</h2>
         <p>You can specify the location for this request using any of the previous geocoding examples. Non-geography requests use the <em>APIRequest()</em> function.</p>
         <pre>
             var request = {
@@ -300,9 +264,8 @@ published: true
             }
         </pre>
         <p>Notice the new "data" tag - this is an array of object(s) which contain the data we requested. It will have multiple objects if we make a sublevel request.</p>
-    </div>
-    <div class="row">
-        <h3>Sublevel Request - With Data</h3>
+
+        <h2>Sublevel Request - With Data</h2>
         <p>You can specify the location for this request using any of the previous geocoding examples. Non-geography requests use the <em>APIRequest()</em> function.</p>
         <pre>
             var request = {
@@ -360,5 +323,3 @@ published: true
         objects contains individual geocoding information.</p>
     </div>
 </div>
-</div>
-</body>

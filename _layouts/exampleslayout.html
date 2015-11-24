@@ -1,70 +1,61 @@
 <!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>CitySDK - {{ page.organization-name }}</title>
-    <link rel="stylesheet" href="{{ site.baseurl }}/static/css/bootstrap.min.css">
-    <script src="{{ site.baseurl }}/static/js/jquery.js"></script>
-    <script src="{{ site.baseurl }}/static/js/bootstrap.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
 
-    <!--[if IE]>
-    <link rel="stylesheet" href="{{ site.baseurl }}/static/css/for-ie-only.css">
-    <![endif]-->
-
-    <style>
-        body {
-            padding-top: 60px;
-        }
-    </style>
-
+    <title>CitySDK - {{ page.title }}</title>
+    {% include headscriptsAndCSS.html %}
 
 </head>
 <body>
 
+
 <div class="container">
     <div class="row clearfix">
-        <div class="col-md-12 column">
+        <div class="col-md-12 column cenNavigation">
             {% include header.html %}
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 column">
 
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-3 column">
+            <section class="page-header">
+                <h1>
+                    <small>Example Code</small>
+                </h1>
+            </section>
+            {% include examplesnav.html %}
+        </div>
 
-                    <div class="row">
-                        <div class="page-header">
-                            <h1><small>Example Code</small></h1>
-                        </div>
-                    </div>
-                    {% include examplesnav.html %}
-                </div>
+        <div class="col-md-9 column">
+            <header class="page-header">
+                <h1>{{ page.title }}</hl>
+            </header>
 
-                <div class="col-md-9 column">
-                    {{ content }}
-                </div> <!--wrap-->
+            <section>
+                {{ content }}
+            </section>
+        </div> <!--col-md-9 column-->
 
+    </div>
+    <div class="row">
+        <div class="col-md-12 column">
+            <div class="page-header">
+                <h4>
+                    <small>About</small>
+                </h4>
             </div>
-            <div class="col-md-12 column">
-                <div class="row">
-                    <div class="page-header">
-                        <h4><small>About</small></h4>
-                    </div>
-                    <div>
-                        {% include footer.html %}
-                    </div>
-                </div>
+            <div>
+                {% include footer.html %}
             </div>
         </div>
     </div>
 </div>
 
+</div>
 
     <!-- <script src="{{ site.baseurl }}/static/js/docs.min.js"></script> --> <!-- Used for Bootstrap documentation site -->
     <script type="text/javascript" src="{{ site.baseurl }}/static/js/expandables.js"></script>
+{% include analytics.html %}
+
 </body>
 </html>

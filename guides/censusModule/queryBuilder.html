@@ -1,215 +1,19 @@
 ---
 layout: guideslayout
 published: true
+title: Census Module Query Builder
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-    <title>Census Module Query Builder</title>
-
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-
-    <script>
-    function requestApiKey() {
-        window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
-    };
-    //Following code borrowed from the Census Request Tester by github @mpaquette1
-    var census = null;
-    var variablehash = null;
-    function loadCoords(lat, lng) {
-        $("#lat").val(lat);
-        $("#lng").val(lng);
-    }
-    function visible(x) {
-        var tabs = $("div[id^='" + x.split("_")[0] + "']");
-        tabs.each(function(f) {
-            $("#" + tabs[f].id).css("display", "none");
-        });
-        $('#' + x).css("display", "block");
-    };
-    function submit() {
-        var request = buildCensusModuleRequest();
-        var req = $('[name="CitySDKcall"]:checked').val();
-        var output = $("#output");
-        output.empty();
-        if (req == 'APIRequest')    {
-            census.APIRequest(request, function(response) {
-                output.empty();
-                output.append(JSON.stringify(response, null, 4));
-            });
-        } else  {
-            census.GEORequest(request, function(response) {
-                output.empty();
-                output.append(JSON.stringify(response, null, 4));
-            });
-        }
-        $('#saveLink').removeClass('disabled');
-    }
-    function save() {
-        var csvString;
-        csvString = convertOutput();
-        saveToCSVfile(csvString);
-    }
-    function convertOutput() {
-        var textarea = $('#output').text();
-        var JSONObject = JSON.parse(textarea);
-        var csvString = "";
-        var keys;
-        for (var index in JSONObject.data) {
-            if (index == 0) {
-                keys = Object.keys(JSONObject.data[index]);
-                for (var key in keys) {
-                    csvString = csvString + keys[key];
-                    if (key != (keys.length - 1)) {
-                        csvString = csvString + ',';
-                    } else {
-                        csvString = csvString + '\n';
-                    }
-                }
-            }
-            for (var key in keys) {
-                var dataJSONObject = JSONObject.data[index];
-                csvString = csvString + dataJSONObject[keys[key]];
-                if (key != (keys.length - 1)) {
-                    csvString = csvString + ',';
-                } else {
-                    csvString = csvString + '\n';
-                }
-            }
-        }
-        return csvString;
-    };
-    function saveToCSVfile(csvString) {
-        var filename = "citySDK_output.txt";
-        var fileData;
-        fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
-        $('#saveLink')
-                .attr({
-                    'download': filename,
-                    'href': fileData,
-                    'target': '_blank'
-                });
-    }
-    function buildCensusModuleRequest(){
-        var request = {};
-        var lat = $("#lat").val();
-        var lng = $("#lng").val();
-        var level = $("#level").val();
-        var state = $('#state').val();
-        var zip = $('#zip').val();
-        var container = $('#container').val();
-        var sublev  = $('#sublevel:checked').val();
-        var addr_street = $('#address_street').val();
-        var addr_city = $('#address_city').val();
-        var addr_state = $('#address_state').val();
-        var variables = [];
-        $("#variable option:selected").each(function(n, o){
-            variables.push(o.value);
-        });
-        request.level = level;
-        if (lat > 0) request.lat = lat;
-        if (lng < 0) request.lng = lng;
-        if (state.length > 0) request.state = state;
-        if (zip.length > 0) request.zip = zip;
-        if (addr_street.length > 0 && addr_city.length > 0 && addr_state.length > 0) {
-            var addr = {
-                street: addr_street,
-                city: addr_city,
-                state: addr_state
-            }
-            request.address = addr;
-        }
-        if (container.length > 0) request.container = container;
-        if (sublev == '1')  {
-            request.sublevel = true;
-        }
-        request.variables = variables;
-        return (request);
-    }
-    $(function(){
-        visible("location_coords");
-        // Instantiate census object.
-        var sdk = new CitySDK();
-        census = sdk.modules.census;
-        census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
-        // Fill in states.
-        $.each(census.stateCapitals, function(stateabbrev, capitalcoords){
-            $('<option>' + stateabbrev + '</option>').appendTo('#state');
-        });
-        // Fill in variables.
-        var sortedvariables = [];
-        variablehash = census.aliases;
-        if (variablehash != undefined)  {
-            $.each(variablehash, function(aliasname, oAlias){
-                sortedvariables.push(aliasname);
-            });
-            sortedvariables.sort();
-            $.each(sortedvariables, function(n, alias){
-                $('<option>' + alias + '</option>').appendTo('#variable');
-            });
-        }
-        // Make parameter changes immediately be reflected in the displayed request.
-        $('.reqparam').change(function(){
-            $('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
-        });
-        // Set the variable drop-down to show a description.
-        $('#variable').change(function(){
-            $('#variable_description').html('');
-            var newdescription = '';
-            $("#variable option:selected").each(function(n, opt)  {
-                var newcensusvariable = opt.value;
-                $.each(variablehash, function(aliasname, oAlias){
-                    if (aliasname == newcensusvariable) {
-                        newdescription += '<br/>' + oAlias.variable + ': &nbsp;&nbsp;<b>' + aliasname + ':</b><br>';
-                        if (oAlias.normalizable)    {
-                            newdescription += ' <i>(Normalizable)</i> ';
-                        }
-                        newdescription += oAlias.description + '.</b><br/>';
-                        return (false);
-                    }
-                });
-            });
-            $('#variable_description').html(newdescription);
-        });
-        $('#variable_description, td').css({'font-family':'sans-serif', 'font-size':'0.9em'});
-        $('#APIRequest').click(function() {
-           $('#save_row').slideDown('slow');
-        });
-        $('#GEORequest').click(function() {
-            $('#save_row').slideUp('slow');
-        });
-;    });
-    </script>
-
-    <style>
-    </style>
-</head>
-
-<body>
 
     <div class="row">
-            <div class="page-header">
-              <h1>Census Module Query Builder</hl>
-            </div>
-     </div>
+        <div class="col-md-12">
+            <h2>Overview</h2>
 
-    <div>
-        <h3>Overview</h3> 
-        <p>This interactive tool will help you craft queries to test out the CitySDK, and make sure you are getting the correct response.</p>
-     </div>
+            <p>This interactive tool will help you craft queries to test out the CitySDK, and make sure you are getting
+                the correct response.</p>
 
-<div class="container">
-    Modified from code by <a href="https://github.com/mpaquette1">@mpaquette1</a>, thanks!
-    <div>
-        <p>Census API key: <input type="text" size="40" id="apikey" value=''/></p>
+            <label for="apikey">Census API key: </label> <input type="text" size="40" id="apikey" value=''/>
+        </div>
     </div>
     <div class="row" id="call_row">
         <div class="col-md-2">
@@ -221,8 +25,8 @@ published: true
             <input type="radio" name="location_radios" value="location_state" onclick="visible('location_state')"> State Code<br/>
             <input type="radio" name="location_radios" value="location_address" onclick="visible('location_address')"> Address
         </div>
-        <div class="col-md-3">
-
+        <div class="col-md-6">
+            &nbsp;
         </div>
     </div>
     <div class="row" id="location_coords">
@@ -242,7 +46,7 @@ published: true
                 <p><input class="reqparam form-control" id="lng" type="text"/></p>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="row"  style="padding-left: 15px;">
                 <p>Number - The latitude of the requested location (North). Also supported: latitude, y</p>
             </div>
@@ -308,7 +112,7 @@ published: true
             <select  class="reqparam form-control" multiple size="15" id="variable"></select>
             <div id='variable_description'></div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <p>Array - Optional - An array of strings specifying which variables to query. One can specify an aliased variable (see variable aliases) or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the Census's developer portal or via the SDK's getACSVariableDictionary method.</p>
         </div>
     </div>
@@ -326,7 +130,7 @@ published: true
                 <option value="place">place</option>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <p>String - At what level to request the data. These are based on census geographies. Supported options are: "blockGroup", "tract", "county", "state", "us", and "place". Note that the "place" tag currently only supports incorporated places.</p>
         </div>
     </div>
@@ -337,7 +141,7 @@ published: true
         <div class="col-md-4">
             <input class="reqparam" type="checkbox" value='1' id='sublevel' name='sublevel'>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <p>Boolean - Optional Whether or not to return based upon sublevels. See sublevel requests for more information. Defaults to false.</p>
         </div>
     </div>
@@ -355,7 +159,7 @@ published: true
                 <option value="place">place</option>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <p>String - Optional, GeoJSON request only - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that place's geographical boundaries. The container tag says "get all level within container", a place is the census word for an incorporated city, and sublevel says "get all of that level"</p>
         </div>
     </div>
@@ -367,23 +171,204 @@ published: true
             <input type="radio" id='APIRequest' name="CitySDKcall" value="APIRequest"> APIRequest<br/>
             <input type="radio" id='GEORequest' name="CitySDKcall" value="GEORequest" checked> GEORequest
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="submit()" role="button">Update Data</a></p>
         </div>
     </div>
     <div class="row" id="save_row">
-        <div class="col-md-offset-6 col-md-3">
+        <div class="col-md-offset-6 col-md-6">
             <p><a id="saveLink" class="btn btn-primary btn-lg disabled" style="width: 100%; " href="javascript:void(0)" onclick="save()" role="button">Save Variables to CSV File</a></p>
         </div>
     </div>
-
-    <div class="col-md-9">
+<div class="row">
+    <div class="col-md-12">
         <p>CitySDK Census Module Request:</p>
         <pre id="cenreq"></pre>
 
         <p>Output:</p>
         <pre id="output"></pre>
+
+
     </div>
-    
+    </div>
+<div class="row">
+    <div class="col-md-12">
+        <h5>Credits</h5>
+        <cite>Modified from code by <a href="https://github.com/mpaquette1">@mpaquette1</a></cite>
+    </div>
 </div>
-</body>
+<script>
+    function requestApiKey() {
+        window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
+    }
+    ;
+    //Following code borrowed from the Census Request Tester by github @mpaquette1
+    var census = null;
+    var variablehash = null;
+    function loadCoords(lat, lng) {
+        $("#lat").val(lat);
+        $("#lng").val(lng);
+    }
+    function visible(x) {
+        var tabs = $("div[id^='" + x.split("_")[0] + "']");
+        tabs.each(function (f) {
+            $("#" + tabs[f].id).css("display", "none");
+        });
+        $('#' + x).css("display", "block");
+    }
+    ;
+    function submit() {
+        var request = buildCensusModuleRequest();
+        var req = $('[name="CitySDKcall"]:checked').val();
+        var output = $("#output");
+        output.empty();
+        if (req == 'APIRequest') {
+            census.APIRequest(request, function (response) {
+                output.empty();
+                output.append(JSON.stringify(response, null, 4));
+            });
+        } else {
+            census.GEORequest(request, function (response) {
+                output.empty();
+                output.append(JSON.stringify(response, null, 4));
+            });
+        }
+        $('#saveLink').removeClass('disabled');
+    }
+    function save() {
+        var csvString;
+        csvString = convertOutput();
+        saveToCSVfile(csvString);
+    }
+    function convertOutput() {
+        var textarea = $('#output').text();
+        var JSONObject = JSON.parse(textarea);
+        var csvString = "";
+        var keys;
+        for (var index in JSONObject.data) {
+            if (index == 0) {
+                keys = Object.keys(JSONObject.data[index]);
+                for (var key in keys) {
+                    csvString = csvString + keys[key];
+                    if (key != (keys.length - 1)) {
+                        csvString = csvString + ',';
+                    } else {
+                        csvString = csvString + '\n';
+                    }
+                }
+            }
+            for (var key in keys) {
+                var dataJSONObject = JSONObject.data[index];
+                csvString = csvString + dataJSONObject[keys[key]];
+                if (key != (keys.length - 1)) {
+                    csvString = csvString + ',';
+                } else {
+                    csvString = csvString + '\n';
+                }
+            }
+        }
+        return csvString;
+    }
+    ;
+    function saveToCSVfile(csvString) {
+        var filename = "citySDK_output.txt";
+        var fileData;
+        fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+        $('#saveLink')
+                .attr({
+                    'download': filename,
+                    'href': fileData,
+                    'target': '_blank'
+                });
+    }
+    function buildCensusModuleRequest() {
+        var request = {};
+        var lat = $("#lat").val();
+        var lng = $("#lng").val();
+        var level = $("#level").val();
+        var state = $('#state').val();
+        var zip = $('#zip').val();
+        var container = $('#container').val();
+        var sublev = $('#sublevel:checked').val();
+        var addr_street = $('#address_street').val();
+        var addr_city = $('#address_city').val();
+        var addr_state = $('#address_state').val();
+        var variables = [];
+        $("#variable option:selected").each(function (n, o) {
+            variables.push(o.value);
+        });
+        request.level = level;
+        if (lat > 0) request.lat = lat;
+        if (lng < 0) request.lng = lng;
+        if (state.length > 0) request.state = state;
+        if (zip.length > 0) request.zip = zip;
+        if (addr_street.length > 0 && addr_city.length > 0 && addr_state.length > 0) {
+            var addr = {
+                street: addr_street,
+                city: addr_city,
+                state: addr_state
+            }
+            request.address = addr;
+        }
+        if (container.length > 0) request.container = container;
+        if (sublev == '1') {
+            request.sublevel = true;
+        }
+        request.variables = variables;
+        return (request);
+    }
+    $(function () {
+        visible("location_coords");
+        // Instantiate census object.
+        var sdk = new CitySDK();
+        census = sdk.modules.census;
+        census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
+        // Fill in states.
+        $.each(census.stateCapitals, function (stateabbrev, capitalcoords) {
+            $('<option>' + stateabbrev + '</option>').appendTo('#state');
+        });
+        // Fill in variables.
+        var sortedvariables = [];
+        variablehash = census.aliases;
+        if (variablehash != undefined) {
+            $.each(variablehash, function (aliasname, oAlias) {
+                sortedvariables.push(aliasname);
+            });
+            sortedvariables.sort();
+            $.each(sortedvariables, function (n, alias) {
+                $('<option>' + alias + '</option>').appendTo('#variable');
+            });
+        }
+        // Make parameter changes immediately be reflected in the displayed request.
+        $('.reqparam').change(function () {
+            $('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+        });
+        // Set the variable drop-down to show a description.
+        $('#variable').change(function () {
+            $('#variable_description').html('');
+            var newdescription = '';
+            $("#variable option:selected").each(function (n, opt) {
+                var newcensusvariable = opt.value;
+                $.each(variablehash, function (aliasname, oAlias) {
+                    if (aliasname == newcensusvariable) {
+                        newdescription += '<br/>' + oAlias.variable + ': &nbsp;&nbsp;<b>' + aliasname + ':</b><br>';
+                        if (oAlias.normalizable) {
+                            newdescription += ' <i>(Normalizable)</i> ';
+                        }
+                        newdescription += oAlias.description + '.</b><br/>';
+                        return (false);
+                    }
+                });
+            });
+            $('#variable_description').html(newdescription);
+        });
+        $('#variable_description, td').css({'font-family': 'sans-serif', 'font-size': '0.9em'});
+        $('#APIRequest').click(function () {
+            $('#save_row').slideDown('slow');
+        });
+        $('#GEORequest').click(function () {
+            $('#save_row').slideUp('slow');
+        });
+        ;
+    });
+</script>

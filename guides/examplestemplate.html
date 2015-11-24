@@ -1,81 +1,23 @@
 ---
 layout: exampleslayout
 published: true
+title: Population and Income by Address
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Population and Income by Address</title>
 
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-
-<script>
-        var sdk, census;
-
-        $(document).ready(function() {
-            sdk = new CitySDK();
-            census = sdk.modules.census;
-
-            var apiKey = prompt("Please enter your Census API Key", "API key");
-            census.enable(apiKey);
-        });
-
-        function submit() {
-            var street = $('#street');
-            var city = $('#city');
-            var state = $('#state');
-
-            var request = {
-                address: {
-                    street: street.val(),
-                    city: city.val(),
-                    state: state.val()
-                },
-
-                variables: [
-                    "income",
-                    "population"
-                ],
-                level: $("#level option:selected").val()
-            }
-            census.APIRequest(request, function(response) {
-                var output = $('#output');
-                output.empty();
-                output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
-                output.append("Median Income: " + response.data[0].income + "<br/>");
-                output.append("Population: " + response.data[0].population + " </br>");
-                output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
-                output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
-            });
-        }
-    </script>
-
-</head>
-
-<body>
 	<div class="row">
-			<div class="page-header">
-			  <h1>Population and Income by Address</hl>
-			</div>
 
 			<div class="btn-group">
-				  <a href="#" class="btn btn-primary" role="button">View the Example</a>		  
-				  <a href="http://uscensusbureau.github.io/citysdk/guides/examplestemplate_source.html" class="btn btn-default" role="button">Source Code</a>
+                <a href="#" class="btn btn-primary" role="button">View the Example</a>
+                <a href="{{ site.baseurl }}/guides/examplestemplate_source.html" class="btn btn-default" role="button">Source
+                    Code</a>
 			</div>
 	</div>
 
 
-<div>
 	<div class="row">
-					<h3>Overview</h3> 
+        <h2>Overview</h2>
 				    <p>This example allows you to enter an address and return population and income information that corresponds to the location.  You may specify how granular you want the return value, by choosing Tract, State, County, Block Group, or Incorporated Place.  </p>
 	</div>
     <div class="row">
@@ -114,12 +56,45 @@ published: true
 <pre id="output">
 
 </pre>
-    </div>
-</body>
-</html>
-    </section>
 
-    </div>
-  </div> <!--wrap-->
 
-</body>
+<script>
+    var sdk, census;
+
+    $(document).ready(function () {
+        sdk = new CitySDK();
+        census = sdk.modules.census;
+
+        var apiKey = prompt("Please enter your Census API Key", "API key");
+        census.enable(apiKey);
+    });
+
+    function submit() {
+        var street = $('#street');
+        var city = $('#city');
+        var state = $('#state');
+
+        var request = {
+            address: {
+                street: street.val(),
+                city: city.val(),
+                state: state.val()
+            },
+
+            variables: [
+                "income",
+                "population"
+            ],
+            level: $("#level option:selected").val()
+        }
+        census.APIRequest(request, function (response) {
+            var output = $('#output');
+            output.empty();
+            output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
+            output.append("Median Income: " + response.data[0].income + "<br/>");
+            output.append("Population: " + response.data[0].population + " </br>");
+            output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
+            output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
+        });
+    }
+</script>

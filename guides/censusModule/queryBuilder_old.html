@@ -1,175 +1,8 @@
 ---
 layout: guideslayout
 published: true
+title: Census Module Query Builder
 ---
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-    <title>Census Module Query Builder</title>
-
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-
-    <script>
-    function requestApiKey() {
-        window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
-    };
-
-    //Following code borrowed from the Census Request Tester by github @mpaquette1
-    var census = null;
-    var variablehash = null;
-
-    function loadCoords(lat, lng) {
-        $("#lat").val(lat);
-        $("#lng").val(lng);
-    }
-
-    function visible(x) {
-        var tabs = $("div[id^='" + x.split("_")[0] + "']");
-        tabs.each(function(f) {
-            $("#" + tabs[f].id).css("display", "none");
-        });
-        $('#' + x).css("display", "block");
-    };
-
-    function submit() {
-        var request = buildCensusModuleRequest();
-        var req = $('[name="CitySDKcall"]:checked').val();
-        var output = $("#output");
-        output.empty();
-
-        if (req == 'APIRequest')    {
-            census.APIRequest(request, function(response) {
-                output.append(JSON.stringify(response, null, 4));
-            });
-        } else  {
-            census.GEORequest(request, function(response) {
-                output.append(JSON.stringify(response, null, 4));
-            });
-        }
-    }
-
-
-
-    function buildCensusModuleRequest(){
-        var request = {};
-        var lat = $("#lat").val();
-        var lng = $("#lng").val();
-        var level = $("#level").val();
-        var state = $('#state').val();
-        var zip = $('#zip').val();
-        var container = $('#container').val();
-        var sublev  = $('#sublevel:checked').val();
-        var addr_street = $('#address_street').val();
-        var addr_city = $('#address_city').val();
-        var addr_state = $('#address_state').val();
-
-        var variables = [];
-        $("#variable option:selected").each(function(n, o){
-            variables.push(o.value);
-        });
-
-
-        request.level = level;
-        if (lat > 0) request.lat = lat;
-        if (lng < 0) request.lng = lng;
-        if (state.length > 0) request.state = state;
-        if (zip.length > 0) request.zip = zip;
-        if (addr_street.length > 0 && addr_city.length > 0 && addr_state.length > 0) {
-            var addr = {
-                street: addr_street,
-                city: addr_city,
-                state: addr_state
-            }
-            request.address = addr;
-        }
-        if (container.length > 0) request.container = container;
-        if (sublev == '1')  {
-            request.sublevel = true;
-        }
-        request.variables = variables;
-        return (request);
-    }
-
-
-
-    $(function(){
-        visible("location_coords");
-
-        // Instantiate census object.
-        var sdk = new CitySDK();
-        census = sdk.modules.census;
-        census.enable($("#apikey").val());
-
-        // Fill in states.
-        $.each(census.stateCapitals, function(stateabbrev, capitalcoords){
-            $('<option>' + stateabbrev + '</option>').appendTo('#state');
-        });
-
-        // Fill in variables.
-        var sortedvariables = [];
-        variablehash = census.aliases;
-        if (variablehash != undefined)  {
-            $.each(variablehash, function(aliasname, oAlias){
-                sortedvariables.push(aliasname);
-            });
-            sortedvariables.sort();
-            $.each(sortedvariables, function(n, alias){
-                $('<option>' + alias + '</option>').appendTo('#variable');
-            });
-        }
-
-        // Make parameter changes immediately be reflected in the displayed request.
-        $('.reqparam').change(function(){
-            $('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
-        });
-
-        // Set the variable drop-down to show a description.
-        $('#variable').change(function(){
-            $('#variable_description').html('');
-            var newdescription = '';
-
-            $("#variable option:selected").each(function(n, opt)  {
-                var newcensusvariable = opt.value;
-                $.each(variablehash, function(aliasname, oAlias){
-                    if (aliasname == newcensusvariable) {
-                        newdescription += '<br/>' + oAlias.variable + ': &nbsp;&nbsp;<b>' + aliasname + ':</b><br>';
-                        if (oAlias.normalizable)    {
-                            newdescription += ' <i>(Normalizable)</i> ';
-                        }
-                        newdescription += oAlias.description + '.</b><br/>';
-                        return (false);
-                    }
-                });
-            });
-
-            $('#variable_description').html(newdescription);
-        });
-
-        $('#variable_description, td').css({'font-family':'sans-serif', 'font-size':'0.9em'});
-    });
-
-    </script>
-
-    <style>
-
-    </style>
-</head>
-
-<body>
-
-    <div class="row">
-            <div class="page-header">
-              <h1>Census Module Query Builder</hl>
-            </div>
-     </div>
 
     <div>
         <h3>Overview</h3> 
@@ -348,5 +181,145 @@ published: true
     <p>Output:</p>
     <pre id="output"></pre>
 </div>
-</div>
-</body>
+
+
+<script>
+    function requestApiKey() {
+        window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
+    }
+    ;
+
+    //Following code borrowed from the Census Request Tester by github @mpaquette1
+    var census = null;
+    var variablehash = null;
+
+    function loadCoords(lat, lng) {
+        $("#lat").val(lat);
+        $("#lng").val(lng);
+    }
+
+    function visible(x) {
+        var tabs = $("div[id^='" + x.split("_")[0] + "']");
+        tabs.each(function (f) {
+            $("#" + tabs[f].id).css("display", "none");
+        });
+        $('#' + x).css("display", "block");
+    }
+    ;
+
+    function submit() {
+        var request = buildCensusModuleRequest();
+        var req = $('[name="CitySDKcall"]:checked').val();
+        var output = $("#output");
+        output.empty();
+
+        if (req == 'APIRequest') {
+            census.APIRequest(request, function (response) {
+                output.append(JSON.stringify(response, null, 4));
+            });
+        } else {
+            census.GEORequest(request, function (response) {
+                output.append(JSON.stringify(response, null, 4));
+            });
+        }
+    }
+
+
+    function buildCensusModuleRequest() {
+        var request = {};
+        var lat = $("#lat").val();
+        var lng = $("#lng").val();
+        var level = $("#level").val();
+        var state = $('#state').val();
+        var zip = $('#zip').val();
+        var container = $('#container').val();
+        var sublev = $('#sublevel:checked').val();
+        var addr_street = $('#address_street').val();
+        var addr_city = $('#address_city').val();
+        var addr_state = $('#address_state').val();
+
+        var variables = [];
+        $("#variable option:selected").each(function (n, o) {
+            variables.push(o.value);
+        });
+
+
+        request.level = level;
+        if (lat > 0) request.lat = lat;
+        if (lng < 0) request.lng = lng;
+        if (state.length > 0) request.state = state;
+        if (zip.length > 0) request.zip = zip;
+        if (addr_street.length > 0 && addr_city.length > 0 && addr_state.length > 0) {
+            var addr = {
+                street: addr_street,
+                city: addr_city,
+                state: addr_state
+            }
+            request.address = addr;
+        }
+        if (container.length > 0) request.container = container;
+        if (sublev == '1') {
+            request.sublevel = true;
+        }
+        request.variables = variables;
+        return (request);
+    }
+
+
+    $(function () {
+        visible("location_coords");
+
+        // Instantiate census object.
+        var sdk = new CitySDK();
+        census = sdk.modules.census;
+        census.enable($("#apikey").val());
+
+        // Fill in states.
+        $.each(census.stateCapitals, function (stateabbrev, capitalcoords) {
+            $('<option>' + stateabbrev + '</option>').appendTo('#state');
+        });
+
+        // Fill in variables.
+        var sortedvariables = [];
+        variablehash = census.aliases;
+        if (variablehash != undefined) {
+            $.each(variablehash, function (aliasname, oAlias) {
+                sortedvariables.push(aliasname);
+            });
+            sortedvariables.sort();
+            $.each(sortedvariables, function (n, alias) {
+                $('<option>' + alias + '</option>').appendTo('#variable');
+            });
+        }
+
+        // Make parameter changes immediately be reflected in the displayed request.
+        $('.reqparam').change(function () {
+            $('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+        });
+
+        // Set the variable drop-down to show a description.
+        $('#variable').change(function () {
+            $('#variable_description').html('');
+            var newdescription = '';
+
+            $("#variable option:selected").each(function (n, opt) {
+                var newcensusvariable = opt.value;
+                $.each(variablehash, function (aliasname, oAlias) {
+                    if (aliasname == newcensusvariable) {
+                        newdescription += '<br/>' + oAlias.variable + ': &nbsp;&nbsp;<b>' + aliasname + ':</b><br>';
+                        if (oAlias.normalizable) {
+                            newdescription += ' <i>(Normalizable)</i> ';
+                        }
+                        newdescription += oAlias.description + '.</b><br/>';
+                        return (false);
+                    }
+                });
+            });
+
+            $('#variable_description').html(newdescription);
+        });
+
+        $('#variable_description, td').css({'font-family': 'sans-serif', 'font-size': '0.9em'});
+    });
+
+</script>

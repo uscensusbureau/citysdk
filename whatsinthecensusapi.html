@@ -1,46 +1,19 @@
 ---
 layout: guideslayout
 published: true
+title: What's available in the Census API?
 ---
 
-<!DOCTYPE html>
-
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="chrome=1">
-  <title>Census API Explorer</title>
-
-  <link href="css/query.css" rel="stylesheet" >
-
-  <!-- Script
-  <link href="css/bootstrap.min.css" rel="stylesheet" >
-  <script type="text/javascript" src="js/jquery.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="js/tabs.js"></script>
-  <script type="text/javascript" src="js/jquery-xdomainrequest.js"></script>
-  <script type="text/javascript" src="js/affix.js"></script>
-  <script type="text/javascript" src="js/jquery.autosize.js"></script>
-  <script type="text/javascript" src="js/mrl-query.js"></script>
-  -->
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-</head>
 
-<body>
-
-
-<div class="container">
 
     <div class="row">
-            <div class="page-header">
-              <h1>What's available in the Census API?</h1>
+        <div class="col-md-12">
                 <p>The Census API contains multiple datasets.  The table below illustrates mapping between the types of data you can find in the various Census datasets, accessible via the API.</p>
             </div>
      </div>
+<div class="row">
 
     <div class="col-md-9">
       <table class="table">
@@ -77,7 +50,9 @@ published: true
 
 
               <tr>
-                  <td><a href=http://uscensusbureau.github.io/citysdk/guides.html><small>CitySDK</small></a></td>
+                  <td><a href={{ site.baseurl }}/guides.html>
+                      <small>CitySDK</small>
+                      </a></td>
                   <td class="success"></td>
                   <td class="danger"></td>
                   <td class="success"></td>
@@ -271,7 +246,8 @@ published: true
 
         </tbody>
     </table>
-
+    </div>
+</div>
 <!--
   <h2><A NAME="CitySDK">CitySDK</A></h2>
 
@@ -352,9 +328,6 @@ published: true
               </div>
       </div>
 -->
-</body>
-
-
 
 <script TYPE="text/javascript">
 
@@ -393,6 +366,3 @@ published: true
   });
 
 </script>
-
-
-</html>

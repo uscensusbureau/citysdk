@@ -1,34 +1,14 @@
 ---
 layout: guideslayout
 published: true
+title: How to Use the Census Module
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>How to Use the Census Module</title>
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    
-</head>
+<div class="row">
+    <div class="col-md-12">
 
-<body>
-
-
-    <div class="row">
-            <div class="page-header">
-              <h1>How to Use the Census Module</hl>
-            </div>
-     </div>
-
-    <div>
-    
-        <h3>Overview</h3> 
+        <h2>Overview</h2>
         <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
         <h3>Contents</h3>
         <ul>
@@ -41,10 +21,9 @@ published: true
             <li><a href="#requestingGeojsonWithData">Requesting GeoJSON with Data</a></li>
             <li><a href="#theRequestObjectInDetail">The Request Object in Detail</a></li>
         </ul>
-    </div>
 
     <div id="importingTheModule">
-        <h3>Theory of Operation</h3>
+        <h2>Theory of Operation</h2>
         <p>At a high-level, the CitySDK and Census Module work by using a JSON object in order to define key parameters and then simultaneously retrieve data across multiple APIs.  
         </p>
         <pre>
@@ -65,12 +44,14 @@ published: true
 
         <p>This type of JSON request/response paradigm brings together numerous services, that prior to the CitySDK would need to be called separately and mashed up in a manual fashion as described below.
         </p>
-        
-        <h1><img src="../static/img/oldprocess.jpg"/></h1>
 
-        <h3>Importing the Module</h3>
+        <img src="../static/img/oldprocess.jpg" class="img-responsive"
+             alt="Request goes through the Data API, Geocoding Service, and Geography API and is combined into a GeoJSON & Data response."/>
+
+        <h2>Importing the Module</h2>
         <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
-        core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your &lt;head&gt; tag, like so:</p>
+            core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your <code>&lt;head&gt;</code>
+            tag, like so:</p>
         <pre>
             &lt;head&gt;
                 &lt;title&gt;CitySDK - Example&lt;/title&gt;
@@ -92,7 +73,7 @@ published: true
     </div>
 
     <div id="requestingVariables">
-        <h3>Requesting Variables</h3>
+        <h2>Requesting Variables</h2>
         <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to access is the ACS 5-year. To request a variable, pass a
         JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" and "population" for Washington D.C.</p>
         <pre>
@@ -154,7 +135,7 @@ published: true
     </div>
 
     <div id="sublevelRequests">
-        <h3>Sublevel Requests</h3>
+        <h2>Sublevel Requests</h2>
         <p>Finding data at a single location is all well and good - but what if you want the data for all counties in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
         <p>By specifying the tag "sublevel" as true, the SDK will request data for each entity in the level's container relationship. These relationships are:</p>
         <ul>
@@ -221,7 +202,7 @@ published: true
     </div>
 
     <div id="variableAliases">
-        <h3>Variable Aliases</h3>
+        <h2>Variable Aliases</h2>
         <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.</p>
         <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census module supports some aliased variables.</p>
         <p>Aliased variable are specified by a string and return the most appropriate variable.
@@ -231,7 +212,7 @@ published: true
     </div>
 
     <div id="requestingGeojson">
-        <h3>Requesting GeoJSON</h3>
+        <h2>Requesting GeoJSON</h2>
         <p>The Census module can acquire GeoJSON for any supported level from the Census's TigerWeb ArcGIS API. To do this, we will submit our request using a different method: <em>GEORequest()</em>. This method
         takes the request object and a callback. The response is GeoJSON.</p>
         <p>The following code will get us the GeoJSON for the state of Maryland and attach it directly to a Google Map layer:</p>
@@ -311,7 +292,7 @@ published: true
     </div>
 
     <div id="requestingGeojsonWithData">
-        <h3>Requesting GeoJSON with Data</h3>
+        <h2>Requesting GeoJSON with Data</h2>
         <p>We can now get all the geography we could ever need. But what about data? Surely we don't want to have to make a <em>GEORequest()</em> call AND a <em>APIRequest()</em> call and unify the data ourselves, right?
         Right. We'd never let you down like that. You can request variables right alongside your GeoJSON. The variable data will be attached to each feature's properties tag.</p>
         <p>For example, let's get the income for every block group in New York City:</p>
@@ -373,7 +354,7 @@ published: true
     </div>
 
     <div id="theRequestObjectInDetail">
-        <h3>The Request Object in Detail</h3>
+        <h2>The Request Object in Detail</h2>
         <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the available options.</p>
         <ul>
             <p><strong>Location Options</strong></p>
@@ -406,4 +387,6 @@ published: true
         </ul>
     </div>
 
-</body>
+
+    </div>
+</div>

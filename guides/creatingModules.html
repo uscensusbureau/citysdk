@@ -1,43 +1,29 @@
 ---
 layout: guideslayout
 published: true
+title: Creating a Module
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Creating a Module</title>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Overview</h2>
 
-</head>
+        <p>This page will guide you through creating your own module to interact with the CitySDK.</p>
 
-<body>
 
-    <div class="row">
-            <div class="page-header">
-              <h1>Creating a Module</hl>
-            </div>
-     </div>
-
-    <div class="col-md-9 column">    
-    <h3>Overview</h3>     
-    <p>This page will guide you through creating your own module to interact with the CitySDK.</p>
-
-        <div class="row">
-            <h3>CORS Support</h3>
+        <h2>CORS Support</h2>
             <p>The CitySDK is a JavaScript SDK which means to access data on other domains, that domain must either support CORS headers or JSONP requests. Before starting work on a module,
             please ensure the API you wish to work with supports one of those options.</p>
             <p>You can learn more about CORS <a href="http://enable-cors.org/" target="_blank">here</a>.</p>
             <p>You can test your API's CORS support <a href="http://test-cors.org/" target="_blank">here</a>.</p>
+    </div>
         </div>
 
         <div class="row">
-            <h3>Getting Started</h3>
+            <div class="col-md-12">
+
+                <h2>Getting Started</h2>
             <p>For this guide, we'll be constructing a module for the Energy Information Agency's API. The first step is to decide on a name for your module, we're going to go with <em>citysdk.eia.js</em> - it easily tells users what
             this module interfaces with.</p>
             <p>Next, we'll open up <em>citysdk.moduleTemplate.js</em> from the CitySDK github repository to use as our basis. Let's go ahead and save it as our chosen filename.</p>
@@ -64,10 +50,13 @@ published: true
                 CitySDK.prototype.modules.eia = new EIAModule();
             </pre>
             <p>Perfect! We're all set to start implementing our code.</p>
+            </div>
         </div>
 
         <div class="row">
-            <h3>GET, POST, and JSONP requests</h3>
+            <div class="col-md-12">
+
+                <h2>GET, POST, and JSONP requests</h2>
             <p>The CitySDK has three core methods for accessing data from another website. The first is <em>ajaxRequest()</em> which takes a single parameter - the URL for the request, and
             returns a standard AJAX promise. The second is <em>jsonpRequest()</em> which also takes a single parameter and returns a standard promise, but uses jQuery's built in JSONP callback
             functionality to handle the data response. Last is the <em>postRequest()</em> function which takes two parameters: the URL and the data. Data is usually a JSON object, but can vary
@@ -95,9 +84,12 @@ published: true
             <p>Notice we access the instance of the SDK by using <em>CitySDK.prototype.sdkInstance</em> - when the SDK is instantiated it places a reference to itself here, so that all modules can
             access the same instance. We then use this to make a GET request to the URL, parse the response as JSON, and call the callback function on that JSON.</p>
         </div>
+        </div>
 
         <div class="row">
-            <h3>More Features</h3>
+            <div class="col-md-12">
+
+                <h2>More Features</h2>
             <p>As you can see, creating a module for the CitySDK is relatively simple - it's all about abstracting the API level interaction to reduce the time for a developer to go from "idea" to "application"
             and increasing the usability of the API's data by doing so. For more complex examples check out the Census module on our repository. In the meantime, here's the full source for the EIA module:</p>
             <pre>
@@ -189,5 +181,5 @@ published: true
                 //when 'this' is ambiguous
             </pre>
         </div>
-    </div>
-</body>
+        </div>
+
