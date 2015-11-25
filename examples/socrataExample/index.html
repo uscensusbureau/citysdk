@@ -1,105 +1,100 @@
 ---
 layout: exampleslayout
 published: true
+title: Chicago City Payroll using Socrata and SoQL
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Chicago City Payroll using Socrata and SoQL</title>
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.socrata.js"></script>
-
-    <script>
-        var sdk, socrata;
-
-        $(document).ready(function() {
-            sdk = new CitySDK();
-            socrata = sdk.modules.socrata;
-        });
-
-        function submit() {
-            var request = {
-                "url": "data.cityofchicago.org",
-                "dataset": "xzkq-xp2w"
-            }
-
-            var where = $('#where');
-            if(where.val().length > 0) {
-                request.where = where.val();
-            }
-
-            var select = $('#select');
-            if(select.val().length > 0) {
-                request.select = select.val();
-            }
-
-            var group = $('#group');
-            if(group.val().length > 0) {
-                request.group = group.val();
-            }
-
-            var q = $('#q');
-            if(q.val().length > 0) {
-                request.q = q.val();
-            }
-
-            socrata.request(request, function(response) {
-                var output = $('#output');
-                output.empty();
-
-                response.forEach(function(entry) {
-                    for (var property in entry) {
-                        if (entry.hasOwnProperty(property)) {
-                            output.append("<b>" + property + "</b>: " + entry[property] + "; ");
-                        }
-                    }
-                    output.append("<br/>");
-                });
-            });
-        }
-    </script>
-</head>
-<body>
-
-    <div class="row">
-            <div class="page-header col-md-12">
-              <h1>Chicago City Payroll using Socrata and SoQL</h1>
-            </div>
-
-            <div class="btn-group col-md-12">
-                  <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-                  <a href="http://uscensusbureau.github.io/citysdk/examples/socrataExample/source.html" class="btn btn-default" role="button">Source Code</a>
-            </div>
+<div class="row">
+    <div class="btn-group col-md-12">
+        <a href="#" class="btn btn-primary" role="button">View the Example</a>
+        <a href="source.html" class="btn btn-default" role="button">Source Code</a>
     </div>
+</div>
 
-    <div class="container">
+<div class="row">
 
-        <div class="col-md-9">
-            <h2>City of Chicago Employee Data</h2>
-            <p>Fields: name, department, job_titles, employee_annual_salary</p>
-            <p>Check out <a href="http://dev.socrata.com/docs/queries.html">http://dev.socrata.com/docs/queries.html</a> for more on how to use these clauses.</p>
-            <p>Try out some clauses (leave blank to ignore):</p>
-            <p>Where: <input id="where" style="width: 200px;" type="text"/> (i.e. employee_annual_salary>100000 or department='fire')</p>
-            <p>Select: <input id="select" style="width: 200px;" type="text"/> (i.e. department,sum(employee_annual_salary))</p>
-            <p>Group: <input id="group" style="width: 200px;" type="text"/> (i.e. department or name)</p>
-            <p>Search: <input id="q" style="width: 200px;" type="text"/> (i.e. John or Rahm)</p>
-            <input type="submit" onclick="submit()" value="Query"/>
-        </div>
+    <div class="col-md-12">
 
-        <div class="col-md-9">
+        <h2>City of Chicago Employee Data</h2>
+
+        <p>Fields: name, department, job_titles, employee_annual_salary</p>
+
+        <p>Check out <a href="http://dev.socrata.com/docs/queries.html">http://dev.socrata.com/docs/queries.html</a> for
+            more on how to use these clauses.</p>
+
+        <p>Try out some clauses (leave blank to ignore):</p>
+
+        <p>Where: <input id="where" style="width: 200px;" type="text"/> (i.e. employee_annual_salary>100000 or
+            department='fire')</p>
+
+        <p>Select: <input id="select" style="width: 200px;" type="text"/> (i.e. department,sum(employee_annual_salary))
+        </p>
+
+        <p>Group: <input id="group" style="width: 200px;" type="text"/> (i.e. department or name)</p>
+
+        <p>Search: <input id="q" style="width: 200px;" type="text"/> (i.e. John or Rahm)</p>
+        <input type="submit" onclick="submit()" value="Query"/>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Output</h3>
             <pre id="output">
 
             </pre>
-        </div>
-
     </div>
-</body>
-</html>
+
+</div>
+
+<script>
+    var sdk, socrata;
+
+    $(document).ready(function () {
+        sdk = new CitySDK();
+        socrata = sdk.modules.socrata;
+    });
+
+    function submit() {
+        var request = {
+            "url": "data.cityofchicago.org",
+            "dataset": "xzkq-xp2w"
+        }
+
+        var where = $('#where');
+        if (where.val().length > 0) {
+            request.where = where.val();
+        }
+
+        var select = $('#select');
+        if (select.val().length > 0) {
+            request.select = select.val();
+        }
+
+        var group = $('#group');
+        if (group.val().length > 0) {
+            request.group = group.val();
+        }
+
+        var q = $('#q');
+        if (q.val().length > 0) {
+            request.q = q.val();
+        }
+
+        socrata.request(request, function (response) {
+            var output = $('#output');
+            output.empty();
+
+            response.forEach(function (entry) {
+                for (var property in entry) {
+                    if (entry.hasOwnProperty(property)) {
+                        output.append("<b>" + property + "</b>: " + entry[property] + "; ");
+                    }
+                }
+                output.append("<br/>");
+            });
+        });
+    }
+</script>

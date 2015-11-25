@@ -1,25 +1,62 @@
 ---
 layout: guideslayout
 published: true
+title: Census Module Aliases
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Census Module Aliases</title>
+<div class="row">
+    <div class="col-md-12">
+        <h2>Overview</h2>
 
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-    <script src="../../static/js/citysdk.census.decennial.sf.js"></script>
+        <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable"
+            the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the
+            appopriate geographical population.</p>
+        <br/>
 
-    <script src="https://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+        <div class="row">
+            <div class="col-md-6" style="height: 50px; padding-top: 8px;">
+                <select id="table-selector" class="select-center" onchange="buildTable(this.selectedIndex)" style="">
+                    <option>American Community Survey Alias List (2012-14)</option>
+                    <option>American Community Survey acs1 List (2012)</option>
+                    <option>American Community Survey acs1 List (2013)</option>
+                    <option>American Community Survey acs1 List (2014)</option>
+                    <option>American Community Survey acs3 List (2012)</option>
+                    <option>American Community Survey acs3 List (2013)</option>
+                    <option>American Community Survey acs5 List (2010)</option>
+                    <option>American Community Survey acs5 List (2011)</option>
+                    <option>American Community Survey acs5 List (2012)</option>
+                    <option>American Community Survey acs5 List (2013)</option>
+                    <option>Decennial Alias List (1990, 2000, 2010)</option>
+                    <option>Decennial sf1 List (1990)</option>
+                    <option>Decennial sf1 List (2000)</option>
+                    <option>Decennial sf1 List (2010)</option>
+                    <option>Decennial sf3 List (1990)</option>
+                    <option>Decennial sf3 List (2000)</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="height: 50px;">
+                <div class="loading-icon"></div>
+            </div>
+        </div>
+        <br/>
+
+        <table id="output" class="display" width="100%">
+
+            <thead>
+            <tr>
+                <th>Alias Name</th>
+                <th>Normalized</th>
+                <th>API</th>
+                <th>Variable</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
 
     <script>
 
@@ -34,7 +71,7 @@ published: true
             $('#output').hide();
 
 
-            setTimeout(function() {
+            setTimeout(function () {
                 if (typeof(table) != "undefined") {
                     table.destroy();
                 }
@@ -43,11 +80,11 @@ published: true
                 switch (type) {
                     case 0:
                         var content = "income" + "<br/>" +
-                        "employment" + "<br/>" +
-                        "poverty" + "<br/>" +
-                        "education" + "<br/>" +
-                        "commute" + "<br/>" +
-                        "house/rent" + "<br/>";
+                                "employment" + "<br/>" +
+                                "poverty" + "<br/>" +
+                                "education" + "<br/>" +
+                                "commute" + "<br/>" +
+                                "house/rent" + "<br/>";
 
                         var sdk = new CitySDK();
                         var census = sdk.modules.census;
@@ -223,10 +260,11 @@ published: true
                         break;
                 }
 
-            }, (total_rows > 10000) ? 1000: 0);
+            }, (total_rows > 10000) ? 1000 : 0);
             //console.log(total_rows);
 
-        };
+        }
+        ;
 
         function drawAliasTable(census, content) {
             table = $('#output').DataTable({
@@ -253,9 +291,9 @@ published: true
                 } else {
                     rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
                 }
-                rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api +"</div>";
-                rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable +"</div>";
-                rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description +"</div>";
+                rowJSON.api = "<div data-th='API'>" + census.aliases[alias].api + "</div>";
+                rowJSON.variable = "<div data-th='Variable'>" + census.aliases[alias].variable + "</div>";
+                rowJSON.description = "<div data-th='Description'>" + census.aliases[alias].description + "</div>";
 
                 rowsArray.push(rowJSON);
 
@@ -272,8 +310,8 @@ published: true
                 title: "SUGGESTED CATEGORIES",
                 content: content,
                 html: true,
-                placement:"top",
-                trigger:"focus"
+                placement: "top",
+                trigger: "focus"
             });
         }
 
@@ -285,11 +323,11 @@ published: true
                 "aaSorting": [],
                 data: data,
                 columns: [
-                    {data: "alias","defaultContent": "", "width": "20%"},
-                    {data: "normalized","defaultContent": ""},
-                    {data: "api","defaultContent": ""},
-                    {data: "variable","defaultContent": ""},
-                    {data: "description","defaultContent": ""}
+                    {data: "alias", "defaultContent": "", "width": "20%"},
+                    {data: "normalized", "defaultContent": ""},
+                    {data: "api", "defaultContent": ""},
+                    {data: "variable", "defaultContent": ""},
+                    {data: "description", "defaultContent": ""}
                 ]
             });
 
@@ -300,18 +338,18 @@ published: true
                 rowJSON.alias = "<div data-th='Alias Name' style='word-wrap:break-word; width: 200px;'></div>";
                 rowJSON.normalized = "<div data-th='Normalized'>&nbsp</div>";
                 rowJSON.api = "<div data-th='API'>" + this.api + "</div>";
-                rowJSON.variable = "<div data-th='Variable'>" + key +"</div>";
-                rowJSON.description = "<div data-th='Description'> (" + this.year + ") " + result.variables[key].label +"</div>";
+                rowJSON.variable = "<div data-th='Variable'>" + key + "</div>";
+                rowJSON.description = "<div data-th='Description'> (" + this.year + ") " + result.variables[key].label + "</div>";
 
                 rowsArray.push(rowJSON);
 
                 total_rows++;
             }
             table.clear();
-            setTimeout(function() {
+            setTimeout(function () {
                 table.rows.add(rowsArray);
                 table.draw();
-                
+
                 $('.loading-icon').fadeOut(500);
                 $('#output').fadeIn(500);
 
@@ -328,136 +366,4 @@ published: true
 
     </script>
 
-    <style>
-        /* Icon found from loading screen on http://www.sbcounty.gov/cao/budget/ */
-        .loading-icon {
-            background: url("../../static/img/Loading.gif") no-repeat center;
-            background-size: contain;
-            width: 100%;
-            height: 50px;
-            margin: auto;
-            display: inline-block;
-        }
 
-
-        /* Drop down style */
-        #table-selector {
-            padding: 5px;
-            border: 1px solid #ccc;
-            height: 34px;
-        }
-
-        /* Table converts to one column in mobile sized display */
-        #output td {
-            text-align: left;
-            display: block;
-            width: 95%;
-        }
-        #output th {
-            text-align: left;
-            display: block;
-            width: 87% !important;
-            padding-right: 25px;
-        }
-        #output th:last-child {
-            margin-bottom: 5px;
-        }
-        #output td {
-            background-color: white;
-        }
-        #output td:nth-child(1) {
-            background-color: #f7f7f7;
-            border-top: thin solid #337ab7;
-        }
-        #output td > div:before {
-            content: attr(data-th) ": ";
-            display: inline-block;
-            width: 100px;
-        }
-        .select-center {
-            display: block;
-            margin: 0 auto;
-            float: none;
-        }
-
-        @media (min-width: 480px) {
-            #output th, #output td {
-                text-align: inherit;
-                display: table-cell;
-                width: 5% !important;
-            }
-            #output th:nth-child(5), #output td:nth-child(5) {
-                text-align: inherit;
-                display: table-cell;
-                width: 30% !important;
-            }
-            #output td {
-                background-color: inherit;
-            }
-            #output td:nth-child(1) {
-                background-color: inherit;
-                border-top: thin solid #ddd;
-            }
-            #output td > div:before {
-                display: none;
-            }
-
-            .select-center {
-                margin: inherit;
-                float: inherit;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="row">
-            <div class="page-header col-md-12">
-                <h1>Census Module Aliases</h1>
-
-                <h3>Overview</h3>
-                <p>Here you will find a table of aliases available in the Census module. If a module is marked as "normalizable" the data returned will include *VARIABLE_NAME*_normalized, which will be that variable divided by the appopriate geographical population.</p>
-                <br/>
-                <div class="row">
-                    <div class="col-md-6" style="height: 50px; padding-top: 8px;">
-                        <select id="table-selector" class="select-center" onchange="buildTable(this.selectedIndex)" style="">
-                            <option>American Community Survey Alias List (2012-14)</option>
-                            <option>American Community Survey acs1 List (2012)</option>
-                            <option>American Community Survey acs1 List (2013)</option>
-                            <option>American Community Survey acs1 List (2014)</option>
-                            <option>American Community Survey acs3 List (2012)</option>
-                            <option>American Community Survey acs3 List (2013)</option>
-                            <option>American Community Survey acs5 List (2010)</option>
-                            <option>American Community Survey acs5 List (2011)</option>
-                            <option>American Community Survey acs5 List (2012)</option>
-                            <option>American Community Survey acs5 List (2013)</option>
-                            <option>Decennial Alias List (1990, 2000, 2010)</option>
-                            <option>Decennial sf1 List (1990)</option>
-                            <option>Decennial sf1 List (2000)</option>
-                            <option>Decennial sf1 List (2010)</option>
-                            <option>Decennial sf3 List (1990)</option>
-                            <option>Decennial sf3 List (2000)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6" style="height: 50px;">
-                        <div class="loading-icon"></div>
-                    </div>
-                </div>
-                <br/>
-
-                <table id="output" class="display" width="100%">
-
-                    <thead>
-                    <tr>
-                        <th>Alias Name</th>
-                        <th>Normalized</th>
-                        <th>API</th>
-                        <th>Variable</th>
-                        <th>Description</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
-    </div>
-</body>

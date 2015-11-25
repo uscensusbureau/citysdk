@@ -1,129 +1,158 @@
 ---
-layout: default
+layout: exampleslayout
 published: true
+title: CitySDK - Farmer's Market Search
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-    <title>CitySDK - Farmer's Market Search</title>
-
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.farmersMarket.js"></script>
-
-    <script>
-        var sdk = new CitySDK();
-        var farmersMarkets = sdk.modules.farmersMarket;
-
-        function loadCoords(lat, lng) {
-            $("#lat").val(lat);
-            $("#lng").val(lng);
-        }
-
-        function submit() {
-            $('#details').empty();
-
-            var lat = $("#lat").val();
-            var lng = $("#lng").val();
-            var zip = $("#zip").val();
-
-            var request = {};
-
-            if(lat == "" || lng == "") {
-                request.zip = zip;
-            } else {
-                request.lat = lat;
-                request.lng = lng;
-            }
+<div class="row">
+    <div class="col-md-12">
 
 
-            farmersMarkets.search(request, function(response) {
-                var output = $('#output');
-                output.empty();
-                for(var i = 0; i < response.results.length; i++) {
-                    output.append(response.results[i].marketname);
-                    output.append('<input type="submit" value="View Details" onclick="details(' + response.results[i].id + ',\'' + String(response.results[i].marketname).replace(/(['"])/g, "\\$1") + '\')">');
-                    output.append("<br/>");
-                }
-            });
-        }
-
-        function details(id, name) {
-            farmersMarkets.detail({ "id": id }, function(response) {
-                response = response.marketdetails;
-                var details = $('#details');
-                details.empty();
-                details.append('<h3>' + name + '</h3>');
-                details.append('<br/>');
-                details.append(response.Schedule);
-                details.append('<br/>');
-                details.append(response.Address);
-                details.append('<br/>');
-                details.append(' <a href="' + response.GoogleLink + '">(Google Map)</a>');
-                details.append('<br/>');
-                details.append("<b>Products:</b> " + response.Products);
-            });
-        };
-    </script>
-</head>
-<body>
-<div class="jumbotron">
-    <div class="container">
-        <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK Farmers Market Search</i>
+        <div class="jumbotron">
+            <div class="container">
+                <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK Farmers Market Search</i>
+            </div>
+        </div>
     </div>
 </div>
-<div class="container" style="position:relative;">
-<p>Enter coordinates here:</p>
-<p>Latitude:&nbsp;&nbsp;&nbsp;&nbsp;<input id="lat" type="text"/>&deg; N<br/>Longitude: <input id="lng" type="text"/>&deg; E</p>
-<p>OR</p>
-Zipcode: <input id="zip" type="text"/></p><br/><br/>
-<p><input type="submit" value="Update data" onclick="submit()"></p>
-<div style="position: absolute; top: 5px; right: 5px;"><p>Some common co-ordinates:</p>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Lat (N)</th>
-            <th>Lng (E)</th>
-        </tr>
-        <tr onclick="loadCoords(38.9047,-77.0164)">
-            <td>Washington DC</td>
-            <td>38.9047</td>
-            <td>-77.0164</td>
-        </tr>
-        <tr onclick="loadCoords(47.6097,-122.3331)">
-            <td>Seattle</td>
-            <td>47.6097</td>
-            <td>-122.3331</td>
-        </tr>
-        <tr onclick="loadCoords(21.3000,-157.8167)">
-            <td>Honolulu</td>
-            <td>21.3000</td>
-            <td>-157.8167</td>
-        </tr>
-        <tr onclick="loadCoords(25.7753,-80.2089)">
-            <td>Miami</td>
-            <td>25.7753</td>
-            <td>-80.2089</td>
-        </tr>
-        <tr onclick="loadCoords(29.7604,-95.3698)">
-            <td>Houston</td>
-            <td>29.7604</td>
-            <td>-95.3698</td>
-        </tr>
-    </table>
+<div class="row">
+    <div class="col-md-6">
+        <h3>Enter coordinates here:</h3>
+
+        <form>
+            <div class="form-group">
+
+                <label for="lat">Latitude:</label>
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="lat" placeholder="" aria-describedby="basic-addon2">
+                    <span class="input-group-addon" id="basic-addon2">&deg;N</span>
+                </div>
+                <label for="lng">Longitude:</label>
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="lng" placeholder="" aria-describedby="basic-addon3">
+                    <span class="input-group-addon" id="basic-addon3">&deg;E</span>
+                </div>
+            </div>
+            <p>OR</p>
+
+            <div class="form-group">
+
+                <label for="zip">Zipcode:</label>
+                <input id="zip" type="text"/>
+            </div>
+            <input id="submitFindFarmersMarket" type="button" value="Update data" class="btn btn-primary">
+        </form>
+    </div>
+    <div class="col-md-6">
+
+        <h3>Some common co-ordinates:</h3>
+        <table class="table table-striped">
+            <tr>
+                <th>Name</th>
+                <th>Lat (N)</th>
+                <th>Lng (E)</th>
+            </tr>
+            <tr onclick="loadCoords(38.9047,-77.0164)">
+                <td>Washington DC</td>
+                <td>38.9047</td>
+                <td>-77.0164</td>
+            </tr>
+            <tr onclick="loadCoords(47.6097,-122.3331)">
+                <td>Seattle</td>
+                <td>47.6097</td>
+                <td>-122.3331</td>
+            </tr>
+            <tr onclick="loadCoords(21.3000,-157.8167)">
+                <td>Honolulu</td>
+                <td>21.3000</td>
+                <td>-157.8167</td>
+            </tr>
+            <tr onclick="loadCoords(25.7753,-80.2089)">
+                <td>Miami</td>
+                <td>25.7753</td>
+                <td>-80.2089</td>
+            </tr>
+            <tr onclick="loadCoords(29.7604,-95.3698)">
+                <td>Houston</td>
+                <td>29.7604</td>
+                <td>-95.3698</td>
+            </tr>
+        </table>
+
+    </div>
+
 </div>
-<br/>
-<p>Details:</p>
+<div class="row">
+    <div class="col-md-12">
+
+
+        <h4>Details:</h4>
 <div id="details"></div>
-<p>Output:</p>
+        <h4>Output:</h4>
 <pre id="output"></pre>
+
+
     </div>
-</body>
-</html>
+</div>
+
+<script>
+    var sdk = new CitySDK();
+    var farmersMarkets = sdk.modules.farmersMarket;
+
+    jQuery(document).ready(function () {
+        jQuery("#submitFindFarmersMarket").click(submitFindFarmersMarket);
+    });
+
+    function loadCoords(lat, lng) {
+        $("#lat").val(lat);
+        $("#lng").val(lng);
+    }
+
+    function submitFindFarmersMarket() {
+        $('#details').empty();
+
+        var lat = $("#lat").val();
+        var lng = $("#lng").val();
+        var zip = $("#zip").val();
+
+        var request = {};
+
+        if (lat == "" || lng == "") {
+            request.zip = zip;
+        } else {
+            request.lat = lat;
+            request.lng = lng;
+        }
+
+
+        farmersMarkets.search(request, function (response) {
+            var output = $('#output');
+            output.empty();
+            for (var i = 0; i < response.results.length; i++) {
+                output.append(response.results[i].marketname);
+                output.append('<input type="submit" value="View Details" onclick="details(' + response.results[i].id + ',\'' + String(response.results[i].marketname).replace(/(['"])/g, "\\$1") + '\')">');
+                output.append("<br/>");
+            }
+        });
+    }
+
+    function details(id, name) {
+        farmersMarkets.detail({"id": id}, function (response) {
+            response = response.marketdetails;
+            var details = $('#details');
+            details.empty();
+            details.append('<h3>' + name + '</h3>');
+            details.append('<br/>');
+            details.append(response.Schedule);
+            details.append('<br/>');
+            details.append(response.Address);
+            details.append('<br/>');
+            details.append(' <a href="' + response.GoogleLink + '">(Google Map)</a>');
+            details.append('<br/>');
+            details.append("<b>Products:</b> " + response.Products);
+        });
+    }
+    ;
+</script>

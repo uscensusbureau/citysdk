@@ -1,22 +1,67 @@
 ---
 layout: exampleslayout
 published: true
+title: FEMA Module - Disaster Declaration Summaries
 ---
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FEMA Module - Disaster Declaration Summaries</title>
-    <!-- <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script> -->
-    <!-- <script src="../../js/citysdk.js" type="text/javascript"></script> -->
-    <!-- <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.3/js/citysdk.fema.js" type="text/javascript"></script> -->
 
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/master/js/citysdk.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/master/js/citysdk.fema.js" type="text/javascript"></script>
-    <script src="https://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+<div class="row">
+    <div class="col-md-12">
 
-    <script>
+
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary" role="button">View the Example</a>
+            <a href="source.html" class="btn btn-default" role="button">Source Code</a>
+        </div>
+        <div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Describe Desired Disaster Information</h2>
+                <label for="disasterNumber">Disaster Number:</label> <input type="number" id="disasterNumber" value=""
+                                                                            max="9999"/><br/>
+                <label for="state">State Abvr:</label> <input type="text" id="state" value="VA" maxlength="2"/><br/>
+                <label for="county">County:</label> <input type="text" id="county" value=""/><br/>
+                <label for="declarationRangeStart">Declared Date Range Start:</label> <input type="date"
+                                                                                             id="declarationRangeStart"
+                                                                                             value="2011-01-01"/><br/>
+                <label for="declarationRangeEnd">Declared Date Range End:</label> <input type="date"
+                                                                                         id="declarationRangeEnd"
+                                                                                         value="2013-10-31"/><br/>
+                <label for="take">Take:</label> <input type="number" id="take" value="20"/><br/>
+                <label for="skip">Skip:</label> <input type="number" id="skip" value="0"/><br/>
+                <input class="btn btn-primary" type="submit" onclick="submit()" value="Query"/> <input
+                    class="btn btn-warning" type="submit" onclick="resetForm()" value="Clear"/>
+
+
+                <h3>Resulting Data</h3>
+                <table id="output" class="display" width="100%">
+                    <thead>
+                    <tr>
+                        <th>Disaster Number</th>
+                        <th>IH Program Declared</th>
+                        <th>IA Program Declared</th>
+                        <th>PA Program Declared</th>
+                        <th>HM Program Declared</th>
+                        <th>State</th>
+                        <th>Declaration Date</th>
+                        <th>Disaster Type</th>
+                        <th>Incident Type</th>
+                        <th>Title</th>
+                        <th>Incident Begin Date</th>
+                        <th>Incident End Date</th>
+                        <th>Disaster Close Out Date</th>
+                        <th>Place Code</th>
+                        <th>Declared County Area</th>
+                    </tr>
+                    </thead>
+                </table>
+
+
+            </div>
+        </div>
+
+        <script>
         var sdk, census;
         var data = [];
         var table;
@@ -98,54 +143,3 @@ published: true
             $('#skip').val('');
         }
     </script>
-</head>
-<body>
-    <div class="row">
-        <div class="page-header">
-            <h1>FEMA Module - Disaster Declaration Summaries</h1>
-        </div>
-    </div>
-
-    <div class="btn-group">
-        <a href="#" class="btn btn-primary" role="button">View the Example</a>
-        <a href="source.html" class="btn btn-default" role="button">Source Code</a>
-    </div>
-<div>
-
-    <br/>
-    Disaster Number: <input type="number" id="disasterNumber" value="4100" max="9999"/><br/>
-    State Abvr: <input type="text" id="state" value="VA" maxlength="2"/><br/>
-    County: <input type="text" id="county" value="Loudon"/><br/>
-    Declared Date Range Start: <input type="date" id="declarationRangeStart" value="2000-01-01"/><br/>
-    Declared Date Range End: <input type="date" id="declarationRangeEnd" value="2015-10-31"/><br/>
-    Take: <input type="number" id="take" value="20"/><br/>
-    Skip: <input type="number" id="skip" value="0"/><br/>
-        <input type="submit" onclick="submit()" value="Query"/> <input type="submit" onclick="resetForm()" value="Clear"/>
-</div>
-<br/>
-<br/>
-
-<table id="output" class="display" width="100%">
-    <thead>
-    <tr>
-        <th>Disaster Number</th>
-        <th>IH Program Declared</th>
-        <th>IA Program Declared</th>
-        <th>PA Program Declared</th>
-        <th>HM Program Declared</th>
-        <th>State</th>
-        <th>Declaration Date</th>
-        <th>Disaster Type</th>
-        <th>Incident Type</th>
-        <th>Title</th>
-        <th>Incident Begin Date</th>
-        <th>Incident End Date</th>
-        <th>Disaster Close Out Date</th>
-        <th>Place Code</th>
-        <th>Declared County Area</th>
-    </tr>
-    </thead>
-</table>
-
-</body>
-</html>

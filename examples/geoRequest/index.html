@@ -1,197 +1,30 @@
 ---
 layout: exampleslayout
 published: true
+title: GeoRequests and Supplemental Requests
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>GeoRequests and Supplemental Requests</title>
-    <link href="style.css" rel="stylesheet" type="text/css"/>
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-    <script type="text/javascript"
-            src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
-    </script>
-    <script>
-        var map;
-        var sdk = new CitySDK();
-        var census = sdk.modules.census;
-
-        var geoCities = {
-            "Asheville_NC": [35.5800, -82.5558],
-            "Austin_TX": [30.2500, -97.7500],
-            "Boston_MA": [42.3601, -71.0589],
-            "Chicago_IL": [41.8369, -87.6847],
-            "Fargo_ND": [46.8772, -96.7894],
-            "Montgomery_County_MD": [39.1319, -77.2264],
-            "NYC_NY": [40.7127, -74.0059],
-            "Portland_OR": [45.5200, -122.6819],
-            "San_Francisco_CA": [37.7833, -122.4167],
-            "Seattle_WA": [47.6097, -122.3331],
-            "Washington_DC": [38.9047, -77.0164]
-        };
-
-        var variables = [];
-        var level = "place";
-
-        function initialize() {
-            var mapOptions = {
-                center: { lat: 38.91732, lng: -77.2211},
-                zoom: 10
-            };
-            map = new google.maps.Map(document.getElementById('map-canvas'),
-                    mapOptions);
-
-            map.data.setStyle({
-                fillColor: 'blue'
-            });
-
-            // global infowindow
-            var infowindow = new google.maps.InfoWindow();
-
-            // When the user clicks, open an infowindow
-            map.data.addListener('click', function(event) {
-                var myHTML = "<h3>" +
-                ((level == "blockGroup") ? "Block Group: " : (level == "tract") ? "Tract: " : "")
-                + event.feature.getProperty("NAME") + "</h3><div style='width:150px; text-align: center;'>";
-                for(var i = 0; i < variables.length; i++) {
-                    myHTML += "<br/><b>" + variables[i] + "</b>: " + event.feature.getProperty(variables[i]);
-                }
-
-                switch(level) {
-                    case "blockGroup":
-                        myHTML += "<br/><b>Tract: </b>" + event.feature.getProperty("TRACT");
-                    case "tract":
-                        myHTML+= "<br/><b>County: </b>" + event.feature.getProperty("COUNTY");
-                }
-
-                myHTML += "</div>";
-
-                infowindow.setContent(myHTML);
-                infowindow.setPosition(event.latLng);
-                infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
-                infowindow.open(map);
-            });
-
-            census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
-
-            $('#clear').click(clear);
-        }
-
-        google.maps.event.addDomListener(window, 'load', initialize);
-
-
-        function checkLoading() {
-            if(census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT == 0) {
-                $('#loading').empty();
-                $('#loading').css('display','none');
-                return;
-            } else if (census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT > 0){
-                window.setTimeout(checkLoading, 1500);
-            }
-        }
-
-        function toggleVar(variable) {
-            var position = window.jQuery.inArray(variable, variables);
-            if(position >= 0) {
-                variables.splice(position, 1);
-                $('#' + variable + "Button").addClass("off");
-            } else {
-                variables.push(variable);
-                $("#" + variable + "Button").removeClass("off");
-            }
-        }
-
-        function setLevel(newlevel) {
-            if(newlevel == level) {
-                return;
-            }
-
-            var levels = ["blockGroup", "tract", "place"];
-            levels.forEach(function(x) {
-                if(newlevel != x) {
-                    $("#" + x).addClass("off");
-                }
-            });
-            $("#" + newlevel).removeClass("off");
-
-            level = newlevel;
-        }
-
-        function clear() {
-            map.data.forEach(function(feature) {
-                map.data.remove(feature);
-            });
-        }
-
-        function loadCity(city) {
-            var reqLevel = level;
-            if(city == "Montgomery_County_MD" && level == "place") {
-                reqLevel = "county";
-            }
-
-            map.panTo(new google.maps.LatLng(geoCities[city][0], geoCities[city][1]));
-
-            $('#loading').append('<img src="loading.gif"/><br/>Loading features...');
-            $('#loading').css('display', 'block');
-
-            //BEGIN CITYSDK REQUEST
-            var request = {
-                "lat": geoCities[city][0],
-                "lng": geoCities[city][1],
-                "level": reqLevel,
-                "variables": variables
-            };
-
-            if(reqLevel == "tract" || reqLevel == "blockGroup") {
-                request.sublevel = true;
-                request.container = (city == "Montgomery_County_MD") ? "county" : "place";
-            }
-
-            census.GEORequest(request, function(geojson) {
-                checkLoading();
-                map.data.addGeoJson(geojson);
-            });
-            //END CITYSDK REQUEST
-        }
-    </script>
-</head>
-
-<body>
-
-    <div class="row">
-        <div class="page-header col-md-12">
-          <h1>GeoRequests and Supplemental Requests</h1>
-        </div>
+<div class="row">
+    <div class="btn-group col-md-12">
+        <a href="#" class="btn btn-primary" role="button">View the Example</a>
+        <a href="source.html" class="btn btn-default" role="button">Source Code</a>
+    </div>
     </div>
 
-    <div class="row">
-        <div class="btn-group col-md-12">
-              <a href="#" class="btn btn-primary" role="button">View the Example</a>
-              <a href="http://uscensusbureau.github.io/citysdk/examples/geoRequest/source.html" class="btn btn-default" role="button">Source Code</a>
-        </div>
-    </div>
 
-    <div>
-        <h3>Overview</h3> 
+<div class="row">
+    <div class="col-md-12">
+        <h2>Overview</h2>
         <p>This example demonstrates how to make a GeoRequest for the CitySDK and also a supplemental request.  It's important to consider how the "container" tag works when crafting a GeoRequest. Sometimes a container's boundaries surround multiple Census geography boundaries - for example, NYC spans multiple New York state counties. Due to the way the ACS API works, we can only retrieve part of the block group's data at once. Because of this, we must make supplemental requests to the API to fill in data that we are missing. You can track how many of these requests are in flight using the SUPPLEMENTAL_REQUESTS_IN_FLIGHT variable in the Census module. When this number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the return of some data. These requests are typically quick as they do not require any geocoding. </p>
-    </div>
 
 
-    <div>
-        <h4>1. Choose variables of interest</h4> 
+        <h3>1. Choose variables of interest</h3>
     </div>
+</div>
 
     <div class="row">
-            <div class="col-md-12">
+        <div class="col-md-12">
                 <div class="btn btn-default" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
                 <div class="btn btn-default" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
                 <div class="btn btn-default" id="populationButton" onclick="toggleVar('population')">Population</div>
@@ -201,25 +34,27 @@ published: true
             </div>
     </div>
 
-    <div>
-        <h4>2. Retrieve data at the Place (City), Tract, or Block Group level</h4> 
+<div class="row">
+    <div class="col-md-12">
+        <h3>2. Retrieve data at the Place (City), Tract, or Block Group level</h3>
     </div>
+</div>
 
         <div class="row">
             <div class="col-md-12">
                 <div class="btn btn-default" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
                 <div class="btn btn-default" id="tract" onclick="setLevel('tract')">Tracts</div>
                 <div class="btn btn-default" id="place" onclick="setLevel('place')">Place</div>
-                <div class="btn btn-default" id="clear" style="margin-right: 0.75em;">
-                    Clear
-                </div>
+                <div class="btn btn-default" id="clear" style="margin-right: 0.75em;">Clear</div>
             </div>
       
     </div>
 
-      <div>
-        <h4>3. Choose your city</h4> 
+<div class="row">
+    <div class="col-md-12">
+        <h3>3. Choose your city</h3>
     </div>
+</div>
 
     <div class="row">
         <div class="col-md-12">
@@ -268,6 +103,152 @@ published: true
 
 <div id="loading">
 </div>
-</div>
-</body>
-</html>
+
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+</script>
+
+<script>
+    var map;
+    var sdk = new CitySDK();
+    var census = sdk.modules.census;
+
+    var geoCities = {
+        "Asheville_NC": [35.5800, -82.5558],
+        "Austin_TX": [30.2500, -97.7500],
+        "Boston_MA": [42.3601, -71.0589],
+        "Chicago_IL": [41.8369, -87.6847],
+        "Fargo_ND": [46.8772, -96.7894],
+        "Montgomery_County_MD": [39.1319, -77.2264],
+        "NYC_NY": [40.7127, -74.0059],
+        "Portland_OR": [45.5200, -122.6819],
+        "San_Francisco_CA": [37.7833, -122.4167],
+        "Seattle_WA": [47.6097, -122.3331],
+        "Washington_DC": [38.9047, -77.0164]
+    };
+
+    var variables = [];
+    var level = "place";
+
+    function initialize() {
+        var mapOptions = {
+            center: {lat: 38.91732, lng: -77.2211},
+            zoom: 10
+        };
+        map = new google.maps.Map(document.getElementById('map-canvas'),
+                mapOptions);
+
+        map.data.setStyle({
+            fillColor: 'blue'
+        });
+
+        // global infowindow
+        var infowindow = new google.maps.InfoWindow();
+
+        // When the user clicks, open an infowindow
+        map.data.addListener('click', function (event) {
+            var myHTML = "<h3>" +
+                    ((level == "blockGroup") ? "Block Group: " : (level == "tract") ? "Tract: " : "")
+                    + event.feature.getProperty("NAME") + "</h3><div style='width:150px; text-align: center;'>";
+            for (var i = 0; i < variables.length; i++) {
+                myHTML += "<br/><b>" + variables[i] + "</b>: " + event.feature.getProperty(variables[i]);
+            }
+
+            switch (level) {
+                case "blockGroup":
+                    myHTML += "<br/><b>Tract: </b>" + event.feature.getProperty("TRACT");
+                case "tract":
+                    myHTML += "<br/><b>County: </b>" + event.feature.getProperty("COUNTY");
+            }
+
+            myHTML += "</div>";
+
+            infowindow.setContent(myHTML);
+            infowindow.setPosition(event.latLng);
+            infowindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
+            infowindow.open(map);
+        });
+
+        census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
+
+        $('#clear').click(clear);
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+
+    function checkLoading() {
+        if (census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT == 0) {
+            $('#loading').empty();
+            $('#loading').css('display', 'none');
+            return;
+        } else if (census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT > 0) {
+            window.setTimeout(checkLoading, 1500);
+        }
+    }
+
+    function toggleVar(variable) {
+        var position = window.jQuery.inArray(variable, variables);
+        if (position >= 0) {
+            variables.splice(position, 1);
+            $('#' + variable + "Button").addClass("off");
+        } else {
+            variables.push(variable);
+            $("#" + variable + "Button").removeClass("off");
+        }
+    }
+
+    function setLevel(newlevel) {
+        if (newlevel == level) {
+            return;
+        }
+
+        var levels = ["blockGroup", "tract", "place"];
+        levels.forEach(function (x) {
+            if (newlevel != x) {
+                $("#" + x).addClass("off");
+            }
+        });
+        $("#" + newlevel).removeClass("off");
+
+        level = newlevel;
+    }
+
+    function clear() {
+        map.data.forEach(function (feature) {
+            map.data.remove(feature);
+        });
+    }
+
+    function loadCity(city) {
+        var reqLevel = level;
+        if (city == "Montgomery_County_MD" && level == "place") {
+            reqLevel = "county";
+        }
+
+        map.panTo(new google.maps.LatLng(geoCities[city][0], geoCities[city][1]));
+
+        $('#loading').append('<img src="loading.gif"/><br/>Loading features...');
+        $('#loading').css('display', 'block');
+
+        //BEGIN CITYSDK REQUEST
+        var request = {
+            "lat": geoCities[city][0],
+            "lng": geoCities[city][1],
+            "level": reqLevel,
+            "variables": variables
+        };
+
+        if (reqLevel == "tract" || reqLevel == "blockGroup") {
+            request.sublevel = true;
+            request.container = (city == "Montgomery_County_MD") ? "county" : "place";
+        }
+
+        census.GEORequest(request, function (geojson) {
+            checkLoading();
+            map.data.addGeoJson(geojson);
+        });
+        //END CITYSDK REQUEST
+    }
+</script>

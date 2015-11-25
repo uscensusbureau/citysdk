@@ -1,36 +1,22 @@
 ---
 layout: guideslayout
 published: true
+title: How to Use the Census Module
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>How to Use the Census Module</title>
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    
-</head>
+<div class="row">
 
-<body>
+    <div class="col-md-12">
 
+        <h2>Overview</h2>
 
-    <div class="row">
-            <div class="page-header col-md-12">
-              <h1>How to Use the Census Module</h1>
-            </div>
-    </div>
+        <p>This page will guide you through using the Census module, from importing the scripts onto your page to
+            requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)"
+                                                                     onclick="requestApiKey()">grab a Census API key</a>
+            before you get started.</p>
 
-    <div>
-    
-        <h3>Overview</h3> 
-        <p>This page will guide you through using the Census module, from importing the scripts onto your page to requesting GeoJSON data from the Census. Go ahead and <a href="javascript:void(0)" onclick="requestApiKey()">grab a Census API key</a> before you get started.</p>
-        <h3>Contents</h3>
+        <h2>Contents</h2>
         <ul>
             <li><a href="#importingTheModule">Theory of Operation</a></li>
             <li><a href="#importingTheModule">Importing the Module</a></li>
@@ -41,12 +27,13 @@ published: true
             <li><a href="#requestingGeojsonWithData">Requesting GeoJSON with Data</a></li>
             <li><a href="#theRequestObjectInDetail">The Request Object in Detail</a></li>
         </ul>
-    </div>
 
-    <div id="importingTheModule">
-        <h3>Theory of Operation</h3>
-        <p>At a high-level, the CitySDK and Census Module work by using a JSON object in order to define key parameters and then simultaneously retrieve data across multiple APIs.  
-        </p>
+        <div id="importingTheModule">
+            <h2>Theory of Operation</h2>
+
+            <p>At a high-level, the CitySDK and Census Module work by using a JSON object in order to define key
+                parameters and then simultaneously retrieve data across multiple APIs.
+            </p>
         <pre>
             var request = {
                 zip: "10001",
@@ -63,14 +50,19 @@ published: true
             census.GEORequest(request, callback);
         </pre>
 
-        <p>This type of JSON request/response paradigm brings together numerous services, that prior to the CitySDK would need to be called separately and mashed up in a manual fashion as described below.
-        </p>
-        
-        <h1><img src="../static/img/oldprocess.jpg"/></h1>
+            <p>This type of JSON request/response paradigm brings together numerous services, that prior to the CitySDK
+                would need to be called separately and mashed up in a manual fashion as described below.
+            </p>
 
-        <h3>Importing the Module</h3>
-        <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census module, you'll need to import jQuery, the
-        core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your &lt;head&gt; tag, like so:</p>
+            <img src="../static/img/oldprocess.jpg" class="img-responsive"
+                 alt="Make a Request which is then processed via the Data API, Geocoding Service, and Geography API separately and combined in a response of Data and GeoJSON shape(s)"/>
+
+            <h2>Importing the Module</h2>
+
+            <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census
+                module, you'll need to import jQuery, the
+                core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your <code>
+                    &lt;head&gt;</code> tag, like so:</p>
         <pre>
             &lt;head&gt;
                 &lt;title&gt;CitySDK - Example&lt;/title&gt;
@@ -81,20 +73,25 @@ published: true
 
             &lt;/head&gt;
         </pre>
-        <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <em>enable()</em> function on the module, passing to it your API key as a string.</p>
+            <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <em>enable()</em>
+                function on the module, passing to it your API key as a string.</p>
         <pre>
             var sdk = new CitySDK();
             var censusModule = sdk.modules.census;
 
             censusModule.enable("CensusAPIKeyHere");
         </pre>
-        <p>Once the module is enabled, you're all set to start using functionality. The following sections will show you how to make some common calls.</p>
-    </div>
+            <p>Once the module is enabled, you're all set to start using functionality. The following sections will show
+                you how to make some common calls.</p>
+        </div>
 
-    <div id="requestingVariables">
-        <h3>Requesting Variables</h3>
-        <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to access is the ACS 5-year. To request a variable, pass a
-        JSON object containing the request and a callback function to the module's <em>APIRequest()</em> function. Below is an example that requests "income" and "population" for Washington D.C.</p>
+        <div id="requestingVariables">
+            <h2>Requesting Variables</h2>
+
+            <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to
+                access is the ACS 5-year. To request a variable, pass a
+                JSON object containing the request and a callback function to the module's <em>APIRequest()</em>
+                function. Below is an example that requests "income" and "population" for Washington D.C.</p>
         <pre>
             var request = {
                 "lat": 38.9047,
@@ -110,18 +107,34 @@ published: true
                 console.log(response);
             });
         </pre>
-        <p>Let's break down the request object piece by piece.</p>
-        <ul>
-            <li><strong>lat</strong> - <em>Number</em> - This tag specifies the latitude of the location in which we are interested. You can also specify this as "latitude" or "y".</li>
-            <li><strong>lng</strong> - <em>Number</em> - This tag specifies the longitude of the location in which we are interested. You can also specify this as "longitude" or "x".</li>
-            <li><strong>level</strong> - <em>String</em> - This tag specifies the "level" of data to request. Supported levels are based off of Census geographies, the SDK supporting: "blockGroup", "tract", "county", "state", "us", and "place".
-            Please note, that the "place" level currently only supports incorporated places. If we changed our level to "blockGroup" instead of state, we would get information for a much smaller geographic region.</li>
-            <li><strong>variables</strong> - <em>Array</em> - This is an optional array of strings which specify the variables from the ACS to request. This example uses an alias (see aliases below), but you could also request
-            raw ACS variables like "B01003_001E". You can find a list of all ACS variables on the Census's developer site, or by calling the Census module's <em>getACSVariableDictionary()</em> function.</li>
-        </ul>
-        <p>We'll dive into the request object in detail later on. But first, let's look at what the response from this call looks like.</p>
-        <p>The response to all requests in the Census module is a JSON object containing the request parameters and an extra property called <em>data</em>. The data property is an array of objects with
-        properties consisting of the requested variables. Here's the response to the request we made:</p>
+            <p>Let's break down the request object piece by piece.</p>
+            <ul>
+                <li><strong>lat</strong> - <em>Number</em> - This tag specifies the latitude of the location in which we
+                    are interested. You can also specify this as "latitude" or "y".
+                </li>
+                <li><strong>lng</strong> - <em>Number</em> - This tag specifies the longitude of the location in which
+                    we are interested. You can also specify this as "longitude" or "x".
+                </li>
+                <li><strong>level</strong> - <em>String</em> - This tag specifies the "level" of data to request.
+                    Supported levels are based off of Census geographies, the SDK supporting: "blockGroup", "tract",
+                    "county", "state", "us", and "place".
+                    Please note, that the "place" level currently only supports incorporated places. If we changed our
+                    level to "blockGroup" instead of state, we would get information for a much smaller geographic
+                    region.
+                </li>
+                <li><strong>variables</strong> - <em>Array</em> - This is an optional array of strings which specify the
+                    variables from the ACS to request. This example uses an alias (see aliases below), but you could
+                    also request
+                    raw ACS variables like "B01003_001E". You can find a list of all ACS variables on the Census's
+                    developer site, or by calling the Census module's <em>getACSVariableDictionary()</em> function.
+                </li>
+            </ul>
+            <p>We'll dive into the request object in detail later on. But first, let's look at what the response from
+                this call looks like.</p>
+
+            <p>The response to all requests in the Census module is a JSON object containing the request parameters and
+                an extra property called <em>data</em>. The data property is an array of objects with
+                properties consisting of the requested variables. Here's the response to the request we made:</p>
         <pre>
             {
                   "year": "2013",
@@ -141,29 +154,43 @@ published: true
                   }]
             }
         </pre>
-        <p>You can see we got a lot of data back. Let's step through each property.</p>
-        <ul>
-            <li><strong>lat, lng, level</strong> - These properties are whatever you specified in your request.</li>
-            <li><strong>year</strong> - This is the year of the ACS the module queried. ACS1, ACS3, and ACS5 support different years, so ensure you are requesting data for a year that is supported.</li>
-            <li><strong>state, county, tract, blockGroup, place</strong> - These numbers are FIPS codes - how the Census
-            categorizes its geographies. You won't typically need these, but they are provided in case you do.</li>
-            <li><strong>api</strong> - This specifies the API the SDK used to acquire the data. You can specify this in your request. Check out the full-detail request object further on.</li>
-            <li><strong>place_name</strong> - If your requested location lies within an incorporated place, the name of the place will be given to you.</li>
-            <li><strong>data</strong> - This property is an array of objects containing properties corresponding to the requested variables.</li>
-        </ul>
-    </div>
+            <p>You can see we got a lot of data back. Let's step through each property.</p>
+            <ul>
+                <li><strong>lat, lng, level</strong> - These properties are whatever you specified in your request.</li>
+                <li><strong>year</strong> - This is the year of the ACS the module queried. ACS1, ACS3, and ACS5 support
+                    different years, so ensure you are requesting data for a year that is supported.
+                </li>
+                <li><strong>state, county, tract, blockGroup, place</strong> - These numbers are FIPS codes - how the
+                    Census
+                    categorizes its geographies. You won't typically need these, but they are provided in case you do.
+                </li>
+                <li><strong>api</strong> - This specifies the API the SDK used to acquire the data. You can specify this
+                    in your request. Check out the full-detail request object further on.
+                </li>
+                <li><strong>place_name</strong> - If your requested location lies within an incorporated place, the name
+                    of the place will be given to you.
+                </li>
+                <li><strong>data</strong> - This property is an array of objects containing properties corresponding to
+                    the requested variables.
+                </li>
+            </ul>
+        </div>
 
-    <div id="sublevelRequests">
-        <h3>Sublevel Requests</h3>
-        <p>Finding data at a single location is all well and good - but what if you want the data for all counties in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
-        <p>By specifying the tag "sublevel" as true, the SDK will request data for each entity in the level's container relationship. These relationships are:</p>
-        <ul>
-            <li>Sublevel on "us" returns data for all states in the U.S.</li>
-            <li>Sublevel on "state" returns data for all counties in that state</li>
-            <li>Sublevel on "county" returns data for all tracts in that county</li>
-            <li>Sublevel on "tract" returns data for all block groups in that tract</li>
-        </ul>
-        <p>Let's look at an example request that will get all counties in Delaware.</p>
+        <div id="sublevelRequests">
+            <h2>Sublevel Requests</h2>
+
+            <p>Finding data at a single location is all well and good - but what if you want the data for all counties
+                in a state? Or all tracts in a county? This is where the sublevel tag comes into play.</p>
+
+            <p>By specifying the tag "sublevel" as true, the SDK will request data for each entity in the level's
+                container relationship. These relationships are:</p>
+            <ul>
+                <li>Sublevel on "us" returns data for all states in the U.S.</li>
+                <li>Sublevel on "state" returns data for all counties in that state</li>
+                <li>Sublevel on "county" returns data for all tracts in that county</li>
+                <li>Sublevel on "tract" returns data for all block groups in that tract</li>
+            </ul>
+            <p>Let's look at an example request that will get all counties in Delaware.</p>
         <pre>
             var request = {
                             "state":"DE",
@@ -174,10 +201,14 @@ published: true
                                 "population"
                            ]};
         </pre>
-        <p>You'll notice that instead of specifying <strong>lat, lng</strong> we've instead specified <strong>state</strong> with a
-        two-letter USPS state code. This is shorthand for specifying the capital of a state's co-ordinates. Therefore, we're actually
-        giving the request the co-ordinates for Dover, Delaware. This shorthand is useful when you're grabbing data at the state level.</p>
-        <p>Here's what the response looks like:</p>
+            <p>You'll notice that instead of specifying <strong>lat, lng</strong> we've instead specified
+                <strong>state</strong> with a
+                two-letter USPS state code. This is shorthand for specifying the capital of a state's co-ordinates.
+                Therefore, we're actually
+                giving the request the co-ordinates for Dover, Delaware. This shorthand is useful when you're grabbing
+                data at the state level.</p>
+
+            <p>Here's what the response looks like:</p>
         <pre>
             {
                 "level" : "state",
@@ -216,25 +247,40 @@ published: true
             }
 
         </pre>
-        <p>It looks a lot like our other response, except in this case <em>data</em> now has multiple objects rather than a single object. Each of these objects contain the name of the
-        entity, any relevant FIPS codes, and the data you requested.</p>
-    </div>
+            <p>It looks a lot like our other response, except in this case <em>data</em> now has multiple objects rather
+                than a single object. Each of these objects contain the name of the
+                entity, any relevant FIPS codes, and the data you requested.</p>
+        </div>
 
-    <div id="variableAliases">
-        <h3>Variable Aliases</h3>
-        <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.</p>
-        <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census module supports some aliased variables.</p>
-        <p>Aliased variable are specified by a string and return the most appropriate variable.
-           Some variables are marked as "normalizable" which will generate a *VARIABLE_NAME*_normalized variable in the return along with the regular variable.</variable_name></p>
-        <p>Available aliases can be found <a href="./censusModule/aliases.html">here</a>.</p>
-        <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.</p>
-    </div>
+        <div id="variableAliases">
+            <h2>Variable Aliases</h2>
 
-    <div id="requestingGeojson">
-        <h3>Requesting GeoJSON</h3>
-        <p>The Census module can acquire GeoJSON for any supported level from the Census's TigerWeb ArcGIS API. To do this, we will submit our request using a different method: <em>GEORequest()</em>. This method
-        takes the request object and a callback. The response is GeoJSON.</p>
-        <p>The following code will get us the GeoJSON for the state of Maryland and attach it directly to a Google Map layer:</p>
+            <p>The SDK can acquire <em>any</em> variable from supported Census APIs if you specify the appropriate
+                variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.
+            </p>
+
+            <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census
+                module supports some aliased variables.</p>
+
+            <p>Aliased variable are specified by a string and return the most appropriate variable.
+                Some variables are marked as "normalizable" which will generate a *VARIABLE_NAME*_normalized variable in
+                the return along with the regular variable.</variable_name></p>
+
+            <p>Available aliases can be found <a href="./censusModule/aliases.html">here</a>.</p>
+
+            <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.
+            </p>
+        </div>
+
+        <div id="requestingGeojson">
+            <h2>Requesting GeoJSON</h2>
+
+            <p>The Census module can acquire GeoJSON for any supported level from the Census's TigerWeb ArcGIS API. To
+                do this, we will submit our request using a different method: <em>GEORequest()</em>. This method
+                takes the request object and a callback. The response is GeoJSON.</p>
+
+            <p>The following code will get us the GeoJSON for the state of Maryland and attach it directly to a Google
+                Map layer:</p>
         <pre>
             var request = {
                 state: "MD",
@@ -245,7 +291,8 @@ published: true
                 map.data.addGeoJson(response);
             });
         </pre>
-        <p>In our callback for this example we place our response directly into a Google Map. But what does the response actually look like?</p>
+            <p>In our callback for this example we place our response directly into a Google Map. But what does the
+                response actually look like?</p>
         <pre>
      {
         "type" : "FeatureCollection",
@@ -284,9 +331,13 @@ published: true
     }
 
         </pre>
-        <p>Our response is GeoJSON! (We've trimmed some of the coordinates to fit it on this page!) Additionally, in the properties object we have various fields from the Census's server. Check out <a href="http://tigerweb.geo.census.gov/" target="_blank">TigerWeb</a> for more information
-        on these variables.</p>
-        <p>We've got GeoJSON for a state - that's all well and good. But what if we want to break this down smaller? Let's get all the counties in Delaware:</p>
+            <p>Our response is GeoJSON! (We've trimmed some of the coordinates to fit it on this page!) Additionally, in
+                the properties object we have various fields from the Census's server. Check out <a
+                        href="http://tigerweb.geo.census.gov/" target="_blank">TigerWeb</a> for more information
+                on these variables.</p>
+
+            <p>We've got GeoJSON for a state - that's all well and good. But what if we want to break this down smaller?
+                Let's get all the counties in Delaware:</p>
         <pre>
             var request = {
                 state: "DE",
@@ -296,8 +347,10 @@ published: true
 
             census.GEORequest(request, callback);
         </pre>
-        <p>Easy! We just attached the sublevel tag just like when we were requesting data. However, what if we want to get all of the tracts in Delaware? Regularly, the sublevel tag will only
-        break a state into counties. To get more complicated hierarchies we'll need to use the <strong>container</strong> tag. Check out below:</p>
+            <p>Easy! We just attached the sublevel tag just like when we were requesting data. However, what if we want
+                to get all of the tracts in Delaware? Regularly, the sublevel tag will only
+                break a state into counties. To get more complicated hierarchies we'll need to use the
+                <strong>container</strong> tag. Check out below:</p>
         <pre>
             var request = {
                 state: "DE",
@@ -306,15 +359,21 @@ published: true
                 sublevel: true
             };
         </pre>
-        <p>Note that our level has changed to "tract" and we've specified a container - "state". Our response GeoJSON will now have all tracts within the boundaries of Delaware. Be careful - the larger your
-        container and the smaller the level the longer the request will take. Requesting all the block groups in Texas will take a little while.</p>
-    </div>
+            <p>Note that our level has changed to "tract" and we've specified a container - "state". Our response
+                GeoJSON will now have all tracts within the boundaries of Delaware. Be careful - the larger your
+                container and the smaller the level the longer the request will take. Requesting all the block groups in
+                Texas will take a little while.</p>
+        </div>
 
-    <div id="requestingGeojsonWithData">
-        <h3>Requesting GeoJSON with Data</h3>
-        <p>We can now get all the geography we could ever need. But what about data? Surely we don't want to have to make a <em>GEORequest()</em> call AND a <em>APIRequest()</em> call and unify the data ourselves, right?
-        Right. We'd never let you down like that. You can request variables right alongside your GeoJSON. The variable data will be attached to each feature's properties tag.</p>
-        <p>For example, let's get the income for every block group in New York City:</p>
+        <div id="requestingGeojsonWithData">
+            <h2>Requesting GeoJSON with Data</h2>
+
+            <p>We can now get all the geography we could ever need. But what about data? Surely we don't want to have to
+                make a <em>GEORequest()</em> call AND a <em>APIRequest()</em> call and unify the data ourselves, right?
+                Right. We'd never let you down like that. You can request variables right alongside your GeoJSON. The
+                variable data will be attached to each feature's properties tag.</p>
+
+            <p>For example, let's get the income for every block group in New York City:</p>
         <pre>
             var request = {
                 zip: "10001",
@@ -330,7 +389,8 @@ published: true
 
             census.GEORequest(request, callback);
         </pre>
-        <p>This request will give us a very large GeoJSON object, so we're only going to show you a single feature:</p>
+            <p>This request will give us a very large GeoJSON object, so we're only going to show you a single
+                feature:</p>
         <pre>
             {
                 "type" : "Feature",
@@ -364,46 +424,98 @@ published: true
                 "bbox" : [-74.2815229999206, 40.46651399997253, -74.24858499981055, 40.4871199997387]
             }
         </pre>
-        <p>You'll notice that the feature has an extra property - "income" - the variable we requested! This will happen for every feature in the feature collection. No need to unify data and geography on your own!</p>
-        <p>A special note about using the "container" tag. Sometimes a container's boundaries surround multiple Census geography boundaries - in this instance, NYC spans multiple
-        New York state counties. Due to the way the ACS API works, we can only retrieve part of the block group's data at once. Because of this, we must make supplemental requests to the
-        API to fill in data that we are missing. You can track how many of these requests are in flight using the <em>SUPPLEMENTAL_REQUESTS_IN_FLIGHT</em> variable in the Census module. When this
-        number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the return of some data. These requests are typically quick as they do not require any
-        geocoding. Please see the GeoRequest example in the CitySDK github repository for an example of how to interact with the supplemental requests variable.</p>
-    </div>
+            <p>You'll notice that the feature has an extra property - "income" - the variable we requested! This will
+                happen for every feature in the feature collection. No need to unify data and geography on your own!</p>
 
-    <div id="theRequestObjectInDetail">
-        <h3>The Request Object in Detail</h3>
-        <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the available options.</p>
-        <ul>
-            <p><strong>Location Options</strong></p>
-            <p>To specify a location, you must use <strong>lat</strong> and <strong>lng</strong>, or <strong>zip</strong>, or <strong>state</strong>. At least one of these must be specified.</p>
-            <li><strong>lat</strong> - <em>Number</em> - The latitude of the requested location (North). Also supported: <strong>latitude</strong>, <strong>y</strong></li>
-            <li><strong>lng</strong> - <em>Number</em> - The longitude of the requested location (East). Also supported: <strong>longitude</strong>, <strong>x</strong></li>
-            <li><strong>zip</strong> - <em>String</em> - The 5-digit zip code of the location. Note that USPS zip code areas do not align precisely with Census geographies, so
-                when high accuracy is required it is recommended to use latitude and longitude. Specified as a string because certain zip codes begin with zeroes.</li>
-            <li><strong>state</strong> - <em>String</em> - The 2-letter USPS state code. It will be converted into the latitude and longitude of that state's capital.</li>
-            <br/>
-            <p><strong>Level Options</strong></p>
-            <li><strong>level</strong> - <em>String</em> - At what level to request the data. These are based on census geographies. Supported options are: "blockGroup",
-                "tract", "county", "state", "us", and "place". Note that the "place" tag currently only supports incorporated places.</li>
-            <li><strong>sublevel</strong> - <em>Boolean</em> - <em><small>Optional</small></em> Whether or not to return based upon sublevels. See <a href="#sublevelRequests">sublevel requests</a> for more information.
-                Defaults to false.</li>
-            <li><strong>container</strong> - <em>String</em> - <em><small>Optional, GeoJSON request only</small></em> - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your
-                level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that place's geographical boundaries. Supported options are: "tract", "county", "state", "place", "geometry", and "geometry_within". Note that for the
-                "geometry" and "geometry" within tags you must specify the containerGeometry. "geometry" will return any entities that intersect the given geometry (including if they intersect but extend beyond the perimeter) whereas "geometry_within" will only
-            return entities that are entirely contained within the containerGeometry specified.</li>
-            <li><strong>containerGeometry</strong> - <em>Object</em> - <em><small>Optional, GeoJSON request only</small></em> - Specifies the bounding geometry for a GeoJSON request. The format
-            of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's <em>GEOtoESRI()</em> method. The boundary can be any arbitrary closed region or regions.</li>
-            <br/>
-            <p><strong>Data Options</strong></p>
-            <li><strong>api</strong> - <em>String</em> - <em><small>Optional</small></em> - Specifies the API to use. Supported options are: "acs1", "acs3", and "acs5". The default is "acs5".</li>
-            <li><strong>year</strong> - <em>Number</em> - <em><small>Optional</small></em> - Specifies the year of the API to use. Supported years per API vary, please see the <em>acsyears</em> object
-            of the Census module for details. Defaults to 2013.</li>
-            <li><strong>variables</strong> - <em>Array</em> - <em><small>Optional</small></em> - An array of strings specifying which variables to query. One can specify an aliased variable (see <a href="#variableAliases"> variable aliases</a>)
-                or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the Census's developer
-            portal or via the SDK's <em>getACSVariableDictionary</em> method.</li>
-        </ul>
-    </div>
+            <p>A special note about using the "container" tag. Sometimes a container's boundaries surround multiple
+                Census geography boundaries - in this instance, NYC spans multiple
+                New York state counties. Due to the way the ACS API works, we can only retrieve part of the block
+                group's data at once. Because of this, we must make supplemental requests to the
+                API to fill in data that we are missing. You can track how many of these requests are in flight using
+                the <em>SUPPLEMENTAL_REQUESTS_IN_FLIGHT</em> variable in the Census module. When this
+                number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the
+                return of some data. These requests are typically quick as they do not require any
+                geocoding. Please see the GeoRequest example in the CitySDK github repository for an example of how to
+                interact with the supplemental requests variable.</p>
+        </div>
 
-</body>
+        <div id="theRequestObjectInDetail">
+            <h2>The Request Object in Detail</h2>
+
+            <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the
+                available options.</p>
+            <ul>
+                <p><strong>Location Options</strong></p>
+
+                <p>To specify a location, you must use <strong>lat</strong> and <strong>lng</strong>, or
+                    <strong>zip</strong>, or <strong>state</strong>. At least one of these must be specified.</p>
+                <li><strong>lat</strong> - <em>Number</em> - The latitude of the requested location (North). Also
+                    supported: <strong>latitude</strong>, <strong>y</strong></li>
+                <li><strong>lng</strong> - <em>Number</em> - The longitude of the requested location (East). Also
+                    supported: <strong>longitude</strong>, <strong>x</strong></li>
+                <li><strong>zip</strong> - <em>String</em> - The 5-digit zip code of the location. Note that USPS zip
+                    code areas do not align precisely with Census geographies, so
+                    when high accuracy is required it is recommended to use latitude and longitude. Specified as a
+                    string because certain zip codes begin with zeroes.
+                </li>
+                <li><strong>state</strong> - <em>String</em> - The 2-letter USPS state code. It will be converted into
+                    the latitude and longitude of that state's capital.
+                </li>
+                <br/>
+
+                <p><strong>Level Options</strong></p>
+                <li><strong>level</strong> - <em>String</em> - At what level to request the data. These are based on
+                    census geographies. Supported options are: "blockGroup",
+                    "tract", "county", "state", "us", and "place". Note that the "place" tag currently only supports
+                    incorporated places.
+                </li>
+                <li><strong>sublevel</strong> - <em>Boolean</em> - <em>
+                    <small>Optional</small>
+                </em> Whether or not to return based upon sublevels. See <a href="#sublevelRequests">sublevel
+                    requests</a> for more information.
+                    Defaults to false.
+                </li>
+                <li><strong>container</strong> - <em>String</em> - <em>
+                    <small>Optional, GeoJSON request only</small>
+                </em> - Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your
+                    level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return
+                    all tracts which fall within or touch that place's geographical boundaries. Supported options are:
+                    "tract", "county", "state", "place", "geometry", and "geometry_within". Note that for the
+                    "geometry" and "geometry" within tags you must specify the containerGeometry. "geometry" will return
+                    any entities that intersect the given geometry (including if they intersect but extend beyond the
+                    perimeter) whereas "geometry_within" will only
+                    return entities that are entirely contained within the containerGeometry specified.
+                </li>
+                <li><strong>containerGeometry</strong> - <em>Object</em> - <em>
+                    <small>Optional, GeoJSON request only</small>
+                </em> - Specifies the bounding geometry for a GeoJSON request. The format
+                    of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's
+                    <em>GEOtoESRI()</em> method. The boundary can be any arbitrary closed region or regions.
+                </li>
+                <br/>
+
+                <p><strong>Data Options</strong></p>
+                <li><strong>api</strong> - <em>String</em> - <em>
+                    <small>Optional</small>
+                </em> - Specifies the API to use. Supported options are: "acs1", "acs3", and "acs5". The default is
+                    "acs5".
+                </li>
+                <li><strong>year</strong> - <em>Number</em> - <em>
+                    <small>Optional</small>
+                </em> - Specifies the year of the API to use. Supported years per API vary, please see the
+                    <em>acsyears</em> object
+                    of the Census module for details. Defaults to 2013.
+                </li>
+                <li><strong>variables</strong> - <em>Array</em> - <em>
+                    <small>Optional</small>
+                </em> - An array of strings specifying which variables to query. One can specify an aliased variable
+                    (see <a href="#variableAliases"> variable aliases</a>)
+                    or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will
+                    simply geocode the location into Census FIPS codes. A list of all ACS variables is available on the
+                    Census's developer portal or via the SDK's <em>getACSVariableDictionary</em> method.
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>

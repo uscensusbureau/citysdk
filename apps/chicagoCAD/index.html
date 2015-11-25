@@ -1,50 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+---
+layout: exampleslayout
+published: true
+title: Chicago Crime and Demographics
+---
 
-    <title>Chicago Crime and Demographics</title>
 
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
-
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.socrata.js"></script>
-
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
-    <script src="js/chicagocad.js"></script>
-
-    <script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
-    </script>
 
     <style>
         .row-spacer {
             margin-top: 0.5em;
         }
+
+        .chicagoCADMasthead {
+            padding: 10px 30px;
+        }
     </style>
 </head>
 
-<body>
     <div style="background: url(skyline.jpg) no-repeat center center; margin-bottom: 2em; color: white; height: 300px; background-size: cover; background-position: -100px, -100px;
                 background-color:black; position:relative;">
-        <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="chicagoCADMasthead">
             <h3>Chicago Crime and Demographics</h3>
             <p>Visualize Chicago Crime data versus various demographics. Change the date range, crime types, and arrest options for Crime.</p>
             <p>Select your boundary types and variables to compare.
             Click a crime marker to view more data about that crime, or click inside a boundary to view the requested variables for that boundary.</p>
+                </div>
+            </div>
         </div>
         <div style="color:white; font-size: 75%; position:absolute; bottom:0; right:0; padding: 0.5em; text-align:right;">
             Powered by<br/>
-            <a href="http://uscensusbureau.github.io/citysdk/index.html" target="_blank"><img height="50px" src="./citysdk_horizontal_logo.png"/></a>
+            <a href="{{ site.baseurl }}/index.html" target="_blank"><img height="50px"
+                                                                         src="./citysdk_horizontal_logo.png"/></a>
         </div>
     </div>
-    <div class="container">
+<div class="row">
         <div class="col-md-6" style="position:relative;">
             <div id="map-canvas" style="width:100%; height:800px;"></div>
             <div id="loading" style="position:absolute; top:350px; left: 250px; background-color: white; text-align: center; width: 100px; height:100px; border-radius: 5px; padding-top: 25px;">Loading...<br/><img src="loading.gif"/></div>
@@ -82,9 +73,8 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="row">
                 <h3>Crime Controls</h3>
-            </div>
+
             <div class="row row-spacer">
                 <div class="col-md-3">
                     Start date:
@@ -259,12 +249,26 @@
         </div>
     </div>
     <div style="background-color: black; padding: 0.5em; color:white; margin-top: 1.5em;">
-        <div class="container">
+        <div class="row">
+            <div class="col-md-12">
             <p style="font-size: smaller;">Skyline image CC-BY-3.0 <a href="https://www.flickr.com/photos/earlwilkersonphotography/5599454581">Earl Wilkerson</a></p>
             <p style="font-size: smaller;">Population, income, and demographics provided by the <a href="https://www.census.gov">U.S. Census Bureau</a></p>
             <p style="font-size: smaller;">Crime data provided by the <a href="https://data.cityofchicago.org/">City of Chicago</a></p>
-            <p style="font-size: smaller;">Data access powered by <a href="http://uscensusbureau.github.io/citysdk/index.html">CitySDK</a></p>
+
+                <p style="font-size: smaller;">Data access powered by <a
+                        href="{{ site.baseurl }}/index.html">CitySDK</a></p>
+            </div>
         </div>
     </div>
-</body>
-</html>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css"
+      rel="stylesheet" type="text/css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
+<script src="js/chicagocad.js"></script>
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+</script>
+

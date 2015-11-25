@@ -1,202 +1,228 @@
 ---
 layout: exampleslayout
 published: true
+title: Using Sublevels and Normalized Aliases
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Commute Query using Sublevels and Normalized Aliases</title>
-
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
-
-    <script>
-        function loadCoords(lat, lng) {
-            $("#lat").val(lat);
-            $("#lng").val(lng);
-        }
-
-        function loadState() {
-            var stateCode = prompt("Please enter a valid state code", "DC");
-            loadCoords(CensusModule.prototype.stateCapitals[stateCode][0],
-                       CensusModule.prototype.stateCapitals[stateCode][1]);
-        }
-
-        function SortByAveragedProperty(a, b){
-            var property = $("#property option:selected").val();
-
-            var aval, bval;
-
-            if($("#normalize").is(':checked')) {
-                aval = Number(a[property])/ Number(a.population);
-                bval = Number(b[property])/ Number(b.population);
-            } else {
-                aval = Number(a[property]);
-                bval = Number(b[property]);
-            }
-
-            return ((aval > bval) ? -1 : (bval > aval) ? 1 : 0);
-        }
-
-        function submit() {
-            var lat = $("#lat").val();
-            var lng = $("#lng").val();
-
-            var level;
-            switch($("#level option:selected").val()) {
-                case "states":
-                    level = "us";
-                    break;
-                case "counties":
-                    level = "state";
-                    break;
-                case "tracts":
-                    level = "county";
-                    break;
-                case "blockGroups":
-                    level = "tract";
-                    break;
-            }
-
-            var variables = ["commute_time",
-                             "commute_time_solo_automobile",
-                             "commute_time_carpool",
-                             "commute_time_public_transport",
-                             "commute_time_walked",
-                             "commute_time_other"];
-
-            var sdk = new CitySDK();
-            var census = sdk.modules.census;
-            census.enable($("#api").val());
-            var request = {};
-
-            request.level = level;
-            request.lat = lat;
-            request.lng = lng;
-            request.variables = variables;
-            request.sublevel = true;
-
-            var entry = "";
-            var currentObject;
-            census.APIRequest(request, function(response) {
-                response.data.sort(SortByAveragedProperty);
-                var output = $("#output");
-                output.empty();
-                for(var i = 0; i < response.data.length; i++) {
-                    currentObject = response.data[i];
-                    entry = "<b>" + currentObject.name + "</b>";
-
-                    var val;
-
-                    if($("#normalize").is(':checked')) {
-                        val = (currentObject[$("#property option:selected").val() + "_normalized"]);
-                    } else {
-                        val = (currentObject[$("#property option:selected").val()]);
-                    }
+<div class="row">
+    <div class="col-md-12">
 
 
-                    entry += " - " + census.aliases[$("#property option:selected").val()].description + ": " + val + " minutes";
-                    output.append(entry + "\n");
-                }
-            });
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary" role="button">View the Example</a>
+            <a href="source.html" class="btn btn-default" role="button">Source Code</a>
+        </div>
 
-        }
-    </script>
-</head>
-<body>
+        <div>
+            <h2>Overview</h2>
 
-    <div>
-            <div class="page-header">
-              <h1>Using Sublevels and Normalized Aliases</h1>
+            <p>This example demonstrates two key concepts used in the Census Module of the CitySDK. The first concept is
+                specifying sublevels, which allows you to enter a location (such as State) and get values that are one
+                level
+                below (i.e. County). This is helpful because it's not always obvious how to specify the sublevels when
+                making an API call, as you wouldn't normally memorize county names. The next key concept is normalized
+                variables. Some data from the Census American Community Survey (ACS) provide a return value in a special
+                unit of measure that is averaged out across the population. In this case, Commuting data can be returned
+                in
+                a normalized fashion which equates to "avg minutes of commute per person".</p>
+        </div>
+
+        <div class="alert alert-dismissable alert-info">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            <h4>
+                Requires a Census API Key
+            </h4>
+
+            <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo.
+                <a
+                        href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+
+            <p>Enter your Census API key here <input type="text" id="api"/></p>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-5"><h5>Enter coordinates here:</h5>
+
+                <div class="form-group">
+
+                    <label for="lat">Latitude:</label>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="lat" placeholder="" aria-describedby="basic-addon2">
+                        <span class="input-group-addon" id="basic-addon2">&deg;N</span>
+                    </div>
+                    <label for="lng">Longitude:</label>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="lng" placeholder="" aria-describedby="basic-addon3">
+                        <span class="input-group-addon" id="basic-addon3">&deg;E</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2"><p>OR</p>
+            </div>
+            <div class="col-md-5"><h5>Look up by State</h5><input type="button" class="btn-lg btn-info"
+                                                                  onclick="loadState()" value="Enter state code"/>
             </div>
 
+        </div>
 
-            <div class="btn-group">
-                  <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-                  <a href="http://uscensusbureau.github.io/citysdk/examples/commuteQuery/source.html" class="btn btn-default" role="button">Source Code</a>
-            </div>
 
-            <div>
-                <h3>Overview</h3> 
-                <p>This example demonstrates two key concepts used in the Census Module of the CitySDK.  The first concept is specifying sublevels, which allows you to enter a location (such as State) and get values that are one level below (i.e. County).  This is helpful because it's not always obvious how to specify the sublevels when making an API call, as you wouldn't normally memorize county names.   The next key concept is normalized variables.  Some data from the Census American Community Survey (ACS) provide a return value in a special unit of measure that is averaged out across the population.  In this case, Commuting data can be returned in a normalized fashion which equates to "avg minutes of commute per person".</p>
-            </div>
-            
-    <div class="alert alert-dismissable alert-info">
-                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <h4>
-                    Requires a Census API Key
-                </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-                <p>Enter your Census API key here <input type="text" id="api"/></p>
+        <div class="form-group">
+
+            <label for="property">Value:</label>
+            <select id="property">
+                <option value="commute_time">Total</option>
+                <option value="commute_time_solo_automobile">Drive Alone</option>
+                <option value="commute_time_carpool">Carpool</option>
+                <option value="commute_time_public_transport">Public Transportation</option>
+                <option value="commute_time_walked">Walked</option>
+                <option value="commute_time_other">Other</option>
+            </select>
+            <label for="level">Level:</label>
+            <select id="level">
+                <option value="states">States</option>
+                <option value="counties">Counties</option>
+                <option value="tracts">Tracts</option>
+                <option value="blockGroups">Block Groups</option>
+            </select>
+            <input id="normalize" type="checkbox" name="normalize" checked/><label for="normalize">Normalize</label>
+        </div>
+        <input type="submit" class="btn-lg btn-primary" value="Update data" onclick="submit()">
+
+
+        <h3>Some common co-ordinates:</h3>
+        <table class="table table-striped">
+            <tr>
+                <th>Name</th>
+                <th>Lat (N)</th>
+                <th>Lng (E)</th>
+            </tr>
+            <tr onclick="loadCoords(38.9047,-77.0164)">
+                <td>Washington DC</td>
+                <td>38.9047</td>
+                <td>-77.0164</td>
+            </tr>
+            <tr onclick="loadCoords(47.6097,-122.3331)">
+                <td>Seattle</td>
+                <td>47.6097</td>
+                <td>-122.3331</td>
+            </tr>
+            <tr onclick="loadCoords(21.3000,-157.8167)">
+                <td>Honolulu</td>
+                <td>21.3000</td>
+                <td>-157.8167</td>
+            </tr>
+            <tr onclick="loadCoords(25.7753,-80.2089)">
+                <td>Miami</td>
+                <td>25.7753</td>
+                <td>-80.2089</td>
+            </tr>
+            <tr onclick="loadCoords(29.7604,-95.3698)">
+                <td>Houston</td>
+                <td>29.7604</td>
+                <td>-95.3698</td>
+            </tr>
+        </table>
+
+        <h3>Output:</h3>
+        <pre id="output"></pre>
+
     </div>
-
-<p>Enter your census API key here <input type="text" id="api"/></p>
-<p>Enter coordinates here:</p>
-<p>Latitude:&nbsp;&nbsp;&nbsp;&nbsp;<input id="lat" type="text"/>&deg; N<br/>Longitude: <input id="lng" type="text"/>&deg; E</p>
-<input type="button" onclick="loadState()" value="Enter state code"/>
-<br/><br/><br/><br/>
-Value:
-<select id="property">
-    <option value="commute_time">Total</option>
-    <option value="commute_time_solo_automobile">Drive Alone</option>
-    <option value="commute_time_carpool">Carpool</option>
-    <option value="commute_time_public_transport">Public Transportation</option>
-    <option value="commute_time_walked">Walked</option>
-    <option value="commute_time_other">Other</option>
-</select>
-Level:
-<select id="level">
-    <option value="states">States</option>
-    <option value="counties">Counties</option>
-    <option value="tracts">Tracts</option>
-    <option value="blockGroups">Block Groups</option>
-</select>
-<input id="normalize" type="checkbox" name="normalize" checked/>Normalize
-<p><input type="submit" value="Update data" onclick="submit()"></p>
-<div><p>Some common co-ordinates:</p>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Lat (N)</th>
-            <th>Lng (E)</th>
-        </tr>
-        <tr onclick="loadCoords(38.9047,-77.0164)">
-            <td>Washington DC</td>
-            <td>38.9047</td>
-            <td>-77.0164</td>
-        </tr>
-        <tr onclick="loadCoords(47.6097,-122.3331)">
-            <td>Seattle</td>
-            <td>47.6097</td>
-            <td>-122.3331</td>
-        </tr>
-        <tr onclick="loadCoords(21.3000,-157.8167)">
-            <td>Honolulu</td>
-            <td>21.3000</td>
-            <td>-157.8167</td>
-        </tr>
-        <tr onclick="loadCoords(25.7753,-80.2089)">
-            <td>Miami</td>
-            <td>25.7753</td>
-            <td>-80.2089</td>
-        </tr>
-        <tr onclick="loadCoords(29.7604,-95.3698)">
-            <td>Houston</td>
-            <td>29.7604</td>
-            <td>-95.3698</td>
-        </tr>
-    </table>
 </div>
-<br/>
-<p>Output:</p>
-<pre id="output"></pre>
-    </div>
-</body>
-</html>
+
+
+<script>
+    function loadCoords(lat, lng) {
+        $("#lat").val(lat);
+        $("#lng").val(lng);
+    }
+
+    function loadState() {
+        var stateCode = prompt("Please enter a valid state code", "DC");
+        loadCoords(CensusModule.prototype.stateCapitals[stateCode][0],
+                CensusModule.prototype.stateCapitals[stateCode][1]);
+    }
+
+    function SortByAveragedProperty(a, b) {
+        var property = $("#property option:selected").val();
+
+        var aval, bval;
+
+        if ($("#normalize").is(':checked')) {
+            aval = Number(a[property]) / Number(a.population);
+            bval = Number(b[property]) / Number(b.population);
+        } else {
+            aval = Number(a[property]);
+            bval = Number(b[property]);
+        }
+
+        return ((aval > bval) ? -1 : (bval > aval) ? 1 : 0);
+    }
+
+    function submit() {
+        var lat = $("#lat").val();
+        var lng = $("#lng").val();
+
+        var level;
+        switch ($("#level option:selected").val()) {
+            case "states":
+                level = "us";
+                break;
+            case "counties":
+                level = "state";
+                break;
+            case "tracts":
+                level = "county";
+                break;
+            case "blockGroups":
+                level = "tract";
+                break;
+        }
+
+        var variables = ["commute_time",
+            "commute_time_solo_automobile",
+            "commute_time_carpool",
+            "commute_time_public_transport",
+            "commute_time_walked",
+            "commute_time_other"];
+
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+        census.enable($("#api").val());
+        var request = {};
+
+        request.level = level;
+        request.lat = lat;
+        request.lng = lng;
+        request.variables = variables;
+        request.sublevel = true;
+
+        var entry = "";
+        var currentObject;
+        census.APIRequest(request, function (response) {
+            response.data.sort(SortByAveragedProperty);
+            var output = $("#output");
+            output.empty();
+            for (var i = 0; i < response.data.length; i++) {
+                currentObject = response.data[i];
+                entry = "<b>" + currentObject.name + "</b>";
+
+                var val;
+
+                if ($("#normalize").is(':checked')) {
+                    val = (currentObject[$("#property option:selected").val() + "_normalized"]);
+                } else {
+                    val = (currentObject[$("#property option:selected").val()]);
+                }
+
+
+                entry += " - " + census.aliases[$("#property option:selected").val()].description + ": " + val + " minutes";
+                output.append(entry + "\n");
+            }
+        });
+
+    }
+</script>
