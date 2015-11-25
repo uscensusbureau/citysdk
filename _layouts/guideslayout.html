@@ -15,20 +15,23 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-3 hidden-sm hidden-xs">
 
-            <section class="page-header">
-                <h1>
-                    <small>Guides</small>
-                </h1>
-            </section>
             {% include guidesnav.html %}
+
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-9 col-sm-12">
             <header class="page-header">
-                <h1>{{ page.title }}</hl>
+                <h1>{{ page.title }}</h1>
             </header>
+
+            <ol class="breadcrumb">
+                <li><a href="{{ site.baseurl }}/">CitySDK</a></li>
+                <li><a href="{{ site.baseurl }}/guides.html">Guides</a></li>
+                <li class="active">{{ page.title }}</li>
+            </ol>
+
 
             <section>
                 {{ content }}

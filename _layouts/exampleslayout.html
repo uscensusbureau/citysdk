@@ -16,20 +16,20 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3 column">
-
-            <section class="page-header">
-                <h1>
-                    <small>Example Code</small>
-                </h1>
-            </section>
+        <div class="col-md-3 hidden-sm hidden-xs">
             {% include examplesnav.html %}
         </div>
 
-        <div class="col-md-9 column">
+        <div class="col-md-9 col-sm-12">
             <header class="page-header">
-                <h1>{{ page.title }}</hl>
+                <h1>{{ page.title }}</h1>
             </header>
+
+            <ol class="breadcrumb">
+                <li><a href="{{ site.baseurl }}/">CitySDK</a></li>
+                <li><a href="{{ site.baseurl }}/examplecode.html">Examples</a></li>
+                <li class="active">{{ page.title }}</li>
+            </ol>
 
             <section>
                 {{ content }}

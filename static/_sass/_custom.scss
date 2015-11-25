@@ -4,6 +4,21 @@
   height: auto;
 }
 
+.cenSidebarNav > .page-header h1 {
+  font-weight: 400;
+  color: #777;
+  font-size: 24px;
+  line-height: 1.65;
+}
+
+.cenSidebarNav .nav-sidebar li a {
+  font-size: 0.9em;
+}
+
+.breadcrumb {
+  background-color: #fcfcfc;
+}
+
 /* Icon found from loading screen on http://www.sbcounty.gov/cao/budget/ */
 .loading-icon {
   background: url("../img/Loading.gif") no-repeat center;

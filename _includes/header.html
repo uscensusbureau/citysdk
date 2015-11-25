@@ -14,8 +14,24 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right" style="font-size: 14px; margin-right: 20px;">
-                <li><a href="{{ site.baseurl }}/guides.html" class="guides">Guides</a></li>
-                <li><a href="{{ site.baseurl }}/examplecode.html" class="examplecode">Example Code</a></li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle guides" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Guides <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        {% include guidesnavLinks.html %}
+                    </ul>
+                </li>
+
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle guides" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Example Code <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        {% include examplesnavLinks.html %}
+                    </ul>
+                </li>
+
                 <li><a href="{{ site.baseurl }}/gallery.html" class="gallery">Gallery</a></li>
                <li><a href="{{ site.baseurl }}/news.html" class="news">News</a></li>
                 <li><a href="https://github.com/uscensusbureau/citysdk" class="Github"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a></li>
