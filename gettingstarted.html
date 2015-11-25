@@ -26,21 +26,17 @@ title: Getting Started
 
         <h2>Obtaining a Census Developer Key</h2>
 
-        <p>You'll need a Census API key to fully enjoy our samples. Keys are free and quick. Click the button on the
-            left to get one, and then enter it with the button on the right.</p>
-        </div>
+        <p>You'll need a Census API key to implement CitySDK. Keys are free and quick. </p>
+    </div>
 </div>
 
-<div class="alert alert-dismissable alert-info">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+<div class="alert alert-info">
     <h4>
-        Requires a Census API Key
+        Census API Key Required
     </h4>
 
-    <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a
+    <p>If you don't already have one, be sure to grab a Census API key. <a
             href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-
-    <p>Enter your Census API key here <input type="text" id="api"/></p>
 </div>
 
 
@@ -226,11 +222,6 @@ title: Getting Started
     var census = sdk.modules.census;
     var farmersMarket = sdk.modules.farmersMarket;
 
-    function getApiKey() {
-        census.enable("#api");
-    }
-    ;
-
     function requestApiKey() {
         window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
     }
@@ -267,7 +258,7 @@ title: Getting Started
                 map.data.setStyle({
                     fillColor: 'blue'
                 });
-                census.enable("#api");
+                census.enable(citySDKdemoConfiguration.apikey);
 
             }
     );

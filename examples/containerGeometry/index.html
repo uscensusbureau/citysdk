@@ -20,17 +20,6 @@ title: GeoRequest with Arbitrary Boundaries
 
             <p>An example demonstrating how to use arbitrary boundaries as your GeoRequest container.</p>
         </div>
-        <div class="alert alert-dismissable alert-info">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4>
-                Requires a Census API Key
-            </h4>
-
-            <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo.
-                <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-
-            <p>Enter your Census API key here <input type="text" id="api"/></p>
-        </div>
     </div>
 </div>
 
@@ -106,7 +95,7 @@ title: GeoRequest with Arbitrary Boundaries
         };
 
         function getApiKey() {
-            census.enable("#api");
+            census.enable(citySDKdemoConfiguration.apikey);
         };
 
         function clearMap() {

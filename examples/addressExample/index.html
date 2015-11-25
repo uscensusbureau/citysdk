@@ -18,13 +18,14 @@ title: Population and Income by Address
         </div>
 
 
-        <div class="alert alert-dismissable alert-info">
-                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <h4>
-                        Requires a Census API Key
-                    </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-                    <p>Enter your Census API key here <input type="text" id="api"/></p>
-        </div>
+<!-- <div class="alert alert-dismissable alert-info">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+             <h4>
+                 Requires a Census API Key
+             </h4>
+             <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+             <p>Enter your Census API key here <input type="text" id="api"/></p>
+        </div>-->
 
         <div class="row">
             <div class="col-md-2">
@@ -81,7 +82,7 @@ title: Population and Income by Address
     $(document).ready(function () {
         sdk = new CitySDK();
         census = sdk.modules.census;
-        census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
+        census.enable(citySDKdemoConfiguration.apikey);
 
     });
 

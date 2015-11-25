@@ -28,7 +28,7 @@ title: Using Sublevels and Normalized Aliases
                 a normalized fashion which equates to "avg minutes of commute per person".</p>
         </div>
 
-        <div class="alert alert-dismissable alert-info">
+        <!-- <div class="alert alert-dismissable alert-info">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
             <h4>
                 Requires a Census API Key
@@ -39,7 +39,7 @@ title: Using Sublevels and Normalized Aliases
                         href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
 
             <p>Enter your Census API key here <input type="text" id="api"/></p>
-        </div>
+        </div>-->
 
 
         <div class="row">
@@ -64,7 +64,7 @@ title: Using Sublevels and Normalized Aliases
             <div class="col-md-2"><p>OR</p>
             </div>
             <div class="col-md-5"><h5>Look up by State</h5><input type="button" class="btn-lg btn-info"
-                                                                  onclick="loadState()" value="Enter state code"/>
+                                                                  id="loadStateButton" value="Enter state code"/>
             </div>
 
         </div>
@@ -191,7 +191,7 @@ title: Using Sublevels and Normalized Aliases
 
         var sdk = new CitySDK();
         var census = sdk.modules.census;
-        census.enable($("#api").val());
+        census.enable(citySDKdemoConfiguration.apikey);
         var request = {};
 
         request.level = level;
@@ -225,4 +225,8 @@ title: Using Sublevels and Normalized Aliases
         });
 
     }
+
+    jQuery(document).ready(function () {
+        jQuery("#loadStateButton").click(loadState);
+    });
 </script>

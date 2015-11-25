@@ -322,7 +322,7 @@ title: Census Module Query Builder
         // Instantiate census object.
         var sdk = new CitySDK();
         census = sdk.modules.census;
-        census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
+        census.enable(citySDKdemoConfiguration.apikey);
         // Fill in states.
         $.each(census.stateCapitals, function (stateabbrev, capitalcoords) {
             $('<option>' + stateabbrev + '</option>').appendTo('#state');

@@ -19,7 +19,7 @@ title: GeoRequest using Bing Maps
         var bingKey = "AklB4zJPwc8gevQHBaUtGrAFzJTnNCtZJc6D0DwXUL6ak6JdQD4pS25IaaStiPxR";
         var sdk = new CitySDK();
         var census = sdk.modules.census;
-        census.enable('21ca50e1a3e22cf2b18083748c278199395408ec');
+        census.enable(citySDKdemoConfiguration.apikey);
 
         jQuery(document).ready(function () {
             GetMap();

@@ -112,7 +112,7 @@ title: CitySDK - Sublevel Example 2
 
         var sdk = new CitySDK();
         var census = sdk.modules.census;
-        census.enable($("#api").val());
+        census.enable(citySDKdemoConfiguration.apikey);
         var request = {};
 
         request.level = level;
