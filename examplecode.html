@@ -1,89 +1,87 @@
 ---
 layout: exampleslayout
 published: true
+title: Population and Income by Zipcode
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../font-awesome/css/font-awesome.min.css">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <title>Population and Income by Zipcode</title>
-    <script src="http://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"></script>
-    <script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"></script>
+<div class="row">
+    <div class="col-md-12">
 
-    <script>
-        var sdk, census;
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary" role="button">View the Example</a>
+            <a href="{{ site.baseurl }}/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source
+                Code</a>
+        </div>
 
-        $(document).ready(function() {
-            sdk = new CitySDK();
-            census = sdk.modules.census;
-            census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
-        });
 
-        function submit() {
-            var zip = $('#zipcode');
+        <h2>Overview</h2>
 
-            var request = {
-                zip: zip.val(),
-                variables: [
-                    "income",
-                    "population"
-                ],
-                level: $("#level option:selected").val()
-            }
-            census.APIRequest(request, function(response) {
-                var output = $('#output');
-                output.empty();
-                output.append("ZIP: " + response.zip + "<br/>");
-                output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
-                output.append("Median Income: " + response.data[0].income + "<br/>");
-                output.append("Population: " + response.data[0].population + " </br>");
-            });
-        }
-    </script>
-</head>
+        <p>This example allows you to enter a zip code and return population and income information that corresponds to
+            the location. You may specify how granular you want the return value, by choosing Tract, State, County,
+            Block Group, or Incorporated Place. </p>
 
-<body>
-
-    <div class="row">
-            <div class="page-header col-md-12">
-              <h1>Population and Income by Zipcode</h1>
-            </div>
+        <form>
+            <label for="zipcode">Zipcode</label>
+            <input type="text" id="zipcode"/>
+            <label for="level">Geography Level</label>
+            <select id="level">
+                <option value="tract" selected>Tract</option>
+                <option value="state">State</option>
+                <option value="county">County</option>
+                <option value="blockGroup">Block Group</option>
+                <option value="place">Incorporated Place</option>
+            </select>
+            <input type="button" class="btn btn-primary" id="queryPopulationIncomeByZipcode" value="Query"/>
+        </form>
     </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
 
-    <div class="btn-group">
-        <a href="#" class="btn btn-primary" role="button">View the Example</a>
-        <a href="{{ site.baseurl }}/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source
-            Code</a>
-    </div>
-
-
-    <div>
-                <h3>Overview</h3> 
-                <p>This example allows you to enter a zip code and return population and income information that corresponds to the location.  You may specify how granular you want the return value, by choosing Tract, State, County, Block Group, or Incorporated Place.  </p>
-    </div>
-
-    <input type="text" id="zipcode"/>
-    <select id="level">
-        <option value="tract" selected>Tract</option>
-        <option value="state">State</option>
-        <option value="county">County</option>
-        <option value="blockGroup">Block Group</option>
-        <option value="place">Incorporated Place</option>
-    </select>
-    <input type="submit" onclick="submit()" value="Query"/>
-
-   <div class="col-md-7">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Output</h3>
         <pre id="output">
         </pre>
-    </div>
+            </div>
+        </div>
 
     </div>
-</body>
-</html>
+</div>
+
+
+<script>
+    var sdk, census;
+
+    jQuery(document).ready(function () {
+        sdk = new CitySDK();
+        census = sdk.modules.census;
+        census.enable("21ca50e1a3e22cf2b18083748c278199395408ec");
+
+        jQuery("#queryPopulationIncomeByZipcode").click(queryPopulationIncomeByZipcode);
+
+    });
+
+    function queryPopulationIncomeByZipcode(e) {
+        e.preventDefault();
+        var zip = $('#zipcode');
+
+        var request = {
+            zip: zip.val(),
+            variables: [
+                "income",
+                "population"
+            ],
+            level: $("#level option:selected").val()
+        }
+        census.APIRequest(request, function (response) {
+            var output = $('#output');
+            output.empty();
+            output.append("ZIP: " + response.zip + "<br/>");
+            output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
+            output.append("Median Income: " + response.data[0].income + "<br/>");
+            output.append("Population: " + response.data[0].population + " </br>");
+        });
+    }
+</script>
