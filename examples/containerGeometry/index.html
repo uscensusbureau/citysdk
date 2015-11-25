@@ -139,46 +139,60 @@ published: true
 </head>
 
 <body>
+    <div class="container">
+        <div class="row">
+                <div class="page-header col-md-12">
+                  <h1>GeoRequest with Arbitrary Boundaries</h1>
+                </div>
+        </div>
 
-    <div class="row">
-            <div class="page-header">
-              <h1>GeoRequest with Arbitrary Boundaries</hl>
+        <div class="row">
+            <div class="btn-group col-md-12">
+                  <a href="#" class="btn btn-primary" role="button">View the Example</a>
+                  <a href="http://uscensusbureau.github.io/citysdk/examples/containerGeometry/source.html" class="btn btn-default" role="button">Source Code</a>
             </div>
-    </div>
+        </div>
 
-    <div class="btn-group">
-          <a href="#" class="btn btn-primary" role="button">View the Example</a>          
-          <a href="http://uscensusbureau.github.io/citysdk/examples/containerGeometry/source.html" class="btn btn-default" role="button">Source Code</a>
-    </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div>
+                    <h3>Overview</h3>
+                    <p>An example demonstrating how to use arbitrary boundaries as your GeoRequest container.</p>
+                </div>
+                <div class="alert alert-dismissable alert-info">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4>
+                        Requires a Census API Key
+                    </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+                    <p>Enter your Census API key here <input type="text" id="api"/></p>
+                </div>
+            </div>
+        </div>
 
-    <div>
-        <h3>Overview</h3> 
-        <p>An example demonstrating how to use arbitrary boundaries as your GeoRequest container.</p>
-    </div>
 
-    <div class="alert alert-dismissable alert-info">
-                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                <h4>
-                    Requires a Census API Key
-                </h4> <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo. <a href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-                <p>Enter your Census API key here <input type="text" id="api"/></p>
-    </div>
 
-<div class="container">
-    <div id="map-canvas" style="width: 750px; height: 500px;"></div>
-    <input type="submit" value="Clear and Draw Triangle" onclick="showTriangle()"/>
-    <input type="submit" value="Get Block Groups" onclick="go('blockGroup')"/>
-    <input type="submit" value="Get Places" onclick="go('place')"/>
-    <input type="submit" value="Get Tracts" onclick="go('tract')"/>
-    <input type="submit" value="Get Counties" onclick="go('county')"/>
-    <input type="submit" value="Get States" onclick="go('state')"/>
-<br/>
-<input type="submit" value="Set container 'geometry'" onclick="setContainer('geometry')"/>
-    <input type="submit" value="Set container 'geometry_within'" onclick="setContainer('geometry_within')"/>
-<br/>
-'geometry' grabs anything that is within or touches the boundary.
-<br/>
-'geometry_within' grabs anything that is entirely contained within the boundary.
-</div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="map-canvas" style="height: 500px;"></div>
+            </div>
+        </div>
+        <br/>
+        <input type="submit" value="Clear and Draw Triangle" onclick="showTriangle()"/>
+        <input type="submit" value="Get Block Groups" onclick="go('blockGroup')"/>
+        <input type="submit" value="Get Places" onclick="go('place')"/>
+        <input type="submit" value="Get Tracts" onclick="go('tract')"/>
+        <input type="submit" value="Get Counties" onclick="go('county')"/>
+        <input type="submit" value="Get States" onclick="go('state')"/>
+        <br/>
+        <br/>
+        <input type="submit" value="Set container 'geometry'" onclick="setContainer('geometry')"/>
+        <input type="submit" value="Set container 'geometry_within'" onclick="setContainer('geometry_within')"/>
+        <br/>
+        <br/>
+        'geometry' grabs anything that is within or touches the boundary.
+        <br/>
+        <br/>
+        'geometry_within' grabs anything that is entirely contained within the boundary.
+    </div>
 </body>
 </html>
