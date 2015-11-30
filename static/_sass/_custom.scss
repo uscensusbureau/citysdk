@@ -19,6 +19,24 @@
   background-color: #fcfcfc;
 }
 
+.validating-variable-code-alert, .error-variable-code-alert {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.cenVariableDetails {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  font-family: sans-serif;
+  font-size: 0.9em;
+}
+
+#container-input-warning-label {
+  display: none;
+}
+
 /* Icon found from loading screen on http://www.sbcounty.gov/cao/budget/ */
 .loading-icon {
   background: url("../img/Loading.gif") no-repeat center;
@@ -27,6 +45,10 @@
   height: 50px;
   margin: auto;
   display: inline-block;
+}
+
+.loading-icon-initialstate {
+  display: none;
 }
 
 header.header {
@@ -78,6 +100,30 @@ header.header {
   margin: 0 auto;
   float: none;
 }
+
+.glyphicon-refresh-animate {
+  -animation: spin .7s infinite linear;
+  -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
 
 @media (min-width: 480px) {
   #output th, #output td {
