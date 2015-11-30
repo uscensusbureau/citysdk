@@ -617,22 +617,15 @@ title: Census Module Query Builder
 
             // The census variable definition list is empty, load it
             if (censusVariableDefinitionList.length == 0) {
-                $.ajax({
-                    dataType: "json",
-                    url: "http://api.census.gov/data/2013/acs5/variables.json",
-                    api: "acs5",
-                    year: "2013",
-                    beforeSend: function () {
-                        jQuery(".validating-variable-code-alert").fadeIn();
-                    },
-                    success: function (result) {
+                jQuery(".validating-variable-code-alert").fadeIn();
 
-                        censusVariableDefinitionList = result.variables;
-                        addManuallySpecifiedVariable(manuallyDefinedVariable);
-                        jQuery(".validating-variable-code-alert").fadeOut();
-
-                    }
+                // Get the variable list
+                censusVariableDefinitionList = census.getACSVariableDictionary("acs5", "2013", function (result) {
+                    censusVariableDefinitionList = result.variables;
+                    addManuallySpecifiedVariable(manuallyDefinedVariable);
+                    jQuery(".validating-variable-code-alert").fadeOut();
                 });
+
             } else {
                 addManuallySpecifiedVariable(manuallyDefinedVariable);
             }
