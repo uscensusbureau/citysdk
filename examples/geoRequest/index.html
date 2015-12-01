@@ -19,90 +19,136 @@ title: GeoRequests and Supplemental Requests
         <p>This example demonstrates how to make a GeoRequest for the CitySDK and also a supplemental request.  It's important to consider how the "container" tag works when crafting a GeoRequest. Sometimes a container's boundaries surround multiple Census geography boundaries - for example, NYC spans multiple New York state counties. Due to the way the ACS API works, we can only retrieve part of the block group's data at once. Because of this, we must make supplemental requests to the API to fill in data that we are missing. You can track how many of these requests are in flight using the SUPPLEMENTAL_REQUESTS_IN_FLIGHT variable in the Census module. When this number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the return of some data. These requests are typically quick as they do not require any geocoding. </p>
 
 
-        <h3>1. Choose variables of interest</h3>
-    </div>
-</div>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">1. Select Location</h3>
+            </div>
+            <div class="panel-body ">
 
-    <div class="row">
-        <div class="col-md-12">
-                <div class="btn btn-default" id="incomeButton" onclick="toggleVar('income')">Median Income</div>
-                <div class="btn btn-default" id="income_per_capitaButton" onclick="toggleVar('income_per_capita')">Income per Capita</div>
-                <div class="btn btn-default" id="populationButton" onclick="toggleVar('population')">Population</div>
-                <div class="btn btn-default" id="commute_timeButton" onclick="toggleVar('commute_time')">Total Commute Time</div>
-                <div class="btn btn-default" id="median_male_ageButton" onclick="toggleVar('median_male_age')">Median Male Age</div>
-                <div class="btn btn-default" id="median_female_ageButton" onclick="toggleVar('median_female_age')">Median Female Age</div>
+                <div class="form-group">
+                    <label for="level">Choose Your City</label>
+
+                    <select class="reqparam form-control" id="city">
+                        <option value="Washington_DC">
+                            Washington, D.C.
+                </div>
+                <option value="Seattle_WA">
+                    Seattle, WA
+                </option>
+                <option value="San_Francisco_CA">
+                    San Francisco, CA
+                </option>
+                <option value="Portland_OR">
+                    Portland, OR
+                </option>
+                <option value="NYC_NY">
+                    New York City, NY
+                </option>
+                <option value="Montgomery_County_MD">
+                    Montgomery County, MD
+                </option>
+                <option value="Fargo_ND">
+                    Fargo, ND
+                </option>
+                <option value="Chicago_IL">
+                    Chicago, IL
+                </option>
+                <option value="Boston_MA">
+                    Boston, MA
+                </option>
+                <option value="Austin_TX">
+                    Austin, TX
+                </option>
+                <option value="Asheville_NC">
+                    Asheville, NC
+                </option>
+                </select>
             </div>
+
+
+        </div>
     </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <h3>2. Retrieve data at the Place (City), Tract, or Block Group level</h3>
-    </div>
-</div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="btn btn-default" id="blockGroup" onclick="setLevel('blockGroup')">Block Groups</div>
-                <div class="btn btn-default" id="tract" onclick="setLevel('tract')">Tracts</div>
-                <div class="btn btn-default" id="place" onclick="setLevel('place')">Place</div>
-                <div class="btn btn-default" id="clear" style="margin-right: 0.75em;">Clear</div>
-            </div>
-      
-    </div>
-
-<div class="row">
-    <div class="col-md-12">
-        <h3>3. Choose your city</h3>
-    </div>
-</div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="btn btn-default" onclick="loadCity('Washington_DC')">
-                Washington, D.C.
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Seattle_WA')">
-                Seattle, WA
-            </div>
-            <div class="btn btn-default" onclick="loadCity('San_Francisco_CA')">
-                San Francisco, CA
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Portland_OR')">
-                Portland, OR
-            </div>
-            <div class="btn btn-default" onclick="loadCity('NYC_NY')">
-                New York City, NY
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Montgomery_County_MD')">
-                Montgomery County, MD
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Fargo_ND')">
-                Fargo, ND
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Chicago_IL')">
-                Chicago, IL
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Boston_MA')">
-                Boston, MA
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Austin_TX')">
-                Austin, TX
-            </div>
-            <div class="btn btn-default" onclick="loadCity('Asheville_NC')">
-                Asheville, NC
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">2. Choose variables of interest</h3>
+        </div>
+        <div class="panel-body variable-selection-bar">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="checkbox" id="populationButton" value="population" checked> <label
+                        for="populationButton">Population</label><br/>
+                    <input type="checkbox" id="commute_timeButton" value="commute_time"> <label
+                        for="commute_timeButton">Total Commute Time</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="checkbox" id="incomeButton" value="income"> <label for="incomeButton">Median
+                    Income</label><br/>
+                    <input type="checkbox" id="income_per_capitaButton" value="income_per_capita"> <label
+                        for="income_per_capitaButton">Income per Capita</label>
+                </div>
+                <div class="col-md-4">
+                    <input type="checkbox" id="median_male_ageButton" value="median_male_age"> <label
+                        for="median_male_ageButton">Median Male Age</label><br/>
+                    <input type="checkbox" id="median_female_ageButton" value="median_female_age"> <label
+                        for="median_female_ageButton">Median Female Age</label>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">3. How Will The Data Be Grouped?</h3>
+        </div>
+        <div class="panel-body ">
+            <div class="form-group">
+                <label for="level">Level</label>
+
+                <select class="reqparam form-control" id="level" aria-describedby="level-helpblock">
+                    <option value="tract">tract</option>
+                    <option value="blockGroup">blockGroup</option>
+                    <option value="place">place</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">4. Load the Data</h3>
+        </div>
+        <div class="panel-body ">
+            <button type="button" id="cen-load-the-data" class="center-block btn btn-lg btn-primary">Load Data</button>
+        </div>
+    </div>
+
+
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">The Resulting Map</h3>
+        </div>
+        <div class="panel-body ">
+
+
+            <div class="loading-icon loading-icon-initialstate"></div>
+
             <div id="map-canvas" style="height:500px; margin-top: 20px"></div>
+
+            <button class="btn btn-primary btn-sm" id="cenClearMap" style="margin-top: 10px;">Clear Map</button>
         </div>
     </div>
 
 
-<div id="loading">
+    <h3></h3>
+    </div>
 </div>
+
+
+
 
 
 <script type="text/javascript"
@@ -128,7 +174,6 @@ title: GeoRequests and Supplemental Requests
         "Washington_DC": [38.9047, -77.0164]
     };
 
-    var variables = [];
     var level = "place";
 
     function initialize() {
@@ -180,40 +225,15 @@ title: GeoRequests and Supplemental Requests
 
     function checkLoading() {
         if (census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT == 0) {
-            $('#loading').empty();
-            $('#loading').css('display', 'none');
+            jQuery(".loading-icon-initialstate").hide();
             return;
         } else if (census.SUPPLEMENTAL_REQUESTS_IN_FLIGHT > 0) {
             window.setTimeout(checkLoading, 1500);
         }
     }
 
-    function toggleVar(variable) {
-        var position = window.jQuery.inArray(variable, variables);
-        if (position >= 0) {
-            variables.splice(position, 1);
-            $('#' + variable + "Button").addClass("off");
-        } else {
-            variables.push(variable);
-            $("#" + variable + "Button").removeClass("off");
-        }
-    }
 
-    function setLevel(newlevel) {
-        if (newlevel == level) {
-            return;
-        }
 
-        var levels = ["blockGroup", "tract", "place"];
-        levels.forEach(function (x) {
-            if (newlevel != x) {
-                $("#" + x).addClass("off");
-            }
-        });
-        $("#" + newlevel).removeClass("off");
-
-        level = newlevel;
-    }
 
     function clear() {
         map.data.forEach(function (feature) {
@@ -221,16 +241,34 @@ title: GeoRequests and Supplemental Requests
         });
     }
 
-    function loadCity(city) {
-        var reqLevel = level;
+    function loadCity() {
+        var city = jQuery('#city').val();
+
+
+        var reqLevel = jQuery('#level').val();
         if (city == "Montgomery_County_MD" && level == "place") {
             reqLevel = "county";
         }
 
+        var variables = [];
+
+        jQuery(".variable-selection-bar input:checked").each(function (n, o) {
+            variables.push(o.value);
+        });
+
+        variables = variables.filter(function (n) {
+            return n != undefined
+        });
+        variables = variables.filter(function (n) {
+            return n != ""
+        });
+
+
+        jQuery(".loading-icon-initialstate").show();
+
         map.panTo(new google.maps.LatLng(geoCities[city][0], geoCities[city][1]));
 
-        $('#loading').append('<img src="loading.gif"/><br/>Loading features...');
-        $('#loading').css('display', 'block');
+
 
         //BEGIN CITYSDK REQUEST
         var request = {
@@ -251,4 +289,22 @@ title: GeoRequests and Supplemental Requests
         });
         //END CITYSDK REQUEST
     }
+
+    jQuery(document).ready(function () {
+
+        jQuery("#cenClearMap").click(clear);
+
+        jQuery("#cen-load-the-data").click(loadCity);
+
+        jQuery(".variable-selection-bar input").click(function () {
+            if (jQuery('.variable-selection-bar input:checked').size() > 0) {
+                jQuery("#cen-load-the-data").removeAttr("disabled", "disabled");
+            } else {
+                jQuery("#cen-load-the-data").attr("disabled", "disabled");
+            }
+
+        });
+
+
+    });
 </script>
