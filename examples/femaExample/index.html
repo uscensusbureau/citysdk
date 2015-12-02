@@ -13,133 +13,228 @@ title: FEMA Module - Disaster Declaration Summaries
             <a href="#" class="btn btn-primary" role="button">View the Example</a>
             <a href="source.html" class="btn btn-default" role="button">Source Code</a>
         </div>
+
         <div>
         </div>
         <div class="row">
             <div class="col-md-12">
                 <h2>Describe Desired Disaster Information</h2>
-                <label for="disasterNumber">Disaster Number:</label> <input type="number" id="disasterNumber" value=""
-                                                                            max="9999"/><br/>
-                <label for="state">State Abvr:</label> <input type="text" id="state" value="VA" maxlength="2"/><br/>
-                <label for="county">County:</label> <input type="text" id="county" value=""/><br/>
-                <label for="declarationRangeStart">Declared Date Range Start:</label> <input type="date"
-                                                                                             id="declarationRangeStart"
-                                                                                             value="2011-01-01"/><br/>
-                <label for="declarationRangeEnd">Declared Date Range End:</label> <input type="date"
-                                                                                         id="declarationRangeEnd"
-                                                                                         value="2013-10-31"/><br/>
-                <label for="take">Take:</label> <input type="number" id="take" value="20"/><br/>
-                <label for="skip">Skip:</label> <input type="number" id="skip" value="0"/><br/>
-                <input class="btn btn-primary" type="submit" onclick="submit()" value="Query"/> <input
-                    class="btn btn-warning" type="submit" onclick="resetForm()" value="Clear"/>
+
+                <form class="form-horizontal">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Where?</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+
+                                        <label for="disasterNumber" class="col-sm-5">Disaster Number:</label>
+                                        <input type="number" id="disasterNumber" value="" max="9999" class="col-sm-6"/>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label for="state" class="col-sm-5">State Abvr:</label>
+                                        <input type="text" id="state" value="VA" maxlength="2" class="col-sm-6"/>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label for="county" class="col-sm-5">County:</label>
+                                        <input type="text" id="county" value="" class="col-sm-6"/>
+                                    </div>
+                                </div>
+                            </div>
 
 
-                <h3>Resulting Data</h3>
-                <table id="output" class="display" width="100%">
-                    <thead>
-                    <tr>
-                        <th>Disaster Number</th>
-                        <th>IH Program Declared</th>
-                        <th>IA Program Declared</th>
-                        <th>PA Program Declared</th>
-                        <th>HM Program Declared</th>
-                        <th>State</th>
-                        <th>Declaration Date</th>
-                        <th>Disaster Type</th>
-                        <th>Incident Type</th>
-                        <th>Title</th>
-                        <th>Incident Begin Date</th>
-                        <th>Incident End Date</th>
-                        <th>Disaster Close Out Date</th>
-                        <th>Place Code</th>
-                        <th>Declared County Area</th>
-                    </tr>
-                    </thead>
-                </table>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">How Many Records?</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
 
+                                        <label for="take" class="col-sm-5">Take:</label>
+                                        <input type="number" id="take" value="20" class="col-sm-6"/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="skip" class="col-sm-5">Skip:</label>
+                                        <input type="number" id="skip" value="0" class="col-sm-6"/>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div><!-- end col-md-6 -->
+                        <div class="col-md-6">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">When?</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+
+                                        <label for="declarationRangeStart" class="col-sm-5">Declared Date Range
+                                            Start:</label>
+                                        <input type="date" id="declarationRangeStart" value="2011-01-01"
+                                               class="col-sm-6"/>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label for="declarationRangeEnd" class="col-sm-5">Declared Date Range
+                                            End:</label>
+                                        <input type="date" id="declarationRangeEnd" value="2013-10-31"
+                                               class="col-sm-6"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Query</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <div class="col-sm-10 col-sm-offset-1">
+                                            <button class="btn btn-lg btn-primary" id="btnQueryData">Query</button>
+                                            <button class="btn btn-lg btn-warning" id="btnReset">Clear</button>
+                                        </div>
+                                    </div>
+                                    <div class="loading-icon loading-icon-initialstate"></div>
+
+                                </div>
+                            </div>
+
+                        </div><!-- end col-md-6 -->
+                    </div><!-- end row -->
+                </form>
+
+
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Resulting Data</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <table id="output" class="display" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Disaster Number</th>
+                                <th>IH Program Declared</th>
+                                <th>IA Program Declared</th>
+                                <th>PA Program Declared</th>
+                                <th>HM Program Declared</th>
+                                <th>State</th>
+                                <th>Declaration Date</th>
+                                <th>Disaster Type</th>
+                                <th>Incident Type</th>
+                                <th>Title</th>
+                                <th>Incident Begin Date</th>
+                                <th>Incident End Date</th>
+                                <th>Disaster Close Out Date</th>
+                                <th>Place Code</th>
+                                <th>Declared County Area</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
 
             </div>
         </div>
 
-        <script>
-        var sdk, census;
-        var data = [];
-        var table;
-        $(document).ready(function() {
-            sdk = new CitySDK();
-            fema = sdk.modules.fema;
+    </div>
+</div>
 
-            table = $('#output').DataTable({
-                "autoWidth": false,
-                data: data,
-                columns: [
-                    {data: "disasterNumber","defaultContent": ""},
-                    {data: "ihProgramDeclared","defaultContent": ""},
-                    {data: "iaProgramDeclared","defaultContent": ""},
-                    {data: "paProgramDeclared","defaultContent": ""},
-                    {data: "hmProgramDeclared","defaultContent": ""},
-                    {data: "state","defaultContent": ""},
-                    {data: "declarationDate","defaultContent": ""},
-                    {data: "disasterType","defaultContent": ""},
-                    {data: "incidentType","defaultContent": ""},
-                    {data: "title","defaultContent": ""},
-                    {data: "incidentBeginDate","defaultContent": ""},
-                    {data: "incidentEndDate","defaultContent": ""},
-                    {data: "disasterCloseOutDate","defaultContent": ""},
-                    {data: "placeCode","defaultContent": ""},
-                    {data: "declaredCountyArea","defaultContent": ""}
-                ]
-            });
-            fema.enable();
+<script>
+    var sdk, census;
+    var data = [];
+    var table;
+    jQuery(document).ready(function () {
+        sdk = new CitySDK();
+        fema = sdk.modules.fema;
 
+        table = jQuery('#output').DataTable({
+            "autoWidth": false,
+            data: data,
+            columns: [
+                {data: "disasterNumber", "defaultContent": ""},
+                {data: "ihProgramDeclared", "defaultContent": ""},
+                {data: "iaProgramDeclared", "defaultContent": ""},
+                {data: "paProgramDeclared", "defaultContent": ""},
+                {data: "hmProgramDeclared", "defaultContent": ""},
+                {data: "state", "defaultContent": ""},
+                {data: "declarationDate", "defaultContent": ""},
+                {data: "disasterType", "defaultContent": ""},
+                {data: "incidentType", "defaultContent": ""},
+                {data: "title", "defaultContent": ""},
+                {data: "incidentBeginDate", "defaultContent": ""},
+                {data: "incidentEndDate", "defaultContent": ""},
+                {data: "disasterCloseOutDate", "defaultContent": ""},
+                {data: "placeCode", "defaultContent": ""},
+                {data: "declaredCountyArea", "defaultContent": ""}
+            ]
+        });
+        fema.enable();
+
+
+        jQuery("#btnQueryData").click(submitQuery);
+
+    });
+
+    function submitQuery() {
+
+        jQuery(".loading-icon-initialstate").show();
+        var disasterNumber = $('#disasterNumber').val();
+        var county = $('#county').val();
+        var state = $('#state').val();
+        var declarationRangeStart = $('#declarationRangeStart').val();
+        var declarationRangeEnd = $('#declarationRangeEnd').val();
+        var take = $('#take').val();
+        var skip = $('#skip').val();
+
+        var request = {};
+
+        if (disasterNumber) {
+            request.disasterNumber = disasterNumber;
+        }
+        if (state) {
+            request.state = state;
+        }
+        if (county) {
+            request.county = county;
+        }
+        if (declarationRangeStart) {
+            request.declarationRangeStart = declarationRangeStart;
+        }
+        if (declarationRangeEnd) {
+            request.declarationRangeEnd = declarationRangeEnd;
+        }
+        if (take) {
+            request.take = take;
+        }
+        if (skip) {
+            request.skip = skip;
+        }
+
+        fema.DisasterDeclarationsSummariesRequest(request, function (response) {
+            table.clear();
+            table.rows.add(response.DisasterDeclarationsSummaries);
+            table.draw();
+            jQuery(".loading-icon-initialstate").hide();
         });
 
-        function submit() {
-            var disasterNumber = $('#disasterNumber').val();
-            var county = $('#county').val();
-            var state = $('#state').val();
-            var declarationRangeStart = $('#declarationRangeStart').val();
-            var declarationRangeEnd = $('#declarationRangeEnd').val();
-            var take = $('#take').val();
-            var skip = $('#skip').val();
+        return false;
+    }
 
-            var request = { };
-            if (disasterNumber) {
-                request.disasterNumber = disasterNumber;
-            }
-            if (state) {
-                request.state = state;
-            }
-            if (county) {
-                request.county = county;
-            }
-            if (declarationRangeStart) {
-                request.declarationRangeStart = declarationRangeStart;
-            }
-            if (declarationRangeEnd) {
-                request.declarationRangeEnd = declarationRangeEnd;
-            }
-            if (take) {
-                request.take = take;
-            }
-            if (skip) {
-                request.skip = skip;
-            }
-
-            fema.DisasterDeclarationsSummariesRequest(request, function(response) {
-                table.clear();
-                table.rows.add(response.DisasterDeclarationsSummaries);
-                table.draw();
-            });
-        }
-
-        function resetForm() {
-            $('#disasterNumber').val('');
-            $('#county').val('');
-            $('#state').val('');
-            $('#declarationRangeStart').val('');
-            $('#declarationRangeEnd').val('');
-            $('#take').val('');
-            $('#skip').val('');
-        }
-    </script>
+    function resetForm() {
+        $('#disasterNumber').val('');
+        $('#county').val('');
+        $('#state').val('');
+        $('#declarationRangeStart').val('');
+        $('#declarationRangeEnd').val('');
+        $('#take').val('');
+        $('#skip').val('');
+    }
+</script>

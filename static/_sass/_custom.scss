@@ -63,6 +63,11 @@ header.header {
 }
 
 /* Table converts to one column in mobile sized display */
+#output {
+  overflow-x: auto;
+  display: block;
+}
+
 #output td {
   text-align: left;
   display: block;
