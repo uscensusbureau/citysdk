@@ -14,19 +14,31 @@ title: Using Sublevels and Normalized Aliases
             <a href="source.html" class="btn btn-default" role="button">Source Code</a>
         </div>
 
-        <div>
             <h2>Overview</h2>
 
-            <p>This example demonstrates two key concepts used in the Census Module of the CitySDK. The first concept is
-                specifying sublevels, which allows you to enter a location (such as State) and get values that are one
-                level
-                below (i.e. County). This is helpful because it's not always obvious how to specify the sublevels when
-                making an API call, as you wouldn't normally memorize county names. The next key concept is normalized
-                variables. Some data from the Census American Community Survey (ACS) provide a return value in a special
-                unit of measure that is averaged out across the population. In this case, Commuting data can be returned
-                in
-                a normalized fashion which equates to "avg minutes of commute per person".</p>
+        This example demonstrates two key concepts used in the Census Module of the CitySDK: sublevels and
+        normalization.
+
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Sublevels</h3>
+
+                <p>Specifying a sublevel allows you to enter a location (such as State) and get values that are one
+                    level below (i.e. County). This is helpful because it's not always obvious how to specify the
+                    sublevels when making an API call, as you wouldn't normally memorize county names.</p>
+
+            </div>
+            <div class="col-md-6">
+                <h3>Normalization</h3>
+
+                <p>Some data from the Census American Community Survey (ACS) provide a return value in a special unit of
+                    measure that is averaged out across the population. In this case, Commuting data can be returned in
+                    a normalized fashion which equates to "avg minutes of commute per person".</p>
+
+            </div>
+
         </div>
+
 
         <!-- <div class="alert alert-dismissable alert-info">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -41,109 +53,333 @@ title: Using Sublevels and Normalized Aliases
             <p>Enter your Census API key here <input type="text" id="api"/></p>
         </div>-->
 
+        <form id="cenBuildRequest">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">1. Select Location</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Specify Location By</label><br/>
+                            <input type="radio" name="location_radios" id="specify_location_coords"
+                                   value="location_coords"
+                                   onclick="visible('location_coords')" checked="checked"> <label
+                                for="specify_location_coords">Coordinates</label><br/>
+                            <!--<input type="radio" name="location_radios" id="specify_location_zip" value="location_zip"
+                                   onclick="visible('location_zip')"> <label for="specify_location_zip">Zip
+                            Code</label><br/>-->
+                            <input type="radio" name="location_radios" id="specify_location_state"
+                                   value="location_state"
+                                   onclick="visible('location_state')"> <label for="specify_location_state">State
+                            Code</label><br/>
+                            <!--<input type="radio" name="location_radios" id="specify_location_address"
+                                   value="location_address" onclick="visible('location_address')"> <label
+                                for="specify_location_address">Address</label>-->
+                        </div><!-- end col-md-4 -->
 
-        <div class="row">
-            <div class="col-md-5"><h5>Enter coordinates here:</h5>
+                        <div class="col-md-8">
 
-                <div class="form-group">
 
-                    <label for="lat">Latitude:</label>
+                            <div class="location_coords">
+                                <label for="lat">Latitude:</label>
 
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="lat" placeholder="" aria-describedby="basic-addon2">
-                        <span class="input-group-addon" id="basic-addon2">&deg;N</span>
-                    </div>
-                    <label for="lng">Longitude:</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control reqparam" id="lat" placeholder=""
+                                           aria-describedby="lat-helpblock">
+                                    <span class="input-group-addon" id="basic-addon2">&deg;N</span>
+                                </div>
+                                <span id="lat-helpblock" class="help-block">Number - The latitude of the requested location (North). Also supported: latitude, y</span>
+                                <label for="lng">Longitude:</label>
 
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="lng" placeholder="" aria-describedby="basic-addon3">
-                        <span class="input-group-addon" id="basic-addon3">&deg;E</span>
+                                <div class="input-group">
+                                    <input type="text" class="form-control reqparam" id="lng" placeholder=""
+                                           aria-describedby="lng-helpblock">
+                                    <span class="input-group-addon" id="basic-addon3">&deg;E</span>
+                                </div>
+                                <span id="lng-helpblock" class="help-block">Number - The longitude of the requested location (East). Also supported: longitude, x</span>
+                            </div><!-- end location_coords -->
+
+
+                            <!--<div class="location_zip">
+                                <label>Zip Code:</label>
+                                <input class="reqparam form-control" id="zip" type="text" size="5"
+                                       aria-describedby="zip-helpblock"/>
+
+                                <span id="zip-helpblock" class="help-block">String - The 5-digit zip code of the location. Note that USPS zip code areas do not
+                                    align precisely with Census geographies, so when high accuracy is required it is
+                                    recommended to use latitude and longitude. Specified as a string because certain zip
+                                    codes begin with zeroes.</span>
+
+                            </div>--><!-- end location_zip -->
+
+
+                            <div class="location_state">
+                                <label for="state">State:</label>
+                                <select class="reqparam form-control" id='state'>
+                                    <option value=""></option>
+                                </select>
+
+                                <p>String - The 2-letter USPS state code. It will be converted into the latitude and
+                                    longitude of that state's capital.</p>
+
+                            </div><!-- end location_state -->
+
+
+                            <!--<div class="location_address">
+                                <label for="address_street">Street:</label>
+                                <input class="reqparam form-control" id="address_street" type="text"/>
+                                <label for="address_city">City:</label>
+                                <input class="reqparam form-control" id="address_city" type="text"/>
+                                <label for="address_state">State:</label>
+                                <input class="reqparam form-control" id="address_state" type="text"/>
+
+                                <p><em>Object - Represents the address of the requested location.</em></p>
+                            </div>--><!-- end location_address -->
+
+
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-2"><p>OR</p>
-            </div>
-            <div class="col-md-5"><h5>Look up by State</h5><input type="button" class="btn-lg btn-info"
-                                                                  id="loadStateButton" value="Enter state code"/>
+                <table class="location_coords table table-striped">
+                    <caption>Some common co-ordinates:</caption>
+                    <tr>
+                        <th>Name</th>
+                        <th>Lat (N)</th>
+                        <th>Lng (E)</th>
+                    </tr>
+                    <tr onclick="loadCoords(38.9047,-77.0164)">
+                        <td>Washington DC</td>
+                        <td>38.9047</td>
+                        <td>-77.0164</td>
+                    </tr>
+                    <tr onclick="loadCoords(47.6097,-122.3331)">
+                        <td>Seattle</td>
+                        <td>47.6097</td>
+                        <td>-122.3331</td>
+                    </tr>
+                    <tr onclick="loadCoords(21.3000,-157.8167)">
+                        <td>Honolulu</td>
+                        <td>21.3000</td>
+                        <td>-157.8167</td>
+                    </tr>
+                    <tr onclick="loadCoords(25.7753,-80.2089)">
+                        <td>Miami</td>
+                        <td>25.7753</td>
+                        <td>-80.2089</td>
+                    </tr>
+                    <tr onclick="loadCoords(29.7604,-95.3698)">
+                        <td>Houston</td>
+                        <td>29.7604</td>
+                        <td>-95.3698</td>
+                    </tr>
+                </table>
+
             </div>
 
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-info" style="min-height: 180px;">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">2. Select Desired Variables</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="property">Value:</label>
+                                        <select id="property" class="form-control">
+                                            <option value="commute_time">Total</option>
+                                            <option value="commute_time_solo_automobile">Drive Alone</option>
+                                            <option value="commute_time_carpool">Carpool</option>
+                                            <option value="commute_time_public_transport">Public Transportation</option>
+                                            <option value="commute_time_walked">Walked</option>
+                                            <option value="commute_time_other">Other</option>
+                                        </select>
+
+                                        <div class="form-group">
+                                            <div class="checkbox">
+                                                <label for="normalize"><input id="normalize" type="checkbox"
+                                                                              name="normalize"
+                                                                              checked/>Normalize</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div><!-- end panel panel-info -->
+
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-info" style="min-height: 180px;">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">3. How Will The Data Be Grouped?</h3>
+                    </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+
+
+                                        <label for="level">Level:</label>
+                                        <select id="level" class="form-control">
+                                            <option value="states">States</option>
+                                            <option value="counties">Counties</option>
+                                            <option value="tracts">Tracts</option>
+                                            <option value="blockGroups">Block Groups</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                </div>
+
+            </div>
+
+            </div>
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">4. Submit</h3>
+            </div>
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Get the Data</h4>
+
+                        </div><!-- end col-md-6 -->
+
+                        <div class="col-md-6">
+
+                            <button class="btn btn-primary btn-lg" style="width: 100%;" id="btnUpdateData"
+                                    role="button">Update Data
+                            </button>
+
+                            <div class="loading-icon loading-icon-initialstate"></div>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-warning alert-dismissible submitAlert" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <strong>Error!</strong> <span class="textOfErrorMessage"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+        </div>
+        </form>
+
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">The Request</h3>
+
+            </div>
+            <div class="panel-body">
+                <pre id="cenreq"></pre>
+
+            </div>
         </div>
 
 
-        <div class="form-group">
+        <div class="panel panel-success">
+            <div class="panel-heading">
 
-            <label for="property">Value:</label>
-            <select id="property">
-                <option value="commute_time">Total</option>
-                <option value="commute_time_solo_automobile">Drive Alone</option>
-                <option value="commute_time_carpool">Carpool</option>
-                <option value="commute_time_public_transport">Public Transportation</option>
-                <option value="commute_time_walked">Walked</option>
-                <option value="commute_time_other">Other</option>
-            </select>
-            <label for="level">Level:</label>
-            <select id="level">
-                <option value="states">States</option>
-                <option value="counties">Counties</option>
-                <option value="tracts">Tracts</option>
-                <option value="blockGroups">Block Groups</option>
-            </select>
-            <input id="normalize" type="checkbox" name="normalize" checked/><label for="normalize">Normalize</label>
+
+                <h3 class="panel-title">The Returned Data</h3>
+
+            </div>
+            <div class="panel-body">
+
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+
+                <div class="outputSet">
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#formateedOutput"
+                                                                  aria-controls="formateedOutput" role="tab"
+                                                                  data-toggle="tab">Formated Data</a></li>
+                        <li role="presentation"><a href="#unformattedOutput" aria-controls="unformattedOutput"
+                                                   role="tab" data-toggle="tab">Raw JSON Response</a></li>
+                        <li role="presentation"><a href="#shortCodeExample" aria-controls="shortCodeExample" role="tab"
+                                                   data-toggle="tab">Sample Code</a></li>
+
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="formateedOutput">
+                            <table id="output" class="table table-striped">
+                            </table>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="unformattedOutput">
+                            <p><pre id="rawOutput">
+                                    </pre>
+                            </p>
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="shortCodeExample">
+                            <p><pre><code>&lt;script&gt;
+
+                            var <var>sdk</var> = new CitySDK();
+                            var <var>census</var> = <var>sdk.modules.census</var>;
+                            census.enable("Your API Key Here");
+
+                            var <var>request</var> = <span id="machineRequestPlaceholder"></span>;
+
+                            census.APIRequest(<var>request</var>, function (<var>response</var>) {
+
+                            //Outputs the raw JSON text
+                            jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+
+                            });
+                            &lt;/script&gt;</code></pre>
+                            </p>
+                            <p>
+                                <small>Note: This sample code snippet does not depict normalization.</small>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
         </div>
-        <input type="submit" class="btn-lg btn-primary" value="Update data" onclick="submit()">
 
-
-        <h3>Some common co-ordinates:</h3>
-        <table class="table table-striped">
-            <tr>
-                <th>Name</th>
-                <th>Lat (N)</th>
-                <th>Lng (E)</th>
-            </tr>
-            <tr onclick="loadCoords(38.9047,-77.0164)">
-                <td>Washington DC</td>
-                <td>38.9047</td>
-                <td>-77.0164</td>
-            </tr>
-            <tr onclick="loadCoords(47.6097,-122.3331)">
-                <td>Seattle</td>
-                <td>47.6097</td>
-                <td>-122.3331</td>
-            </tr>
-            <tr onclick="loadCoords(21.3000,-157.8167)">
-                <td>Honolulu</td>
-                <td>21.3000</td>
-                <td>-157.8167</td>
-            </tr>
-            <tr onclick="loadCoords(25.7753,-80.2089)">
-                <td>Miami</td>
-                <td>25.7753</td>
-                <td>-80.2089</td>
-            </tr>
-            <tr onclick="loadCoords(29.7604,-95.3698)">
-                <td>Houston</td>
-                <td>29.7604</td>
-                <td>-95.3698</td>
-            </tr>
-        </table>
-
-        <h3>Output:</h3>
-        <pre id="output"></pre>
 
     </div>
 </div>
 
 
 <script>
+
+    var sdk = new CitySDK();
+    var census = sdk.modules.census;
+    census.enable(citySDKdemoConfiguration.apikey);
+
+
+
+
     function loadCoords(lat, lng) {
         $("#lat").val(lat);
         $("#lng").val(lng);
-    }
-
-    function loadState() {
-        var stateCode = prompt("Please enter a valid state code", "DC");
-        loadCoords(CensusModule.prototype.stateCapitals[stateCode][0],
-                CensusModule.prototype.stateCapitals[stateCode][1]);
+        buildCensusModuleRequest();
     }
 
     function SortByAveragedProperty(a, b) {
@@ -161,10 +397,38 @@ title: Using Sublevels and Normalized Aliases
 
         return ((aval > bval) ? -1 : (bval > aval) ? 1 : 0);
     }
+    function visible(x) {
+        var tabs = jQuery("*[class^='" + x.split("_")[0] + "']");
+        tabs.each(function (f) {
+            jQuery(this).hide();
+        });
+        jQuery('.' + x).show();
+    }
+    ;
 
-    function submit() {
-        var lat = $("#lat").val();
-        var lng = $("#lng").val();
+    //
+
+
+    function buildCensusModuleRequest() {
+        //Build the request
+        jQuery(".submitAlert").hide();
+
+        // Is the location being specified by coords or state?
+        if (jQuery("#specify_location_coords").is(':checked')) {
+            // Coordinates are being used
+            var lat = jQuery("#lat").val();
+            var lng = jQuery("#lng").val();
+            // Verify that actual numbers were input for both lat and long
+
+
+        } else {
+            // A 2-letter state abbreviation was used.  Look up the coords.
+            var stateCode = jQuery('#state').val();
+            var lat = CensusModule.prototype.stateCapitals[stateCode][0];
+            var lng = CensusModule.prototype.stateCapitals[stateCode][1];
+
+        }
+
 
         var level;
         switch ($("#level option:selected").val()) {
@@ -189,26 +453,59 @@ title: Using Sublevels and Normalized Aliases
             "commute_time_walked",
             "commute_time_other"];
 
-        var sdk = new CitySDK();
-        var census = sdk.modules.census;
-        census.enable(citySDKdemoConfiguration.apikey);
+
         var request = {};
 
+        // Populate the request object
         request.level = level;
         request.lat = lat;
         request.lng = lng;
         request.variables = variables;
         request.sublevel = true;
 
+        jQuery('#cenreq').text(JSON.stringify(request, null, 4));
+        jQuery('#machineRequestPlaceholder').text(JSON.stringify(request, null, 4));
+
+        // Return false and show an error if the lattitude and longiture are invalid
+        if (isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) {
+            // SHOW ERROR
+            jQuery(".submitAlert .textOfErrorMessage").text("A valid location is required.  Please input a valid Lattitude and Longiture combination or select a state.");
+            jQuery(".submitAlert").show();
+            return false;
+        }
+
+        return request;
+    }
+
+    function getCommuteData(e) {
+        e.preventDefault();
+        // Show loading graphics
+        jQuery(".loading-icon-initialstate").show();
+        jQuery(".outputSet").hide();
+
+        request = buildCensusModuleRequest();
+        if (request == false) {
+            jQuery(".loading-icon").hide();
+            jQuery(".outputSet").show();
+
+            return false;
+        }
+
         var entry = "";
         var currentObject;
         census.APIRequest(request, function (response) {
             response.data.sort(SortByAveragedProperty);
-            var output = $("#output");
+            var output = jQuery("#output");
+            var rawOutput = jQuery("#rawOutput");
             output.empty();
+            rawOutput.empty();
+
+            rawOutput.append(JSON.stringify(response));
+
+
             for (var i = 0; i < response.data.length; i++) {
                 currentObject = response.data[i];
-                entry = "<b>" + currentObject.name + "</b>";
+                entry = "<tr><td>" + currentObject.name + "</td>";
 
                 var val;
 
@@ -218,15 +515,30 @@ title: Using Sublevels and Normalized Aliases
                     val = (currentObject[$("#property option:selected").val()]);
                 }
 
-
-                entry += " - " + census.aliases[$("#property option:selected").val()].description + ": " + val + " minutes";
+                entry += "<td>" + census.aliases[$("#property option:selected").val()].description + "</td><td>" + val + " minutes</td>";
+                entry += "</tr>";
                 output.append(entry + "\n");
             }
+            jQuery(".loading-icon").hide();
+            jQuery(".outputSet").show();
+
         });
 
     }
 
     jQuery(document).ready(function () {
-        jQuery("#loadStateButton").click(loadState);
+
+        visible("location_coords");
+
+        jQuery(".submitAlert").hide();
+        jQuery.each(census.stateCapitals, function (stateabbrev, capitalcoords) {
+            jQuery('<option value="' + stateabbrev + '">' + stateabbrev + '</option>').appendTo('#state');
+        });
+        jQuery('#state').val("VA");
+
+        jQuery('#btnUpdateData').click(getCommuteData);
+
+        jQuery('#cenBuildRequest').on('change', buildCensusModuleRequest());
+
     });
 </script>
