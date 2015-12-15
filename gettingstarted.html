@@ -4,215 +4,175 @@ title: Getting Started
 ---
 
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12 cenCoreStyles">
 
-        <h2>Modularity</h2>
-
-        <p>CitySDK is designed with modularity in mind. Are you working on a project and want to include population,
-            income, or any other Census data? Load the Census module! Would you rather tell people where the closest
-            Farmers' Market is? There's a module for that.</p>
-
-        <p>Modules allow you to customize your CitySDK experience - take the functionality you want, and trim back on
-            the things you don't need.</p>
-
-        <h2>Community</h2>
-
-        <p>We've written modules for the Census, EIA, and the USDA - but we can't write them all. CitySDK is an
-            open-source project hosted on GitHub, open and ready for community participation.</p>
-
-        <p>Does your local city have an open data API that you think others might like? Create a module for it! Writing
-            a module is simple - you can leverage the core CitySDK functionality and some simple JavaScript to get
-            started.<
-
-        <h2>Obtaining a Census Developer Key</h2>
-
-        <p>You'll need a Census API key to implement CitySDK. Keys are free and quick. </p>
-    </div>
-</div>
-
-<div class="alert alert-info">
-    <h4>
-        Census API Key Required
-    </h4>
-
-    <p>If you don't already have one, be sure to grab a Census API key. <a
-            href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-</div>
+        <div class="row">
+            <div class="col-md-6">
+                <p>CitySDK is fundamentally a javascript library that is expanded by modules which call on various APIs.
+                    Each module essentially adds a new data source for scripting to consume. The core library
+                    (citysdk.js) includes some basic utility functions that return coordinates for state capitals,
+                    etc.</p>
 
 
-<div class="row ">
-    <div class="col-md-6">
-        <h1>The Census Module</h1>
+                <p>Implementing the library can be requires these steps:</p>
 
-        <p>Let's show you what the Census module can already do. If you entered your Census API key above, the examples
-            below should be ready to go.</p>
+            </div>
+            <div class="col-md-6">
 
-        <p>Our google map to the right looks kind of plain. Let's draw some things on it.</p>
+                <ol>
+                    <li>Add the CitySDK javascript library and any desired module libraries</li>
+                    <li>Instantiate the CitySDK and desired modules</li>
+                    <li>Create a request JSON object
+                        <ol>
+                            <li>Define Location</li>
+                            <li>Choose Variables</li>
+                            <li>Choose Geographic Grouping / Level</li>
+                        </ol>
+                    </li>
+                    <li>Make the Request</li>
+                    <li>Use the returned object</li>
+                </ol>
 
-        <p>The code below will load the boundaries of Maryland onto the map:</p>
-                        <textarea id="example1" rows="4" cols="50" style="width:100%; height:230px;">
-                    var request = {
-                        "state": "MD",
-                        "level": "state"
-                    };
+            </div>
+        </div>
 
-                    var callback = function(response) {
-                        map.data.addGeoJson(response);
-                    };
 
-                    census.GEORequest(request, callback);
-                        </textarea>
+        <h2>1. Add the Library</h2>
 
-        <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)"
-              onclick="runExample('example1')" role="button">Run This &raquo;</a></p>
+        <p>Add the script libraries to the page.</p>
+        <pre>&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"&gt;&lt;/script&gt;</pre>
+        <p><span class="label label-info">Note</span> jQuery is also required.</p>
 
-        <p>Looks good! But let's break the state down into counties. Edit the code above, and add the line
-        <pre>"sublevel": true,</pre>
-        just before the line that says
-        <pre>"state": "MD",</pre>
-        . This should make the request object look like:</p>
-                        <pre>
-            var request = {
-                "sublevel": true,
-                "state": "MD",
-                "level": "state"
-            };
-                        </pre>
-        <p>Once it looks like that, run the example again!</p>
-    </div>
 
-    <div class="col-md-6">
-        <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 6.5rem;"></div>
-        <p style="margin-top: 7rem;">Now that you have a hang on this basic request, keep tinkering with the example.
-            Try changing the state, level (try out "place" for incorporated cities!), or specifying a container! You can
-            even specify latitude and longitude. Here's another example that will load all the Census tracts in Myrtle
-            Beach, S.C.*</p>
-                        <pre>
-            var request = {
-                "lat": 33.7167,
-                "lng": -78.8833,
-                "sublevel": true,
-                "level": "tract",
-                "container": "place"
-            };
-                        </pre>
-        <p style="font-size: smaller; font-style: italic;">*City boundaries rarely align perfectly with Census geography
-            boundaries, so when you get all "x" within a City, it will sometimes extend outside of the boundaries of the
-            city proper.</p>
-    </div>
-</div>
+        <h2>2. Enable the Library(s)</h2>
 
-<div class="row ">
-    <div class="col-md-4">
-        <h3>Let's try getting some data</h3>
+        <p>Instantiate the CitySDK and modules you intend to use. Some modules may require an API key.</p>
 
-        <p>You can request data from the Census's API by specifying variables in your request. You can find more details
-            about variable names and codes on our github examples.</p>
+        <div class="row">
+            <div class="col-md-8">
+        <pre>&lt;script&gt;
+        var <var>sdk</var> = new CitySDK(); //Create the CitySDK Instance
+        <var>census</var> = <var>sdk.modules.census</var>; //Create an instance of the module
+        census.enable("API-KEY"); //Enable the module with the api key
+&lt;/script&gt;</pre>
 
-        <p>Try it out with the code on the right!</p>
+            </div>
+            <div class="col-md-4">
 
-        <p>Try tinkering with the example to add sublevels, or query by a city, to see what happens.</p>
+                <div class="alert alert-info">
+                    <h4>
+                        Census API Key Required
+                    </h4>
 
-        <p>You can use the same "variables" format tags when requesting geography data. Doing this will request the data
-            for each geographical feature, and attach the data to the "properties" tag of that feature.</p>
-    </div>
+                    <p>If you don't already have one, be sure to grab a Census API key. <a
+                            href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
+                </div>
 
-    <div class="col-md-4" style="height:100%;">
-        <h3>&nbsp;<br/><br/></h3>
-                        <textarea id="example2" rows="4" cols="50" style="width:100%; height:230px;">
+            </div>
+        </div>
+
+
+        <h2>3. Create the Request</h2>
+
+        <div class="row">
+            <div class="col-md-7"><h3>Define Location</h3>
+
+                <p>The location can be defined by coordinates (latitude/longiture), state, zipcode, or address.
+                    Generally coordinate points are optimal and fastest.</p>
+
+                <h3>Select Variables</h3>
+
+                <p>The variables determine what data points are returned by the request. For census modules many of the
+                    most common variables have been aliased for easier use. You can use either the <a
+                            href="{{ site.baseurl }}/guides/censusModule/aliases.html">aliases</a> or the variable
+                    names.</p>
+
+                <h3>Choose Geographic <br/>Grouping / Level</h3>
+
+                <p>Choose what geographic level of data desired. For example, selecting “state” along with the
+                    coordinates of Richmond, VA will return data for the state of Virginia. Optionally you can include
+                    the sublevel which will include the next unit down (in the previous example, selecting sublevel when
+                    requesting a state will also include county).</p>
+            </div>
+            <div class="col-md-5">
+                <h3>The Completed Request</h3>
+
+        <pre>&lt;script&gt;
+    var <var>request</var> = {
+        "level": "state",
+        "state": "AK",
+        "sublevel": true,
+        "variables": [
+            "B24124_407E",
+            "age",
+            "commute_time",
+            "commute_time_carpool",
+            "commute_time_other"
+        ]
+    }
+&lt;/script&gt;</pre>
+            </div>
+        </div>
+
+
+        <h2>4. Submit the Request</h2>
+
+        <p>Make the request and use a callback to utilize the response.</p>
+
+
+
+        <pre>&lt;script&gt;
+
+    //Create a callback function to use the data returned
+     var callback = function(response) {
+        // Do something with the response
+     };
+
+     // Make the request
+     census.GEORequest(request, callback);
+
+&lt;/script&gt;</pre>
+
+
+        <h2>5. See It In Action</h2>
+
+        <p>See the CitySDK populate a Google map.</p>
+
+        <div class="row">
+            <div class="col-md-6">
+            <pre>
+
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+
         var request = {
-            "lat": 40.7127,
-            "lng": -74.0059,
-            "level": "state",
-            "variables": [
-                "income",
-                "population",
-                "median_male_age"
-            ]
+            "state": "MD",
+            "level": "state"
         };
 
         var callback = function(response) {
-            $('#example2output').empty();
-            $('#example2output').append(JSON.stringify(response, null, 4));
-        };
+            map.data.addGeoJson(response);
+            };
 
-        census.APIRequest(request, callback);
-                        </textarea>
+        census.GEORequest(request, callback);
 
-        <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)"
-              onclick="runExample('example2')" role="button">Run This &raquo;</a></p>
-    </div>
-
-    <div class="col-md-4">
-        <h3>&nbsp;<br/><br/></h3>
-        <pre id="example2output" style="width:100%; height: 230px; overflow: auto;"></pre>
-    </div>
-</div>
-
-<div class="row ">
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Unifying multiple APIs</h3>
-
-                <p>Let's try out another API - the USDA's Farmer's Market API. We've already imported the module, so all
-                    you need to do is put your zip code in the request below to find Farmer's markets near you!</p>
+        </pre>
             </div>
+
+            <div class="col-md-6">
+                <div id="map-canvas" style="width: 100%; height: 400px; position: relative; border-radius:5px;"></div>
+            </div>
+
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <textarea id="example3" rows="4" cols="50" style="width:100%; height:230px;">
-            var request = {
-                "zip": 10012
-            };
 
-            var callback = function(response) {
-                $('#example3output').empty();
-                $('#example3output').append(JSON.stringify(response, null, 4));
-            };
 
-            farmersMarket.search(request, callback);
-                    </textarea>
-                    <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)" onclick="runExample('example3')" role="button">Run This &raquo;</a></p>
-                </div>
-
-            <div class="col-md-6">
-                    <pre id="example3output" style="width:100%; height: 280px; overflow: auto;"></pre>
-                </div>
-            </div>
-    </div>
-</div>
-
-<div class="row ">
-    <div class="col-md-12">
-        <h3>Example Library</h3>
-
-        <p>The CitySDK has an ever expanding library of examples, containing multiple simple chunks of code you can
-            modify and alter to jump start your development. You can find them on our <a
-                    href="https://github.com/uscensusbureau/citysdk" target="_blank">github page</a> under the examples
-            directory.
-            Additionally, the main page in the examples directory contains some more in-depth documentation.</p>
-
-        <p>Some of our favorite examples are:</p>
-        <ul>
-            <li><strong>GeoRequest</strong> - This example demonstrates how to acquire GeoJSON for cities using their
-                boundaries
-            </li>
-            <li><strong>Commute Query</strong> - Use this example to learn how to use sublevels (and to show your
-                friends that your commute <em>is</em> probably worse than theirs)
-            </li>
-            <li><strong>EIA Browser</strong> - Check out the Energy Information Administration's datasets with this
-                interactive browser
-            </li>
-        </ul>
-        <p>Keep your eyes peeled - we're adding more examples all the time.</p>
     </div>
 </div>
 
 
 <script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
-</script>
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
 
 
 <script>
@@ -222,10 +182,7 @@ title: Getting Started
     var census = sdk.modules.census;
     var farmersMarket = sdk.modules.farmersMarket;
 
-    function requestApiKey() {
-        window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
-    }
-    ;
+
 
     function clearMap() {
         map.data.forEach(function (feature) {
@@ -235,10 +192,7 @@ title: Getting Started
     ;
 
     function runExample(id) {
-        if (!census.enabled) {
-            alert("Please enter your API key first!");
-            return;
-        }
+
         clearMap();
         var textarea = $('#' + id);
 
@@ -250,15 +204,25 @@ title: Getting Started
             function () {
                 var mapOptions = {
                     center: {lat: 38.91732, lng: -77.2211},
-                    zoom: 7
+                    zoom: 6
                 };
-                map = new google.maps.Map(document.getElementById('map-canvas'),
-                        mapOptions);
+                map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
                 map.data.setStyle({
                     fillColor: 'blue'
                 });
                 census.enable(citySDKdemoConfiguration.apikey);
+
+                var request = {
+                    "state": "MD",
+                    "level": "state"
+                };
+
+                var callback = function (response) {
+                    map.data.addGeoJson(response);
+                };
+
+                census.GEORequest(request, callback);
 
             }
     );

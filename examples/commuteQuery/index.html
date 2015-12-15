@@ -40,18 +40,7 @@ title: Using Sublevels and Normalized Aliases
         </div>
 
 
-        <!-- <div class="alert alert-dismissable alert-info">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-            <h4>
-                Requires a Census API Key
-            </h4>
 
-            <p><strong>Note:</strong> If you don't already have one, be sure to grab a Census API key to run this demo.
-                <a
-                        href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-
-            <p>Enter your Census API key here <input type="text" id="api"/></p>
-        </div>-->
 
         <form id="cenBuildRequest">
             <div class="panel panel-info">
@@ -66,16 +55,12 @@ title: Using Sublevels and Normalized Aliases
                                    value="location_coords"
                                    onclick="visible('location_coords')" checked="checked"> <label
                                 for="specify_location_coords">Coordinates</label><br/>
-                            <!--<input type="radio" name="location_radios" id="specify_location_zip" value="location_zip"
-                                   onclick="visible('location_zip')"> <label for="specify_location_zip">Zip
-                            Code</label><br/>-->
+
                             <input type="radio" name="location_radios" id="specify_location_state"
                                    value="location_state"
                                    onclick="visible('location_state')"> <label for="specify_location_state">State
                             Code</label><br/>
-                            <!--<input type="radio" name="location_radios" id="specify_location_address"
-                                   value="location_address" onclick="visible('location_address')"> <label
-                                for="specify_location_address">Address</label>-->
+
                         </div><!-- end col-md-4 -->
 
                         <div class="col-md-8">
@@ -101,19 +86,6 @@ title: Using Sublevels and Normalized Aliases
                             </div><!-- end location_coords -->
 
 
-                            <!--<div class="location_zip">
-                                <label>Zip Code:</label>
-                                <input class="reqparam form-control" id="zip" type="text" size="5"
-                                       aria-describedby="zip-helpblock"/>
-
-                                <span id="zip-helpblock" class="help-block">String - The 5-digit zip code of the location. Note that USPS zip code areas do not
-                                    align precisely with Census geographies, so when high accuracy is required it is
-                                    recommended to use latitude and longitude. Specified as a string because certain zip
-                                    codes begin with zeroes.</span>
-
-                            </div>--><!-- end location_zip -->
-
-
                             <div class="location_state">
                                 <label for="state">State:</label>
                                 <select class="reqparam form-control" id='state'>
@@ -126,54 +98,12 @@ title: Using Sublevels and Normalized Aliases
                             </div><!-- end location_state -->
 
 
-                            <!--<div class="location_address">
-                                <label for="address_street">Street:</label>
-                                <input class="reqparam form-control" id="address_street" type="text"/>
-                                <label for="address_city">City:</label>
-                                <input class="reqparam form-control" id="address_city" type="text"/>
-                                <label for="address_state">State:</label>
-                                <input class="reqparam form-control" id="address_state" type="text"/>
-
-                                <p><em>Object - Represents the address of the requested location.</em></p>
-                            </div>--><!-- end location_address -->
 
 
                         </div>
                     </div>
                 </div>
-                <table class="location_coords table table-striped">
-                    <caption>Some common co-ordinates:</caption>
-                    <tr>
-                        <th>Name</th>
-                        <th>Lat (N)</th>
-                        <th>Lng (E)</th>
-                    </tr>
-                    <tr onclick="loadCoords(38.9047,-77.0164)">
-                        <td>Washington DC</td>
-                        <td>38.9047</td>
-                        <td>-77.0164</td>
-                    </tr>
-                    <tr onclick="loadCoords(47.6097,-122.3331)">
-                        <td>Seattle</td>
-                        <td>47.6097</td>
-                        <td>-122.3331</td>
-                    </tr>
-                    <tr onclick="loadCoords(21.3000,-157.8167)">
-                        <td>Honolulu</td>
-                        <td>21.3000</td>
-                        <td>-157.8167</td>
-                    </tr>
-                    <tr onclick="loadCoords(25.7753,-80.2089)">
-                        <td>Miami</td>
-                        <td>25.7753</td>
-                        <td>-80.2089</td>
-                    </tr>
-                    <tr onclick="loadCoords(29.7604,-95.3698)">
-                        <td>Houston</td>
-                        <td>29.7604</td>
-                        <td>-95.3698</td>
-                    </tr>
-                </table>
+                {% include coordsTable.html %}
 
             </div>
 
@@ -369,7 +299,10 @@ title: Using Sublevels and Normalized Aliases
 
 <script>
 
+    // Instantiate the CitySDK Instance
     var sdk = new CitySDK();
+
+    // Instantiate the modules desired
     var census = sdk.modules.census;
     census.enable(citySDKdemoConfiguration.apikey);
 
@@ -397,6 +330,8 @@ title: Using Sublevels and Normalized Aliases
 
         return ((aval > bval) ? -1 : (bval > aval) ? 1 : 0);
     }
+
+
     function visible(x) {
         var tabs = jQuery("*[class^='" + x.split("_")[0] + "']");
         tabs.each(function (f) {
@@ -404,13 +339,12 @@ title: Using Sublevels and Normalized Aliases
         });
         jQuery('.' + x).show();
     }
-    ;
-
-    //
 
 
     function buildCensusModuleRequest() {
         //Build the request
+
+
         jQuery(".submitAlert").hide();
 
         // Is the location being specified by coords or state?

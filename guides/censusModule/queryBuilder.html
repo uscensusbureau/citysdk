@@ -41,7 +41,7 @@ title: Census Module Query Builder
                     <div class="col-md-8">
 
 
-                        <div id="location_coords">
+                        <div class="location_coords">
                             <label for="lat">Latitude:</label>
 
                             <div class="input-group">
@@ -61,7 +61,7 @@ title: Census Module Query Builder
                         </div><!-- end location_coords -->
 
 
-                        <div id="location_zip">
+                        <div class="location_zip">
                             <label>Zip Code:</label>
                             <input class="reqparam form-control" id="zip" type="text" size="5"
                                    aria-describedby="zip-helpblock"/>
@@ -74,7 +74,7 @@ title: Census Module Query Builder
                         </div><!-- end location_zip -->
 
 
-                        <div id="location_state">
+                        <div class="location_state">
                             <label for="state">State:</label>
                             <select class="reqparam form-control" id='state'>
                                 <option value=""></option>
@@ -86,7 +86,7 @@ title: Census Module Query Builder
                         </div><!-- end location_state -->
 
 
-                        <div id="location_address">
+                        <div class="location_address">
                             <label for="address_street">Street:</label>
                             <input class="reqparam form-control" id="address_street" type="text"/>
                             <label for="address_city">City:</label>
@@ -101,6 +101,8 @@ title: Census Module Query Builder
                     </div>
                 </div>
             </div>
+            {% include coordsTable.html %}
+
         </div>
 
 
@@ -176,8 +178,8 @@ title: Census Module Query Builder
                             <label for="level">Level</label>
 
                             <select class="reqparam form-control" id="level" aria-describedby="level-helpblock">
-                                <option value="us">us</option>
-                                <option value="state">state</option>
+                                <!--<option value="us">us</option>-->
+                                <option value="state" checked="checked">state</option>
                                 <option value="county">county</option>
                                 <option value="tract">tract</option>
                                 <option value="blockGroup">blockGroup</option>
@@ -252,9 +254,8 @@ title: Census Module Query Builder
                     <div class="col-md-6">
                         <h4>Get the Data</h4>
 
-                        <p><a class="btn btn-primary btn-lg" style="width: 100%;" href="javascript:void(0)"
-                              onclick="submit()"
-                              role="button">Update Data</a></p>
+                        <p><a class="btn btn-primary btn-lg" id="btnUpdateData" disabled style="width: 100%;"
+                              href="javascript:void(0)" onclick="submit()" role="button">Update Data</a></p>
 
                         <div class="loading-icon loading-icon-initialstate"></div>
 
@@ -274,6 +275,7 @@ title: Census Module Query Builder
             <div class="panel-body">
                 <pre id="cenreq"></pre>
 
+
             </div>
         </div>
 
@@ -290,8 +292,87 @@ title: Census Module Query Builder
 
                 <div class="loading-icon loading-icon-initialstate"></div>
 
-                <pre id="output">
-                </pre>
+
+                <div class="outputSet">
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active mapControlTab"><a href="#formateedOutput"
+                                                                                aria-controls="formateedOutput"
+                                                                                role="tab" data-toggle="tab">Map</a>
+                        </li>
+                        <li role="presentation" class="rawOutputControlTab"><a href="#unformattedOutput"
+                                                                               aria-controls="unformattedOutput"
+                                                                               role="tab" data-toggle="tab">Raw JSON
+                            Response</a></li>
+                        <li role="presentation"><a href="#shortCodeExample" aria-controls="shortCodeExample" role="tab"
+                                                   data-toggle="tab">Sample Code</a></li>
+
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="mapControlTab tab-pane fade in active" id="formateedOutput">
+                            <div id="output" style="width:100%;min-height:500px;">
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane rawOutputControlTab" id="unformattedOutput">
+                            <p><pre id="rawOutput">
+                                    </pre>
+                            </p>
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="shortCodeExample">
+                            <p id="shortCodeExampleAPIRequest"><pre><code>&lt;script&gt;
+
+                            var <var>sdk</var> = new CitySDK();
+                            var <var>census</var> = <var>sdk.modules.census</var>;
+                            census.enable("Your API Key Here");
+
+                            var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
+
+                            census.APIRequest(<var>request</var>, function (<var>response</var>) {
+
+                            //Outputs the raw JSON text
+                            jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+
+                            });
+                            &lt;/script&gt;</code></pre>
+                            </p>
+
+
+                            <p id="shortCodeExampleGEORequest"><pre><code>&lt;script&gt;
+
+                            var <var>sdk</var> = new CitySDK();
+                            var <var>census</var> = <var>sdk.modules.census</var>;
+                            census.enable("Your API Key Here");
+
+                            var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
+
+                            census.GEORequest(<var>request</var>, function (<var>response</var>) {
+
+                            //Outputs the raw JSON text
+                            jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+
+                            map.data.forEach(function (feature) {
+                            map.data.remove(feature);
+                            });
+                            map.data.addGeoJson(response);
+
+                            map.setCenter({
+                            lat : Number(response.features[0].properties.INTPTLAT),
+                            lng : Number(response.features[0].properties.INTPTLON)
+                            });
+
+                            });
+                            &lt;/script&gt;</code></pre>
+                            </p>
+
+                        </div>
+                    </div>
+
+                </div>
+
 
             </div>
         </div>
@@ -313,12 +394,24 @@ title: Census Module Query Builder
         <cite>Modified from code by <a href="https://github.com/mpaquette1">@mpaquette1</a></cite>
     </div>
 </div>
+
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
 <script>
 
     function requestApiKey() {
         window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
     }
     ;
+
+
+    function loadCoords(lat, lng) {
+        $("#lat").val(lat);
+        $("#lng").val(lng);
+        buildCensusModuleRequest();
+    }
+
     //Following code borrowed from the Census Request Tester by github @mpaquette1
     var census = null;
     var variablehash = null;
@@ -327,34 +420,49 @@ title: Census Module Query Builder
         jQuery("#lng").val(lng);
     }
     function visible(x) {
-        var tabs = jQuery("div[id^='" + x.split("_")[0] + "']");
+        var tabs = jQuery("*[class^='" + x.split("_")[0] + "']");
         tabs.each(function (f) {
-            jQuery("#" + tabs[f].id).css("display", "none");
+            jQuery(this).hide();
         });
-        jQuery('#' + x).css("display", "block");
+        jQuery('.' + x).show();
     }
-    ;
+
     function submit() {
         jQuery(".loading-icon-initialstate").show();
-        jQuery("#output").hide();
+        jQuery(".outputSet").hide();
         var request = buildCensusModuleRequest();
         var req = jQuery('[name="CitySDKcall"]:checked').val();
-        var output = jQuery("#output");
+        var output = jQuery("#rawOutput");
         output.empty();
         if (req == 'APIRequest') {
             census.APIRequest(request, function (response) {
                 output.empty();
                 output.append(JSON.stringify(response, null, 4));
                 jQuery(".loading-icon").hide();
-                jQuery("#output").show();
-
+                jQuery(".outputSet").show();
+                jQuery(".mapControlTab").hide();
+                jQuery(".mapControlTab").removeClass("active");
+                jQuery(".rawOutputControlTab").addClass("active");
             });
         } else {
             census.GEORequest(request, function (response) {
                 output.empty();
                 output.append(JSON.stringify(response, null, 4));
                 jQuery(".loading-icon").hide();
-                jQuery("#output").show();
+                jQuery(".outputSet").show();
+                jQuery(".mapControlTab").show();
+                jQuery(".rawOutputControlTab").removeClass("active");
+                jQuery(".mapControlTab").addClass("active");
+
+                map.data.forEach(function (feature) {
+                    map.data.remove(feature);
+                });
+                map.data.addGeoJson(response);
+
+                map.setCenter({
+                    lat: Number(response.features[0].properties.INTPTLAT),
+                    lng: Number(response.features[0].properties.INTPTLON)
+                });
 
             });
         }
@@ -410,16 +518,53 @@ title: Census Module Query Builder
     }
     function buildCensusModuleRequest() {
         var request = {};
-        var lat = jQuery("#lat").val();
-        var lng = jQuery("#lng").val();
+        var locationSelectionType = jQuery("input[name=location_radios]:checked").val();
+
+        var lat = "";
+        var lng = "";
+        var zip = "";
+        var state = "";
+        var addr_street = "";
+        var addr_city = "";
+        var addr_state = "";
+
+        if (locationSelectionType == "location_coords") {
+            lat = jQuery("#lat").val();
+            lng = jQuery("#lng").val();
+            if (lat != "" && lng != "") {
+                jQuery("#btnUpdateData").removeAttr("disabled");
+            } else {
+                jQuery("#btnUpdateData").attr("disabled", true);
+            }
+        } else if (locationSelectionType == "location_zip") {
+            zip = jQuery('#zip').val();
+            if (zip != "") {
+                jQuery("#btnUpdateData").removeAttr("disabled");
+            } else {
+                jQuery("#btnUpdateData").attr("disabled", true);
+            }
+        } else if (locationSelectionType == "location_state") {
+            state = jQuery('#state').val();
+            if (state != "") {
+                jQuery("#btnUpdateData").removeAttr("disabled");
+            } else {
+                jQuery("#btnUpdateData").attr("disabled", true);
+            }
+        } else {
+            addr_street = jQuery('#address_street').val();
+            addr_city = jQuery('#address_city').val();
+            addr_state = jQuery('#address_state').val();
+            if (addr_street != "" && addr_city != "" && addr_state != "") {
+                jQuery("#btnUpdateData").removeAttr("disabled");
+            } else {
+                jQuery("#btnUpdateData").attr("disabled", true);
+            }
+        }
+
         var level = jQuery("#level").val();
-        var state = jQuery('#state').val();
-        var zip = jQuery('#zip').val();
         var container = jQuery('#container').val();
         var sublev = jQuery('#sublevel:checked').val();
-        var addr_street = jQuery('#address_street').val();
-        var addr_city = jQuery('#address_city').val();
-        var addr_state = jQuery('#address_state').val();
+
         var variables = jQuery("#cenvariable_manual_set").val().split("|");
 
         jQuery("#variable option:selected").each(function (n, o) {
@@ -451,6 +596,8 @@ title: Census Module Query Builder
             request.sublevel = true;
         }
         request.variables = variables;
+
+
         return (request);
     }
 
@@ -515,6 +662,8 @@ title: Census Module Query Builder
 
         // Update query json text
         jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+        jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+
         return true;
     }
 
@@ -538,6 +687,7 @@ title: Census Module Query Builder
         // Remove any selected aliases
         jQuery("#variable [value=" + variablename + "]").prop("selected", false);
         jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+        jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
 
         changeAliasSelection();
 
@@ -587,10 +737,12 @@ title: Census Module Query Builder
         var sdk = new CitySDK();
         census = sdk.modules.census;
         census.enable(citySDKdemoConfiguration.apikey);
+
         // Fill in states.
-        $.each(census.stateCapitals, function (stateabbrev, capitalcoords) {
+        jQuery.each(census.stateCapitals, function (stateabbrev, capitalcoords) {
             jQuery('<option>' + stateabbrev + '</option>').appendTo('#state');
         });
+
         // Fill in variables.
         var sortedvariables = [];
         variablehash = census.aliases;
@@ -605,9 +757,12 @@ title: Census Module Query Builder
                 jQuery('<option value="' + alias + '">' + alias + '</option>').appendTo('#variable');
             });
         }
+
         // Make parameter changes immediately be reflected in the displayed request.
         jQuery('.reqparam').change(function () {
             jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+            jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+
         });
 
 
@@ -638,9 +793,11 @@ title: Census Module Query Builder
             jQuery('#save_row').slideDown('slow');
             jQuery('#container-input-warning-label').show();
             jQuery("select#container [value=\"\"]").attr("selected", "selected");
-
             jQuery('select#container').prop('disabled', true);
             jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+            jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+            jQuery("#shortCodeExampleGEORequest").hide();
+            jQuery("#shortCodeExampleAPIRequest").show();
 
         });
         jQuery('#GEORequest').click(function () {
@@ -648,9 +805,25 @@ title: Census Module Query Builder
             jQuery('#container-input-warning-label').hide();
             jQuery('select#container').prop('disabled', false);
             jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
-
-
+            jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+            jQuery("#shortCodeExampleGEORequest").show();
+            jQuery("#shortCodeExampleAPIRequest").hide();
         });
-        ;
+
+
+        var mapOptions = {
+            center: {lat: 38.91732, lng: -77.2211},
+            zoom: 10
+        };
+        map = new google.maps.Map(document.getElementById('output'), mapOptions);
+
+        map.data.setStyle({
+            fillColor: 'blue'
+        });
+
+        jQuery("#shortCodeExampleAPIRequest").hide();
+        jQuery("#shortCodeExampleAPIRequest").html("Moo is Me");
+
+
     });
 </script>

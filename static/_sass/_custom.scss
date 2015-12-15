@@ -37,6 +37,22 @@
   display: none;
 }
 
+/* Core Text Styles Alterations */
+
+.cenCoreStyles ol > li {
+  font-weight: 600;
+  font-size: 15px;
+  margin-top: 10px;
+}
+
+.cenCoreStyles ol > li > ol > li {
+  font-size: 90%;
+  font-weight: 400;
+}
+
+
+
+
 /* Icon found from loading screen on http://www.sbcounty.gov/cao/budget/ */
 .loading-icon {
   background: url("../img/Loading.gif") no-repeat center;
