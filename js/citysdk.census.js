@@ -20,9 +20,18 @@ CensusModule.prototype.enable = function(apiKey) {
 //After this point the module is all up to you
 
 //Defaults
-CensusModule.prototype.DEFAULT_YEAR = 2013;
+CensusModule.prototype.DEFAULT_YEAR = 2014;
 CensusModule.prototype.DEFAULT_LEVEL = "blockGroup";
 CensusModule.prototype.DEFAULT_API = "acs5";
+
+// Endpoint URLS
+CensusModule.prototype.DEFAULT_ENDPOINTS = {};
+CensusModule.prototype.DEFAULT_ENDPOINTS.acsVariableDictionaryURL = "http://api.census.gov/data/";
+CensusModule.prototype.DEFAULT_ENDPOINTS.geocoderURL = "http://geocoding.geo.census.gov/geocoder/geographies/";
+CensusModule.prototype.DEFAULT_ENDPOINTS.tigerwebURL = "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/";
+CensusModule.prototype.DEFAULT_ENDPOINTS.acsURL = "http://api.census.gov/data/";
+
+
 
 //Global variables for supplemental georequests
 CensusModule.prototype.SUPPLEMENTAL_REQUESTS_IN_FLIGHT = 0;
@@ -36,7 +45,8 @@ CensusModule.prototype.acsyears = {
     "2010": ["acs5"],
     "2011": ["acs5"],
     "2012": ["acs5", "acs3", "acs1"],
-    "2013": ["acs5", "acs3", "acs1"]
+    "2013": ["acs5", "acs3", "acs1"],
+    "2014": ["acs5", "acs1"]
 };
 
 
@@ -44,59 +54,7 @@ CensusModule.prototype.acsyears = {
  * Dictionary of state codes to state capital coordinates. i.e. "AL" -> 32.3617, -86.2792
  * @type {object} Object with properties of state codes and values of arrays of coordinates
  */
-CensusModule.prototype.stateCapitals = {
-    "AL": [32.3617, -86.2792],
-    "AK": [58.3, -134.4167],
-    "AZ": [33.45, -112.0667],
-    "AR": [34.6361, -92.3311],
-    "CA": [38.5766, -121.4934],
-    "CO": [39.7391, -104.9849],
-    "CT": [41.7641, -72.6828],
-    "DE": [39.1619, -75.5267],
-    "DC": [38.9047, -77.0164],
-    "FL": [30.4381, -84.2816],
-    "GA": [33.7493, -84.3883],
-    "HI": [21.3073, -157.8573],
-    "ID": [43.6177, -116.1996],
-    "IL": [39.7983, -89.6544],
-    "IN": [39.7686, -86.1625],
-    "IA": [41.5912, -93.6039],
-    "KS": [39.0481, -95.6781],
-    "KY": [38.1867, -84.8753],
-    "LA": [30.4571, -91.1874],
-    "ME": [44.3235, -69.7653],
-    "MD": [38.9786, -76.4911],
-    "MA": [42.3582, -71.0637],
-    "MI": [42.7337, -84.5556],
-    "MN": [44.9553, -93.1022],
-    "MS": [32.2992, -90.1800],
-    "MO": [38.5791, -92.1730],
-    "MT": [46.5958, -112.0270],
-    "NE": [40.8106, -96.6803],
-    "NV": [39.1608, -119.7539],
-    "NH": [43.2067, -71.5381],
-    "NJ": [40.2237, -74.7640],
-    "NM": [35.6672, -105.9644],
-    "NY": [42.6525, -73.7572],
-    "NC": [35.7806, -78.6389],
-    "ND": [46.8133, -100.7790],
-    "OH": [39.9833, -82.9833],
-    "OK": [35.4822, -97.5350],
-    "OR": [44.9308, -123.0289],
-    "PA": [40.2697, -76.8756],
-    "RI": [41.8236, -71.4222],
-    "SC": [34.0298, -80.8966],
-    "SD": [44.3680, -100.3364],
-    "TN": [36.1667, -86.7833],
-    "TX": [30.2500, -97.7500],
-    "UT": [40.7500, -111.8833],
-    "VT": [44.2500, -72.5667],
-    "VA": [37.5333, -77.4667],
-    "WA": [47.0425, -122.8931],
-    "WV": [38.3472, -81.6333],
-    "WI": [43.0667, -89.4000],
-    "WY": [41.1456, -104.8019]
-};
+CensusModule.prototype.stateCapitals = CitySDK.prototype.stateCapitals();
 
 /**
  * Bounding box to allow users to request all geographies within the US, as there is no US boundary map server
@@ -842,6 +800,7 @@ CensusModule.prototype.parseRequestStateCode = function(request) {
             }
         }
     }
+    return request;
 };
 
 /**
@@ -850,27 +809,7 @@ CensusModule.prototype.parseRequestStateCode = function(request) {
  * @param request Object representing an api request
  */
 CensusModule.prototype.parseRequestLatLng = function(request) {
-    //Check if we have latitude and longitude in the request
-    //Allow the users to use either x,y; lat,lng; latitude,longitude to sepecify co-ordinates
-    if(!("lat" in request)) {
-        if("latitude" in request) {
-            request.lat = request.latitude;
-            delete request.latitude;
-        } else if ("y" in request) {
-            request.lat = request.y;
-            delete request.y;
-        }
-    }
-
-    if(!("lng" in request)) {
-        if("longitude" in request) {
-            request.lng = request.longitude;
-            delete request.longitude;
-        } else if("x" in request) {
-            request.lng = request.x;
-            delete request.x;
-        }
-    }
+    request =  CitySDK.prototype.parseRequestLatLng(request);
 };
 
 /**
@@ -880,7 +819,7 @@ CensusModule.prototype.parseRequestLatLng = function(request) {
  * @constructor
  */
 CensusModule.prototype.ESRItoGEO = function(esriJSON) {
-    var json = $.parseJSON(esriJSON);
+    var json = jQuery.parseJSON(esriJSON);
     var features = json.features;
 
     var geojson = {
@@ -916,13 +855,13 @@ CensusModule.prototype.getACSVariableDictionary = function(api, year, callback) 
     var apiPattern = /({api})/;
     var yearPattern = /({year})/;
 
-    var URL = "http://api.census.gov/data/{year}/{api}/variables.json";
+    var URL = this.DEFAULT_ENDPOINTS.acsVariableDictionaryURL + "{year}/{api}/variables.json";
     URL = URL.replace(apiPattern, api);
     URL = URL.replace(yearPattern, year);
 
     CitySDK.prototype.sdkInstance.ajaxRequest(URL).done(
         function(response) {
-            response = $.parseJSON(response);
+            response = jQuery.parseJSON(response);
             callback(response);
         }
     );
@@ -944,7 +883,7 @@ CensusModule.prototype.latLngToFIPS = function(lat, lng, callback) {
     var lngPattern = /({lng})/;
 
     //The question mark at the end of this url tells JQuery to handle setting up and calling the JSONP callback
-    var geocoderURL = "http://geocoding.geo.census.gov/geocoder/geographies/coordinates?x={lng}&y={lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp&callback=?";
+    var geocoderURL = this.DEFAULT_ENDPOINTS.geocoderURL + "coordinates?x={lng}&y={lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp&callback=?";
 
     //Insert our requested coordinates into the geocoder url
     geocoderURL = geocoderURL.replace(latPattern, lat);
@@ -969,13 +908,13 @@ CensusModule.prototype.latLngToFIPS = function(lat, lng, callback) {
  * @param state State (2-Letter USPS Code)
  * @param callback Callback function
  */
-CensusModule.prototype.addressToFIPS = function(street, city, state, callback) {
+CensusModule.prototype.addressToFIPS = function(street, city, state, moo) {
     var streetPattern = /({street})/;
     var cityPattern = /({city})/;
     var statePattern = /({state})/;
 
     //Geocoder URL for addresses
-    var geocoderURL = "http://geocoding.geo.census.gov/geocoder/geographies/address?street={street}&city={city}&state={state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp&callback=?";
+    var geocoderURL = this.DEFAULT_ENDPOINTS.geocoderURL + "address?street={street}&city={city}&state={state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp&callback=?";
 
     //Replace with our data
     geocoderURL = geocoderURL.replace(streetPattern, street);
@@ -990,7 +929,7 @@ CensusModule.prototype.addressToFIPS = function(street, city, state, callback) {
 
     //Send to the callback
     request.done(function(response) {
-        callback(response.result.addressMatches);
+        moo(response.result.addressMatches);
     });
 };
 
@@ -1002,14 +941,14 @@ CensusModule.prototype.addressToFIPS = function(street, city, state, callback) {
 CensusModule.prototype.ZIPtoLatLng = function(zip, callback) {
     var zipPattern = /({zip})/;
 
-    var tigerURL = "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/2/query?where=ZCTA5%3D{zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson";
+    var tigerURL = this.DEFAULT_ENDPOINTS.tigerwebURL + "tigerWMS_Current/MapServer/2/query?where=ZCTA5%3D{zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson";
 
     tigerURL = tigerURL.replace(zipPattern, zip);
 
     var request = CitySDK.prototype.sdkInstance.ajaxRequest(tigerURL);
 
     request.done(function(response) {
-        response = $.parseJSON(response);
+        response = jQuery.parseJSON(response);
         var returnValue = {
             "lat": null,
             "lng": null
@@ -1165,7 +1104,7 @@ CensusModule.prototype.acsSummaryRequest = function(request, callback) {
     }
 
     //The URL for ACS5 request (summary file)
-    var acsURL = "http://api.census.gov/data/{year}/{api}?get=NAME,{var}&{qualifiers}&key={key}";
+    var acsURL = this.DEFAULT_ENDPOINTS.acsURL + "{year}/{api}?get=NAME,{var}&{qualifiers}&key={key}";
 
     //Regex our URL to insert appropriate variables
     acsURL = acsURL.replace(qualifiersPattern, qualifiers);
@@ -1184,7 +1123,7 @@ CensusModule.prototype.acsSummaryRequest = function(request, callback) {
     //Attach a completion event to the promise
     request.done(function(response) {
         //Turn it into json
-        var jsonObject = $.parseJSON(response);
+        var jsonObject = jQuery.parseJSON(response);
         //Call the callback
         callback(jsonObject);
     });
@@ -1202,7 +1141,7 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
 
     var servers = {
         current: {
-            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/{mapserver}/query",
+            url: this.DEFAULT_ENDPOINTS.tigerwebURL + "tigerWMS_Current/MapServer/{mapserver}/query",
             mapServers: {
                 "state": 84,
                 "county": 86,
@@ -1213,7 +1152,7 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
             }
         },
         acs2014: {
-            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/MapServer/{mapserver}/query",
+            url: this.DEFAULT_ENDPOINTS.tigerwebURL + "/tigerWMS_ACS2014/MapServer/{mapserver}/query",
             mapServers: {
                 "state": 82,
                 "county": 84,
@@ -1223,7 +1162,7 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
             }
         },
         acs2013: {
-            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2013/MapServer/{mapserver}/query",
+            url: this.DEFAULT_ENDPOINTS.tigerwebURL + "tigerWMS_ACS2013/MapServer/{mapserver}/query",
             mapServers: {
                 "state": 82,
                 "county": 84,
@@ -1233,7 +1172,7 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
             }
         },
         census2010: {
-            url: "http://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Census2010/MapServer/{mapserver}/query",
+            url: this.DEFAULT_ENDPOINTS.tigerwebURL + "tigerWMS_Census2010/MapServer/{mapserver}/query",
             mapServers: {
                 "state": 98,
                 "county": 100,
@@ -1322,7 +1261,7 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
 
             CitySDK.prototype.sdkInstance.postRequest(tigerURL, tigerRequest).done(
                 function(response) {
-                    var json = $.parseJSON(response);
+                    var json = jQuery.parseJSON(response);
                     var features = json.features;
                     //Grab our container ESRI geography, attach it to our request, and call this function again.
                     if(request.container == "us") {
@@ -1559,6 +1498,7 @@ CensusModule.prototype.APIRequest = function(request, callback) {
             this.acsSummaryRequest(
                 request,
                 function(response) {
+
                     if(request.sublevel) {
                         //If sublevel is set to true, our "data" property will be an array of objects for each sublevel item.
                         request.data = [];
