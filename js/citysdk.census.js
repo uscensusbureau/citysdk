@@ -855,6 +855,9 @@ CensusModule.prototype.getACSVariableDictionary = function(api, year, callback) 
     var apiPattern = /({api})/;
     var yearPattern = /({year})/;
 
+
+
+
     var URL = this.DEFAULT_ENDPOINTS.acsVariableDictionaryURL + "{year}/{api}/variables.json";
     URL = URL.replace(apiPattern, api);
     URL = URL.replace(yearPattern, year);
@@ -973,6 +976,18 @@ CensusModule.prototype.addressToFIPS = function(street, city, state, moo) {
 CensusModule.prototype.ZIPtoLatLng = function(zip, callback) {
     var zipPattern = /({zip})/;
 
+    var cacheKey = "ZIPtoLatLng"+zip.toString();
+
+    // Check to see if this question is cached
+    if(CitySDK.prototype.sdkInstance.allowCache == true){
+        var cachedData = CitySDK.prototype.sdkInstance.getCachedData("census",cacheKey);
+        if(cachedData != null){
+            callback(cachedData);
+            return;
+        }
+    }
+
+
     var tigerURL = this.DEFAULT_ENDPOINTS.tigerwebURL + "tigerWMS_Current/MapServer/2/query?where=ZCTA5%3D{zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&f=pjson";
 
     tigerURL = tigerURL.replace(zipPattern, zip);
@@ -992,7 +1007,9 @@ CensusModule.prototype.ZIPtoLatLng = function(zip, callback) {
                 returnValue.lng = response.features[0].attributes.CENTLON;
             }
         }
-
+        if(CitySDK.prototype.sdkInstance.allowCache == true) {
+            CitySDK.prototype.sdkInstance.setCachedData("census", cacheKey, returnValue);
+        }
         callback(returnValue);
     })
 };
@@ -1004,6 +1021,20 @@ CensusModule.prototype.ZIPtoLatLng = function(zip, callback) {
  * @param {function} callback
  */
 CensusModule.prototype.acsSummaryRequest = function(request, callback) {
+
+    //
+    var cacheKey = "acsSummaryRequest"+JSON.stringify(request).replace(/\W/g, '');
+
+    // Check to see if this question is cached
+    if(CitySDK.prototype.sdkInstance.allowCache == true){
+        var cachedData = CitySDK.prototype.sdkInstance.getCachedData("census",cacheKey);
+        if(cachedData != null){
+            callback(cachedData);
+            return;
+        }
+    }
+
+
     var yearPattern = /({year})/;
     var apiPattern = /({api})/;
     var variablePattern = /({var})/;
@@ -1156,6 +1187,10 @@ CensusModule.prototype.acsSummaryRequest = function(request, callback) {
     request.done(function(response) {
         //Turn it into json
         var jsonObject = jQuery.parseJSON(response);
+        if(CitySDK.prototype.sdkInstance.allowCache == true) {
+            CitySDK.prototype.sdkInstance.setCachedData("census", cacheKey, jsonObject);
+        }
+
         //Call the callback
         callback(jsonObject);
     });
@@ -1432,6 +1467,9 @@ CensusModule.prototype.tigerwebRequest = function(request, callback) {
  * @param {function} callback A callback, which accepts a response parameter
  */
 CensusModule.prototype.APIRequest = function(request, callback) {
+
+
+
     //Check for a year
     if(!("year" in request)) {
         request.year = this.DEFAULT_YEAR;

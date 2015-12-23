@@ -1,8 +1,10 @@
 
 
 var sdk = new CitySDK();
-//sdk.allowCache = false;
+sdk.allowCache = true;
 //localStorage.clear();
+console.log(localStorage);
+
 
 var testResultStatus = {};
 
