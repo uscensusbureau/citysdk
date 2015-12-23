@@ -882,6 +882,19 @@ CensusModule.prototype.latLngToFIPS = function(lat, lng, callback) {
     var latPattern = /({lat})/;
     var lngPattern = /({lng})/;
 
+    var cacheKey = "latLngToFIPS"+lat.toString()+lng.toString();
+
+    // Check to see if this question is cached
+    if(CitySDK.prototype.sdkInstance.allowCache == true){
+        var cachedData = CitySDK.prototype.sdkInstance.getCachedData("census",cacheKey);
+
+        if(cachedData != null){
+            callback(cachedData);
+            return;
+        }
+    }
+
+
     //The question mark at the end of this url tells JQuery to handle setting up and calling the JSONP callback
     var geocoderURL = this.DEFAULT_ENDPOINTS.geocoderURL + "coordinates?x={lng}&y={lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp&callback=?";
 
@@ -894,6 +907,9 @@ CensusModule.prototype.latLngToFIPS = function(lat, lng, callback) {
     //Attach a completion event to the promise
     request.done(function(response) {
         //Call the callback
+        if(CitySDK.prototype.sdkInstance.allowCache == true) {
+            CitySDK.prototype.sdkInstance.setCachedData("census", cacheKey, response.result.geographies);
+        }
         callback(response.result.geographies);
     });
 };
@@ -913,6 +929,19 @@ CensusModule.prototype.addressToFIPS = function(street, city, state, moo) {
     var cityPattern = /({city})/;
     var statePattern = /({state})/;
 
+
+    var cacheKey = "addressToFIPS"+street.replace(/\W/g, '')+city.replace(/\W/g, '')+state.replace(/\W/g, '');
+
+    // Check to see if this question is cached
+    if(CitySDK.prototype.sdkInstance.allowCache == true){
+        var cachedData = CitySDK.prototype.sdkInstance.getCachedData("census",cacheKey);
+        if(cachedData != null){
+            moo(cachedData);
+            return;
+        }
+    }
+
+
     //Geocoder URL for addresses
     var geocoderURL = this.DEFAULT_ENDPOINTS.geocoderURL + "address?street={street}&city={city}&state={state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp&callback=?";
 
@@ -929,6 +958,9 @@ CensusModule.prototype.addressToFIPS = function(street, city, state, moo) {
 
     //Send to the callback
     request.done(function(response) {
+        if(CitySDK.prototype.sdkInstance.allowCache == true) {
+            CitySDK.prototype.sdkInstance.setCachedData("census", cacheKey, response.result.addressMatches);
+        }
         moo(response.result.addressMatches);
     });
 };

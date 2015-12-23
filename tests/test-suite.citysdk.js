@@ -1,6 +1,8 @@
 
 
 var sdk = new CitySDK();
+//sdk.allowCache = false;
+//localStorage.clear();
 
 var testResultStatus = {};
 

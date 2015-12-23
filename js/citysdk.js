@@ -22,6 +22,7 @@ function CitySDK() {
  * @type {object}
  */
 CitySDK.prototype.allowCache = true;
+CitySDK.prototype.localCache = {};
 
 
 /**
@@ -286,3 +287,90 @@ CitySDK.prototype.parseRequestLatLng = function(request) {
 
     return request;
 };
+
+
+
+
+// Caching Systems
+
+/**
+ * Retrieves a value from the cache
+ * @param module {string} name of the CitySDK module
+ * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
+ * @return {object} the value of the cached data.  Returns false if nothing found
+ */
+CitySDK.prototype.getCachedData = function(module,hashKey){
+    if(typeof module == "undefined" || typeof hashKey =="undefined" || module == "" || hashKey == ""){
+        return false;
+    }
+    var returnThis = null;
+    if (this.storageAvailable('localStorage')) {
+        returnThis = JSON.parse(localStorage.getItem(module+"-"+hashKey));
+    }
+    else {
+        if(typeof this.localCache[module+"-"+hashKey] != 'undefined'){
+            returnThis = typeof this.localCache[module+"-"+hashKey];
+        }
+    }
+    return returnThis;
+}//getCachedDate
+
+/**
+ * Creates and/or Updates a value from the cache
+ * @param module {string} name of the CitySDK module
+ * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
+ * @param dataValue {object} this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it.
+ * @return {object} the value of the cached data.  Returns false if nothing found
+ */
+CitySDK.prototype.setCachedData = function(module,hashKey,dataValue){
+    if(typeof module == "undefined" || typeof hashKey =="undefined" || typeof dataValue == "undefined" || dataValue =="" || module == "" || hashKey == ""){
+        return false;
+    }
+    if (this.storageAvailable('localStorage')) {
+        localStorage.setItem(module+"-"+hashKey, JSON.stringify(dataValue));
+    }
+    else {
+        this.localCache[module+"-"+hashKey]=dataValue;
+    }
+    return true;
+}//setCachedData
+
+
+/**
+ * Deletes a value from the cache
+ * @param module {string} name of the CitySDK module
+ * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
+ * @return {object} the value of the cached data.  Returns false if nothing found
+ */
+CitySDK.prototype.deleteCachedData = function(module,hashKey){
+    if(typeof module == "undefined" || typeof hashKey =="undefined" || module == "" || hashKey == ""){
+        return false;
+    }
+    if (this.storageAvailable('localStorage')) {
+        localStorage.removeItem(module+"-"+hashKey);
+    }
+    else {
+        delete this.localCache[module+"-"+hashKey];
+    }
+    return true;
+}//deleteCachedData
+
+
+
+/**
+ * Checks to see whether local storage is available
+ * @param type {string} the tyoe fo storage being tested. Generally 'localstorage' is used.
+ * @return {boolean} true if storage type is available
+ */
+ CitySDK.prototype.storageAvailable =function(type) {
+    try {
+        var storage = window[type],
+            x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return false;
+    }
+}
