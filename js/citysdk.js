@@ -6,13 +6,50 @@
 CitySDK.prototype.sdkInstance = null;
 
 
-
 /**
  * Instantiates an instance of the CitySDK object.
  * @constructor
  */
 function CitySDK() {
     CitySDK.prototype.sdkInstance = this;
+
+    var idbSupported = false;
+
+
+    // Initialize Cache System
+    if ("indexedDB" in window) {
+        // browser support of indexedDB is present
+        idbSupported = true;
+    } else {
+        // Disable cache due to lack of browser support
+        this.allowCache = false;
+    }
+
+    if (idbSupported && this.allowCache == true) {
+        var openRequest = indexedDB.open("CitySDKdb", 1);
+
+        openRequest.onupgradeneeded = function (e) {
+            console.log("running onupgradeneeded");
+            CitySDK.prototype.CitySDKdb = e.target.result;
+
+            if (!CitySDK.prototype.CitySDKdb.objectStoreNames.contains("citySDKCache")) {
+                var objectStore = CitySDK.prototype.CitySDKdb.createObjectStore("citySDKCache", {autoIncrement: true});
+                objectStore.createIndex("cacheKeys", ["module", "functionName", "hashKey"], {unique: false});
+            }
+
+        }
+
+        openRequest.onsuccess = function (e) {
+            CitySDK.prototype.CitySDKdb = e.target.result;
+        }
+
+        openRequest.onerror = function (e) {
+            console.log("Error");
+            console.dir(e);
+        }
+
+    }
+
 }
 
 
@@ -22,8 +59,7 @@ function CitySDK() {
  * @type {object}
  */
 CitySDK.prototype.allowCache = true;
-CitySDK.prototype.localCache = {};
-
+CitySDK.prototype.CitySDKdb;
 
 /**
  * Stores each module
@@ -32,20 +68,12 @@ CitySDK.prototype.localCache = {};
 CitySDK.prototype.modules = {};
 
 
-
 // Polyfills
 if (!Array.isArray) {
-    Array.isArray = function(arg) {
+    Array.isArray = function (arg) {
         return Object.prototype.toString.call(arg) === '[object Array]';
     };
 }
-
-
-
-
-
-
-
 
 
 /**
@@ -54,7 +82,7 @@ if (!Array.isArray) {
  * @return {promise} Returns a standard ajax promise
  */
 CitySDK.prototype.ajaxRequest = function (url) {
-    return $.ajax({
+    return jQuery.ajax({
         type: 'GET',
         dataType: 'text',
         contentType: 'text/plain',
@@ -68,7 +96,7 @@ CitySDK.prototype.ajaxRequest = function (url) {
  * @return {object} Returns a standard ajax promise
  */
 CitySDK.prototype.jsonpRequest = function (url) {
-    return $.ajax({
+    return jQuery.ajax({
         type: 'GET',
         dataType: "jsonp",
         contentType: 'text/plain',
@@ -83,7 +111,7 @@ CitySDK.prototype.jsonpRequest = function (url) {
  * @returns {*}
  */
 CitySDK.prototype.postRequest = function (url, data) {
-    return $.ajax({
+    return jQuery.ajax({
         type: "POST",
         url: url,
         data: data,
@@ -92,10 +120,7 @@ CitySDK.prototype.postRequest = function (url, data) {
 };
 
 
-
-
 // General cross-module utility functions
-
 
 
 /**
@@ -263,10 +288,10 @@ CitySDK.prototype.getStateCapitalCoords = function (stateString) {
  * @param request {object} the request being made to the module
  * @return {object} the updated request
  */
-CitySDK.prototype.parseRequestLatLng = function(request) {
+CitySDK.prototype.parseRequestLatLng = function (request) {
     //Allow the users to use either x,y; lat,lng; latitude,longitude to specify co-ordinates
-    if(!("lat" in request)) {
-        if("latitude" in request) {
+    if (!("lat" in request)) {
+        if ("latitude" in request) {
             request.lat = request.latitude;
             delete request.latitude;
         } else if ("y" in request) {
@@ -275,11 +300,11 @@ CitySDK.prototype.parseRequestLatLng = function(request) {
         }
     }
 
-    if(!("lng" in request)) {
-        if("longitude" in request) {
+    if (!("lng" in request)) {
+        if ("longitude" in request) {
             request.lng = request.longitude;
             delete request.longitude;
-        } else if("x" in request) {
+        } else if ("x" in request) {
             request.lng = request.x;
             delete request.x;
         }
@@ -287,8 +312,6 @@ CitySDK.prototype.parseRequestLatLng = function(request) {
 
     return request;
 };
-
-
 
 
 // Caching Systems
@@ -299,20 +322,41 @@ CitySDK.prototype.parseRequestLatLng = function(request) {
  * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
  * @return {object} the value of the cached data.  Returns false if nothing found
  */
-CitySDK.prototype.getCachedData = function(module,hashKey){
-    if(typeof module == "undefined" || typeof hashKey =="undefined" || module == "" || hashKey == ""){
+CitySDK.prototype.getCachedData = function (module, functionName, hashKey, callback) {
+    if (typeof module == "undefined" || typeof hashKey == "undefined" || module == "" || hashKey == "" || CitySDK.prototype.sdkInstance.allowCache == false) {
         return false;
     }
-    var returnThis = null;
-    if (this.storageAvailable('localStorage')) {
-        returnThis = JSON.parse(localStorage.getItem(module+"-"+hashKey));
-    }
-    else {
-        if(typeof this.localCache[module+"-"+hashKey] != 'undefined'){
-            returnThis = typeof this.localCache[module+"-"+hashKey];
+
+    // In your query section
+    var transaction = this.CitySDKdb.transaction(["citySDKCache"], 'readonly');
+    var store = transaction.objectStore('citySDKCache');
+    var index = store.index('cacheKeys');
+    // Select only those records where prop1=value1 and prop2=value2
+    var request = index.openCursor(IDBKeyRange.only([module, functionName, hashKey]));
+    // Select the first matching record
+    var request = index.get(IDBKeyRange.only([module, functionName, hashKey]));
+
+    request.onerror = function (event) {
+        return null;
+    };
+    request.onsuccess = function (e) {
+
+        var result = e.target.result;
+        if (result) {
+            //console.log(result.data[0]);
+            if (typeof callback != 'undefined' && typeof callback == 'function') {
+                callback(result.data);
+            }
+            return result.data;
+        } else {
+            if (typeof callback != 'undefined' && typeof callback == 'function') {
+                callback(null);
+            }
+            return null;
         }
     }
-    return returnThis;
+
+
 }//getCachedDate
 
 /**
@@ -322,16 +366,19 @@ CitySDK.prototype.getCachedData = function(module,hashKey){
  * @param dataValue {object} this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it.
  * @return {object} the value of the cached data.  Returns false if nothing found
  */
-CitySDK.prototype.setCachedData = function(module,hashKey,dataValue){
-    if(typeof module == "undefined" || typeof hashKey =="undefined" || typeof dataValue == "undefined" || dataValue =="" || module == "" || hashKey == ""){
+CitySDK.prototype.setCachedData = function (module, functionName, hashKey, dataValue) {
+    if (typeof module == "undefined" || typeof hashKey == "undefined" || typeof functionName == "undefined" || typeof dataValue == "undefined" || dataValue == "" || module == "" || hashKey == "" || CitySDK.prototype.sdkInstance.allowCache == false) {
         return false;
     }
-    if (this.storageAvailable('localStorage')) {
-        localStorage.setItem(module+"-"+hashKey, JSON.stringify(dataValue));
-    }
-    else {
-        this.localCache[module+"-"+hashKey]=dataValue;
-    }
+
+    // CitySDKdb CitySDKdb citySDKCache
+    var storeData = {"module": module, "functionName": functionName, "hashKey": hashKey, "data": dataValue}
+
+
+    var transaction = this.CitySDKdb.transaction(["citySDKCache"], "readwrite");
+    var store = transaction.objectStore("citySDKCache");
+    var request = store.add(storeData);
+
     return true;
 }//setCachedData
 
@@ -342,19 +389,13 @@ CitySDK.prototype.setCachedData = function(module,hashKey,dataValue){
  * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
  * @return {object} the value of the cached data.  Returns false if nothing found
  */
-CitySDK.prototype.deleteCachedData = function(module,hashKey){
-    if(typeof module == "undefined" || typeof hashKey =="undefined" || module == "" || hashKey == ""){
+CitySDK.prototype.deleteCachedData = function (module, functionName, hashKey) {
+    if (typeof module == "undefined" || typeof hashKey == "undefined" || module == "" || hashKey == "" || CitySDK.prototype.sdkInstance.allowCache == false) {
         return false;
     }
-    if (this.storageAvailable('localStorage')) {
-        localStorage.removeItem(module+"-"+hashKey);
-    }
-    else {
-        delete this.localCache[module+"-"+hashKey];
-    }
+
     return true;
 }//deleteCachedData
-
 
 
 /**
@@ -362,7 +403,7 @@ CitySDK.prototype.deleteCachedData = function(module,hashKey){
  * @param type {string} the tyoe fo storage being tested. Generally 'localstorage' is used.
  * @return {boolean} true if storage type is available
  */
- CitySDK.prototype.storageAvailable =function(type) {
+CitySDK.prototype.storageAvailable = function (type) {
     try {
         var storage = window[type],
             x = '__storage_test__';
@@ -370,7 +411,7 @@ CitySDK.prototype.deleteCachedData = function(module,hashKey){
         storage.removeItem(x);
         return true;
     }
-    catch(e) {
+    catch (e) {
         return false;
     }
 }

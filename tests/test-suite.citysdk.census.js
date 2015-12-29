@@ -134,13 +134,14 @@ function testCensusModule(){
         request["place_name"] = ("Incorporated Places" in geographies) ? (geographies["Incorporated Places"].length > 0) ? geographies["Incorporated Places"][0]["NAME"] : null : null;
 
         request.geocoded = true;
+
         census.acsSummaryRequest(request, function (response) {
             asyncTestsRunning--;
             if(response[1][2]!="189255"){
                 failTest(moduleName,"acsSummaryRequest","2013 ACS1 State Level with sublevel Request Failed");
-                updateStatusDisplay();
-
             }
+            updateStatusDisplay();
+
         });
 
 
@@ -156,12 +157,12 @@ function testCensusModule(){
         ]
         census.acsSummaryRequest(request, function (response) {
             asyncTestsRunning--;
-            console.log(response);
+
             if(response[1][4]!="2600861"){
                 failTest(moduleName,"acsSummaryRequest","2014 ACS5 County Level Request Failed: Population variable not included in data");
-                updateStatusDisplay();
-
             }
+            updateStatusDisplay();
+
         });
 
     });

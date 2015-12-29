@@ -3,7 +3,6 @@
 var sdk = new CitySDK();
 sdk.allowCache = true;
 //localStorage.clear();
-console.log(localStorage);
 
 
 var testResultStatus = {};
