@@ -851,7 +851,7 @@ CensusModule.prototype.GEOtoESRI = function (geoJSON) {
  * @param callback
  */
 CensusModule.prototype.getACSVariableDictionary = function (inapi, inyear, callback) {
-    var intermediate = JSON.parse(JSON.stringify([inapi,inyear]));
+    var intermediate = JSON.parse(JSON.stringify([inapi, inyear]));
     var api = intermediate[0];
     var year = intermediate[1];
 
@@ -861,7 +861,7 @@ CensusModule.prototype.getACSVariableDictionary = function (inapi, inyear, callb
         if (cachedData != null) {
             callback(cachedData);
             return;
-        }else{
+        } else {
             var apiPattern = /({api})/;
             var yearPattern = /({year})/;
 
@@ -872,7 +872,7 @@ CensusModule.prototype.getACSVariableDictionary = function (inapi, inyear, callb
             CitySDK.prototype.sdkInstance.ajaxRequest(URL).done(
                 function (response) {
                     response = jQuery.parseJSON(response);
-                    CitySDK.prototype.sdkInstance.setCachedData("census", "getACSVariableDictionary", cacheKey,response);
+                    CitySDK.prototype.sdkInstance.setCachedData("census", "getACSVariableDictionary", cacheKey, response);
                     callback(response);
                 }
             );
@@ -894,7 +894,7 @@ CensusModule.prototype.getACSVariableDictionary = function (inapi, inyear, callb
  * @param {function} callback Callback function
  */
 CensusModule.prototype.latLngToFIPS = function (inlat, inlng, callback) {
-    var intermediate = JSON.parse(JSON.stringify([inlat,inlng]));
+    var intermediate = JSON.parse(JSON.stringify([inlat, inlng]));
     var lat = intermediate[0];
     var lng = intermediate[1];
 
@@ -945,7 +945,7 @@ CensusModule.prototype.latLngToFIPS = function (inlat, inlng, callback) {
  * @param callback Callback function
  */
 CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, moo) {
-    var intermediate = JSON.parse(JSON.stringify([instreet,incity,instate]));
+    var intermediate = JSON.parse(JSON.stringify([instreet, incity, instate]));
     var city = intermediate[1];
     var street = intermediate[0];
     var state = intermediate[2];
@@ -1051,170 +1051,169 @@ CensusModule.prototype.acsSummaryRequest = function (request, callback) {
     var apiKey = this.apiKey;
 
     // Check to see if this question is cached
-       CitySDK.prototype.sdkInstance.getCachedData("census", "acsSummaryRequest", cacheKey,function(cachedData){
-           if (cachedData != null) {
-               callback(cachedData);
-               return;
-           }else{
-               var yearPattern = /({year})/;
-               var apiPattern = /({api})/;
-               var variablePattern = /({var})/;
-               var blockGroupPattern = /({blockGroup})/;
-               var statePattern = /({state})/;
-               var countyPattern = /({county})/;
-               var tractPattern = /({tract})/;
-               var placePattern = /({place})/;
-               var keyPattern = /({key})/;
-               var qualifiersPattern = /({qualifiers})/;
+    CitySDK.prototype.sdkInstance.getCachedData("census", "acsSummaryRequest", cacheKey, function (cachedData) {
+        if (cachedData != null) {
+            callback(cachedData);
+            return;
+        } else {
+            var yearPattern = /({year})/;
+            var apiPattern = /({api})/;
+            var variablePattern = /({var})/;
+            var blockGroupPattern = /({blockGroup})/;
+            var statePattern = /({state})/;
+            var countyPattern = /({county})/;
+            var tractPattern = /({tract})/;
+            var placePattern = /({place})/;
+            var keyPattern = /({key})/;
+            var qualifiersPattern = /({qualifiers})/;
 
-               var qualifiers = "for=";
-               var cascade = false;
+            var qualifiers = "for=";
+            var cascade = false;
 
-               if (cows.sublevel) {
-                   var level = (cows.level == "blockGroup") ? "block+group" : cows.level;
-                   switch (cows.container) {
-                       case "us":
-                           qualifiers += level + ":*";
-                           break;
-                       case "place":
-                       case "state":
-                           qualifiers += level + ":*&in=state:{state}";
-                           if (cows.level == "blockGroup") qualifiers += "+county:{county}";
-                           break;
-                       case "county":
-                           qualifiers += level + ":*&in=county:{county}+state:{state}";
-                           break;
-                       case "tract":
-                           qualifiers += level + ":*&in=tract:{tract}+county:{county}+state:{state}";
-                           break;
-                   }
-               }
+            if (cows.sublevel) {
+                var level = (cows.level == "blockGroup") ? "block+group" : cows.level;
+                switch (cows.container) {
+                    case "us":
+                        qualifiers += level + ":*";
+                        break;
+                    case "place":
+                    case "state":
+                        qualifiers += level + ":*&in=state:{state}";
+                        if (cows.level == "blockGroup") qualifiers += "+county:{county}";
+                        break;
+                    case "county":
+                        qualifiers += level + ":*&in=county:{county}+state:{state}";
+                        break;
+                    case "tract":
+                        qualifiers += level + ":*&in=tract:{tract}+county:{county}+state:{state}";
+                        break;
+                }
+            }
 
-               //Only do this if the previous switch had no effect (i.e. no contianer)
-               //TODO: Clean this up, unify with the above
-               if (qualifiers == "for=") {
-                   switch (cows.level) {
-                       case "us":
-                           //If sublevel, add the appropriate for and attach the in
-                           if (cows.sublevel) {
-                               qualifiers += "state:*";
-                               cascade = true;
-                           } else {
-                               qualifiers += "us:1";
-                           }
-                           break;
-                       case "blockGroup":
-                           if (cows.sublevel) {
-                               //Can't do this. No levels beneath. We'll set the sublevel to false here
-                               cows.sublevel = false;
-                           }
-                           qualifiers += "block+Group:{blockGroup}";
-                           if (!cascade) {
-                               qualifiers += "&in=";
-                               cascade = true;
-                           }
-                       case "tract":
-                           //If sublevel, add the appropriate for and attach the in
-                           //We also check the cascade tag so we don't do this twice.
-                           if (cows.sublevel & !cascade) {
-                               qualifiers += "block+Group:*&in=";
-                               cascade = true;
-                           }
+            //Only do this if the previous switch had no effect (i.e. no contianer)
+            //TODO: Clean this up, unify with the above
+            if (qualifiers == "for=") {
+                switch (cows.level) {
+                    case "us":
+                        //If sublevel, add the appropriate for and attach the in
+                        if (cows.sublevel) {
+                            qualifiers += "state:*";
+                            cascade = true;
+                        } else {
+                            qualifiers += "us:1";
+                        }
+                        break;
+                    case "blockGroup":
+                        if (cows.sublevel) {
+                            //Can't do this. No levels beneath. We'll set the sublevel to false here
+                            cows.sublevel = false;
+                        }
+                        qualifiers += "block+Group:{blockGroup}";
+                        if (!cascade) {
+                            qualifiers += "&in=";
+                            cascade = true;
+                        }
+                    case "tract":
+                        //If sublevel, add the appropriate for and attach the in
+                        //We also check the cascade tag so we don't do this twice.
+                        if (cows.sublevel & !cascade) {
+                            qualifiers += "block+Group:*&in=";
+                            cascade = true;
+                        }
 
-                           qualifiers += "tract:{tract}";
-                           if (!cascade) {
-                               qualifiers += "&in=";
-                               cascade = true;
-                           } else {
-                               qualifiers += "+";
-                           }
-                       case "county":
-                           //If sublevel, add the appropriate for and attach the in
-                           //We also check the cascade tag so we don't do this twice.
-                           if (cows.sublevel & !cascade) {
-                               qualifiers += "tract:*&in=";
-                               cascade = true;
-                           }
+                        qualifiers += "tract:{tract}";
+                        if (!cascade) {
+                            qualifiers += "&in=";
+                            cascade = true;
+                        } else {
+                            qualifiers += "+";
+                        }
+                    case "county":
+                        //If sublevel, add the appropriate for and attach the in
+                        //We also check the cascade tag so we don't do this twice.
+                        if (cows.sublevel & !cascade) {
+                            qualifiers += "tract:*&in=";
+                            cascade = true;
+                        }
 
-                           qualifiers += "county:{county}";
-                           if (!cascade) {
-                               qualifiers += "&in=";
-                               cascade = true;
-                           } else {
-                               qualifiers += "+";
-                           }
-                       case "place":
-                           //If sublevel, add the appropriate for and attach the in
-                           //Check for cascade so we don't do this twice
-                           if (cows.sublevel & !cascade) {
-                               qualifiers += "place:*&in=";
-                               cascade = true;
-                           } else if (!cascade) {
-                               //We only use place in the for, for the moment
-                               qualifiers += "place:{place}&in=";
-                               cascade = true;
-                           }
-                       case "state":
-                           //If sublevel, add the appropriate for and attach the in
-                           //We also check the cascade tag so we don't do this twice.
-                           if (cows.sublevel & !cascade) {
-                               qualifiers += "county:*&in=";
-                               cascade = true;
-                           }
+                        qualifiers += "county:{county}";
+                        if (!cascade) {
+                            qualifiers += "&in=";
+                            cascade = true;
+                        } else {
+                            qualifiers += "+";
+                        }
+                    case "place":
+                        //If sublevel, add the appropriate for and attach the in
+                        //Check for cascade so we don't do this twice
+                        if (cows.sublevel & !cascade) {
+                            qualifiers += "place:*&in=";
+                            cascade = true;
+                        } else if (!cascade) {
+                            //We only use place in the for, for the moment
+                            qualifiers += "place:{place}&in=";
+                            cascade = true;
+                        }
+                    case "state":
+                        //If sublevel, add the appropriate for and attach the in
+                        //We also check the cascade tag so we don't do this twice.
+                        if (cows.sublevel & !cascade) {
+                            qualifiers += "county:*&in=";
+                            cascade = true;
+                        }
 
-                           qualifiers += "state:{state}";
-                           break;
-                   }
-               }
+                        qualifiers += "state:{state}";
+                        break;
+                }
+            }
 
-               //Construct the list of variables
-               var variableString = "";
+            //Construct the list of variables
+            var variableString = "";
 
-               for (var i = 0; i < cows.variables.length; i++) {
-                   if (CensusModule.prototype.isNormalizable(cows.variables[i])) {
-                       if (window.jQuery.inArray("population", cows.variables) < 0) {
-                           //We have a variable that is normalizable, but no population in the request.
-                           //Grab the population
-                           cows.variables.push("population");
-                       }
-                       //We have normalizable variables AND a request for population, we can break the for loop now
-                       break;
-                   }
-               }
+            for (var i = 0; i < cows.variables.length; i++) {
+                if (CensusModule.prototype.isNormalizable(cows.variables[i])) {
+                    if (window.jQuery.inArray("population", cows.variables) < 0) {
+                        //We have a variable that is normalizable, but no population in the request.
+                        //Grab the population
+                        cows.variables.push("population");
+                    }
+                    //We have normalizable variables AND a request for population, we can break the for loop now
+                    break;
+                }
+            }
 
-               for (var i = 0; i < cows.variables.length; i++) {
-                   if (i != 0) variableString += ",";
-                   variableString += CensusModule.prototype.parseToVariable(cows.variables[i]);
-               }
+            for (var i = 0; i < cows.variables.length; i++) {
+                if (i != 0) variableString += ",";
+                variableString += CensusModule.prototype.parseToVariable(cows.variables[i]);
+            }
 
-               //The URL for ACS5 request (summary file)
-               var acsURL = CensusModule.prototype.DEFAULT_ENDPOINTS.acsURL + "{year}/{api}?get=NAME,{var}&{qualifiers}&key={key}";
+            //The URL for ACS5 request (summary file)
+            var acsURL = CensusModule.prototype.DEFAULT_ENDPOINTS.acsURL + "{year}/{api}?get=NAME,{var}&{qualifiers}&key={key}";
 
-               //Regex our URL to insert appropriate variables
-               acsURL = acsURL.replace(qualifiersPattern, qualifiers);
-               acsURL = acsURL.replace(apiPattern, cows.api);
-               acsURL = acsURL.replace(yearPattern, cows.year);
-               acsURL = acsURL.replace(variablePattern, variableString);
-               acsURL = acsURL.replace(blockGroupPattern, cows.blockGroup);
-               acsURL = acsURL.replace(statePattern, cows.state);
-               acsURL = acsURL.replace(countyPattern, cows.county);
-               acsURL = acsURL.replace(tractPattern, cows.tract);
-               acsURL = acsURL.replace(placePattern, cows.place);
-               acsURL = acsURL.replace(keyPattern, apiKey);
-               var request = CitySDK.prototype.sdkInstance.ajaxRequest(acsURL);
+            //Regex our URL to insert appropriate variables
+            acsURL = acsURL.replace(qualifiersPattern, qualifiers);
+            acsURL = acsURL.replace(apiPattern, cows.api);
+            acsURL = acsURL.replace(yearPattern, cows.year);
+            acsURL = acsURL.replace(variablePattern, variableString);
+            acsURL = acsURL.replace(blockGroupPattern, cows.blockGroup);
+            acsURL = acsURL.replace(statePattern, cows.state);
+            acsURL = acsURL.replace(countyPattern, cows.county);
+            acsURL = acsURL.replace(tractPattern, cows.tract);
+            acsURL = acsURL.replace(placePattern, cows.place);
+            acsURL = acsURL.replace(keyPattern, apiKey);
+            var request = CitySDK.prototype.sdkInstance.ajaxRequest(acsURL);
 
-               //Attach a completion event to the promise
-               request.done(function (response) {
-                   //Turn it into json
-                   var jsonObject = jQuery.parseJSON(response);
-                   CitySDK.prototype.sdkInstance.setCachedData("census", "acsSummaryRequest", cacheKey, jsonObject);
+            //Attach a completion event to the promise
+            request.done(function (response) {
+                //Turn it into json
+                var jsonObject = jQuery.parseJSON(response);
+                CitySDK.prototype.sdkInstance.setCachedData("census", "acsSummaryRequest", cacheKey, jsonObject);
 
-                   //Call the callback
-                   callback(jsonObject);
-               });
-           }
-        });
-
+                //Call the callback
+                callback(jsonObject);
+            });
+        }
+    });
 
 
 };
@@ -1348,20 +1347,33 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
             tigerRequest.geometry = request.lng + "," + request.lat;
             tigerRequest.geometryType = "esriGeometryPoint";
             tigerRequest.spatialRel = "esriSpatialRelIntersects";
+// caching here
+            var cacheKey = tigerURL.toString().replace(/\W/g, '') + JSON.stringify(tigerRequest).replace(/\W/g, '');
+            var tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
+            var tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
+            CitySDK.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
+                if (cachedData != null) {
+                    CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(cachedData, callback);
+                    return;
+                } else {
 
-            CitySDK.prototype.sdkInstance.postRequest(tigerURL, tigerRequest).done(
-                function (response) {
-                    var json = jQuery.parseJSON(response);
-                    var features = json.features;
-                    //Grab our container ESRI geography, attach it to our request, and call this function again.
-                    if (request.container == "us") {
-                        request.containerGeometry = CitySDK.prototype.sdkInstance.modules.census.GEOtoESRI(usBoundingBox)[0].geometry;
-                    } else {
-                        request.containerGeometry = features[0].geometry;
-                    }
-                    CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+                    CitySDK.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(
+                        function (response) {
+                            var json = jQuery.parseJSON(response);
+                            var features = json.features;
+                            //Grab our container ESRI geography, attach it to our request, and call this function again.
+                            if (request.container == "us") {
+                                request.containerGeometry = CitySDK.prototype.sdkInstance.modules.census.GEOtoESRI(usBoundingBox)[0].geometry;
+                            } else {
+                                request.containerGeometry = features[0].geometry;
+                            }
+                            CitySDK.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, request);
+
+                            CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+                        }
+                    );
                 }
-            );
+            });
             return;
         } else {
             //We have a sublevel request with a container, AND we've already grabbed the container's ESRI json
@@ -1372,11 +1384,20 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
 
             delete request.containerGeometry;
 
-            CitySDK.prototype.sdkInstance.postRequest(tigerURL, tigerRequest).done(
-                function (response) {
-                    callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(response));
+            var cacheKey = tigerURL.toString().replace(/\W/g, '') + JSON.stringify(tigerRequest).replace(/\W/g, '');
+            var tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
+            var tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
+            CitySDK.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
+                if (cachedData != null) {
+                    callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(cachedData));
+                    return;
+                } else {
+                    CitySDK.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(function (response) {
+                            CitySDK.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, response);
+                            callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(response));
+                        });
                 }
-            );
+            });
         }
     } else if ("sublevel" in request) {
         if (!request.sublevel) {
@@ -1417,11 +1438,24 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
         tigerRequest.geometryType = "esriGeometryPoint";
         tigerRequest.spatialRel = "esriSpatialRelIntersects";
 
-        CitySDK.prototype.sdkInstance.postRequest(tigerURL, tigerRequest).done(
-            function (response) {
-                callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(response));
+// caching here
+        var cacheKey = tigerURL.toString().replace(/\W/g, '') + JSON.stringify(tigerRequest).replace(/\W/g, '');
+        var tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
+        var tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
+        CitySDK.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
+            if (cachedData != null) {
+                callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(cachedData));
+                return;
+            } else {
+                CitySDK.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(
+                    function (response) {
+                        CitySDK.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, response);
+
+                        callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(response));
+                    });
             }
-        );
+        });
+
     }
 };
 
