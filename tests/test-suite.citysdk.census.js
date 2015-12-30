@@ -167,11 +167,8 @@ function testCensusModule(){
 
 
         asyncTestsRunning++;
-
-
         census.GEORequest(request, function (response) {
             asyncTestsRunning--;
-            console.log(response);
             if(response['features'][0]['properties']['COUNTY']!="086" && response['features'][0]['geometry']['coordinates'][1][0] != "-80.44061099982213"){
                 failTest(moduleName,"GEORequest","Failed to retrieve GEO Request");
             }
