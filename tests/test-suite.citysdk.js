@@ -14,7 +14,7 @@ function runAllTests(){
     testResultStatus['all']=true;
     runCoreTest();
     testCensusModule();
-    testNoaaModule();
+    //testNoaaModule();
 }//runAllTests
 
 function runCoreTest(){
@@ -81,7 +81,7 @@ jQuery(document).ready(function(){
     jQuery("tr[dataModuleName='all'] .runTestButton").click(runAllTests);
     jQuery("tr[dataModuleName='core'] .runTestButton").click(runCoreTest);
     jQuery("tr[dataModuleName='census'] .runTestButton").click(testCensusModule);
-    jQuery("tr[dataModuleName='noaa'] .runTestButton").click(testNoaaModule);
+    //jQuery("tr[dataModuleName='noaa'] .runTestButton").click(testNoaaModule);
 
 
 });
