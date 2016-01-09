@@ -118,7 +118,7 @@ function testCensusModule() {
     };
 
 
-    // Test of acsSummaryRequest
+    // Tests that require valid FIPS location
     census.latLngToFIPS("25.7753", "-80.2089", function (geographies) {
         var fipsData = geographies["2010 Census Blocks"][0];
         request["state"] = fipsData["STATE"];
@@ -130,15 +130,19 @@ function testCensusModule() {
 
         request.geocoded = true;
 
+        census.validateRequestGeographyVariables(request, function(response){
+
+        });
+
+
+
         census.acsSummaryRequest(request, function (response) {
             asyncTestsRunning--;
             if (response[1][2] != "189255") {
                 failTest(moduleName, "acsSummaryRequest", "2013 ACS1 State Level with sublevel Request Failed");
             }
             updateStatusDisplay();
-
         });
-
 
         asyncTestsRunning++;
         request.level = "county";
@@ -149,7 +153,8 @@ function testCensusModule() {
             "commute_time",
             "commute_time_carpool",
             "commute_time_other"
-        ]
+        ];
+
         census.acsSummaryRequest(request, function (response) {
             asyncTestsRunning--;
 
@@ -162,6 +167,7 @@ function testCensusModule() {
 
 
         asyncTestsRunning++;
+
         census.GEORequest(request, function (response) {
             asyncTestsRunning--;
             if (response['features'][0]['properties']['COUNTY'] != "086" && response['features'][0]['geometry']['coordinates'][1][0] != "-80.44061099982213") {
@@ -182,6 +188,7 @@ function testCensusModule() {
             "age_75_to_79_1990",
             "race_south_american_uruguayan_2010"
         ];
+
         census.summaryRequest(request, function (response) {
             asyncTestsRunning--;
             if (response[1][1] != "2496435") {
@@ -212,6 +219,11 @@ function testCensusModule() {
         });
 
 
+
+
+
+
+
         asyncTestsRunning++;
         request.level = "state";
         request.sublevel = false;
@@ -230,6 +242,48 @@ function testCensusModule() {
             updateStatusDisplay();
 
         });
+
+
+        asyncTestsRunning++;
+        request.level = "state";
+        request.sublevel = false;
+        request.year = 2007;
+        request.api = "ewks";
+        request.variables = [
+            "EMP",
+            "ESTAB"
+        ];
+
+        census.APIRequest(request, function (response) {
+            asyncTestsRunning--;
+            if (response['data'][0]['EMP'] != "0" && response['data'][0]['ESTAB'] != "55") {
+                failTest(moduleName, "APIRequest", "APIRequest 2007 Economic Census Request Failed: ESTAB variable not included in data or not correct");
+            }
+            updateStatusDisplay();
+
+        });
+
+
+        asyncTestsRunning++;
+        // Note - this is INVALID input.  The function is SUPPOSED to fail.
+        request.level = "tract";
+        request.sublevel = false;
+        request.year = 2007;
+        request.api = "ewks";
+        request.variables = [
+            "EMP",
+            "ESTAB"
+        ];
+        census.GEORequest(request, function (response) {
+            asyncTestsRunning--;
+            if(response != false){
+                failTest(moduleName, "GEORequest", "Function returned data with invalid geographic specification.");
+
+            }
+            updateStatusDisplay();
+
+        });
+
 
 
 

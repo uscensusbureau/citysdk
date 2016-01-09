@@ -153,7 +153,7 @@ CensusModule.prototype.parseToVariable = function (aliasOrVariable) {
 CensusModule.prototype.parseToValidVariable = function (aliasOrVariable,api,year) {
     //If the requested string is an alias, return the appropriate variable from the dictionary
     if (aliasOrVariable in this.aliases) {
-        if(api in this.aliases[aliasOrVariable]['api'] && this.aliases[aliasOrVariable]['api'][api].indexOf(year) != -1){
+        if(api in this.aliases[aliasOrVariable]['api'] && this.aliases[aliasOrVariable]['api'][api].indexOf(parseInt(year)) != -1){
             // Alias found and is valid for selected API & year combination
             return this.aliases[aliasOrVariable].variable;
         }else{
@@ -221,6 +221,10 @@ CensusModule.prototype.parseRequestLatLng = function (request) {
  */
 CensusModule.prototype.ESRItoGEO = function (esriJSON) {
     var json = jQuery.parseJSON(esriJSON);
+    if(!("features" in json)){
+        // data is missing
+        return false;
+    }
     var features = json.features;
 
     var geojson = {
@@ -448,7 +452,6 @@ CensusModule.prototype.ZIPtoLatLng = function (inzip, callback) {
 CensusModule.prototype.summaryRequest = function (request, callback) {
     var cows = JSON.parse(JSON.stringify(request));
     var cacheKey = JSON.stringify(cows).replace(/\W/g, '');
-
     var apiKey = this.apiKey;
 
     // Check to see if this question is cached
@@ -570,7 +573,6 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
 
             //Construct the list of variables
             var variableString = "";
-            console.log(cows.variables);
 
             for (var i = 0; i < cows.variables.length; i++) {
                 if (CensusModule.prototype.isNormalizable(cows.variables[i])) {
@@ -592,8 +594,7 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
                     cows.variables[i] = variableIntermediate;
                 }
             }
-            console.log(CensusModule.prototype.requiredVariables[cows.api]);
-console.log(cows.variables);
+
             // Add the Required Variables
             if(jQuery.inArray(cows.api,CensusModule.prototype.requiredVariables)){
                 if(jQuery.inArray(cows.year,CensusModule.prototype.requiredVariables[cows.api])){
@@ -604,14 +605,12 @@ console.log(cows.variables);
                     }
                 }
             }
-            console.log(cows.variables);
             // Add the variables to request string
             for (var i = 0; i < cows.variables.length; i++) {
                 if (i != 0) variableString += ",";
                     variableString += cows.variables[i];
 
             }
-console.log(variableString);
 
             //The URL for ACS5 request (summary file)
 
@@ -954,7 +953,6 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
  * @param {function} callback A callback, which accepts a response parameter
  */
 CensusModule.prototype.APIRequest = function (requestIn, callback) {
-
     var request = JSON.parse(JSON.stringify(requestIn));
 
     if (!("api" in request)) {
@@ -1052,8 +1050,15 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
         return; //We return because the callback will fix our request into FIPs, and then call the request again
     }
 
-    if ("state" in request && "county" in request && "tract" in request && "blockGroup" in request) {
-        if ("variables" in request) {
+    // Check to see if geography is complete as required by api
+
+    if("geographyValidForAPI" in request){
+        if(request.geographyValidForAPI == false){
+            console.log("Full of Terrible Fail");
+            console.log(request);
+            callback({});
+            return;
+        }else if ("variables" in request) {
             //If we don't have a data object in the request, create one
             if (!("data" in request)) request.data = [];
 
@@ -1062,7 +1067,6 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             this.summaryRequest(
                 request,
                 function (response) {
-
                     if (request.sublevel) {
                         //If sublevel is set to true, our "data" property will be an array of objects for each sublevel item.
                         request.data = [];
@@ -1158,22 +1162,112 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             callback(request);
             return;
         }
-    } else {
-        //Is the level the US?
-        if (request.level == "us") {
-            //Ok, let's just resubmit it with D.C. as the "state"
-            request.state = "DC";
-            CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
-        }
+    }else{
+        if ((request.level == "us" && !("geographyValidForAPI" in request)) || "containerGeometry" in request) {
 
-        //We have some container geometry but no specific location, let the supplemental requests handle the variables
-        if ("containerGeometry" in request) {
-            request.data = [];
-            callback(request);
-        }
+            //Is the level the US?
+            if (request.level == "us") {
+                //Ok, let's just resubmit it with D.C. as the "state"
+                request.state = "DC";
+                CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
+            }
 
-        return;
+            //We have some container geometry but no specific location, let the supplemental requests handle the variables
+            if ("containerGeometry" in request) {
+                request.geographyValidForAPI = true;
+
+                request.data = [];
+                callback(request);
+            }
+
+            return;
+        }else{
+            CitySDK.prototype.sdkInstance.modules.census.validateRequestGeographyVariables(request,function(response){
+                CitySDK.prototype.sdkInstance.modules.census.APIRequest(response, callback);
+            });
+        }
     }
+
+    if ("state" in request && "county" in request && "tract" in request && "blockGroup" in request) {
+
+    } else {
+
+    }
+};
+
+/**
+ * Checks the geo-related parts of the request against the geography definition of the API being requested
+ * @param requestIn
+ * @param callback
+ */
+CensusModule.prototype.validateRequestGeographyVariables = function(requestIn,callback){
+
+    var request = JSON.parse(JSON.stringify(requestIn));
+    var cacheKey = "apiGeography"+request.year.toString()+request.api.toString();
+
+    // Check to see if this question is cached
+    CitySDK.prototype.sdkInstance.getCachedData("census", "validateRequestGeographyVariables", cacheKey, function (cachedData) {
+        if (cachedData != null) {
+            // Use cached geography definition
+            request.geographyValidForAPI = CensusModule.prototype.validateRequestGeographyVariablesProcess(request,cachedData);
+
+            callback(request);
+            return;
+        } else {
+            // Get geography definition
+            var geographyURL = CensusModule.prototype.DEFAULT_ENDPOINTS.censusURL + request.year + "/" + request.api + "/geography.json" ;
+
+            var geographyrequest = CitySDK.prototype.sdkInstance.ajaxRequest(geographyURL);
+
+            geographyrequest.done(function (response) {
+                var geoDefinition = jQuery.parseJSON(response);
+
+                if (CitySDK.prototype.sdkInstance.allowCache == true) {
+                    CitySDK.prototype.sdkInstance.setCachedData("census", "validateRequestGeographyVariables", cacheKey, geoDefinition);
+                }
+                request.geographyValidForAPI = CensusModule.prototype.validateRequestGeographyVariablesProcess(request,geoDefinition);
+                callback(request);
+                return;
+            });
+        }
+    });
+}; // end validateRequestGeographyVariables
+
+/**
+ * Compares the geoDefinition against the request.  Returns false if location variables required by the api are missing.
+ * @param requestIn
+ * @param callback
+ */
+CensusModule.prototype.validateRequestGeographyVariablesProcess = function(request,geoDefinition){
+    var found = false;
+
+    jQuery.each(geoDefinition['fips'],function(index,value){
+        if(value.name == request.level){
+            // Possible level match found, check to see if there are requirements
+
+            if("requires" in value){
+                // If there are requirements check for each
+
+                var potentialfound=true;
+                jQuery.each(value.requires, function(index,value){
+                    if(!(value in request)){
+                        // Requirement is missing, request does not match to a valid geo combination
+                        potentialfound=false;
+                    }
+                });
+
+                // If no requirements are missing, this is a match.
+                if(potentialfound==true){
+                    // level has required geographic inputs
+                    found = true;
+                }
+            }else{
+                // No requirements needed
+                found = true;
+            }
+        }
+    });
+    return found;
 };
 
 
@@ -1197,6 +1291,7 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
  * @param {function} callback The callback to take the response, which is geoJSON
  */
 CensusModule.prototype.GEORequest = function (requestIn, callback) {
+
     //Reference dictionary of levels -> geocoder response variables
     var comparisonVariables = {
         "tract": "TRACT",
@@ -1205,11 +1300,14 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
         "blockGroup": "BLKGRP"
     };
     var request = JSON.parse(JSON.stringify(requestIn));
-
     //First - check if we have a data object in the request OR if we aren't requesting variables
     if ("data" in request || !("variables" in request)) {
         //We have a data object for the request (or there isn't any requested), now we can get the geoJSON for the area
         CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, function (response) {
+            if(response == false){
+                // No data returned
+                callback(false);
+            }
             if (!("totals" in response)) {
                 response.totals = {};
             }
@@ -1245,6 +1343,8 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
                             "blockGroup": features[i].properties["BLKGRP"],
                             "place": features[i].properties["PLACE"],
                             "level": request.level,
+                            "year" : request.year,
+                            "api" : request.api,
                             "variables": variables,
                             "featuresIndex": i
                         };
