@@ -15,7 +15,18 @@ function FarmersMarketModule() {
 //Enable function. Stores the API key for this module and sets it as enabled
 FarmersMarketModule.prototype.enable = function() {
     this.enabled = true;
+    if(CitySDK.prototype.sdkInstance.version >= FarmersMarketModule.prototype.minCoreVersionRequired){
+        this.enabled = true;
+        return true;
+    }else{
+        this.enabled = false;
+        return false;
+    }
 };
+
+// Version Numbers
+FarmersMarketModule.prototype.version = 1.0;
+FarmersMarketModule.prototype.minCoreVersionRequired = 1.5;
 
 /**
  * Searches near a specified lat/lng or zipcode

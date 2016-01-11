@@ -14,8 +14,20 @@ function FEMAModule() {
 
 //Enable function. Stores the API key for this module and sets it as enabled
 FEMAModule.prototype.enable = function() {
-    this.enabled = true;
+    if(CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired){
+        this.enabled = true;
+        return true;
+    }else{
+        this.enabled = false;
+        return false;
+    }
 };
+
+
+// Version Numbers
+FEMAModule.prototype.version = 1.0;
+FEMAModule.prototype.minCoreVersionRequired = 1.5;
+
 
 /**
  * Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset

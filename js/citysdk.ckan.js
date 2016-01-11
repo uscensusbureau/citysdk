@@ -13,8 +13,19 @@ function CkanModule() {
 
 //Enable function.
 CkanModule.prototype.enable = function() {
-    this.enabled = true;
+    if(CitySDK.prototype.sdkInstance.version >= CkanModule.prototype.minCoreVersionRequired){
+        this.enabled = true;
+        return true;
+    }else{
+        this.enabled = false;
+        return false;
+    }
 };
+
+// Version Numbers
+CkanModule.prototype.version = 1.0;
+CkanModule.prototype.minCoreVersionRequired = 1.5;
+
 
 /**
  * Sends a SQL query to a CKAN server.

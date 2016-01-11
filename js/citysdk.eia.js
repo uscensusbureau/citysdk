@@ -15,8 +15,19 @@ function EIAModule() {
 //Enable function. Stores the API key for this module and sets it as enabled
 EIAModule.prototype.enable = function(apiKey) {
     this.apiKey = apiKey;
-    this.enabled = true;
+    if(CitySDK.prototype.sdkInstance.version >= EIAModule.prototype.minCoreVersionRequired){
+        this.enabled = true;
+        return true;
+    }else{
+        this.enabled = false;
+        return false;
+    }
 };
+
+// Version Numbers
+EIAModule.prototype.version = 1.0;
+EIAModule.prototype.minCoreVersionRequired = 1.5;
+
 
 /**
  * Call which returns category listings from the dataset explorer

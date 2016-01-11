@@ -55,11 +55,18 @@ function CitySDK() {
 
 //Settings
 /**
+ * Version number of the CitySDK Core
+ */
+CitySDK.prototype.version = 1.5;
+
+/**
  * Toggles whether CitySDK will attempt to cache data to reduce the API call requirements
- * @type {object}
  */
 CitySDK.prototype.allowCache = true;
 CitySDK.prototype.CitySDKdb;
+
+
+
 
 /**
  * Stores each module
