@@ -1054,8 +1054,6 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
 
     if("geographyValidForAPI" in request){
         if(request.geographyValidForAPI == false){
-            console.log("Full of Terrible Fail");
-            console.log(request);
             callback({});
             return;
         }else if ("variables" in request) {
@@ -1307,6 +1305,7 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
             if(response == false){
                 // No data returned
                 callback(false);
+                return;
             }
             if (!("totals" in response)) {
                 response.totals = {};
