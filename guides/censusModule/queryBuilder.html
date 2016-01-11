@@ -513,7 +513,7 @@ title: Census Module Query Builder
         var fileData;
         //fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
 
-        var blob = new Blob([csvString], {type: "text/plain;charset=utf-8"});
+        var blob = new Blob([csvString], {type: "application/csv;charset=utf-8"});
         saveAs(blob, filename);
 
 
