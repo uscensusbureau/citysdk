@@ -281,9 +281,8 @@ title: Census Module Query Builder
 
         <div class="panel panel-success">
             <div class="panel-heading">
-                <div class="pull-right"><a id="saveLink" class="btn btn-primary btn-xs disabled"
-                                           href="javascript:void(0)" onclick="save()" role="button">Save Variables to
-                    CSV File</a></div>
+                <div class="pull-right"><a id="saveLink" class="btn btn-primary btn-xs disabled" href="#" role="button">Save
+                    Variables to CSV File</a></div>
 
                 <h3 class="panel-title">The Returned Data</h3>
 
@@ -470,13 +469,16 @@ title: Census Module Query Builder
     }
 
 
-    function save() {
+    jQuery("#saveLink").click(function (e) {
+        e.preventDefault();
+
         var csvString;
         csvString = convertOutput();
         saveToCSVfile(csvString);
-    }
+
+    });
     function convertOutput() {
-        var textarea = jQuery('#output').text();
+        var textarea = jQuery('#rawOutput').text();
         var JSONObject = JSON.parse(textarea);
         var csvString = "";
         var keys;
@@ -506,15 +508,20 @@ title: Census Module Query Builder
     }
     ;
     function saveToCSVfile(csvString) {
+
         var filename = "citySDK_output.txt";
         var fileData;
-        fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
-        jQuery('#saveLink')
-                .attr({
+        //fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+
+        var blob = new Blob([csvString], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, filename);
+
+
+        /*jQuery('#saveLink').attr({
                     'download': filename,
                     'href': fileData,
                     'target': '_blank'
-                });
+         });*/
     }
     function buildCensusModuleRequest() {
         var request = {};
