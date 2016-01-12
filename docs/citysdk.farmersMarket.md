@@ -29,7 +29,7 @@ Searches near a specified lat/lng or zipcode
 
 **callback**: `function`, Searches near a specified lat/lng or zipcode
 
-**Returns**: `object`, {     results: [         {             id: 11011             marketname: "Farmers Market A"         },         {             id: 4203             marketname: "Farmers Market B"         }     ]}
+**Returns**: `object`, <pre><code>{     results: [         {             id: 11011             marketname: "Farmers Market A"         },         {             id: 4203             marketname: "Farmers Market B"         }     ]}</code></pre>
 
 ### FarmersMarketModule.detail(request, callback) 
 
