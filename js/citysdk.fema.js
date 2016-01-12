@@ -43,6 +43,8 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  *
  * Request can be filted by the following fields.  If no values, the API will return the first values
  * The API return paged results.  Use skip and take to control which page is returned
+ *
+ * @param {object} request
  * {
  *      disasterNumber: 3849,
  *      state: "VA",
@@ -52,8 +54,8 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  *      skip: 0,
  *      take: 1000
  * }
- *
- * Response object
+ * @param {function} callback
+ * @returns {object}
  * {
  *      "metadata": {
  *          "skip": 0,
@@ -106,11 +108,7 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  *          }]
  *      }
  * }
- *
- * @param {object} request
- * @param {function} callback
- * @returns {object}
- */
+ **/
 FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, callback) {
 
     var addedFilter = false;

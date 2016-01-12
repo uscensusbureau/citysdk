@@ -6,27 +6,39 @@
 
 * * *
 
-### categoryRequest(request, callback) 
+## Class: EIAModule
+Instantiates an instance of the CitySDK EIA object.
 
-Call which returns category listings from the dataset explorerRequest should specify category. If no category specified, will default to the root list of datasets{     category: 05}
+### EIAModule.enable(apiKey) 
 
-**Parameters**
-
-**request**: , Call which returns category listings from the dataset explorerRequest should specify category. If no category specified, will default to the root list of datasets{     category: 05}
-
-**callback**: , Call which returns category listings from the dataset explorerRequest should specify category. If no category specified, will default to the root list of datasets{     category: 05}
-
-
-
-### seriesRequest(request, callback) 
-
-Call which returns data from the specified seriesRequest should specify a series, if not, nothing will happen{     series: "ELEC.GEN.ALL-AL-99.A"}
+Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
 
 **Parameters**
 
-**request**: , Call which returns data from the specified seriesRequest should specify a series, if not, nothing will happen{     series: "ELEC.GEN.ALL-AL-99.A"}
+**apiKey**: `string`, The census API key.
 
-**callback**: , Call which returns data from the specified seriesRequest should specify a series, if not, nothing will happen{     series: "ELEC.GEN.ALL-AL-99.A"}
+**Returns**: `boolean`, True if enabled, false is not enabled.
+
+### EIAModule.categoryRequest(request, callback) 
+
+Call which returns category listings from the dataset explorer
+
+**Parameters**
+
+**request**: `object`, * Request should specify category. If no category specified, will default to the root list of datasets{     category: 05}
+
+**callback**: `function`, Call which returns category listings from the dataset explorer
+
+
+### EIAModule.seriesRequest(request, callback) 
+
+Call which returns data from the specified series
+
+**Parameters**
+
+**request**: `object`, Request should specify a series, if not, nothing will happen{     series: "ELEC.GEN.ALL-AL-99.A"}
+
+**callback**: `function`, Call which returns data from the specified series
 
 
 

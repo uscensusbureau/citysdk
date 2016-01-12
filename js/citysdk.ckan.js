@@ -6,12 +6,20 @@
 //It is advised to keep the filenames and module property names the same
 CitySDK.prototype.modules.ckan = new CkanModule();
 
-//Module object definition. Every module should have an "enabled" property and an "enable"  function.
+/**
+ * Instantiates an instance of the CitySDK CKAN object.
+ * @constructor
+ */
 function CkanModule() {
     this.enabled = false;
 };
 
-//Enable function.
+/**
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ *
+ * @param {string} apiKey The census API key.
+ * @returns {boolean} True if enabled, false is not enabled.
+ */
 CkanModule.prototype.enable = function() {
     if(CitySDK.prototype.sdkInstance.version >= CkanModule.prototype.minCoreVersionRequired){
         this.enabled = true;
@@ -30,15 +38,17 @@ CkanModule.prototype.minCoreVersionRequired = 1.5;
 /**
  * Sends a SQL query to a CKAN server.
  * The DataStore extension must be installed to utilise this.
+
  *
- * var request = {
+ * @param {object} request JSON Object
+ *  var request = {
  *     "url": 'catalog.opendata.city',
  *     "Select": '"name","streetAddress","postalCode"',
  *     "From": '"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"',
  *     "Limit": '2'
  * }
- *
- * Response:
+ * @param {function} callback
+ * @return {object} JSON Object
  * {
  *     "success": true,
  *     "result": {
@@ -71,9 +81,6 @@ CkanModule.prototype.minCoreVersionRequired = 1.5;
  *         "sql": "SELECT \"name\",\"streetAddress\",\"postalCode\" FROM \"e4491e0c-ba09-4cb2-97c1-d466e3e976a5\" LIMIT 2 "
  *     }
  * }
- *
- * @param request
- * @param callback
  */
 CkanModule.prototype.search = function(request, callback) {
     var urlPattern = /({url})/;
