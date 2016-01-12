@@ -225,7 +225,6 @@ CensusModule.prototype.parseRequestLatLng = function (request) {
  * Converts ESRI JSON to GeoJSON
  * @param esriJSON
  * @returns {{type: string, features: Array}}
- * @constructor
  */
 CensusModule.prototype.ESRItoGEO = function (esriJSON) {
     var json = jQuery.parseJSON(esriJSON);
@@ -252,7 +251,6 @@ CensusModule.prototype.ESRItoGEO = function (esriJSON) {
  * Converts geoJSON to ESRI Json
  * @param geoJSON
  * @returns {*}
- * @constructor
  */
 CensusModule.prototype.GEOtoESRI = function (geoJSON) {
     return Terraformer.ArcGIS.convert(geoJSON);

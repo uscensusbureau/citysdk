@@ -63,14 +63,29 @@ Checks the request object for lat/lng latitude/longitude and x/y fields and move
 
 
 
-## Class: ESRItoGEO
+### ESRItoGEO(esriJSON) 
+
 Converts ESRI JSON to GeoJSON
 
+**Parameters**
 
-## Class: GEOtoESRI
+**esriJSON**: , Converts ESRI JSON to GeoJSON
+
+**Returns**: `Object`
+
+
+### GEOtoESRI(geoJSON) 
+
 Converts geoJSON to ESRI Json
 
-### GEOtoESRI.getVariableDictionary(api, year, callback) 
+**Parameters**
+
+**geoJSON**: , Converts geoJSON to ESRI Json
+
+**Returns**: `*`
+
+
+### getVariableDictionary(api, year, callback) 
 
 Downloads an ACS API's entire dictionary of variables from the Census
 
@@ -83,7 +98,8 @@ Downloads an ACS API's entire dictionary of variables from the Census
 **callback**: , Downloads an ACS API's entire dictionary of variables from the Census
 
 
-### GEOtoESRI.latLngToFIPS(lat, lng, callback) 
+
+### latLngToFIPS(lat, lng, callback) 
 
 Converts co-ordinates to Census FIPS via the Geocoder API
 
@@ -96,7 +112,8 @@ Converts co-ordinates to Census FIPS via the Geocoder API
 **callback**: `function`, Callback function
 
 
-### GEOtoESRI.addressToFIPS(street, city, state, callback) 
+
+### addressToFIPS(street, city, state, callback) 
 
 Converts a street address to Census FIPS via the Geocoder APIReturns an array of matched addresses.
 
@@ -111,7 +128,8 @@ Converts a street address to Census FIPS via the Geocoder APIReturns an array 
 **callback**: , Callback function
 
 
-### GEOtoESRI.ZIPtoLatLng(zip, callback) 
+
+### ZIPtoLatLng(zip, callback) 
 
 Converts a ZIP code to Lat/Lng and calls the callback on it.
 
@@ -122,7 +140,8 @@ Converts a ZIP code to Lat/Lng and calls the callback on it.
 **callback**: , Converts a ZIP code to Lat/Lng and calls the callback on it.
 
 
-### GEOtoESRI.summaryRequest(request, callback) 
+
+### summaryRequest(request, callback) 
 
 Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
 
@@ -133,7 +152,8 @@ Makes a request to the ACS5 Summary API. Should be used via APIRequest and not o
 **callback**: `function`, Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
 
 
-### GEOtoESRI.tigerwebRequest(request, callback) 
+
+### tigerwebRequest(request, callback) 
 
 Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4326
 
@@ -144,7 +164,8 @@ Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4
 **callback**: , Makes a call to the Census TigerWeb API for Geometry.Our spatial reference is 4326
 
 
-### GEOtoESRI.APIRequest(request, callback) 
+
+### APIRequest(request, callback) 
 
 Processes a data request by looking at a JSON requestJSON Requests should include:"year" - Year of the request. See acs5years object for available years. Defaults to 2013 if not specified."lat" - Latitude of the requested location (either specified as x, lat, or latitude) NORTH"lng" - Longitude of the requested location (either specified as y, lng, or longitude) EAST"sublevel" - Defaults to "false". If set to "true", it will return the group of sublevels from the specified level."level" - Level of the request. Options are: blockGroup, tract, county, state, us. Will default to blockGroup."variables" - Array of variables either by alias or specific nameexampleRequest = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup"      "variables": [          "income"      ]  };  exampleResponse = {      "year": "2013",      "lat": 38.9047,      "lng": -77.0164,      "level": "blockGroup",      "state": "11",      "county": "001",      "tract": "004701",      "blockGroup": "2",      "data": {          "income": 33210      }  };  A response where you set sublevel to "true" will have an array in the data field instead of an object.  Another example request:  {     "state": "NY",     "level": "state",     "variables": [         "income",         "population"     ]  }  You could also send an address object to specify location  {     "address": {         "street": "18 F Street NW"         "city": "Washington",         "state": "DC"      }      "level": "blockGroup",      "variables": [         "population"      ]  }
 
@@ -155,7 +176,8 @@ Processes a data request by looking at a JSON requestJSON Requests should incl
 **callback**: `function`, A callback, which accepts a response parameter
 
 
-### GEOtoESRI.validateRequestGeographyVariables(requestIn, callback) 
+
+### validateRequestGeographyVariables(requestIn, callback) 
 
 Checks the geo-related parts of the request against the geography definition of the API being requested
 
@@ -166,7 +188,8 @@ Checks the geo-related parts of the request against the geography definition of 
 **callback**: , Checks the geo-related parts of the request against the geography definition of the API being requested
 
 
-### GEOtoESRI.validateRequestGeographyVariablesProcess(requestIn, callback) 
+
+### validateRequestGeographyVariablesProcess(requestIn, callback) 
 
 Compares the geoDefinition against the request.  Returns false if location variables required by the api are missing.
 
@@ -177,7 +200,8 @@ Compares the geoDefinition against the request.  Returns false if location varia
 **callback**: , Compares the geoDefinition against the request.  Returns false if location variables required by the api are missing.
 
 
-### GEOtoESRI.GEORequest(request, callback) 
+
+### GEORequest(request, callback) 
 
 Retrieves data and geographic shapes encoded as geoJSON.Example request.{     "lat": latitude,     "lng": longitude,     "sublevel": <optional> true/false,     "container": <optional> place/county/state/tract     "level": place/county/state/blockGroup/tract     "variables": []     "containerGeometry": <optional> Must have sublevel true and container flags, this value should be ESRI json and                         marks the boundaries of the query region. You can convery geojson to ESRI via                         CensusModule.prototype.GEOtoESRI}
 
