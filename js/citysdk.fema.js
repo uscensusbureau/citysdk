@@ -14,9 +14,7 @@ CitySDK.prototype.modules.fema = new FEMAModule();
 function FEMAModule() {
     this.enabled = false;
     this.iso8601reg = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
-};
-
-
+}
 // Endpoint URLS
 FEMAModule.prototype.DEFAULT_ENDPOINTS = {};
 FEMAModule.prototype.DEFAULT_ENDPOINTS.apiURL = "https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?";
@@ -33,16 +31,15 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false is not enabled.
  */
-FEMAModule.prototype.enable = function() {
-    if(CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired){
+FEMAModule.prototype.enable = function () {
+    if (CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired) {
         this.enabled = true;
         return true;
-    }else{
+    } else {
         this.enabled = false;
         return false;
     }
 };
-
 
 
 /**
@@ -116,14 +113,14 @@ FEMAModule.prototype.enable = function() {
  *      }
  * }</code></pre>
  **/
-FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, callback) {
+FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function (request, callback) {
 
     var addedFilter = false;
     var addedSkip = false;
     var disasterURL = CitySDK.prototype.modules.fema.DEFAULT_ENDPOINTS.apiURL;
 
-    if("disasterNumber" in request && Number(request.disasterNumber)) {
-        if (!addedFilter){
+    if ("disasterNumber" in request && Number(request.disasterNumber)) {
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "disasterNumber eq " + Number(request.disasterNumber);
             addedFilter = true;
@@ -132,8 +129,8 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("state" in request) {
-        if (!addedFilter){
+    if ("state" in request) {
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "state eq '" + request.state + "'";
             addedFilter = true;
@@ -142,8 +139,8 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("county" in request) {
-        if (!addedFilter){
+    if ("county" in request) {
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "startswith(declaredCountyArea, '" + request.county + "')";
             addedFilter = true;
@@ -152,9 +149,9 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
+    if ("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
         var dateObjectdeclarationRangeStart = new Date(request.declarationRangeStart);
-        if (!addedFilter){
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
             addedFilter = true;
@@ -162,10 +159,10 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
             disasterURL += " and declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
         }
     }
-    if("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
+    if ("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
         var dateObjectdeclarationRangeEnd = new Date(request.declarationRangeEnd);
 
-        if (!addedFilter){
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "declarationDate le '" + dateObjectdeclarationRangeEnd.toISOString() + "'";
             addedFilter = true;
@@ -174,21 +171,22 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("skip" in request && Number(request.skip)) {
-        if (addedFilter){
+    if ("skip" in request && Number(request.skip)) {
+        if (addedFilter) {
             disasterURL += "&";
         }
         disasterURL += "$skip=" + Number(request.skip); //Default - root list of all datasets
         addedSkip = true;
     }
 
-    if("take" in request && Number(request.take)) {
-        if (addedFilter || addedSkip){
+    if ("take" in request && Number(request.take)) {
+        if (addedFilter || addedSkip) {
             disasterURL += "&";
-        }disasterURL += "$top=" + Number(request.take); //Default - root list of all datasets
+        }
+        disasterURL += "$top=" + Number(request.take); //Default - root list of all datasets
     }
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(disasterURL).done(function(response) {
+    CitySDK.prototype.sdkInstance.ajaxRequest(disasterURL).done(function (response) {
         response = jQuery.parseJSON(response);
         callback(response);
     });
@@ -201,14 +199,14 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
  * @param {string} dateString The string of the date to be tested
  * @returns {boolean} True if valid ISO 8601 date.
  */
-FEMAModule.prototype.isIso8601Date = function(dateString) {
+FEMAModule.prototype.isIso8601Date = function (dateString) {
     return CitySDK.prototype.sdkInstance.modules.fema.iso8601reg.test(dateString);
-}
+};
 
 
 // Polyfill
 if (!Date.prototype.toISOString) {
-    (function() {
+    (function () {
 
         function pad(number) {
             if (number < 10) {
@@ -217,7 +215,7 @@ if (!Date.prototype.toISOString) {
             return number;
         }
 
-        Date.prototype.toISOString = function() {
+        Date.prototype.toISOString = function () {
             return this.getUTCFullYear() +
                 '-' + pad(this.getUTCMonth() + 1) +
                 '-' + pad(this.getUTCDate()) +
