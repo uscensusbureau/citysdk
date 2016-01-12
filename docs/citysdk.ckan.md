@@ -1,4 +1,4 @@
-# Global
+# CitySDK CKAN Module
 
 
 
@@ -9,7 +9,7 @@
 ## Class: CkanModule
 Instantiates an instance of the CitySDK CKAN object.
 
-### CkanModule.enable(apiKey) 
+### CitySDK CKAN Module.CkanModule.enable(apiKey) 
 
 Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
 
@@ -17,9 +17,9 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **apiKey**: `string`, The census API key.
 
-**Returns**: `boolean`, True if enabled, false is not enabled.
+**Returns**: `boolean`, True if enabled, false if not enabled.
 
-### CkanModule.search(request, callback) 
+### CitySDK CKAN Module.CkanModule.search(request, callback) 
 
 Sends a SQL query to a CKAN server.The DataStore extension must be installed to utilise this.
 

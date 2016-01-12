@@ -1,4 +1,4 @@
-# Global
+# CitySDK Core
 
 
 
@@ -12,7 +12,7 @@ Instantiates an instance of the CitySDK object.
 **version**:  , Version number of the CitySDK Core
 **allowCache**:  , Toggles whether CitySDK will attempt to cache data to reduce the API call requirements
 **modules**: `object` , Stores each module
-### CitySDK.ajaxRequest(url) 
+### CitySDK Core.CitySDK.ajaxRequest(url) 
 
 Makes an AJAX call
 
@@ -22,7 +22,7 @@ Makes an AJAX call
 
 **Returns**: `promise`, Returns a standard ajax promise
 
-### CitySDK.jsonpRequest(url) 
+### CitySDK Core.CitySDK.jsonpRequest(url) 
 
 Makes an AJAX call (using jsonp)
 
@@ -32,7 +32,7 @@ Makes an AJAX call (using jsonp)
 
 **Returns**: `object`, Returns a standard ajax promise
 
-### CitySDK.postRequest(url, data) 
+### CitySDK Core.CitySDK.postRequest(url, data) 
 
 Make an AJAX call (using POST)
 
@@ -44,19 +44,19 @@ Make an AJAX call (using POST)
 
 **Returns**: `*`
 
-### CitySDK.stateNames() 
+### CitySDK Core.CitySDK.stateNames() 
 
 Returns a list of state names keyed by 2-leter code
 
 **Returns**: `object`, state names keyed by 2-leter code
 
-### CitySDK.stateCapitals() 
+### CitySDK Core.CitySDK.stateCapitals() 
 
 Returns a Lat & Long of each state's capital
 
 **Returns**: `object`, arrays of Lat & Long of each state's capital keyed by 2-leter code
 
-### CitySDK.getStateCapitalCoords(stateString) 
+### CitySDK Core.CitySDK.getStateCapitalCoords(stateString) 
 
 Gets the coordinates of a state's capital from it's name or 2-letter code.
 
@@ -66,7 +66,7 @@ Gets the coordinates of a state's capital from it's name or 2-letter code.
 
 **Returns**: `array`, Returns 2-position array of Lat & Long for the capital of the state. Returns false if no state is found.
 
-### CitySDK.parseRequestLatLng(request) 
+### CitySDK Core.CitySDK.parseRequestLatLng(request) 
 
 Scans the request for alternative ways to specify latitude & longiture and migrates those variables to lat & lng positions.
 
@@ -76,7 +76,7 @@ Scans the request for alternative ways to specify latitude & longiture and migra
 
 **Returns**: `object`, the updated request
 
-### CitySDK.getCachedData(module, hashKey) 
+### CitySDK Core.CitySDK.getCachedData(module, hashKey) 
 
 Retrieves a value from the cache
 
@@ -88,7 +88,7 @@ Retrieves a value from the cache
 
 **Returns**: `object`, the value of the cached data.  Returns false if nothing found
 
-### CitySDK.setCachedData(module, hashKey, dataValue) 
+### CitySDK Core.CitySDK.setCachedData(module, hashKey, dataValue) 
 
 Creates and/or Updates a value from the cache
 
@@ -102,7 +102,7 @@ Creates and/or Updates a value from the cache
 
 **Returns**: `object`, the value of the cached data.  Returns false if nothing found
 
-### CitySDK.deleteCachedData(module, hashKey) 
+### CitySDK Core.CitySDK.deleteCachedData(module, hashKey) 
 
 Deletes a value from the cache
 
@@ -114,7 +114,7 @@ Deletes a value from the cache
 
 **Returns**: `object`, the value of the cached data.  Returns false if nothing found
 
-### CitySDK.storageAvailable(type) 
+### CitySDK Core.CitySDK.storageAvailable(type) 
 
 Checks to see whether local storage is available
 

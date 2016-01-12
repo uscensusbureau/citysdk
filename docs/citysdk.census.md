@@ -14,7 +14,7 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **apiKey**: `string`, The census API key.
 
-**Returns**: `boolean`, True if enabled, false is not enabled.
+**Returns**: `boolean`, True if enabled, false if not enabled.
 
 
 ### parseToVariable(aliasOrVariable) 
@@ -45,13 +45,13 @@ Checks to see if a string is in the aliases dictionary and returns the appropria
 
 ### isNormalizable(alias) 
 
-Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
+Determines if the alias is normalizable.  This is generally limited to aliases of ACS variables (American Community Survey)
 
 **Parameters**
 
-**alias**: `string`, Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
+**alias**: `string`, Determines if the alias is normalizable.  This is generally limited to aliases of ACS variables (American Community Survey)
 
-**Returns**: `boolean`
+**Returns**: `boolean`, Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
 
 
 ### parseRequestStateCode(request) 
@@ -87,13 +87,13 @@ Converts ESRI JSON to GeoJSON
 
 ### GEOtoESRI(geoJSON) 
 
-Converts geoJSON to ESRI Json
+Converts geoJSON to ESRI JSONThis is functionally an alias of Terraformer.ArcGIS.convert (see https://github.com/Esri/Terraformer for details)
 
 **Parameters**
 
-**geoJSON**: , Converts geoJSON to ESRI Json
+**geoJSON**: `string`, Converts geoJSON to ESRI JSONThis is functionally an alias of Terraformer.ArcGIS.convert (see https://github.com/Esri/Terraformer for details)
 
-**Returns**: `*`
+**Returns**: `object`
 
 
 ### getVariableDictionary(api, year, callback) 
@@ -233,6 +233,6 @@ Retrieves data and geographic shapes encoded as geoJSON.Example request.{  
 
 
 
-
+**Overview:** The Census Module provides access to the various data sets provided by the Census Bureau. This includes several surveys (ACS, Decennial, etc), the geocoder service (convert locations to FIPS locations, and TigerWeb (map shape data).
 
 

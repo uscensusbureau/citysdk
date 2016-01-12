@@ -17,7 +17,7 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **apiKey**: `string`, The census API key.
 
-**Returns**: `boolean`, True if enabled, false is not enabled.
+**Returns**: `boolean`, True if enabled, false if not enabled.
 
 ### FEMAModule.DisasterDeclarationsSummariesRequest(request, callback) 
 
@@ -116,6 +116,6 @@ Tests string to see if it is a valid ISO8601 date.
 
 
 
-
+**Overview:** The FEMA Module provides access to FEMA's list of disasters.
 
 

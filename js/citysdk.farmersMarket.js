@@ -1,7 +1,7 @@
 /**
- * This is the CitySDK USDA Farmer's Market API Module
- * This module requires no key.
+ * @module CitySDK USDA Farmer's Market Module
  */
+
 
 //Attach a new module object to the CitySDK prototype.
 //It is advised to keep the filenames and module property names the same
@@ -19,7 +19,7 @@ function FarmersMarketModule() {
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
- * @returns {boolean} True if enabled, false is not enabled.
+ * @returns {boolean} True if enabled, false if not enabled.
  */
 FarmersMarketModule.prototype.enable = function() {
     this.enabled = true;

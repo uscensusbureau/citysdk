@@ -1,6 +1,7 @@
 /**
- * This is the CitySDK Socrata Module Template
+ * @module CitySDK Socrata Module
  */
+
 
 //Attach a new module object to the CitySDK prototype.
 //It is advised to keep the filenames and module property names the same

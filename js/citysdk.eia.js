@@ -1,5 +1,5 @@
 /**
- * This is the CitySDK Module Template's EIA API module.
+ * @module CitySDK EIA API Module
  * This module requires a key from http://www.eia.gov/
  */
 
@@ -19,7 +19,7 @@ function EIAModule() {
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
- * @returns {boolean} True if enabled, false is not enabled.
+ * @returns {boolean} True if enabled, false if not enabled.
  */
 EIAModule.prototype.enable = function(apiKey) {
     this.apiKey = apiKey;

@@ -1,5 +1,5 @@
 /**
- * This is the CitySDK CKAN Module Template
+ * @module CitySDK CKAN Module
  */
 
 //Attach a new module object to the CitySDK prototype.
@@ -18,7 +18,7 @@ function CkanModule() {
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
- * @returns {boolean} True if enabled, false is not enabled.
+ * @returns {boolean} True if enabled, false if not enabled.
  */
 CkanModule.prototype.enable = function() {
     if(CitySDK.prototype.sdkInstance.version >= CkanModule.prototype.minCoreVersionRequired){

@@ -1,5 +1,6 @@
 /**
- * This is the Census module
+ * @module CitySDK Census Module
+ * @overview The Census Module provides access to the various data sets provided by the Census Bureau. This includes several surveys (ACS, Decennial, etc), the geocoder service (convert locations to FIPS locations, and TigerWeb (map shape data).
  */
 
 //Attach a new module object to the CitySDK prototype.
@@ -121,7 +122,7 @@ CensusModule.prototype.aliases = {"population_1990":{"api":{"sf1":[1990,2010],"s
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
- * @returns {boolean} True if enabled, false is not enabled.
+ * @returns {boolean} True if enabled, false if not enabled.
  */
 CensusModule.prototype.enable = function (apiKey) {
     this.apiKey = apiKey;
@@ -192,9 +193,9 @@ CensusModule.prototype.parseToValidVariable = function (aliasOrVariable,api,year
 
 
 /**
- * Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
+ * Determines if the alias is normalizable.  This is generally limited to aliases of ACS variables (American Community Survey)
  * @param {string} alias
- * @returns {boolean}
+ * @returns {boolean} Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
  */
 CensusModule.prototype.isNormalizable = function (alias) {
     if (alias in this.aliases) {
@@ -263,9 +264,10 @@ CensusModule.prototype.ESRItoGEO = function (esriJSON) {
 };
 
 /**
- * Converts geoJSON to ESRI Json
- * @param geoJSON
- * @returns {*}
+ * Converts geoJSON to ESRI JSON
+ * This is functionally an alias of Terraformer.ArcGIS.convert (see https://github.com/Esri/Terraformer for details)
+ * @param {string} geoJSON
+ * @returns {object}
  */
 CensusModule.prototype.GEOtoESRI = function (geoJSON) {
     return Terraformer.ArcGIS.convert(geoJSON);

@@ -1,6 +1,7 @@
 /**
- * CitySDK
- **/
+ * @module CitySDK Core
+ */
+
 
 //SDK instance for the callback functions
 CitySDK.prototype.sdkInstance = null;
