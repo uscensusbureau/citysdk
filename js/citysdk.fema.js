@@ -16,6 +16,17 @@ function FEMAModule() {
     this.iso8601reg = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
 };
 
+
+// Endpoint URLS
+FEMAModule.prototype.DEFAULT_ENDPOINTS = {};
+FEMAModule.prototype.DEFAULT_ENDPOINTS.apiURL = "https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?";
+
+
+// Version Numbers
+FEMAModule.prototype.version = 1.0;
+FEMAModule.prototype.minCoreVersionRequired = 1.5;
+
+
 /**
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
@@ -32,10 +43,6 @@ FEMAModule.prototype.enable = function() {
     }
 };
 
-
-// Version Numbers
-FEMAModule.prototype.version = 1.0;
-FEMAModule.prototype.minCoreVersionRequired = 1.5;
 
 
 /**
@@ -113,7 +120,7 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
 
     var addedFilter = false;
     var addedSkip = false;
-    var disasterURL = "https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?";
+    var disasterURL = CitySDK.prototype.modules.fema.DEFAULT_ENDPOINTS.apiURL;
 
     if("disasterNumber" in request && Number(request.disasterNumber)) {
         if (!addedFilter){
@@ -146,21 +153,24 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
     }
 
     if("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
+        var dateObjectdeclarationRangeStart = new Date(request.declarationRangeStart);
         if (!addedFilter){
             disasterURL += "$filter=";
-            disasterURL += "declarationDate ge '" + request.declarationRangeStart + "'";
+            disasterURL += "declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
             addedFilter = true;
         } else {
-            disasterURL += " and declarationDate ge '" + request.declarationRangeStart + "'";
+            disasterURL += " and declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
         }
     }
     if("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
+        var dateObjectdeclarationRangeEnd = new Date(request.declarationRangeEnd);
+
         if (!addedFilter){
             disasterURL += "$filter=";
-            disasterURL += "declarationDate le '" + request.declarationRangeEnd + "'";
+            disasterURL += "declarationDate le '" + dateObjectdeclarationRangeEnd.toISOString() + "'";
             addedFilter = true;
         } else {
-            disasterURL += " and declarationDate le '" + request.declarationRangeEnd + "'";
+            disasterURL += " and declarationDate le '" + dateObjectdeclarationRangeEnd.toISOString() + "'";
         }
     }
 
@@ -194,6 +204,33 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
 FEMAModule.prototype.isIso8601Date = function(dateString) {
     return CitySDK.prototype.sdkInstance.modules.fema.iso8601reg.test(dateString);
 }
+
+
+// Polyfill
+if (!Date.prototype.toISOString) {
+    (function() {
+
+        function pad(number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return number;
+        }
+
+        Date.prototype.toISOString = function() {
+            return this.getUTCFullYear() +
+                '-' + pad(this.getUTCMonth() + 1) +
+                '-' + pad(this.getUTCDate()) +
+                'T' + pad(this.getUTCHours()) +
+                ':' + pad(this.getUTCMinutes()) +
+                ':' + pad(this.getUTCSeconds()) +
+                '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+                'Z';
+        };
+
+    }());
+}
+
 
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:

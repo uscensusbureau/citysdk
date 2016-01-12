@@ -52,6 +52,13 @@
                                 <button class="btn btn-info runTestButton" type="submit">Run Test</button>
                             </td>
                         </tr>
+                        <tr id="testRowFEMA" dataModuleName="fema">
+                            <td>FEMA Module</td>
+                            <td class="testStatus bg-warning"><span class="glyphicon glyphicon glyphicon-asterisk" aria-hidden="true"> Untested</span></td>
+                            <td>
+                                <button class="btn btn-info runTestButton" type="submit">Run Test</button>
+                            </td>
+                        </tr>
                         <!--<tr id="testRowNoaa" dataModuleName="noaa">
                             <td>NOAA Module</td>
                             <td class="testStatus bg-warning"><span class="glyphicon glyphicon glyphicon-asterisk" aria-hidden="true"> Untested</span></td>
@@ -90,12 +97,16 @@
     <!-- Load the CitySDK Libraries -->
     <script src="../js/citysdk.js" type="text/javascript"></script>
     <script src="../js/citysdk.census.js" type="text/javascript"></script>
+    <script src="../js/citysdk.fema.js" type="text/javascript"></script>
+
     <!-- <script src="../js/citysdk.noaa.js" type="text/javascript"></script> -->
 
 
     <!-- Load the CitySDK Test Suites -->
-<script src="test-suite.citysdk.js" type="text/javascript"></script>
-<script src="test-suite.citysdk.census.js" type="text/javascript"></script>
+    <script src="test-suite.citysdk.js" type="text/javascript"></script>
+    <script src="test-suite.citysdk.census.js" type="text/javascript"></script>
+    <script src="test-suite.citysdk.fema.js" type="text/javascript"></script>
+
 <!--<script src="test-suite.citysdk.noaa.js" type="text/javascript"></script>-->
 
 </body>

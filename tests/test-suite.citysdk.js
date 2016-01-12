@@ -14,6 +14,8 @@ function runAllTests(){
     testResultStatus['all']=true;
     runCoreTest();
     testCensusModule();
+    testFEMAModule();
+
     //testNoaaModule();
 }//runAllTests
 
@@ -81,6 +83,8 @@ jQuery(document).ready(function(){
     jQuery("tr[dataModuleName='all'] .runTestButton").click(runAllTests);
     jQuery("tr[dataModuleName='core'] .runTestButton").click(runCoreTest);
     jQuery("tr[dataModuleName='census'] .runTestButton").click(testCensusModule);
+    jQuery("tr[dataModuleName='fema'] .runTestButton").click(testFEMAModule);
+
     //jQuery("tr[dataModuleName='noaa'] .runTestButton").click(testNoaaModule);
 
 
