@@ -40,9 +40,9 @@ FarmersMarketModule.prototype.minCoreVersionRequired = 1.5;
  * Searches near a specified lat/lng or zipcode
  *
  * @param {object} request JSON request
- *  * request = { lat: 34, lng: 77 }
+ * <pre><code>request = { lat: 34, lng: 77 }</code></pre>
  * Or
- * request = { zip: 20002 }
+ * <pre><code>request = { zip: 20002 }</code></pre>
  * @param {function} callback
  * @returns {object}
  *  <pre><code>{

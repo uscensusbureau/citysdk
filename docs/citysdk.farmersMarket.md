@@ -25,7 +25,7 @@ Searches near a specified lat/lng or zipcode
 
 **Parameters**
 
-**request**: `object`, JSON request * request = { lat: 34, lng: 77 }Orrequest = { zip: 20002 }
+**request**: `object`, JSON request<pre><code>request = { lat: 34, lng: 77 }</code></pre>Or<pre><code>request = { zip: 20002 }</code></pre>
 
 **callback**: `function`, Searches near a specified lat/lng or zipcode
 
