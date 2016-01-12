@@ -85,7 +85,7 @@ if (!Array.isArray) {
 
 /**
  * Makes an AJAX call
- * @param url {string} URL to request
+ * @param {string} url URL to request
  * @return {promise} Returns a standard ajax promise
  */
 CitySDK.prototype.ajaxRequest = function (url) {
@@ -99,7 +99,7 @@ CitySDK.prototype.ajaxRequest = function (url) {
 
 /**
  * Makes an AJAX call (using jsonp)
- * @param url {string} URL to request
+ * @param {string} url URL to request
  * @return {object} Returns a standard ajax promise
  */
 CitySDK.prototype.jsonpRequest = function (url) {
@@ -113,8 +113,8 @@ CitySDK.prototype.jsonpRequest = function (url) {
 
 /**
  * Make an AJAX call (using POST)
- * @param url
- * @param data
+ * @param {string} url
+ * @param {object} data
  * @returns {*}
  */
 CitySDK.prototype.postRequest = function (url, data) {
@@ -256,7 +256,7 @@ CitySDK.prototype.stateCapitals = function () {
 
 /**
  * Gets the coordinates of a state's capital from it's name or 2-letter code.
- * @param stateString {string} Name or 2-letter code of the state (case insensitive)
+ * @param {string} stateString Name or 2-letter code of the state (case insensitive)
  * @return {array} Returns 2-position array of Lat & Long for the capital of the state. Returns false if no state is found.
  */
 CitySDK.prototype.getStateCapitalCoords = function (stateString) {
@@ -292,7 +292,7 @@ CitySDK.prototype.getStateCapitalCoords = function (stateString) {
 //Check if we have latitude and longitude in the request
 /**
  * Scans the request for alternative ways to specify latitude & longiture and migrates those variables to lat & lng positions.
- * @param request {object} the request being made to the module
+ * @param {object} request the request being made to the module
  * @return {object} the updated request
  */
 CitySDK.prototype.parseRequestLatLng = function (request) {
@@ -325,8 +325,8 @@ CitySDK.prototype.parseRequestLatLng = function (request) {
 
 /**
  * Retrieves a value from the cache
- * @param module {string} name of the CitySDK module
- * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
+ * @param {string} module name of the CitySDK module
+ * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
  * @return {object} the value of the cached data.  Returns false if nothing found
  */
 CitySDK.prototype.getCachedData = function (module, functionName, hashKey, callback) {
@@ -368,9 +368,9 @@ CitySDK.prototype.getCachedData = function (module, functionName, hashKey, callb
 
 /**
  * Creates and/or Updates a value from the cache
- * @param module {string} name of the CitySDK module
- * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
- * @param dataValue {object} this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it.
+ * @param {string} module name of the CitySDK module
+ * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
+ * @param {object} dataValue this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it.
  * @return {object} the value of the cached data.  Returns false if nothing found
  */
 CitySDK.prototype.setCachedData = function (module, functionName, hashKey, dataValue) {
@@ -392,8 +392,8 @@ CitySDK.prototype.setCachedData = function (module, functionName, hashKey, dataV
 
 /**
  * Deletes a value from the cache
- * @param module {string} name of the CitySDK module
- * @param hashKey {string} this is a key that identifies the data. Each module has its own hashing scheme.
+ * @param {string} module name of the CitySDK module
+ * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
  * @return {object} the value of the cached data.  Returns false if nothing found
  */
 CitySDK.prototype.deleteCachedData = function (module, functionName, hashKey) {
@@ -407,7 +407,7 @@ CitySDK.prototype.deleteCachedData = function (module, functionName, hashKey) {
 
 /**
  * Checks to see whether local storage is available
- * @param type {string} the tyoe fo storage being tested. Generally 'localstorage' is used.
+ * @param {string} type the tyoe fo storage being tested. Generally 'localstorage' is used.
  * @return {boolean} true if storage type is available
  */
 CitySDK.prototype.storageAvailable = function (type) {

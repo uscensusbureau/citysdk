@@ -7,12 +7,21 @@
 CitySDK.prototype.modules.fema = new FEMAModule();
 
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
+/**
+ * Instantiates an instance of the CitySDK FEMA object.
+ * @constructor
+ */
 function FEMAModule() {
     this.enabled = false;
     this.iso8601reg = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
 };
 
-//Enable function. Stores the API key for this module and sets it as enabled
+/**
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ *
+ * @param {string} apiKey The census API key.
+ * @returns {boolean} True if enabled, false is not enabled.
+ */
 FEMAModule.prototype.enable = function() {
     if(CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired){
         this.enabled = true;
@@ -98,8 +107,9 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  *      }
  * }
  *
- * @param request
- * @param callback
+ * @param {object} request
+ * @param {function} callback
+ * @returns {object}
  */
 FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, callback) {
 
@@ -177,6 +187,12 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
 
 };
 
+/**
+ * Tests string to see if it is a valid ISO8601 date.
+ *
+ * @param {string} dateString The string of the date to be tested
+ * @returns {boolean} True if valid ISO 8601 date.
+ */
 FEMAModule.prototype.isIso8601Date = function(dateString) {
     return CitySDK.prototype.sdkInstance.modules.fema.iso8601reg.test(dateString);
 }

@@ -6,7 +6,20 @@
 
 * * *
 
-### DisasterDeclarationsSummariesRequest(request, callback) 
+## Class: FEMAModule
+Instantiates an instance of the CitySDK FEMA object.
+
+### FEMAModule.enable(apiKey) 
+
+Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+
+**Parameters**
+
+**apiKey**: `string`, The census API key.
+
+**Returns**: `boolean`, True if enabled, false is not enabled.
+
+### FEMAModule.DisasterDeclarationsSummariesRequest(request, callback) 
 
 Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
 
@@ -78,7 +91,7 @@ Response object
 
 **Parameters**
 
-**request**: , Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
+**request**: `object`, Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
 
 Request can be filted by the following fields.  If no values, the API will return the first values
 The API return paged results.  Use skip and take to control which page is returned
@@ -146,7 +159,7 @@ Response object
      }
 }
 
-**callback**: , Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
+**callback**: `function`, Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
 
 Request can be filted by the following fields.  If no values, the API will return the first values
 The API return paged results.  Use skip and take to control which page is returned
@@ -214,6 +227,17 @@ Response object
      }
 }
 
+**Returns**: `object`
+
+### FEMAModule.isIso8601Date(dateString) 
+
+Tests string to see if it is a valid ISO8601 date.
+
+**Parameters**
+
+**dateString**: `string`, The string of the date to be tested
+
+**Returns**: `boolean`, True if valid ISO 8601 date.
 
 
 

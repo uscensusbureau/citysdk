@@ -38,9 +38,9 @@ Make an AJAX call (using POST)
 
 **Parameters**
 
-**url**: , Make an AJAX call (using POST)
+**url**: `string`, Make an AJAX call (using POST)
 
-**data**: , Make an AJAX call (using POST)
+**data**: `object`, Make an AJAX call (using POST)
 
 **Returns**: `*`
 
