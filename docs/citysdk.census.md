@@ -8,11 +8,26 @@
 
 ### parseToVariable(aliasOrVariable) 
 
-Checks to see if a string is in the aliases dictionary and returns the appropriate variable if so.e.g. "income" will return "DP03_0064PE"If the string is not in the alias dictionary, it will return the same string back. This is useful for parsinguser input. (Either a user requests a variable in the alias dictionary OR a specific variable)
+Checks to see if a string is in the aliases dictionary and returns the appropriate variable if so.This function is depreciated and not recommended as it does not check to see if a particular alias is valid for a particular api.e.g. "income" will return "DP03_0064PE"If the string is not in the alias dictionary, it will return the same string back. This is useful for parsinguser input. (Either a user requests a variable in the alias dictionary OR a specific variable)
 
 **Parameters**
 
 **aliasOrVariable**: `string`, A string to parse into a variable string.
+
+**Returns**: `string`, Variable string
+
+
+### parseToValidVariable(aliasOrVariable, api, year) 
+
+Checks to see if a string is in the aliases dictionary and returns the appropriate VALID variable if so.e.g. "income" will return "DP03_0064PE"If the string is not in the alias dictionary, it will return the same string back. This is useful for parsinguser input. (Either a user requests a variable in the alias dictionary OR a specific variable)
+
+**Parameters**
+
+**aliasOrVariable**: `string`, A string to parse into a variable string.
+
+**api**: `string`, The api key being called (acs5, sf1, etc)
+
+**year**: `string`, The year of the desired dataset
 
 **Returns**: `string`, Variable string
 
@@ -55,7 +70,7 @@ Converts ESRI JSON to GeoJSON
 ## Class: GEOtoESRI
 Converts geoJSON to ESRI Json
 
-### GEOtoESRI.getACSVariableDictionary(api, year, callback) 
+### GEOtoESRI.getVariableDictionary(api, year, callback) 
 
 Downloads an ACS API's entire dictionary of variables from the Census
 
@@ -107,7 +122,7 @@ Converts a ZIP code to Lat/Lng and calls the callback on it.
 **callback**: , Converts a ZIP code to Lat/Lng and calls the callback on it.
 
 
-### GEOtoESRI.acsSummaryRequest(request, callback) 
+### GEOtoESRI.summaryRequest(request, callback) 
 
 Makes a request to the ACS5 Summary API. Should be used via APIRequest and not on its own, typically
 
@@ -140,9 +155,31 @@ Processes a data request by looking at a JSON requestJSON Requests should incl
 **callback**: `function`, A callback, which accepts a response parameter
 
 
+### GEOtoESRI.validateRequestGeographyVariables(requestIn, callback) 
+
+Checks the geo-related parts of the request against the geography definition of the API being requested
+
+**Parameters**
+
+**requestIn**: , Checks the geo-related parts of the request against the geography definition of the API being requested
+
+**callback**: , Checks the geo-related parts of the request against the geography definition of the API being requested
+
+
+### GEOtoESRI.validateRequestGeographyVariablesProcess(requestIn, callback) 
+
+Compares the geoDefinition against the request.  Returns false if location variables required by the api are missing.
+
+**Parameters**
+
+**requestIn**: , Compares the geoDefinition against the request.  Returns false if location variables required by the api are missing.
+
+**callback**: , Compares the geoDefinition against the request.  Returns false if location variables required by the api are missing.
+
+
 ### GEOtoESRI.GEORequest(request, callback) 
 
-Example request.{     "lat": latitude,     "lng": longitude,     "sublevel": <optional> true/false,     "container": <optional> place/county/state/tract     "level": place/county/state/blockGroup/tract     "variables": []     "containerGeometry": <optional> Must have sublevel true and container flags, this value should be ESRI json and                         marks the boundaries of the query region. You can convery geojson to ESRI via                         CensusModule.prototype.GEOtoESRI}
+Retrieves data and geographic shapes encoded as geoJSON.Example request.{     "lat": latitude,     "lng": longitude,     "sublevel": <optional> true/false,     "container": <optional> place/county/state/tract     "level": place/county/state/blockGroup/tract     "variables": []     "containerGeometry": <optional> Must have sublevel true and container flags, this value should be ESRI json and                         marks the boundaries of the query region. You can convery geojson to ESRI via                         CensusModule.prototype.GEOtoESRI}
 
 **Parameters**
 

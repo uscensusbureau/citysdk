@@ -654,6 +654,7 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
 };
 CensusModule.prototype.acsSummaryRequest = CensusModule.prototype.summaryRequest; // Alias to maintain backwards support
 CensusModule.prototype.sfSummaryRequest = CensusModule.prototype.summaryRequest; // Alias to maintain backwards support
+
 /**
  * Makes a call to the Census TigerWeb API for Geometry.
  * Our spatial reference is 4326
@@ -1278,6 +1279,8 @@ CensusModule.prototype.validateRequestGeographyVariablesProcess = function(reque
 
 
 /**
+ * Retrieves data and geographic shapes encoded as geoJSON.
+ *
  * Example request.
  *
  * {
