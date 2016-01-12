@@ -45,7 +45,7 @@ FarmersMarketModule.prototype.minCoreVersionRequired = 1.5;
  * request = { zip: 20002 }
  * @param {function} callback
  * @returns {object}
- *  {
+ *  <pre><code>{
  *      results: [
  *          {
  *              id: 11011
@@ -56,7 +56,7 @@ FarmersMarketModule.prototype.minCoreVersionRequired = 1.5;
  *              marketname: "Farmers Market B"
  *          }
  *      ]
- * }
+ * }</code></pre>
  */
 FarmersMarketModule.prototype.search = function(request, callback) {
     var latPattern = /({lat})/;
@@ -112,19 +112,19 @@ FarmersMarketModule.prototype.search = function(request, callback) {
  * Requests details about the farmer's market with specified id
  *
  * @param {object} request JSON request
- * {
+ * <pre><code>{
  *                      id: 2201
- *                  }
+ *                  }</code></pre>
  * @param {function} callback
  * @returns {object}
- * {
+ * <pre><code>{
  *      "marketdetails": {
  *                      "Address":"12011 Government Center Pkwy , Fairfax, Virginia, 22035",
  *                      "GoogleLink":"http://maps.google.com/?q=38.853770%2C%20-77.356961%20(%22Government+Center++Farmers+Market%22)",
  *                      "Products":"",
  *                      "Schedule":"05/01/2014 to 10/30/2014 Thu: 3:00 PM-7:00 PM;<br> <br> <br> "
  *                      }
- * }
+ * }</code></pre>
  */
 FarmersMarketModule.prototype.detail = function(request, callback) {
     var idPattern = /({id})/;

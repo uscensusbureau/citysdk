@@ -41,10 +41,10 @@ EIAModule.prototype.minCoreVersionRequired = 1.5;
  * Call which returns category listings from the dataset explorer
  *
  * @param {object} request
- *  * Request should specify category. If no category specified, will default to the root list of datasets
- * {
+ * Request should specify category. If no category specified, will default to the root list of datasets
+ * <pre><code>{
  *      category: 05
- * }
+ * }</code></pre>
  * @param {function} callback
  */
 EIAModule.prototype.categoryRequest = function(request, callback) {
@@ -61,7 +61,7 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
     categoryURL = categoryURL.replace(categoryPattern, request.category);
 
     CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
-        response = $.parseJSON(response);
+        response = jQuery.parseJSON(response);
         callback(response);
     });
 
@@ -73,10 +73,9 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
  *
  * @param {object} request
  * Request should specify a series, if not, nothing will happen
- *
- * {
+ * <pre><code>{
  *      series: "ELEC.GEN.ALL-AL-99.A"
- * }
+ * }</code></pre>
  * @param {function} callback
  */
 EIAModule.prototype.seriesRequest = function(request, callback) {
@@ -91,7 +90,7 @@ EIAModule.prototype.seriesRequest = function(request, callback) {
     seriesURL = seriesURL.replace(seriesPattern, request.series);
 
     CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
-        response = $.parseJSON(response);
+        response = jQuery.parseJSON(response);
         callback(response);
     });
 };

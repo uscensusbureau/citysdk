@@ -25,11 +25,11 @@ Sends a SQL query to a CKAN server.The DataStore extension must be installed to
 
 **Parameters**
 
-**request**: `object`, JSON Object var request = {    "url": 'catalog.opendata.city',    "Select": '"name","streetAddress","postalCode"',    "From": '"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"',    "Limit": '2'}
+**request**: `object`, JSON Object <pre><code>var request = {    "url": 'catalog.opendata.city',    "Select": '"name","streetAddress","postalCode"',    "From": '"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"',    "Limit": '2'}</code></pre>
 
 **callback**: `function`, Sends a SQL query to a CKAN server.The DataStore extension must be installed to utilise this.
 
-**Returns**: `object`, JSON Object{    "success": true,    "result": {        "records": [            {                "postalCode": "10001",                "streetAddress": "441 WEST 26 STREET",                "name": "Hudson Guild Ccc"            },            {                "postalCode": "10001",                "streetAddress": "459 WEST 26 STREET",                "name": "Hudson Guild Children's Center"            }        ],        "fields": [            {                "type": "text",                "id": "name"            },            {                "type": "text",                "id": "streetAddress"            },            {                "type": "numeric",                "id": "postalCode"            }        ],        "sql": "SELECT \"name\",\"streetAddress\",\"postalCode\" FROM \"e4491e0c-ba09-4cb2-97c1-d466e3e976a5\" LIMIT 2 "    }}
+**Returns**: `object`, JSON Object<pre><code>{    "success": true,    "result": {        "records": [            {                "postalCode": "10001",                "streetAddress": "441 WEST 26 STREET",                "name": "Hudson Guild Ccc"            },            {                "postalCode": "10001",                "streetAddress": "459 WEST 26 STREET",                "name": "Hudson Guild Children's Center"            }        ],        "fields": [            {                "type": "text",                "id": "name"            },            {                "type": "text",                "id": "streetAddress"            },            {                "type": "numeric",                "id": "postalCode"            }        ],        "sql": "SELECT \"name\",\"streetAddress\",\"postalCode\" FROM \"e4491e0c-ba09-4cb2-97c1-d466e3e976a5\" LIMIT 2 "    }}</code></pre>
 
 
 

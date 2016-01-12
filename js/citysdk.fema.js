@@ -45,7 +45,7 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  * The API return paged results.  Use skip and take to control which page is returned
  *
  * @param {object} request
- * {
+ * <pre><code>{
  *      disasterNumber: 3849,
  *      state: "VA",
  *      county: "Loudoun",
@@ -53,10 +53,10 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  *      declarationRangeEnd: "1997-07-16T19:20:30+01:00",
  *      skip: 0,
  *      take: 1000
- * }
+ * }</code></pre>
  * @param {function} callback
  * @returns {object}
- * {
+ * <pre><code>{
  *      "metadata": {
  *          "skip": 0,
  *          "top": 1000,
@@ -107,7 +107,7 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  *              "id": "54f4fbc7df7009de48213e9a"
  *          }]
  *      }
- * }
+ * }</code></pre>
  **/
 FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, callback) {
 
@@ -179,7 +179,7 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
     }
 
     CitySDK.prototype.sdkInstance.ajaxRequest(disasterURL).done(function(response) {
-        response = $.parseJSON(response);
+        response = jQuery.parseJSON(response);
         callback(response);
     });
 

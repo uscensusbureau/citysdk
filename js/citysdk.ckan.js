@@ -41,15 +41,15 @@ CkanModule.prototype.minCoreVersionRequired = 1.5;
 
  *
  * @param {object} request JSON Object
- *  var request = {
+ *  <pre><code>var request = {
  *     "url": 'catalog.opendata.city',
  *     "Select": '"name","streetAddress","postalCode"',
  *     "From": '"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"',
  *     "Limit": '2'
- * }
+ * }</code></pre>
  * @param {function} callback
  * @return {object} JSON Object
- * {
+ * <pre><code>{
  *     "success": true,
  *     "result": {
  *         "records": [
@@ -80,7 +80,7 @@ CkanModule.prototype.minCoreVersionRequired = 1.5;
  *         ],
  *         "sql": "SELECT \"name\",\"streetAddress\",\"postalCode\" FROM \"e4491e0c-ba09-4cb2-97c1-d466e3e976a5\" LIMIT 2 "
  *     }
- * }
+ * }</code></pre>
  */
 CkanModule.prototype.search = function(request, callback) {
     var urlPattern = /({url})/;
@@ -106,7 +106,7 @@ CkanModule.prototype.search = function(request, callback) {
 
     CitySDK.prototype.sdkInstance.ajaxRequest(ckanURL).done(
         function(response) {
-            response = $.parseJSON(response);
+            response = jQuery.parseJSON(response);
             callback(response);
         }
     );

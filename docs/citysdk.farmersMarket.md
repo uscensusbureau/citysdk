@@ -37,11 +37,11 @@ Requests details about the farmer's market with specified id
 
 **Parameters**
 
-**request**: `object`, JSON request{                     id: 2201                 }
+**request**: `object`, JSON request<pre><code>{                     id: 2201                 }</code></pre>
 
 **callback**: `function`, Requests details about the farmer's market with specified id
 
-**Returns**: `object`, {     "marketdetails": {                     "Address":"12011 Government Center Pkwy , Fairfax, Virginia, 22035",                     "GoogleLink":"http://maps.google.com/?q=38.853770%2C%20-77.356961%20(%22Government+Center++Farmers+Market%22)",                     "Products":"",                     "Schedule":"05/01/2014 to 10/30/2014 Thu: 3:00 PM-7:00 PM;<br> <br> <br> "                     }}
+**Returns**: `object`, <pre><code>{     "marketdetails": {                     "Address":"12011 Government Center Pkwy , Fairfax, Virginia, 22035",                     "GoogleLink":"http://maps.google.com/?q=38.853770%2C%20-77.356961%20(%22Government+Center++Farmers+Market%22)",                     "Products":"",                     "Schedule":"05/01/2014 to 10/30/2014 Thu: 3:00 PM-7:00 PM;<br> <br> <br> "                     }}</code></pre>
 
 
 

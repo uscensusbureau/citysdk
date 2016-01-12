@@ -28,7 +28,7 @@ The API return paged results.  Use skip and take to control which page is return
 
 **Parameters**
 
-**request**: `object`, {
+**request**: `object`, <pre><code>{
      disasterNumber: 3849,
      state: "VA",
      county: "Loudoun",
@@ -36,14 +36,14 @@ The API return paged results.  Use skip and take to control which page is return
      declarationRangeEnd: "1997-07-16T19:20:30+01:00",
      skip: 0,
      take: 1000
-}
+}</code></pre>
 
 **callback**: `function`, Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
 
 Request can be filted by the following fields.  If no values, the API will return the first values
 The API return paged results.  Use skip and take to control which page is returned
 
-**Returns**: `object`, {
+**Returns**: `object`, <pre><code>{
      "metadata": {
          "skip": 0,
          "top": 1000,
@@ -94,7 +94,7 @@ The API return paged results.  Use skip and take to control which page is return
              "id": "54f4fbc7df7009de48213e9a"
          }]
      }
-}
+}</code></pre>
 
 ### FEMAModule.isIso8601Date(dateString) 
 
