@@ -7,27 +7,45 @@
 //It is advised to keep the filenames and module property names the same
 CitySDK.prototype.modules.eia = new EIAModule();
 
-//Module object definition. Every module should have an "enabled" property and an "enable"  function.
+/**
+ * Instantiates an instance of the CitySDK EIA object.
+ * @constructor
+ */
 function EIAModule() {
     this.enabled = false;
 };
 
-//Enable function. Stores the API key for this module and sets it as enabled
+/**
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ *
+ * @param {string} apiKey The census API key.
+ * @returns {boolean} True if enabled, false is not enabled.
+ */
 EIAModule.prototype.enable = function(apiKey) {
     this.apiKey = apiKey;
-    this.enabled = true;
+    if(CitySDK.prototype.sdkInstance.version >= EIAModule.prototype.minCoreVersionRequired){
+        this.enabled = true;
+        return true;
+    }else{
+        this.enabled = false;
+        return false;
+    }
 };
+
+// Version Numbers
+EIAModule.prototype.version = 1.0;
+EIAModule.prototype.minCoreVersionRequired = 1.5;
+
 
 /**
  * Call which returns category listings from the dataset explorer
  *
+ * @param {object} request
  * Request should specify category. If no category specified, will default to the root list of datasets
- * {
+ * <pre><code>{
  *      category: 05
- * }
- *
- * @param request
- * @param callback
+ * }</code></pre>
+ * @param {function} callback
  */
 EIAModule.prototype.categoryRequest = function(request, callback) {
     var apiKeyPattern = /({apiKey})/;
@@ -43,7 +61,7 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
     categoryURL = categoryURL.replace(categoryPattern, request.category);
 
     CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
-        response = $.parseJSON(response);
+        response = jQuery.parseJSON(response);
         callback(response);
     });
 
@@ -52,14 +70,13 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
 /**
  * Call which returns data from the specified series
  *
+ *
+ * @param {object} request
  * Request should specify a series, if not, nothing will happen
- *
- * {
+ * <pre><code>{
  *      series: "ELEC.GEN.ALL-AL-99.A"
- * }
- *
- * @param request
- * @param callback
+ * }</code></pre>
+ * @param {function} callback
  */
 EIAModule.prototype.seriesRequest = function(request, callback) {
     var apiKeyPattern = /({apiKey})/;
@@ -73,12 +90,11 @@ EIAModule.prototype.seriesRequest = function(request, callback) {
     seriesURL = seriesURL.replace(seriesPattern, request.series);
 
     CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
-        response = $.parseJSON(response);
+        response = jQuery.parseJSON(response);
         callback(response);
     });
 };
 
-//After this point the module is all up to you
 //References to an instance of the SDK should be called as:
 CitySDK.prototype.sdkInstance;
 //And references to this module should be called as

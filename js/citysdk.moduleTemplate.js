@@ -17,6 +17,16 @@ ModuleTemplateModule.prototype.enable = function(apiKey) {
     this.enabled = true;
 };
 
+
+// Use the search and/or request function as the default request
+ModuleTemplateModule.prototype.request = function(request, callback) {
+    return this.search(request,callback);
+};
+
+ModuleTemplateModule.prototype.search = function(request, callback) {
+
+};
+
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
 CitySDK.prototype.sdkInstance;

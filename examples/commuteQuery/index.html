@@ -15,8 +15,8 @@
 
         function loadState() {
             var stateCode = prompt("Please enter a valid state code", "DC");
-            loadCoords(CensusModule.prototype.stateCapitals[stateCode][0],
-                       CensusModule.prototype.stateCapitals[stateCode][1]);
+            var coords = CitySDK.prototype.getStateCapitalCoords(stateCode);
+            loadCoords(coords[0],coords[1]);
         }
 
         function SortByAveragedProperty(a, b){

@@ -14,8 +14,19 @@ function SocrataModule() {
 
 //Enable function. No API key required
 SocrataModule.prototype.enable = function() {
-    this.enabled = true;
+    if(CitySDK.prototype.sdkInstance.version >= SocrataModule.prototype.minCoreVersionRequired){
+        this.enabled = true;
+        return true;
+    }else{
+        this.enabled = false;
+        return false;
+    }
 };
+
+
+// Version Numbers
+SocrataModule.prototype.version = 1.0;
+SocrataModule.prototype.minCoreVersionRequired = 1.5;
 
 /**
  * Makes a request to the specified Socrata server and resource. You will need the "SODA API" export URL for the resource

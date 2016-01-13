@@ -7,22 +7,49 @@
 CitySDK.prototype.modules.fema = new FEMAModule();
 
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
+/**
+ * Instantiates an instance of the CitySDK FEMA object.
+ * @constructor
+ */
 function FEMAModule() {
     this.enabled = false;
     this.iso8601reg = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/;
+}
+// Endpoint URLS
+FEMAModule.prototype.DEFAULT_ENDPOINTS = {};
+FEMAModule.prototype.DEFAULT_ENDPOINTS.apiURL = "https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?";
+
+
+// Version Numbers
+FEMAModule.prototype.version = 1.0;
+FEMAModule.prototype.minCoreVersionRequired = 1.5;
+
+
+/**
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ *
+ * @param {string} apiKey The census API key.
+ * @returns {boolean} True if enabled, false is not enabled.
+ */
+FEMAModule.prototype.enable = function () {
+    if (CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired) {
+        this.enabled = true;
+        return true;
+    } else {
+        this.enabled = false;
+        return false;
+    }
 };
 
-//Enable function. Stores the API key for this module and sets it as enabled
-FEMAModule.prototype.enable = function() {
-    this.enabled = true;
-};
 
 /**
  * Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
  *
  * Request can be filted by the following fields.  If no values, the API will return the first values
  * The API return paged results.  Use skip and take to control which page is returned
- * {
+ *
+ * @param {object} request
+ * <pre><code>{
  *      disasterNumber: 3849,
  *      state: "VA",
  *      county: "Loudoun",
@@ -30,10 +57,10 @@ FEMAModule.prototype.enable = function() {
  *      declarationRangeEnd: "1997-07-16T19:20:30+01:00",
  *      skip: 0,
  *      take: 1000
- * }
- *
- * Response object
- * {
+ * }</code></pre>
+ * @param {function} callback
+ * @returns {object}
+ * <pre><code>{
  *      "metadata": {
  *          "skip": 0,
  *          "top": 1000,
@@ -84,19 +111,16 @@ FEMAModule.prototype.enable = function() {
  *              "id": "54f4fbc7df7009de48213e9a"
  *          }]
  *      }
- * }
- *
- * @param request
- * @param callback
- */
-FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, callback) {
+ * }</code></pre>
+ **/
+FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function (request, callback) {
 
     var addedFilter = false;
     var addedSkip = false;
-    var disasterURL = "https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries?";
+    var disasterURL = CitySDK.prototype.modules.fema.DEFAULT_ENDPOINTS.apiURL;
 
-    if("disasterNumber" in request && Number(request.disasterNumber)) {
-        if (!addedFilter){
+    if ("disasterNumber" in request && Number(request.disasterNumber)) {
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "disasterNumber eq " + Number(request.disasterNumber);
             addedFilter = true;
@@ -105,8 +129,8 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("state" in request) {
-        if (!addedFilter){
+    if ("state" in request) {
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "state eq '" + request.state + "'";
             addedFilter = true;
@@ -115,8 +139,8 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("county" in request) {
-        if (!addedFilter){
+    if ("county" in request) {
+        if (!addedFilter) {
             disasterURL += "$filter=";
             disasterURL += "startswith(declaredCountyArea, '" + request.county + "')";
             addedFilter = true;
@@ -125,49 +149,86 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function(request, ca
         }
     }
 
-    if("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
-        if (!addedFilter){
+    if ("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
+        var dateObjectdeclarationRangeStart = new Date(request.declarationRangeStart);
+        if (!addedFilter) {
             disasterURL += "$filter=";
-            disasterURL += "declarationDate ge '" + request.declarationRangeStart + "'";
+            disasterURL += "declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
             addedFilter = true;
         } else {
-            disasterURL += " and declarationDate ge '" + request.declarationRangeStart + "'";
+            disasterURL += " and declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
         }
     }
-    if("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
-        if (!addedFilter){
+    if ("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
+        var dateObjectdeclarationRangeEnd = new Date(request.declarationRangeEnd);
+
+        if (!addedFilter) {
             disasterURL += "$filter=";
-            disasterURL += "declarationDate le '" + request.declarationRangeEnd + "'";
+            disasterURL += "declarationDate le '" + dateObjectdeclarationRangeEnd.toISOString() + "'";
             addedFilter = true;
         } else {
-            disasterURL += " and declarationDate le '" + request.declarationRangeEnd + "'";
+            disasterURL += " and declarationDate le '" + dateObjectdeclarationRangeEnd.toISOString() + "'";
         }
     }
 
-    if("skip" in request && Number(request.skip)) {
-        if (addedFilter){
+    if ("skip" in request && Number(request.skip)) {
+        if (addedFilter) {
             disasterURL += "&";
         }
         disasterURL += "$skip=" + Number(request.skip); //Default - root list of all datasets
         addedSkip = true;
     }
 
-    if("take" in request && Number(request.take)) {
-        if (addedFilter || addedSkip){
+    if ("take" in request && Number(request.take)) {
+        if (addedFilter || addedSkip) {
             disasterURL += "&";
-        }disasterURL += "$top=" + Number(request.take); //Default - root list of all datasets
+        }
+        disasterURL += "$top=" + Number(request.take); //Default - root list of all datasets
     }
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(disasterURL).done(function(response) {
-        response = $.parseJSON(response);
+    CitySDK.prototype.sdkInstance.ajaxRequest(disasterURL).done(function (response) {
+        response = jQuery.parseJSON(response);
         callback(response);
     });
 
 };
 
-FEMAModule.prototype.isIso8601Date = function(dateString) {
+/**
+ * Tests string to see if it is a valid ISO8601 date.
+ *
+ * @param {string} dateString The string of the date to be tested
+ * @returns {boolean} True if valid ISO 8601 date.
+ */
+FEMAModule.prototype.isIso8601Date = function (dateString) {
     return CitySDK.prototype.sdkInstance.modules.fema.iso8601reg.test(dateString);
+};
+
+
+// Polyfill
+if (!Date.prototype.toISOString) {
+    (function () {
+
+        function pad(number) {
+            if (number < 10) {
+                return '0' + number;
+            }
+            return number;
+        }
+
+        Date.prototype.toISOString = function () {
+            return this.getUTCFullYear() +
+                '-' + pad(this.getUTCMonth() + 1) +
+                '-' + pad(this.getUTCDate()) +
+                'T' + pad(this.getUTCHours()) +
+                ':' + pad(this.getUTCMinutes()) +
+                ':' + pad(this.getUTCSeconds()) +
+                '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+                'Z';
+        };
+
+    }());
 }
+
 
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
