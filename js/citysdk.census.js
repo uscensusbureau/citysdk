@@ -20,7 +20,7 @@ CensusModule.prototype.enable = function(apiKey) {
 //After this point the module is all up to you
 
 //Defaults
-CensusModule.prototype.DEFAULT_YEAR = 2013;
+CensusModule.prototype.DEFAULT_YEAR = 2014;
 CensusModule.prototype.DEFAULT_LEVEL = "blockGroup";
 CensusModule.prototype.DEFAULT_API = "acs5";
 
@@ -36,7 +36,9 @@ CensusModule.prototype.acsyears = {
     "2010": ["acs5"],
     "2011": ["acs5"],
     "2012": ["acs5", "acs3", "acs1"],
-    "2013": ["acs5", "acs3", "acs1"]
+    "2013": ["acs5", "acs3", "acs1"],
+    "2014": ["acs5", "acs1"]
+
 };
 
 
