@@ -171,16 +171,34 @@ title: CitySDK - Farmer's Market Search
                             <pre id="shortCodeExampleAPIRequest"><code>&lt;script&gt;
 
                                 var <var>sdk</var> = new CitySDK();
-                                var <var>census</var> = <var>sdk.modules.census</var>;
-                                census.enable("Your API Key Here");
+                                var <var>farmersMarkets</var> = sdk.modules.farmersMarket;
 
-                                var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
+                                var <var>request</var> = <span class="machineRequestPlaceholder">{}</span>;
 
-                                census.APIRequest(<var>request</var>, function (<var>response</var>) {
+                                farmersMarkets.APIRequest(request, function (<var>response</var>) {
+                                jQuery(&quot;#rawOutput&quot;).text(JSON.stringify(<var>response</var>));
+                                jQuery(&#39;#output&#39;).empty();
 
-                                //Outputs the raw JSON text
-                                jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+                                if (response.results[0][&#39;id&#39;] != &quot;Error&quot;) {
 
+                                jQuery(&#39;#output&#39;).append(&quot;&lt;table&gt;&lt;tr&gt;&lt;th&gt;Market&lt;/th&gt;&lt;th&gt;Details&lt;/th&gt;&lt;/tr&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&quot;);
+                                for (var i = 0; i &lt; response.results.length; i++) {
+                                jQuery(&#39;#output table tbody&#39;).append(&quot;&lt;tr&gt;&lt;td&gt;&quot; +
+                                response.results[i].marketname + &#39;&lt;/td&gt;&lt;td class=&quot;centeredCellButton
+                                details-link&quot;&gt;&lt;input type=&quot;submit&quot; class=&quot;btn btn-xs
+                                btn-primary&quot; value=&quot;View Details&quot; onclick=&quot;details(&#39; +
+                                response.results[i].id + &#39;,\&#39;&#39; +
+                                String(response.results[i].marketname).replace(/([&#39;&quot;])/g, &quot;\\$1&quot;) +
+                                &#39;\&#39;)&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&#39;);
+                                }
+
+                                } else {
+
+                                jQuery(&#39;#output&#39;).append(&#39;&lt;br/&gt;&lt;div class=&quot;alert alert-warning&quot;
+                                role=&quot;alert&quot;&gt;&lt;strong&gt;No Data.&lt;/strong&gt; There are no farmers
+                                markets matching the requested location.&lt;/div&gt;&#39;);
+
+                                }
                                 });
                                 &lt;/script&gt;</code></pre>
 
@@ -242,9 +260,9 @@ title: CitySDK - Farmer's Market Search
             request.lng = lng;
         }
 
+        jQuery(".machineRequestPlaceholder").text(JSON.stringify(request));
 
-        farmersMarkets.search(request, function (response) {
-            console.log(JSON.stringify(response));
+        farmersMarkets.APIRequest(request, function (response) {
             jQuery("#rawOutput").text(JSON.stringify(response));
             jQuery('#output').empty();
             if (response.results[0]['id'] != "Error") {
