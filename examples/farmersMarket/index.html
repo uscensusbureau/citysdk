@@ -4,94 +4,195 @@ published: true
 title: CitySDK - Farmer's Market Search
 ---
 
+
 <div class="row">
     <div class="col-md-12">
 
 
-        <div class="jumbotron">
-            <div class="container">
-                <i class="fa fa-book fa-5x" style="padding-top: 3rem;"> CitySDK Farmers Market Search</i>
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">1. Select Location</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Specify Location By</label><br/>
+                        <input type="radio" name="location_radios" id="specify_location_coords" value="location_coords"
+                               onclick="visible('location_coords')" checked> <label for="specify_location_coords">Coordinates</label><br/>
+                        <input type="radio" name="location_radios" id="specify_location_zip" value="location_zip"
+                               onclick="visible('location_zip')"> <label for="specify_location_zip">Zip
+                        Code</label><br/>
+                        <!--<input type="radio" name="location_radios" id="specify_location_state" value="location_state"
+                               onclick="visible('location_state')"> <label for="specify_location_state">State
+                        Code</label><br/>
+                        <input type="radio" name="location_radios" id="specify_location_address"
+                               value="location_address" onclick="visible('location_address')"> <label
+                            for="specify_location_address">Address</label>-->
+                    </div><!-- end col-md-4 -->
+
+                    <div class="col-md-8">
+
+
+                        <div class="location_coords">
+                            <label for="lat">Latitude:</label>
+
+                            <div class="input-group">
+                                <input type="text" class="form-control reqparam" id="lat" placeholder=""
+                                       aria-describedby="lat-helpblock">
+                                <span class="input-group-addon" id="basic-addon2">&deg;N</span>
+                            </div>
+                            <span id="lat-helpblock" class="help-block">Number - The latitude of the requested location (North). Also supported: latitude, y</span>
+                            <label for="lng">Longitude:</label>
+
+                            <div class="input-group">
+                                <input type="text" class="form-control reqparam" id="lng" placeholder=""
+                                       aria-describedby="lng-helpblock">
+                                <span class="input-group-addon" id="basic-addon3">&deg;E</span>
+                            </div>
+                            <span id="lng-helpblock" class="help-block">Number - The longitude of the requested location (East). Also supported: longitude, x</span>
+                        </div><!-- end location_coords -->
+
+
+                        <div class="location_zip">
+                            <label>Zip Code:</label>
+                            <input class="reqparam form-control" id="zip" type="text" size="5"
+                                   aria-describedby="zip-helpblock"/>
+
+                            <span id="zip-helpblock" class="help-block">String - The 5-digit zip code of the location. Note that USPS zip code areas do not
+                                align precisely with Census geographies, so when high accuracy is required it is
+                                recommended to use latitude and longitude. Specified as a string because certain zip
+                                codes begin with zeroes.</span>
+
+                        </div><!-- end location_zip -->
+
+
+                        <div class="location_state">
+                            <label for="state">State:</label>
+                            <select class="reqparam form-control" id='state'>
+                                <option value=""></option>
+                            </select>
+
+                            <p>String - The 2-letter USPS state code. It will be converted into the latitude and
+                                longitude of that state's capital.</p>
+
+                        </div><!-- end location_state -->
+
+
+                        <div class="location_address">
+                            <label for="address_street">Street:</label>
+                            <input class="reqparam form-control" id="address_street" type="text"/>
+                            <label for="address_city">City:</label>
+                            <input class="reqparam form-control" id="address_city" type="text"/>
+                            <label for="address_state">State:</label>
+                            <input class="reqparam form-control" id="address_state" type="text"/>
+
+                            <p><em>Object - Represents the address of the requested location.</em></p>
+                        </div><!-- end location_address -->
+
+
+                    </div>
+                </div>
+            </div>
+            {% include coordsTable.html %}
+
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">2. Submit</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="col-md-6">
+                    &nbsp;
+                </div><!-- end col-md-6 -->
+
+                <div class="col-md-6">
+                    <h4>Get the Data</h4>
+
+                    <p><input id="submitFindFarmersMarket" type="button" value="Update data"
+                              class="btn btn-lg btn-primary" style="width: 100%;"></p>
+
+
+                    <div class="loading-icon loading-icon-initialstate"></div>
+
+                </div>
+
+
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <h3>Enter coordinates here:</h3>
 
-        <form>
-            <div class="form-group">
 
-                <label for="lat">Latitude:</label>
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div class="pull-right"><a id="saveLink" class="btn btn-primary btn-xs disabled" href="#" role="button">Save
+                    Variables to CSV File</a></div>
 
-                <div class="input-group">
-                    <input type="text" class="form-control" id="lat" placeholder="" aria-describedby="basic-addon2">
-                    <span class="input-group-addon" id="basic-addon2">&deg;N</span>
-                </div>
-                <label for="lng">Longitude:</label>
+                <h3 class="panel-title">The Returned Data</h3>
 
-                <div class="input-group">
-                    <input type="text" class="form-control" id="lng" placeholder="" aria-describedby="basic-addon3">
-                    <span class="input-group-addon" id="basic-addon3">&deg;E</span>
-                </div>
             </div>
-            <p>OR</p>
+            <div class="panel-body">
 
-            <div class="form-group">
+                <div class="loading-icon loading-icon-initialstate"></div>
 
-                <label for="zip">Zipcode:</label>
-                <input id="zip" type="text"/>
+
+                <div class="outputSet">
+
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active mapControlTab">
+                            <a href="#formateedOutput" aria-controls="formateedOutput" role="tab" data-toggle="tab">Formatted
+                                Results</a>
+                        </li>
+                        <li role="presentation" class="rawOutputControlTab"><a href="#unformattedOutput"
+                                                                               aria-controls="unformattedOutput"
+                                                                               role="tab" data-toggle="tab">Raw JSON
+                            Response</a></li>
+                        <li role="presentation"><a href="#shortCodeExample" aria-controls="shortCodeExample" role="tab"
+                                                   data-toggle="tab">Sample Code</a></li>
+
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="mapControlTab tab-pane fade in active" id="formateedOutput">
+                            <div class="row farmersMarketOutput" style="min-height:500px;width:100%;">
+                                <div class="col-md-6" id="output"></div>
+                                <div class="col-md-6" id="details"></div>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane rawOutputControlTab" id="unformattedOutput">
+                            <p>
+                            <pre id="rawOutput"></pre>
+                            </p>
+
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="shortCodeExample">
+                            <pre id="shortCodeExampleAPIRequest"><code>&lt;script&gt;
+
+                                var <var>sdk</var> = new CitySDK();
+                                var <var>census</var> = <var>sdk.modules.census</var>;
+                                census.enable("Your API Key Here");
+
+                                var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
+
+                                census.APIRequest(<var>request</var>, function (<var>response</var>) {
+
+                                //Outputs the raw JSON text
+                                jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+
+                                });
+                                &lt;/script&gt;</code></pre>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+
             </div>
-            <input id="submitFindFarmersMarket" type="button" value="Update data" class="btn btn-primary">
-        </form>
-    </div>
-    <div class="col-md-6">
-
-        <h3>Some common co-ordinates:</h3>
-        <table class="table table-striped">
-            <tr>
-                <th>Name</th>
-                <th>Lat (N)</th>
-                <th>Lng (E)</th>
-            </tr>
-            <tr onclick="loadCoords(38.9047,-77.0164)">
-                <td>Washington DC</td>
-                <td>38.9047</td>
-                <td>-77.0164</td>
-            </tr>
-            <tr onclick="loadCoords(47.6097,-122.3331)">
-                <td>Seattle</td>
-                <td>47.6097</td>
-                <td>-122.3331</td>
-            </tr>
-            <tr onclick="loadCoords(21.3000,-157.8167)">
-                <td>Honolulu</td>
-                <td>21.3000</td>
-                <td>-157.8167</td>
-            </tr>
-            <tr onclick="loadCoords(25.7753,-80.2089)">
-                <td>Miami</td>
-                <td>25.7753</td>
-                <td>-80.2089</td>
-            </tr>
-            <tr onclick="loadCoords(29.7604,-95.3698)">
-                <td>Houston</td>
-                <td>29.7604</td>
-                <td>-95.3698</td>
-            </tr>
-        </table>
-
-    </div>
-
-</div>
-<div class="row">
-    <div class="col-md-12">
-
-
-        <h4>Details:</h4>
-<div id="details"></div>
-        <h4>Output:</h4>
-<pre id="output"></pre>
+        </div>
 
 
     </div>
@@ -102,7 +203,18 @@ title: CitySDK - Farmer's Market Search
     var farmersMarkets = sdk.modules.farmersMarket;
 
     jQuery(document).ready(function () {
+        visible("location_coords");
         jQuery("#submitFindFarmersMarket").click(submitFindFarmersMarket);
+
+        jQuery("#saveLink").click(function (e) {
+            e.preventDefault();
+
+            var csvString;
+            csvString = convertOutput();
+            saveToCSVfile(csvString);
+
+        });
+
     });
 
     function loadCoords(lat, lng) {
@@ -111,6 +223,10 @@ title: CitySDK - Farmer's Market Search
     }
 
     function submitFindFarmersMarket() {
+        jQuery(".loading-icon-initialstate").show();
+        jQuery(".outputSet").hide();
+
+
         $('#details').empty();
 
         var lat = $("#lat").val();
@@ -119,7 +235,7 @@ title: CitySDK - Farmer's Market Search
 
         var request = {};
 
-        if (lat == "" || lng == "") {
+        if (jQuery('input[name=location_radios]:radio:checked').val() == "location_zip") {
             request.zip = zip;
         } else {
             request.lat = lat;
@@ -128,31 +244,79 @@ title: CitySDK - Farmer's Market Search
 
 
         farmersMarkets.search(request, function (response) {
-            var output = $('#output');
-            output.empty();
-            for (var i = 0; i < response.results.length; i++) {
-                output.append(response.results[i].marketname);
-                output.append('<input type="submit" value="View Details" onclick="details(' + response.results[i].id + ',\'' + String(response.results[i].marketname).replace(/(['"])/g, "\\$1") + '\')">');
-                output.append("<br/>");
+            console.log(JSON.stringify(response));
+            jQuery("#rawOutput").text(JSON.stringify(response));
+            jQuery('#output').empty();
+            if (response.results[0]['id'] != "Error") {
+                jQuery('#output').append("<table><tr><th>Market</th><th>Details</th></tr><tbody></tbody></table>");
+                for (var i = 0; i < response.results.length; i++) {
+                    jQuery('#output table tbody').append("<tr><td>" + response.results[i].marketname + '</td><td class="centeredCellButton details-link"><input type="submit" class="btn btn-xs btn-primary" value="View Details" onclick="details(' + response.results[i].id + ',\'' + String(response.results[i].marketname).replace(/(['"])/g, "\\$1") + '\')"></td></tr>');
+                }
+            } else {
+                jQuery('#output').append('<br/><div class="alert alert-warning" role="alert"><strong>No Data.</strong> There are no farmers markets matching the requested location.</div>');
             }
+
+            jQuery(".loading-icon").hide();
+            jQuery(".outputSet").show();
+            jQuery('#saveLink').removeClass('disabled');
+
         });
     }
 
     function details(id, name) {
         farmersMarkets.detail({"id": id}, function (response) {
             response = response.marketdetails;
+            console.log(response);
             var details = $('#details');
             details.empty();
             details.append('<h3>' + name + '</h3>');
-            details.append('<br/>');
-            details.append(response.Schedule);
-            details.append('<br/>');
-            details.append(response.Address);
-            details.append('<br/>');
-            details.append(' <a href="' + response.GoogleLink + '">(Google Map)</a>');
-            details.append('<br/>');
-            details.append("<b>Products:</b> " + response.Products);
+            details.append("<h4>Schedule</h4><p>" + response.Schedule + "</p>");
+            details.append('<h4>Location <a class="btn btn-xs btn-info" target="_blank" href="' + response.GoogleLink + '">(Google Map)</a></h4><address>' + response.Address + "</address>");
+            details.append('');
+            details.append("<h4>Products</h4><p>" + response.Products + "</p>");
         });
     }
-    ;
+
+    function convertOutput() {
+        var textarea = jQuery('#rawOutput').text();
+        console.log(textarea);
+        var JSONObject = JSON.parse(textarea);
+        console.log(JSONObject);
+        var csvString = "";
+        var keys;
+        for (var index in JSONObject.results) {
+            if (index == 0) {
+                keys = Object.keys(JSONObject.results[index]);
+                for (var key in keys) {
+                    csvString = csvString + keys[key];
+                    if (key != (keys.length - 1)) {
+                        csvString = csvString + ',';
+                    } else {
+                        csvString = csvString + '\n';
+                    }
+                }
+            }
+            for (var key in keys) {
+                var dataJSONObject = JSONObject.results[index];
+                csvString = csvString + dataJSONObject[keys[key]];
+                if (key != (keys.length - 1)) {
+                    csvString = csvString + ',';
+                } else {
+                    csvString = csvString + '\n';
+                }
+            }
+        }
+        console.log(csvString);
+        return csvString;
+    }
+
+    function visible(x) {
+        var tabs = jQuery("*[class^='" + x.split("_")[0] + "']");
+        tabs.each(function (f) {
+            jQuery(this).hide();
+        });
+        jQuery('.' + x).show();
+    }
+
+
 </script>

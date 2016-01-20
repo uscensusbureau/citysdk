@@ -442,11 +442,13 @@ title: How to Use the Census Module
 
             <p>Up until now we've shown you bits and pieces of the request object. Let's take a look at all of the
                 available options.</p>
-            <ul>
-                <p><strong>Location Options</strong></p>
 
-                <p>To specify a location, you must use <strong>lat</strong> and <strong>lng</strong>, or
-                    <strong>zip</strong>, or <strong>state</strong>. At least one of these must be specified.</p>
+            <h3>Location Options</h3>
+
+            <p>To specify a location, you must use <strong>lat</strong> and <strong>lng</strong>, or
+                <strong>zip</strong>, or <strong>state</strong>. At least one of these must be specified.</p>
+            <ul>
+
                 <li><strong>lat</strong> - <em>Number</em> - The latitude of the requested location (North). Also
                     supported: <strong>latitude</strong>, <strong>y</strong></li>
                 <li><strong>lng</strong> - <em>Number</em> - The longitude of the requested location (East). Also
@@ -459,9 +461,11 @@ title: How to Use the Census Module
                 <li><strong>state</strong> - <em>String</em> - The 2-letter USPS state code. It will be converted into
                     the latitude and longitude of that state's capital.
                 </li>
-                <br/>
+            </ul>
 
-                <p><strong>Level Options</strong></p>
+            <h3>Level Options</h3>
+
+            <ul>
                 <li><strong>level</strong> - <em>String</em> - At what level to request the data. These are based on
                     census geographies. Supported options are: "blockGroup",
                     "tract", "county", "state", "us", and "place". Note that the "place" tag currently only supports
@@ -490,9 +494,10 @@ title: How to Use the Census Module
                     of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's
                     <em>GEOtoESRI()</em> method. The boundary can be any arbitrary closed region or regions.
                 </li>
-                <br/>
+            </ul>
 
-                <p><strong>Data Options</strong></p>
+            <h3>Data Options</h3>
+            <ul>
                 <li><strong>api</strong> - <em>String</em> - <em>
                     <small>Optional</small>
                 </em> - Specifies the API to use. Supported options are: "acs1", "acs3", and "acs5". The default is

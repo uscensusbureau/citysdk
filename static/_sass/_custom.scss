@@ -87,7 +87,9 @@ header.header {
 #output td {
   text-align: left;
   display: block;
-  width: 95%;
+  /* width: 95%; */
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 #output th {
@@ -105,9 +107,9 @@ header.header {
   background-color: white;
 }
 
-#output td:nth-child(1) {
+#output td {
   background-color: #f7f7f7;
-  border-top: thin solid #337ab7;
+  border-top: 1px solid #337ab7;
 }
 
 #output td > div:before {
@@ -116,6 +118,9 @@ header.header {
   width: 100px;
 }
 
+#output .centeredCellButton {
+  text-align: center;
+}
 .submitAlert {
   margin-top: 30px;
   margin-bottom: 30px;
@@ -165,7 +170,7 @@ header.header {
   #output td {
     background-color: inherit;
   }
-  #output td:nth-child(1) {
+  #output td {
     background-color: inherit;
     border-top: thin solid #ddd;
   }

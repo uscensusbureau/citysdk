@@ -19,13 +19,13 @@ title: Energy Information Agency Dataset Browser
 <script>
     var sdk = new CitySDK();
     var eia = sdk.modules.eia;
-    var eiaKey = prompt("Please enter your EIA API Key.", "API Key");
+    var eiaKey = citySDKdemoConfiguration.eiakey;
 
     eia.enable(eiaKey);
 
     var output;
 
-    $(document).ready(function () {
+    jQuery(document).ready(function () {
         loadCategory(371);
         output = $('#output');
     });
@@ -70,7 +70,7 @@ title: Energy Information Agency Dataset Browser
 
     function loadSeries(id) {
         eia.seriesRequest({series: id}, function (response) {
-            var data = $('#data');
+            var data = jQuery('#data');
             data.empty();
             data.append('<h3>Data:</h3>');
             data.append(JSON.stringify(response, null, 4));

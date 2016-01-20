@@ -172,6 +172,7 @@ title: GeoRequests and Supplemental Requests
     };
 
     var level = "place";
+    var variables = [];
 
     function initialize() {
         var mapOptions = {
@@ -246,7 +247,6 @@ title: GeoRequests and Supplemental Requests
             reqLevel = "county";
         }
 
-        var variables = [];
 
         jQuery(".variable-selection-bar input:checked").each(function (n, o) {
             variables.push(o.value);

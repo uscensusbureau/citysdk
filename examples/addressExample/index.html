@@ -104,6 +104,7 @@ title: Population and Income by Address
             level: $("#level option:selected").val()
         }
         census.APIRequest(request, function (response) {
+            console.log(response);
             var output = $('#output');
             output.empty();
             output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");

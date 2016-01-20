@@ -19,7 +19,26 @@ title: Census Module Query Builder
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">1. Select Location</h3>
+                <h3 class="panel-title">1. Select Dataset</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="dataset">Dataset</label>
+                        <select class="reqparam form-control" id="dataset"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="apiyear">Year</label>
+                        <select class="reqparam form-control" id="apiyear"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">2. Select Location</h3>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -108,7 +127,7 @@ title: Census Module Query Builder
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">2. Select Desired Variables</h3>
+                <h3 class="panel-title">3. Select Desired Variables</h3>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -125,12 +144,12 @@ title: Census Module Query Builder
                     <div class="col-md-6">
                         <label>Variables</label>
 
-                        <p><em>Need a variable that isn't in the alias list? Input the ACS Variable Code directly
-                            here.</em></p>
+                        <p><em>Need a variable that isn't in the alias list? Input the Variable Code directly here.</em>
+                        </p>
 
                         <div class="input-group">
-                            <input type="text" class="form-control reqparam" id="cenvariable"
-                                   placeholder="Add ACS Variable" aria-describedby="cenvariable-helpblock">
+                            <input type="text" class="form-control reqparam" id="cenvariable" placeholder="Add Variable"
+                                   aria-describedby="cenvariable-helpblock">
                               <span class="input-group-btn">
                                 <button class="btn btn-info" id="add-acs-variable-manually" type="button">Add Variable
                                 </button>
@@ -169,7 +188,7 @@ title: Census Module Query Builder
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">3. How Will The Data Be Grouped?</h3>
+                <h3 class="panel-title">4. How Will The Data Be Grouped?</h3>
             </div>
             <div class="panel-body">
                 <div class="row">
@@ -230,7 +249,7 @@ title: Census Module Query Builder
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">4. Select SDK Call and Submit</h3>
+                <h3 class="panel-title">5. Select SDK Call and Submit</h3>
             </div>
             <div class="panel-body">
 
@@ -469,60 +488,8 @@ title: Census Module Query Builder
     }
 
 
-    jQuery("#saveLink").click(function (e) {
-        e.preventDefault();
-
-        var csvString;
-        csvString = convertOutput();
-        saveToCSVfile(csvString);
-
-    });
-    function convertOutput() {
-        var textarea = jQuery('#rawOutput').text();
-        var JSONObject = JSON.parse(textarea);
-        var csvString = "";
-        var keys;
-        for (var index in JSONObject.data) {
-            if (index == 0) {
-                keys = Object.keys(JSONObject.data[index]);
-                for (var key in keys) {
-                    csvString = csvString + keys[key];
-                    if (key != (keys.length - 1)) {
-                        csvString = csvString + ',';
-                    } else {
-                        csvString = csvString + '\n';
-                    }
-                }
-            }
-            for (var key in keys) {
-                var dataJSONObject = JSONObject.data[index];
-                csvString = csvString + dataJSONObject[keys[key]];
-                if (key != (keys.length - 1)) {
-                    csvString = csvString + ',';
-                } else {
-                    csvString = csvString + '\n';
-                }
-            }
-        }
-        return csvString;
-    }
-
-    function saveToCSVfile(csvString) {
-
-        var filename = "citySDK_output.csv";
-        var fileData;
-        //fileData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
-
-        var blob = new Blob([csvString], {type: "application/csv;charset=utf-8"});
-        saveAs(blob, filename);
 
 
-        /*jQuery('#saveLink').attr({
-                    'download': filename,
-                    'href': fileData,
-                    'target': '_blank'
-         });*/
-    }
     function buildCensusModuleRequest() {
         var request = {};
         var locationSelectionType = jQuery("input[name=location_radios]:checked").val();
@@ -572,6 +539,7 @@ title: Census Module Query Builder
         var container = jQuery('#container').val();
         var sublev = jQuery('#sublevel:checked').val();
 
+
         var variables = jQuery("#cenvariable_manual_set").val().split("|");
 
         jQuery("#variable option:selected").each(function (n, o) {
@@ -603,10 +571,11 @@ title: Census Module Query Builder
             request.sublevel = true;
         }
         request.variables = variables;
-
+        request.api = jQuery("#dataset").val();
+        request.year = jQuery("#apiyear").val();
 
         return (request);
-    }
+    } // end buildCensusModuleRequest
 
     function addManuallySpecifiedVariable(variablename) {
         /*
@@ -614,6 +583,9 @@ title: Census Module Query Builder
          console.log(variablename);
          console.log(censusVariableDefinitionList[variablename]);
          */
+
+        var api = jQuery("#dataset").val();
+        var year = parseInt(jQuery("#apiyear").val());
 
         jQuery(".error-variable-code-alert").fadeOut();
 
@@ -632,7 +604,11 @@ title: Census Module Query Builder
         var knownAlias = false;
         for (var key in variablehash) {
             if (variablehash[key].variable == variablename) {
-                knownAlias = key;
+                if (api in variablehash[key]['api']) {
+                    if (variablehash[key]['api'][api].indexOf(year)) {
+                        knownAlias = key;
+                    }
+                }
             }
         }
 
@@ -645,12 +621,12 @@ title: Census Module Query Builder
 
         } else {
             // Check to see if variable is valid
-            if (variablename in censusVariableDefinitionList) {
+            if (variablename in censusVariableDefinitionList[api][year]) {
                 // Input is a custom variable
 
                 // Add HTML
-                newdescription = '<div class="alert alert-info alias-selected-entry" role="alert"  data-variablename="' + variablename + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close" data-variablename="' + variablename + '"><span aria-hidden="true">&times;</span></button>' + variablename + ': &nbsp;&nbsp;<strong>' + censusVariableDefinitionList[variablename].label + '</strong><br />';
-                newdescription += censusVariableDefinitionList[variablename].concept + '.</div>';
+                newdescription = '<div class="alert alert-info alias-selected-entry" role="alert"  data-variablename="' + variablename + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close" data-variablename="' + variablename + '"><span aria-hidden="true">&times;</span></button>' + variablename + ': &nbsp;&nbsp;<strong>' + censusVariableDefinitionList[api][year][variablename].label + '</strong><br />';
+                newdescription += censusVariableDefinitionList[api][year][variablename].concept + '.</div>';
                 jQuery('#cenvariable_description').append(newdescription);
                 bindVariableCloseAction();
 
@@ -672,7 +648,7 @@ title: Census Module Query Builder
         jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
 
         return true;
-    }
+    }// end addManuallySpecifiedVariable
 
     function removeManuallySpecifiedVariable(variablename) {
 
@@ -700,6 +676,35 @@ title: Census Module Query Builder
 
     }// end removeManuallySpecifiedVariable
 
+    function convertOutput() {
+        var textarea = jQuery('#rawOutput').text();
+        var JSONObject = JSON.parse(textarea);
+        var csvString = "";
+        var keys;
+        for (var index in JSONObject.data) {
+            if (index == 0) {
+                keys = Object.keys(JSONObject.data[index]);
+                for (var key in keys) {
+                    csvString = csvString + keys[key];
+                    if (key != (keys.length - 1)) {
+                        csvString = csvString + ',';
+                    } else {
+                        csvString = csvString + '\n';
+                    }
+                }
+            }
+            for (var key in keys) {
+                var dataJSONObject = JSONObject.data[index];
+                csvString = csvString + dataJSONObject[keys[key]];
+                if (key != (keys.length - 1)) {
+                    csvString = csvString + ',';
+                } else {
+                    csvString = csvString + '\n';
+                }
+            }
+        }
+        return csvString;
+    }
 
     var removeManuallySpecifiedVariableActionHandler = function removeManuallySpecifiedVariableAction(object) {
         removeManuallySpecifiedVariable(jQuery(this).data("variablename"));
@@ -733,8 +738,64 @@ title: Census Module Query Builder
     }// end changeAliasSelection
 
 
+    function updateApiYearList(api) {
+        if (!(api in census.availableDataSets)) {
+            return false;
+        }
+
+        var selectedYear = jQuery("#apiyear").val();
+        jQuery("#apiyear").empty();
+        census.availableDataSets[api].sort();
+
+        for (var yearIdx in census.availableDataSets[api]) {
+            jQuery('<option value="' + census.availableDataSets[api][yearIdx] + '">' + census.availableDataSets[api][yearIdx] + '</option>').appendTo('#apiyear');
+        }
+
+        if (census.availableDataSets[api].indexOf(selectedYear) > -1) {
+            // attempt to keep the currently selected year
+            jQuery("#apiyear").val(selectedYear);
+        } else if (census.availableDataSets[api].indexOf(census.DEFAULT_YEAR) > -1) {
+            // attempt to use the 'default' year defined by the census module
+            jQuery("#apiyear").val(census.DEFAULT_YEAR);
+        }
+
+    }//updateApiYearList
+
+
     // Location to store the census variable list
-    var censusVariableDefinitionList = [];
+    var censusVariableDefinitionList = {};
+
+    function updateAliasAndVariableList(api, year) {
+        // Fill in variables.
+        var sortedvariables = [];
+        variablehash = census.aliases;
+        year = parseInt(year);
+
+        // Clear the already selected variables
+        jQuery("#cenvariable_manual_set").val("");
+        jQuery('#cenvariable_description').html('');
+
+        if (variablehash != undefined) {
+            jQuery.each(variablehash, function (aliasname, oAlias) {
+                if (api in oAlias.api) {
+                    if (oAlias.api[api].indexOf(year) > -1) {
+                        sortedvariables.push(aliasname);
+                    }
+                }
+            });
+            sortedvariables.sort();
+            jQuery('#variable').empty();
+
+            changeAliasSelection();
+
+            jQuery.each(sortedvariables, function (n, alias) {
+                jQuery('<option value="' + alias + '">' + alias + '</option>').appendTo('#variable');
+            });
+        }
+    }//updateAliasAndVariableList
+
+
+
 
 
     jQuery(document).ready(function () {
@@ -750,20 +811,38 @@ title: Census Module Query Builder
             jQuery('<option>' + stateabbrev + '</option>').appendTo('#state');
         });
 
-        // Fill in variables.
-        var sortedvariables = [];
-        variablehash = census.aliases;
 
-
-        if (variablehash != undefined) {
-            $.each(variablehash, function (aliasname, oAlias) {
-                sortedvariables.push(aliasname);
-            });
-            sortedvariables.sort();
-            $.each(sortedvariables, function (n, alias) {
-                jQuery('<option value="' + alias + '">' + alias + '</option>').appendTo('#variable');
-            });
+        // Fill in the API options
+        var datasetsArray = [];
+        jQuery.each(census.availableDataSets, function (index, api) {
+            datasetsArray.push(index);
+        });
+        datasetsArray.sort();
+        for (var index in datasetsArray) {
+            jQuery('<option value="' + datasetsArray[index] + '">' + datasetsArray[index] + '</option>').appendTo('#dataset');
         }
+
+        // Set default API selection
+        jQuery("#dataset").val(census.DEFAULT_API);
+
+        census.availableDataSets[census.DEFAULT_API].sort();
+        for (var yearIdx in census.availableDataSets[census.DEFAULT_API]) {
+            jQuery('<option value="' + census.availableDataSets[census.DEFAULT_API][yearIdx] + '">' + census.availableDataSets[census.DEFAULT_API][yearIdx] + '</option>').appendTo('#apiyear');
+        }
+
+        jQuery("#dataset").on("change", function () {
+            updateApiYearList(jQuery(this).val());
+            updateAliasAndVariableList(jQuery('#dataset').val(), jQuery('#apiyear').val());
+        });
+
+        jQuery("#apiyear").val(census.DEFAULT_YEAR);
+
+        jQuery("#apiyear").on("change", function () {
+            updateAliasAndVariableList(jQuery('#dataset').val(), jQuery('#apiyear').val());
+        });
+
+        // Fil In Variables
+        updateAliasAndVariableList(census.DEFAULT_API, census.DEFAULT_YEAR);
 
         // Make parameter changes immediately be reflected in the displayed request.
         jQuery('.reqparam').change(function () {
@@ -775,14 +854,27 @@ title: Census Module Query Builder
 
         jQuery('#add-acs-variable-manually').click(function () {
             var manuallyDefinedVariable = jQuery("#cenvariable").val();
+            var api = jQuery("#dataset").val();
+            var year = jQuery("#apiyear").val();
 
             // The census variable definition list is empty, load it
-            if (censusVariableDefinitionList.length == 0) {
+            var variablesListIsLoaded = false;
+            if (api in censusVariableDefinitionList) {
+                if (year in censusVariableDefinitionList[api]) {
+                    variablesListIsLoaded = true;
+                }
+            }
+
+            if (variablesListIsLoaded == false) {
                 jQuery(".validating-variable-code-alert").fadeIn();
+                if (!(api in censusVariableDefinitionList)) {
+                    censusVariableDefinitionList[api] = {};
+                }
 
                 // Get the variable list
-                censusVariableDefinitionList = census.getACSVariableDictionary("acs5", "2013", function (result) {
-                    censusVariableDefinitionList = result.variables;
+                censusVariableDefinitionList[api][year] = census.getVariableDictionary(jQuery("#dataset").val(), jQuery("#apiyear").val(), function (result) {
+
+                    censusVariableDefinitionList[api][year] = result.variables;
                     addManuallySpecifiedVariable(manuallyDefinedVariable);
                     jQuery(".validating-variable-code-alert").fadeOut();
                 });
@@ -830,6 +922,14 @@ title: Census Module Query Builder
 
         jQuery("#shortCodeExampleAPIRequest").hide();
 
+        jQuery("#saveLink").click(function (e) {
+            e.preventDefault();
+
+            var csvString;
+            csvString = convertOutput();
+            saveToCSVfile(csvString);
+
+        });
 
     });
 </script>
