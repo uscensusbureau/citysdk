@@ -1,0 +1,229 @@
+---
+layout: guideslayout
+published: true
+title: CitySDK Modules
+---
+
+
+<div class="row">
+
+    <div class="col-md-12">
+
+
+        <p>The CitySDK has a modular structure. The core library provides functions that can be used by various modules.
+            A module in the CitySDK context provides the connection to various data sources. For example, the census
+            module provides connection and processing of census-related APIs and data.</p>
+
+        <h2>The CitySDK Core</h2>
+
+        <p class="text-primary"><span class=""><a
+                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.js"
+                target="_blank">citysdk.js</a></span></p>
+
+        <p>This library provides communications functions, the caching system for CitySDK, and a few hard-coded data
+            sets (such as a directory of state capitals and their latitude and longitude). Individual modules are
+            responsible for deciding how to use the caching system and when to clear the cache.</p>
+
+        <h2>Available Modules</h2>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">CKAN</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-primary"><span class=""><a
+                                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.js"
+                                target="_blank">citysdk.ckan.js</a></span></p>
+
+                        <p>The CKAN module allows the CitySDK to communicate with API’s provided by a CKAN server.</p>
+                    </div>
+                    <div class="panel-footer"><a href="{{ site.baseurl }}/guides/developer/citysdk.ckan.html"
+                                                 class="btn btn-xs btn-primary">Developer Documentation</a></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Census</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-primary"><span class=""><a
+                                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.census.js"
+                                target="_blank">citysdk.census.js</a></span></p>
+
+                        <p>The census module provides functionality to query various census APIs. There are three
+                            primary API groups that can be used:
+
+                        <p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h4>GeoCoder</h4>
+                        <p>This is access via a set of functions that convert various locations (address, zip,
+                            coordinates, etc) into FIPS codes which are used by the other census APIs.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>TigerWeb</h4>
+
+                        <p>This is the Census mapping service that provides shape files that can be overlaid onto maps.
+                            It is accessed via the <code>GEORequest()</code> function.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h4>Api.census.gov</h4>
+
+                        <p>Api.census.gov - These are the various surveys that are available from the Census. It is
+                            accessed via the <code>APIRequest()</code> and/or <code>GEORequest()</code> function.</p>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="panel-footer"><a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                         class="btn btn-xs btn-primary">Developer Documentation</a> <a
+                    href="{{ site.baseurl }}/gettingstarted.html" class="btn btn-xs btn-primary">Getting Started</a> <a
+                    href="{{ site.baseurl }}/guides/censusModule/queryBuilder.html" class="btn btn-xs btn-primary">Query
+                Builder Example</a> <a href="{{ site.baseurl }}/examples/containerGeometry/"
+                                       class="btn btn-xs btn-primary">GeoRequest Example</a></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Energy Information Agency (EIA)</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-primary"><span class=""><a
+                                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.eia.js"
+                                target="_blank">citysdk.eia.js</a></span></p>
+
+                        <p>The EIA module provides access to various summary reports from the Department of Energy. It
+                            returns lists of information categories and individual series of data.
+
+                        <p>
+
+
+                    </div>
+                    <div class="panel-footer"><a href="{{ site.baseurl }}/guides/developer/citysdk.eia.html"
+                                                 class="btn btn-xs btn-primary">Developer Documentation</a> <a
+                            href="{{ site.baseurl }}/examples/eiaBrowser/" class="btn btn-xs btn-primary">Example</a>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Federal Emergency Management Agency (FEMA)</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-primary"><span class=""><a
+                                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.fema.js"
+                                target="_blank">citysdk.fema.js</a></span></p>
+
+                        <p>The FEMA module provides access to the list of all disasters nationally including dates,
+                            durations, and locations.
+
+                        <p>
+
+
+                    </div>
+                    <div class="panel-footer"><a href="{{ site.baseurl }}/guides/developer/citysdk.fema.html"
+                                                 class="btn btn-xs btn-primary">Developer Documentation</a> <a
+                            href="{{ site.baseurl }}/examples/femaExample/" class="btn btn-xs btn-primary">Example</a>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">USDA Farmers Markets</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-primary"><span class=""><a
+                                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.farmersMarket.js"
+                                target="_blank">citysdk.farmersMarket.js</a></span></p>
+
+                        <p>The USDA module provides access to a directory of farmer’s markets including location data
+                            and description of goods for sale.
+
+                        <p>
+
+
+                    </div>
+                    <div class="panel-footer"><a href="{{ site.baseurl }}/guides/developer/citysdk.farmersMarket.html"
+                                                 class="btn btn-xs btn-primary">Developer Documentation</a> <a
+                            href="{{ site.baseurl }}/examples/farmersMarket/" class="btn btn-xs btn-primary">Example</a>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Socrata</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p class="text-primary"><span class=""><a
+                                href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.socrata.js"
+                                target="_blank">citysdk.socrata.js</a></span></p>
+
+                        <p>The Socrata module allows the CitySDK to communicate with API’s provided by a Socrata server.
+                            Socrata is used by many local governments such as data.cityofchicago.org and/or
+                            opendata.socrata.com.
+
+                        <p>
+
+
+                    </div>
+                    <div class="panel-footer"><a href="{{ site.baseurl }}/guides/developer/citysdk.socrata.html"
+                                                 class="btn btn-xs btn-primary">Developer Documentation</a> <a
+                            href="{{ site.baseurl }}/examples/socrataExample/"
+                            class="btn btn-xs btn-primary">Example</a></div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <h2>Creating New Modules</h2>
+
+        <p>Don't see what you need? If you need data that isn't provided by one of these modules, you have a couple
+            options. You can build your own module and submit a pull request or make a request on the <a target="_blank"
+                                                                                                         href="https://github.com/uscensusbureau/citysdk"
+                                                                                                         class="Github">CitySDK
+                Github</a> to
+            have a new module created.</p>
+
+        <p>For more information on how to build a new module, see the guide: <a
+                href="{{ site.baseurl }}/guides/creatingModules.html">How to Create a New CitySDK Module</a>.</p>
+
+
+    </div>
+</div>
