@@ -61,7 +61,7 @@
     <div class="container">
         <i class="fa fa-picture-o fa-5x" style="padding-top: 3rem;"> Variable Explorer</i>
     </div>
-</div>  
+</div>
 
 <div class="button-group filters-button-group" id="filters" style="padding-top: 3rem; padding: 30px; margin-left: 80px;" >
     <button class="button show-all is-checked" data-filter="*">Show All</button>
@@ -72,17 +72,17 @@
 </div>
 
 <script id="item-tpl" type="text/x-handlebars-template">
-     <div class="item {{type}}"> 
+     <div class="item {{type}}">
         <h3 class="name">{{name}}</h3>
-        
+
         <div class="top-container">
-    
+
             <div class="description"> {{description}} </div>
          </div>
-        
+
 
         <ul class="links">
-          {{#each links }} 
+          {{#each links }}
           <li>
             <a href= "{{url}}">{{title}}</a>
           </li>
@@ -278,7 +278,7 @@ body {
 
 $(function () {
 
-   
+
     var data = [
     {
         type: "social",
@@ -333,7 +333,7 @@ $(function () {
         $buttons = $('#filters button');
 
       var source = $("#item-tpl").html();
-      
+
       var template = Handlebars.compile(source);
 
       _(data).each(function (item) {

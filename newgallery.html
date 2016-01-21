@@ -61,7 +61,7 @@
     <div class="container">
         <i class="fa fa-picture-o fa-5x" style="padding-top: 3rem;"> Gallery</i>
     </div>
-</div>  
+</div>
 
 <div class="button-group filters-button-group" id="filters" style="padding-top: 3rem; padding: 30px; margin-left: 80px;" >
     <button class="button show-all is-checked" data-filter="*">Show All</button>
@@ -70,19 +70,19 @@
 </div>
 
 <script id="item-tpl" type="text/x-handlebars-template">
-     <div class="item {{type}}"> 
+     <div class="item {{type}}">
         <h3 class="name">{{name}}</h3>
-        
+
         <div class="top-container">
              <img class="image" src="{{image}}" alt="{{name}}" style="width:100px;">
-    
+
             <div class="description"> {{description}} </div>
          </div>
-        
+
         <i class="githubimage fa fa-github"></i >
 
         <ul class="links">
-          {{#each links }} 
+          {{#each links }}
           <li>
             <a href= "{{url}}">{{title}}</a>
           </li>
@@ -259,7 +259,7 @@ body {
 
 $(function () {
 
-   
+
     var data = [{
         type: "dataset",
         name: "US Census Bureau",
@@ -272,7 +272,7 @@ $(function () {
             url: "{{ site.baseurl }}/guides/censusModule/queryBuilder.html",
             title: "Demo: Interactive Query Builder"
         }]
-    }, 
+    },
                 {
         type: "technology",
         name: "Leaflet",
@@ -295,7 +295,7 @@ $(function () {
             url: "http://esridc.github.io/citysdk-hud/",
             title: "Demo: Housing Loans in Pittsburgh"
         }]
-    }, 
+    },
       {
         type: "dataset",
         name: "US Department of Agriculture",
@@ -308,7 +308,7 @@ $(function () {
             url: "{{ site.baseurl }}/guides/usingMultipleModules.html",
             title: "Demo: Farmer's Markets in California"
         }]
-    },     
+    },
           {
         type: "dataset",
         name: "US Department of Energy",
@@ -321,7 +321,7 @@ $(function () {
             url: "{{ site.baseurl }}/examples/eiaBrowser/",
             title: "Demo: Energy Information Agency browser"
         }]
-    },     
+    },
           {
         type: "technology",
         name: "ESRI",
@@ -334,7 +334,7 @@ $(function () {
             url: "http://esridc.github.io/citysdk-hud/",
             title: "Demo: Chart Showing DC School Enrollment"
         }]
-    },   
+    },
 
               {
         type: "technology",
@@ -351,7 +351,7 @@ $(function () {
             url: "{{ site.baseurl }}/apps/chicagoCAD/",
             title: "Demo: Chicago Crime and Demographics"
         }]
-    },    
+    },
         {
         type: "technology",
         name: "Google Maps",
@@ -363,10 +363,10 @@ $(function () {
         }, {
             url: "http://esridc.github.io/citysdk-hud/",
             title: "Demo: Housing Loans in Pittsburgh"
-        }, 
+        },
         ]
     },
-       {         
+       {
         type: "dataset",
         name: "Public Spaces for Innovation",
         image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/uofchicago.png",
@@ -374,11 +374,11 @@ $(function () {
         links: [{
             url: "https://github.com/dssg/innovation-ecosystems",
             title: "Demo: Innovation Ecosystems"
-             }, 
+             },
         ]
-    },    
-                
-       {         
+    },
+
+       {
         type: "technology",
         name: "Bing Maps",
         image: "https://cdn.rawgit.com/jmeisel/galleryicons/master/bing.png?raw=true",
@@ -386,7 +386,7 @@ $(function () {
         links: [{
             url: "{{ site.baseurl }}/examples/bingMapsExample/",
             title: "Demo: Using Bing Maps with the CitySDK"
-             }, 
+             },
         ]
     }];
 
@@ -394,7 +394,7 @@ $(function () {
         $buttons = $('#filters button');
 
       var source = $("#item-tpl").html();
-      
+
       var template = Handlebars.compile(source);
 
       _(data).each(function (item) {
