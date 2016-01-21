@@ -1,4 +1,5 @@
 /**
+ * @title CitySDK Socrata Module
  * @module CitySDK Socrata Module
  */
 
@@ -13,8 +14,18 @@ function SocrataModule() {
     this.applicationToken = null;
 };
 
-//Enable function. No API key required
-SocrataModule.prototype.enable = function() {
+/**
+ * Enable function. Stores the API key for this module and sets it as enabled.  The API Key is optional for the socrata module but if supplied it will be used as an application Token.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ *
+ * @param {string} apiKey The census API key.
+ * @returns {boolean} True if enabled, false if not enabled.
+ */
+//Enable function. No API key required but is OPTIONAL and can be used as the application token.
+SocrataModule.prototype.enable = function(apiKey) {
+    if(typeof apiKey !== 'undefined'){
+        this.setApplicationToken(apiKey);
+    }
+
     if(CitySDK.prototype.sdkInstance.version >= SocrataModule.prototype.minCoreVersionRequired){
         this.enabled = true;
         return true;
@@ -22,6 +33,8 @@ SocrataModule.prototype.enable = function() {
         this.enabled = false;
         return false;
     }
+
+
 };
 
 
@@ -95,12 +108,12 @@ SocrataModule.prototype.request = function(request, callback) {
 
     CitySDK.prototype.sdkInstance.ajaxRequest(socrataURL).done(
         function(response) {
-            response = $.parseJSON(response);
+            response = jQuery.parseJSON(response);
             callback(response);
         }
     );
 };
-
+SocrataModule.prototype.APIRequest = SocrataModule.prototype.request;
 /**
  * This function accepts a Socrata Application token, and will then append it to every future request
  * Note that an application token is not required, but can help avoid throttling. You can acquire one

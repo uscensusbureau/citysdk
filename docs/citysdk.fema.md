@@ -19,7 +19,7 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **Returns**: `boolean`, True if enabled, false if not enabled.
 
-### FEMAModule.DisasterDeclarationsSummariesRequest(request, callback) 
+### FEMAModule.APIRequest(request, callback) 
 
 Call which returns disaster listings from the DisasterDeclarationsSumamries Dataset
 

@@ -1,4 +1,5 @@
 /**
+ * @title CitySDK USDA Farmer's Market Module
  * @module CitySDK USDA Farmer's Market Module
  */
 
@@ -58,7 +59,7 @@ FarmersMarketModule.prototype.minCoreVersionRequired = 1.5;
  *      ]
  * }</code></pre>
  */
-FarmersMarketModule.prototype.search = function(request, callback) {
+FarmersMarketModule.prototype.APIRequest = function(request, callback) {
     var latPattern = /({lat})/;
     var lngPattern = /({lng})/;
     var zipPattern = /({zip})/;
@@ -107,7 +108,7 @@ FarmersMarketModule.prototype.search = function(request, callback) {
         }
     );
 };
-
+FarmersMarketModule.prototype.search = FarmersMarketModule.prototype.search;
 /**
  * Requests details about the farmer's market with specified id
  *

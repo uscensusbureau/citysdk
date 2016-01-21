@@ -19,7 +19,7 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **Returns**: `boolean`, True if enabled, false if not enabled.
 
-### CitySDK USDA Farmer&#39;s Market Module.FarmersMarketModule.search(request, callback) 
+### CitySDK USDA Farmer&#39;s Market Module.FarmersMarketModule.APIRequest(request, callback) 
 
 Searches near a specified lat/lng or zipcode
 

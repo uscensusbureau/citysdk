@@ -1,4 +1,5 @@
 /**
+ * @title CitySDK FEMA Module
  * @module CitySDK FEMA Module
  * @overview The FEMA Module provides access to FEMA's list of disasters.
  */
@@ -115,7 +116,7 @@ FEMAModule.prototype.enable = function () {
  *      }
  * }</code></pre>
  **/
-FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function (request, callback) {
+FEMAModule.prototype.APIRequest = function (request, callback) {
 
     var addedFilter = false;
     var addedSkip = false;
@@ -194,7 +195,7 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function (request, c
     });
 
 };
-
+FEMAModule.prototype.DisasterDeclarationsSummariesRequest = FEMAModule.prototype.APIRequest;
 /**
  * Tests string to see if it is a valid ISO8601 date.
  *

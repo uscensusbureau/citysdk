@@ -1,5 +1,7 @@
 /**
+ * @title CitySDK Core
  * @module CitySDK Core
+ * @overview This is the core library for the CitySDK.  It houses the ajax mechanics, the caching system, and global data sets (such as state capitals and their coordinate points)
  */
 
 
@@ -335,34 +337,45 @@ CitySDK.prototype.getCachedData = function (module, functionName, hashKey, callb
         return false;
     }
 
-    // In your query section
-    var transaction = this.CitySDKdb.transaction(["citySDKCache"], 'readonly');
-    var store = transaction.objectStore('citySDKCache');
-    var index = store.index('cacheKeys');
-    // Select only those records where prop1=value1 and prop2=value2
-    var request = index.openCursor(IDBKeyRange.only([module, functionName, hashKey]));
-    // Select the first matching record
-    var request = index.get(IDBKeyRange.only([module, functionName, hashKey]));
 
-    request.onerror = function (event) {
-        return null;
-    };
-    request.onsuccess = function (e) {
+    var openRequest = indexedDB.open("CitySDKdb", 1);
 
-        var result = e.target.result;
-        if (result) {
-            //console.log(result.data[0]);
-            if (typeof callback != 'undefined' && typeof callback == 'function') {
-                callback(result.data);
-            }
-            return result.data;
-        } else {
-            if (typeof callback != 'undefined' && typeof callback == 'function') {
-                callback(null);
-            }
+    openRequest.onsuccess = function (e) {
+        CitySDK.prototype.CitySDKdb = e.target.result;
+
+
+
+        // In your query section
+        var transaction = CitySDK.prototype.CitySDKdb.transaction(["citySDKCache"], 'readonly');
+        var store = transaction.objectStore('citySDKCache');
+        var index = store.index('cacheKeys');
+        // Select the first matching record
+        var request = index.get(IDBKeyRange.only([module, functionName, hashKey]));
+
+        request.onerror = function (event) {
             return null;
+        };
+        request.onsuccess = function (e) {
+
+            var result = e.target.result;
+            if (result) {
+                //console.log(result.data[0]);
+                if (typeof callback != 'undefined' && typeof callback == 'function') {
+                    callback(result.data);
+                }
+                return result.data;
+            } else {
+                if (typeof callback != 'undefined' && typeof callback == 'function') {
+                    callback(null);
+                }
+                return null;
+            }
         }
+
+
     }
+
+
 
 
 }//getCachedDate
@@ -381,11 +394,16 @@ CitySDK.prototype.setCachedData = function (module, functionName, hashKey, dataV
 
     // CitySDKdb CitySDKdb citySDKCache
     var storeData = {"module": module, "functionName": functionName, "hashKey": hashKey, "data": dataValue}
+    var openRequest = indexedDB.open("CitySDKdb", 1);
+
+    openRequest.onsuccess = function (e) {
+        CitySDK.prototype.CitySDKdb = e.target.result;
+        var transaction = CitySDK.prototype.CitySDKdb.transaction(["citySDKCache"], "readwrite");
+        var store = transaction.objectStore("citySDKCache");
+        var request = store.add(storeData);
+    }
 
 
-    var transaction = this.CitySDKdb.transaction(["citySDKCache"], "readwrite");
-    var store = transaction.objectStore("citySDKCache");
-    var request = store.add(storeData);
 
     return true;
 }//setCachedData

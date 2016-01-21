@@ -1,12 +1,18 @@
 /**
- * @module CitySDK Census Module
+ * @title  CitySDK Census Module
+ *
  * @overview The Census Module provides access to the various data sets provided by the Census Bureau. This includes several surveys (ACS, Decennial, etc), the geocoder service (convert locations to FIPS locations, and TigerWeb (map shape data).
+ *
+ *
  */
 
 //Attach a new module object to the CitySDK prototype.
 //It is advised to keep the filenames and module property names the same
 CitySDK.prototype.modules.census = new CensusModule();
-
+/**
+ * Instantiates an instance of the CitySDK Census module.
+ * @constructor
+ */
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
 function CensusModule() {
     this.enabled = false;
@@ -371,9 +377,9 @@ CensusModule.prototype.latLngToFIPS = function (inlat, inlng, callback) {
  * @param {string} street Street Address
  * @param {string} city City
  * @param {string} state State (2-Letter USPS Code)
- * @param {function} callback Callback function
+ * @param {function} atfCallback Callback function
  */
-CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, moo2) {
+CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, atfCallback) {
     var intermediate = JSON.parse(JSON.stringify([instreet, incity, instate]));
     var city = intermediate[1];
     var street = intermediate[0];
@@ -384,7 +390,7 @@ CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, moo2
     // Check to see if this question is cached
     CitySDK.prototype.sdkInstance.getCachedData("census", "addressToFIPS", cacheKey, function (cachedData) {
         if (cachedData != null) {
-            moo2(cachedData);
+            atfCallback(cachedData);
             return;
         } else {
             var streetPattern = /({street})/;
@@ -410,7 +416,7 @@ CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, moo2
                 if (CitySDK.prototype.sdkInstance.allowCache == true) {
                     CitySDK.prototype.sdkInstance.setCachedData("census", "addressToFIPS", cacheKey, response.result.addressMatches);
                 }
-                moo2(response.result.addressMatches);
+                atfCallback(response.result.addressMatches);
             });
         }
     });

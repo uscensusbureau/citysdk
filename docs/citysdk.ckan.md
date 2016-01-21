@@ -19,7 +19,7 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **Returns**: `boolean`, True if enabled, false if not enabled.
 
-### CitySDK CKAN Module.CkanModule.search(request, callback) 
+### CitySDK CKAN Module.CkanModule.APIRequest(request, callback) 
 
 Sends a SQL query to a CKAN server.The DataStore extension must be installed to utilise this.
 

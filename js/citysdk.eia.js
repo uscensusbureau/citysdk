@@ -1,4 +1,5 @@
 /**
+ * @title CitySDK EIA API Module
  * @module CitySDK EIA API Module
  * This module requires a key from http://www.eia.gov/
  */
@@ -36,6 +37,11 @@ EIAModule.prototype.enable = function(apiKey) {
 EIAModule.prototype.version = 1.0;
 EIAModule.prototype.minCoreVersionRequired = 1.5;
 
+// Endpoint URLS
+EIAModule.prototype.DEFAULT_ENDPOINTS = {};
+EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL =  "http://api.eia.gov/";
+
+
 
 /**
  * Call which returns category listings from the dataset explorer
@@ -51,7 +57,7 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
     var apiKeyPattern = /({apiKey})/;
     var categoryPattern = /({category})/;
 
-    var categoryURL = "http://api.eia.gov/category/?api_key={apiKey}&category_id={category}";
+    var categoryURL = EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL + "category/?api_key={apiKey}&category_id={category}";
 
     if(!("category" in request)) {
         request.category = 371; //Default - root list of all datasets
@@ -82,7 +88,7 @@ EIAModule.prototype.seriesRequest = function(request, callback) {
     var apiKeyPattern = /({apiKey})/;
     var seriesPattern = /({series})/;
 
-    var seriesURL = "http://api.eia.gov/series/?api_key={apiKey}&series_id={series}"
+    var seriesURL =  EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL + "series/?api_key={apiKey}&series_id={series}"
 
     if(!("series" in request)) return;
 
