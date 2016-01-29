@@ -32,6 +32,9 @@ FarmersMarketModule.prototype.enable = function() {
         return false;
     }
 };
+// Endpoint URLS
+FarmersMarketModule.prototype.DEFAULT_ENDPOINTS = {};
+FarmersMarketModule.prototype.DEFAULT_ENDPOINTS.apiURL = "http://search.ams.usda.gov/farmersmarkets/v1/data.svc/";
 
 // Version Numbers
 FarmersMarketModule.prototype.version = 1.0;
@@ -91,7 +94,7 @@ FarmersMarketModule.prototype.APIRequest = function(request, callback) {
     var zipFragment = "zipSearch?zip={zip}";
     var locFragment = "locSearch?lat={lat}&lng={lng}";
 
-    var farmersMarketURL = "http://search.ams.usda.gov/farmersmarkets/v1/data.svc/{fragment}";
+    var farmersMarketURL = CitySDK.prototype.modules.farmersMarket.DEFAULT_ENDPOINTS.apiURL + "{fragment}";
     if("lat" in request && "lng" in request) {
         farmersMarketURL = farmersMarketURL.replace(fragmentPattern, locFragment);
     } else {
@@ -130,7 +133,7 @@ FarmersMarketModule.prototype.search = FarmersMarketModule.prototype.search;
 FarmersMarketModule.prototype.detail = function(request, callback) {
     var idPattern = /({id})/;
 
-    var detailURL = "http://search.ams.usda.gov/farmersmarkets/v1/data.svc/mktDetail?id={id}";
+    var detailURL = CitySDK.prototype.modules.farmersMarket.DEFAULT_ENDPOINTS.apiURL + "mktDetail?id={id}";
 
     detailURL = detailURL.replace(idPattern, request.id);
 
