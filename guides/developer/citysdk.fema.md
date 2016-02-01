@@ -5,10 +5,6 @@ title: FEMA Module Developer Documentation
 ---
 
 
-
-
-* * *
-
 ## Class: FEMAModule
 Instantiates an instance of the CitySDK FEMA object.
 

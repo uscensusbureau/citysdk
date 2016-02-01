@@ -17,7 +17,7 @@ title: How to Use the Census Module
         <h2>Contents</h2>
         <ul>
             <li><a href="#importingTheModule">Theory of Operation</a></li>
-            <li><a href="#importingTheModule">Importing the Module</a></li>
+            <li><a href="#importingTheModule">Connecting the Module</a></li>
             <li><a href="#requestingVariables">Requesting Variables</a></li>
             <li><a href="#sublevelRequests">Sublevel Requests</a></li>
             <li><a href="#variableAliases">Variable Aliases</a></li>
@@ -55,40 +55,38 @@ title: How to Use the Census Module
             <img src="../static/img/oldprocess.jpg" class="img-responsive"
                  alt="Make a Request which is then processed via the Data API, Geocoding Service, and Geography API separately and combined in a response of Data and GeoJSON shape(s)"/>
 
-            <h2>Importing the Module</h2>
+            <h2>Connecting the Module</h2>
 
             <p>The first step in using the SDK is to import the Javascript files into your page. To use the Census
-                module, you'll need to import jQuery, the
-                core CitySDK (<em>citysdk.js</em>), and the Census module (<em>citysdk.census.js</em>) in your <code>
-                    &lt;head&gt;</code> tag, like so:</p>
+                module, you'll need to include jQuery, the core CitySDK (<code>citysdk.js</code>), and the Census module
+                (<code>citysdk.census.js</code>).</p>
         <pre>
-            &lt;head&gt;
-                &lt;title&gt;CitySDK - Example&lt;/title&gt;
 
-                &lt;script src=&quot;libraries/vendor/jquery/jquery-2.1.3.min.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+                &lt;script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
                 &lt;script src=&quot;js/citysdk.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
                 &lt;script src=&quot;js/citysdk.census.js&quot; text=&quot;text/javascript&quot;&gt;&lt;/script&gt;
 
-            &lt;/head&gt;
         </pre>
-            <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <em>enable()</em>
+
+            <p>The next step is instantiate the SDK and <strong>enable</strong> the module. To do this, call the <code>enable()</code>
                 function on the module, passing to it your API key as a string.</p>
         <pre>
-            var sdk = new CitySDK();
-            var censusModule = sdk.modules.census;
+            var <var>sdk</var> = new CitySDK();
+            var <var>censusModule</var> = sdk.modules.census;
 
             censusModule.enable("CensusAPIKeyHere");
         </pre>
-            <p>Once the module is enabled, you're all set to start using functionality. The following sections will show
-                you how to make some common calls.</p>
+            <p>Once the module is enabled, you can start using the module's functions. The following sections will show
+                some common calls.</p>
         </div>
 
         <div id="requestingVariables">
             <h2>Requesting Variables</h2>
 
-            <p>The Census module can access the Census's ACS 1-year, 3-year, and 5-year surveys. The default survey to
+            <p>The Census module can access various Census surveys. The default survey (and recommended starting point)
+                to
                 access is the ACS 5-year. To request a variable, pass a
-                JSON object containing the request and a callback function to the module's <em>APIRequest()</em>
+                JSON object containing the request and a callback function to the module's <code>APIRequest()</code>
                 function. Below is an example that requests "income" and "population" for Washington D.C.</p>
         <pre>
             var request = {
@@ -257,16 +255,17 @@ title: How to Use the Census Module
                 variable string. A list of all available variables is available at <a href="http://api.census.gov">http://api.census.gov</a>.
             </p>
 
-            <p>The ACS has some complicated and confusing variable codes. To help alleviate this issue, the Census
-                module supports some aliased variables.</p>
+            <p>The ACS has fairly complex variable codes. To expidite common use cases, the Census module supports some
+                aliased variables.</p>
 
-            <p>Aliased variable are specified by a string and return the most appropriate variable.
+            <p>Aliased variables are specified by a string and return the most appropriate variable.
                 Some variables are marked as "normalizable" which will generate a *VARIABLE_NAME*_normalized variable in
-                the return along with the regular variable.</variable_name></p>
+                the return along with the regular variable.</p>
 
             <p>Available aliases can be found <a href="./censusModule/aliases.html">here</a>.</p>
 
-            <p>To find out more about each alias, check out the associated object in the <em>census.aliases</em> object.
+            <p>To find out more about each alias and what api & year combinations supported, check out the associated
+                object in the <code>census.aliases</code> object.
             </p>
         </div>
 
@@ -274,7 +273,7 @@ title: How to Use the Census Module
             <h2>Requesting GeoJSON</h2>
 
             <p>The Census module can acquire GeoJSON for any supported level from the Census's TigerWeb ArcGIS API. To
-                do this, we will submit our request using a different method: <em>GEORequest()</em>. This method
+                do this, we will submit our request using a different method: <code>GEORequest()</code>. This method
                 takes the request object and a callback. The response is GeoJSON.</p>
 
             <p>The following code will get us the GeoJSON for the state of Maryland and attach it directly to a Google
@@ -334,7 +333,7 @@ title: How to Use the Census Module
                         href="http://tigerweb.geo.census.gov/" target="_blank">TigerWeb</a> for more information
                 on these variables.</p>
 
-            <p>We've got GeoJSON for a state - that's all well and good. But what if we want to break this down smaller?
+            <p>We've got GeoJSON for a state. But what if we want to break this down smaller?
                 Let's get all the counties in Delaware:</p>
         <pre>
             var request = {
@@ -348,7 +347,7 @@ title: How to Use the Census Module
             <p>Easy! We just attached the sublevel tag just like when we were requesting data. However, what if we want
                 to get all of the tracts in Delaware? Regularly, the sublevel tag will only
                 break a state into counties. To get more complicated hierarchies we'll need to use the
-                <strong>container</strong> tag. Check out below:</p>
+                <strong>container</strong> tag.</p>
         <pre>
             var request = {
                 state: "DE",
@@ -367,7 +366,8 @@ title: How to Use the Census Module
             <h2>Requesting GeoJSON with Data</h2>
 
             <p>We can now get all the geography we could ever need. But what about data? Surely we don't want to have to
-                make a <em>GEORequest()</em> call AND a <em>APIRequest()</em> call and unify the data ourselves, right?
+                make a <code>GEORequest()</code> call AND a <code>APIRequest()</code> call and unify the data ourselves,
+                right?
                 Right. We'd never let you down like that. You can request variables right alongside your GeoJSON. The
                 variable data will be attached to each feature's properties tag.</p>
 
@@ -387,8 +387,8 @@ title: How to Use the Census Module
 
             census.GEORequest(request, callback);
         </pre>
-            <p>This request will give us a very large GeoJSON object, so we're only going to show you a single
-                feature:</p>
+            <p>This request will give us a very large GeoJSON object, so we're only going to show a single
+                feature as an example:</p>
         <pre>
             {
                 "type" : "Feature",
@@ -423,14 +423,15 @@ title: How to Use the Census Module
             }
         </pre>
             <p>You'll notice that the feature has an extra property - "income" - the variable we requested! This will
-                happen for every feature in the feature collection. No need to unify data and geography on your own!</p>
+                happen for every feature in the feature collection. <em>There is no need to unify data and geography on
+                    your own!</em></p>
 
             <p>A special note about using the "container" tag. Sometimes a container's boundaries surround multiple
                 Census geography boundaries - in this instance, NYC spans multiple
                 New York state counties. Due to the way the ACS API works, we can only retrieve part of the block
                 group's data at once. Because of this, we must make supplemental requests to the
                 API to fill in data that we are missing. You can track how many of these requests are in flight using
-                the <em>SUPPLEMENTAL_REQUESTS_IN_FLIGHT</em> variable in the Census module. When this
+                the <code>SUPPLEMENTAL_REQUESTS_IN_FLIGHT</code> variable in the Census module. When this
                 number is zero, your request has complete data. If it is greater than zero, the SDK is waiting on the
                 return of some data. These requests are typically quick as they do not require any
                 geocoding. Please see the GeoRequest example in the CitySDK github repository for an example of how to
@@ -500,14 +501,11 @@ title: How to Use the Census Module
             <ul>
                 <li><strong>api</strong> - <em>String</em> - <em>
                     <small>Optional</small>
-                </em> - Specifies the API to use. Supported options are: "acs1", "acs3", and "acs5". The default is
-                    "acs5".
+                </em> - Specifies the API to use. The default is "acs5".
                 </li>
                 <li><strong>year</strong> - <em>Number</em> - <em>
                     <small>Optional</small>
-                </em> - Specifies the year of the API to use. Supported years per API vary, please see the
-                    <em>acsyears</em> object
-                    of the Census module for details. Defaults to 2013.
+                </em> - Specifies the year of the API to use. Defaults to the most recent year.
                 </li>
                 <li><strong>variables</strong> - <em>Array</em> - <em>
                     <small>Optional</small>

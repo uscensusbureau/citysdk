@@ -155,6 +155,71 @@ header.header {
   }
 }
 
+/* Gallery Examples */
+.galleryItemsGridView {
+
+}
+
+.galleryItemsGridView .galleryItem {
+  max-width: 370px;
+}
+
+.galleryItemType {
+  float: right;
+}
+
+.galleryItemDesc {
+  clear: both;
+}
+
+.galleryItemLinks {
+  background: #f1f8fb;
+  border: 1px solid #bce8f1;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-radius: 3px;
+  clear: both;
+}
+
+.galleryItemLinks > ul {
+  margin-bottom: 0;
+  padding-left: 10px;
+}
+
+.galleryItemLinks > ul > li {
+  list-style-type: none;
+  margin-bottom: 12px;
+}
+
+.galleryItemLinks > ul > li:last-child {
+  margin-bottom: 0;
+}
+
+.galleryItemEmblem {
+  float: right;
+  margin: 0 0 10px 10px;
+  max-width: 120px;
+}
+
+.galleryFilterControls input[type="checkbox"] {
+  border-top: none;
+  float: right;
+  clear: both;
+  height: 24px;
+  width: 24px;
+}
+
+.galleryFilterControls input[type="checkbox"] + label {
+  float: left;
+  height: 34px;
+}
+
+.galleryFilterControls h3 {
+  clear: both;
+}
+
+/* End Gallery Example */
+
 
 @media (min-width: 480px) {
   #output th, #output td {

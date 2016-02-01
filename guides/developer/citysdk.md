@@ -87,11 +87,15 @@ Retrieves a value from the cache
 
 **module**: `string`, name of the CitySDK module
 
+**functionName**: `string`, this is the name of the function call that is producing the data.
+
 **hashKey**: `string`, this is a key that identifies the data. Each module has its own hashing scheme.
+
+**callback**: `function`, this is a function that will be called upon successful retrieval of the data.
 
 **Returns**: `object`, the value of the cached data.  Returns false if nothing found
 
-### CitySDK.setCachedData(module, hashKey, dataValue) 
+### CitySDK.setCachedData(module, functionName, hashKey, dataValue) 
 
 Creates and/or Updates a value from the cache
 
@@ -101,17 +105,21 @@ Creates and/or Updates a value from the cache
 
 **hashKey**: `string`, this is a key that identifies the data. Each module has its own hashing scheme.
 
+**functionName**: `string`, this is the name of the function call that is producing the data.
+
 **dataValue**: `object`, this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it.
 
 **Returns**: `object`, the value of the cached data.  Returns false if nothing found
 
-### CitySDK.deleteCachedData(module, hashKey) 
+### CitySDK.deleteCachedData(module, functionName, hashKey) 
 
 Deletes a value from the cache
 
 **Parameters**
 
 **module**: `string`, name of the CitySDK module
+
+**functionName**: `string`, this is the name of the function call that is producing the data.
 
 **hashKey**: `string`, this is a key that identifies the data. Each module has its own hashing scheme.
 
@@ -123,7 +131,7 @@ Checks to see whether local storage is available
 
 **Parameters**
 
-**type**: `string`, the tyoe fo storage being tested. Generally 'localstorage' is used.
+**type**: `string`, the type fo storage being tested. Generally 'localstorage' is used.
 
 **Returns**: `boolean`, true if storage type is available
 
