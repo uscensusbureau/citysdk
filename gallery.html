@@ -1,0 +1,702 @@
+---
+layout: default
+title: CitySDK Gallery
+---
+
+<div class="page-header">
+    <h1>Gallery
+        <small>Modules, Code Examples, and Projects</small>
+    </h1>
+</div>
+
+<!-- Filter Controls -->
+
+<div class="panel panel-info galleryFilterControls">
+    <div class="panel-heading">
+        <h3 class="panel-title">Choose What to Show</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-lg-3">
+                <h3><label>Types</label></h3>
+
+                <input type="checkbox" name="projects" value="project" checked="checked" id="galleryProjectsProject">
+                <label for="galleryProjectsProject">Projects</label><br/>
+
+                <input type="checkbox" name="projects" value="example" checked="checked" id="galleryProjectsExample">
+                <label for="galleryProjectsExample">Code Examples</label><br/>
+                <input type="checkbox" name="projects" value="module" checked="checked" id="galleryProjectsModule">
+                <label for="galleryProjectsModule">Modules</label>
+
+            </div><!-- col-lg-4 -->
+            <div class="col-lg-4 col-lg-offset-1">
+
+                <h3><label>Modules Used</label></h3>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="checkbox" name="modules" value="ckan" checked="checked" id="galleryModulesCkan">
+                        <label for="galleryModulesCkan">CKAN</label><br/>
+                        <input type="checkbox" name="modules" value="census" checked="checked"
+                               id="galleryModulesCensus">
+                        <label for="galleryModulesCensus">Census</label><br/>
+                        <input type="checkbox" name="modules" value="eia" checked="checked" id="galleryModulesEIA">
+                        <label for="galleryModulesEIA">EIA</label>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="checkbox" name="modules" value="fema" checked="checked" id="galleryModulesFEMA">
+                        <label for="galleryModulesFEMA">FEMA</label><br/>
+                        <input type="checkbox" name="modules" value="usda" checked="checked"
+                               id="galleryModulesFarmersMarket">
+                        <label for="galleryModulesFarmersMarket">Farmer's Market</label><br/>
+                        <input type="checkbox" name="modules" value="socrata" checked="checked"
+                               id="galleryModulesSocrata">
+                        <label for="galleryModulesSocrata">Socrata</label>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-lg-2 col-lg-offset-1">
+                <h3><label for="gallerySort">Sort By</label></h3>
+                <select class="form-control" id="gallerySort">
+                    <option value="name">Name A-Z</option>
+                    <option value="module">Module A-Z</option>
+                </select>
+            </div>
+        </div><!-- end row-->
+
+
+    </div>
+</div>
+
+
+<!-- gallery -->
+<div class="row">
+    <div class="col-md-12">
+        <div id="galleryItems" class="galleryItemsGridView">
+
+            <!-- census module -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module</span></p>
+
+                        <h3 class="panel-title">US Census Bureau</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/censuslogo.jpg" alt="Census Bureau"
+                                 class="galleryItemEmblem"/>
+
+                            <p>The Census Bureau's mission is to serve as the leading source of quality data about the
+                                nation's people and economy.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="{{ site.baseurl }}/guides/censusModule.html"><i
+                                        class="githubimage fa fa-github"></i> Guide to the Census CitySDK Module</a>
+                                </li>
+                                <li><a href="{{ site.baseurl }}/guides/censusModule/queryBuilder.html"><i
+                                        class="glyphicon glyphicon-link"></i> Demo: Interactive Query Builder</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- ckan module -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="ckan">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module</span></p>
+
+                        <h3 class="panel-title">CKAN</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/CKAN_Logo_full_color.png" alt="CKAN"
+                                 class="galleryItemEmblem"/>
+
+                            <p>The CKAN module allows the CitySDK to consume data published by a CKAN-powered
+                                source.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="http://ckan.org/"><i class="glyphicon glyphicon-link"></i> CKAN
+                                    Reference</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.ckan.html"
+                                                          class="btn btn-xs btn-info">CKAN</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- fema module -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="fema">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module</span></p>
+
+                        <h3 class="panel-title">CitySDK FEMA Module</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/fema-logo-white.png" alt="FEMA"
+                                 class="galleryItemEmblem"/>
+
+                            <p>Access the Disaster Declarations dataset from the Federal Emergency Management Agency to
+                                see what emergencies have occurred in your area.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="{{ site.baseurl }}/examples/femaExample/"><i
+                                        class="glyphicon glyphicon-link"></i> Demo: Disaster Declaration Summaries</a>
+                                </li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">FEMA</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Civic Spark -->
+            <div class="galleryItem galleryShowThisItem" data-project="project" data-module="census">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Project</span></p>
+
+                        <h3 class="panel-title">Civic Spark</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/civicspark.png" alt="Census Bureau"
+                                 class="galleryItemEmblem"/>
+
+                            <p>The CivicSpark App is for civic tech leaders and entrepreneurs to more easily find free
+                                or low-cost spaces in their local communities to meet, teach, and innovate.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="https://github.com/dssg/innovation-ecosystems"><i
+                                        class="githubimage fa fa-github"></i> Dataset Collection and Exploration</a>
+                                </li>
+                                <li><a href="http://civicspark.co/"><i class="glyphicon glyphicon-link"></i> App: Civic
+                                    Spark (prototype)</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="" class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Austin Parks Equity -->
+            <div class="galleryItem galleryShowThisItem" data-project="project" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Project</span></p>
+
+                        <h3 class="panel-title">Austin Parks Equity</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/austinparkequity.png" alt="Austin Park Equity"
+                                 class="galleryItemEmblem"/>
+
+                            <p>This is a civic app that aims to help visualize how Austin's park resources are
+                                distributed throughout the City of Austin.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="https://github.com/open-austin/Austin_Parks_Equity"><i
+                                        class="githubimage fa fa-github"></i> Github Repo: Austin Parks Equity</a></li>
+                                <li><a href="https://github.com/open-austin/atx-citysdk-js"><i
+                                        class="glyphicon glyphicon-link"></i> App: Austin Parks Equity (prototype)</a>
+                                </li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Hyperlocal -->
+            <div class="galleryItem galleryShowThisItem" data-project="project" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Project</span></p>
+
+                        <h3 class="panel-title">Hyperlocal</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/hyperlocal.png" alt="Hyperlocal"
+                                 class="galleryItemEmblem"/>
+
+                            <p>HyperLocal helps Food Truck operators without a lottery parking spot find customers by
+                                locating tweets from those who are hungry.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="https://dchackforchange.herokuapp.com/"><i
+                                        class="glyphicon glyphicon-link"></i> App: Who's Hungry? (prototype)</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Purshable -->
+            <div class="galleryItem galleryShowThisItem" data-project="project" data-module="usda">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Project</span></p>
+
+                        <h3 class="panel-title">Purshable</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/purshable.png" alt="Purshable"
+                                 class="galleryItemEmblem"/>
+
+                            <p>Purshable is a mobile app that will help reduce waste, increase grocer’s profit, and
+                                offer the shopper high quality food at a fraction of the cost.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="http://www.purshable.com/"><i class="glyphicon glyphicon-link"></i>
+                                    Purshable Website</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a
+                            href="{{ site.baseurl }}/guides/developer/citysdk.farmersMarket.html"
+                            class="btn btn-xs btn-info">USDA Farmer's Market</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Accessible Places Finder -->
+            <div class="galleryItem galleryShowThisItem" data-project="project" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Project</span></p>
+
+                        <h3 class="panel-title">Accessible Places Finder</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/accessibility.png" alt="Accessible Places Finder"
+                                 class="galleryItemEmblem"/>
+
+                            <p>This app aims to help people with disabilities to easily find a place to live or travel
+                                in the state of Minnesota that satisfies the specific accessibility needs of this
+                                population group.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="http://website-mnhomefinder.rhcloud.com/accessibilityscore/"><i
+                                        class="glyphicon glyphicon-link"></i> App: Accessible Places Finder (prototype)</a>
+                                </li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Leaflet NYC Boroughs -->
+            <div class="galleryItem galleryShowThisItem" data-project="example" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Code Example</span></p>
+
+                        <h3 class="panel-title">Leaflet NYC Boroughs</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/leaflet.png" alt="Accessible Places Finder"
+                                 class="galleryItemEmblem"/>
+
+                            <p>Leaflet is an Open-Source JavaScript library for web and mobile friendly interactive
+                                maps. It uses the GeoJSON format.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="{{ site.baseurl }}/examples/leafletNYC/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Leaflet NYC Boroughs</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Housing and Urban Development -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module [external]</span></p>
+
+                        <h3 class="panel-title">Housing and Urban Development</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/hud.png" alt="Housing and Urban Development"
+                                 class="galleryItemEmblem"/>
+
+                            <p>Access data on FHA Loans, HUD Insured Properties, Fair Market Rents and dozens of other
+                                datasets related to national housing and property issues.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="https://github.com/esridc/citysdk-hud"><i
+                                        class="githubimage fa fa-github"></i> CitySDK HUD Module</a></li>
+                                <li><a href="http://esridc.github.io/citysdk-hud/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Housing Loans in Pittsburgh</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a> <a
+                            href="https://github.com/esridc/citysdk-hud" class="btn btn-xs btn-default">HUD</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- US Department of Agriculture -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="usda">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module</span></p>
+
+                        <h3 class="panel-title">US Department of Agriculture</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/usda.png" alt="US Department of Agriculture"
+                                 class="galleryItemEmblem"/>
+
+                            <p>Discover fresh food near you with the National Farmer's Market directory module.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li>
+                                    <a href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.farmersMarket.js"><i
+                                            class="githubimage fa fa-github"></i> CitySDK Farmer's Market Module</a>
+                                </li>
+                                <li><a href="{{ site.baseurl }}/guides/usingMultipleModules.html"><i
+                                        class="githubimage fa fa-github"></i> Demo: Farmer's Markets in California</a>
+                                </li>
+
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a
+                            href="{{ site.baseurl }}/guides/developer/citysdk.farmersMarket.html"
+                            class="btn btn-xs btn-info">USDA Farmer's Market</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- US Department of Energy -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="eia">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module</span></p>
+
+                        <h3 class="panel-title">US Department of Energy</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/doe.png" alt="US Department of Energy"
+                                 class="galleryItemEmblem"/>
+
+                            <p>Access the extensive datasets of the U.S. Energy Information Agency, browse various
+                                categories and use their data series in your visualizations.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="https://github.com/uscensusbureau/citysdk/blob/master/js/citysdk.eia.js"><i
+                                        class="githubimage fa fa-github"></i> CitySDK Energy Information Agency
+                                    Module</a></li>
+                                <li><a href="{{ site.baseurl }}/examples/eiaBrowser/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Energy Information Agency
+                                    browser</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.eia.html"
+                                                          class="btn btn-xs btn-info">Energy Information Agency</a>
+                    </div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- ESRI -->
+            <div class="galleryItem galleryShowThisItem" data-project="project" data-module="esri">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module [external]</span></p>
+
+                        <h3 class="panel-title">ESRI / ArcGIS</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/esri.png" alt="ESRI" class="galleryItemEmblem"/>
+
+                            <p>Governments, industry leaders, academics, and nongovernmental organizations (NGOs) use
+                                ESRI to connect with analytic knowledge they need to make decisions.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="http://esridc.github.io/citysdk-arcgis/"><i
+                                        class="githubimage fa fa-github"></i> ESRI ArcGIS Module</a></li>
+                                <li><a href="http://esridc.github.io/citysdk-arcgis/chart.html"><i
+                                        class="githubimage fa fa-github"></i> Demo: Chart Showing DC School
+                                    Enrollment</a></li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="http://esridc.github.io/citysdk-arcgis/"
+                                                          class="btn btn-xs btn-default">ESRI</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Socrata -->
+            <div class="galleryItem galleryShowThisItem" data-project="module" data-module="socrata">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Module</span></p>
+
+                        <h3 class="panel-title">Socrata</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/socrata.png" alt="Socrata"
+                                 class="galleryItemEmblem"/>
+
+                            <p>The Socrata platform is commonly used by municipal, state, and federal agencies use to
+                                distribute their data.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="{{ site.baseurl }}/blob/master/js/citysdk.socrata.js"><i
+                                        class="githubimage fa fa-github"></i> CitySDK Socrata Module</a></li>
+                                <li><a href="{{ site.baseurl }}/examples/socrataExample/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Chicago Payroll Query</a></li>
+                                <li><a href="{{ site.baseurl }}/apps/chicagoCAD/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Chicago Crime and Demographics</a>
+                                </li>
+
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a
+                            href="{{ site.baseurl }}/guides/developer/citysdk.socrata.html" class="btn btn-xs btn-info">Socrata</a>
+                    </div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Google Maps -->
+            <div class="galleryItem galleryShowThisItem" data-project="example" data-module="census,usda">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Code Example</span></p>
+
+                        <h3 class="panel-title">Google Maps</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/googlemaps.png" alt="Google Maps"
+                                 class="galleryItemEmblem"/>
+
+                            <p>There are several CitySDK examples that utilize Google Maps to create interactive web
+                                apps.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="{{ site.baseurl }}/guides/usingMultipleModules.html"><i
+                                        class="githubimage fa fa-github"></i> Demo: Farmer's Markets in California</a>
+                                </li>
+                                <li><a href="http://esridc.github.io/citysdk-hud/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Housing Loans in Pittsburgh</a></li>
+
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a> <a
+                            href="{{ site.baseurl }}/guides/developer/citysdk.farmersMarket.html"
+                            class="btn btn-xs btn-info">USDA Farmer's Market</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+            <!-- Bing Maps -->
+            <div class="galleryItem galleryShowThisItem" data-project="example" data-module="census">
+                <div class="panel panel-default ">
+                    <div class="panel-heading">
+                        <p class="galleryItemType"><span class="label label-primary">Code Example</span></p>
+
+                        <h3 class="panel-title">Bing Maps</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="galleryItemDesc">
+                            <img src="{{ site.baseurl }}/static/img/bing.png" alt="Bing Maps"
+                                 class="galleryItemEmblem"/>
+
+                            <p>CitySDK apps can be built with Microsoft Bing's mapping technology.</p>
+                        </div><!-- end galleryItemDesc -->
+                        <div class="galleryItemLinks">
+                            <ul class="">
+                                <li><a href="{{ site.baseurl }}/examples/bingMapsExample/"><i
+                                        class="githubimage fa fa-github"></i> Demo: Using Bing Maps with the CitySDK</a>
+                                </li>
+                            </ul>
+                        </div><!-- end galleryItemLinks -->
+                    </div><!-- end panel-body -->
+
+                    <div class="panel-footer">Modules: <a href="{{ site.baseurl }}/guides/developer/citysdk.census.html"
+                                                          class="btn btn-xs btn-info">Census</a></div>
+                </div><!-- end panel -->
+            </div><!-- end galleryItem -->
+
+
+        </div><!-- end galleryItems -->
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Submit to the Gallery</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <p>Have a new module to contribute? Want to have your project included in the gallery? Find a really
+                    interesting implementation of the CitySDK? Submit an issue to the project!</p>
+            </div>
+            <div class="col-md-6">
+                <a href="https://github.com/uscensusbureau/citysdk/issues/new" class="btn btn-primary btn-lg">Submit an
+                    Request</a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script src="https://npmcdn.com/imagesloaded@4.1/imagesloaded.pkgd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/2.2.2/isotope.pkgd.min.js"></script>
+<script>
+    jQuery(window).ready(function ($) {
+
+
+        // Isotope Grid
+        $('#galleryItems').imagesLoaded(function () {
+            console.log("Moo");
+            $('#galleryItems').isotope({
+                itemSelector: '.galleryItem',
+                resizable: false, // disable normal resizing
+                getSortData: {
+                    name: function ($item) {
+                        return jQuery($item).find('.panel .panel-heading h3').text();
+                    },
+                    module: function ($item) {
+                        return jQuery($item).find('.panel .panel-footer a').text();
+                    }
+                },
+                sortBy: "name",
+                masonry: {
+                    columnWidth: 380
+                }
+            });
+
+        });
+
+
+        // Form Change Functions
+
+        function updateGalleryFilter() {
+            var selectedModules = [];
+            var selectedProjects = [];
+
+            jQuery('input[name="modules"]:checked').each(function (e) {
+                selectedModules.push(jQuery(this).val());
+            });
+            jQuery('input[name="projects"]:checked').each(function (index, value) {
+                selectedProjects.push(jQuery(this).val());
+            });
+
+            var thisElementProjects = [];
+            var thisElementModules = [];
+            jQuery('.galleryItem').each(function (index, value) {
+                jQuery(this).removeClass("galleryShowThisItem");
+                var showProject = false;
+                var showModule = false;
+                thisElementProjects = jQuery(this).data("project").replace(" ", "").split(",");
+                thisElementModules = jQuery(this).data("module").replace(" ", "").split(",");
+
+                jQuery(selectedModules).each(function (index, value) {
+                    if (thisElementModules.indexOf(value) > -1) {
+                        showModule = true;
+                    }
+                });
+                jQuery(selectedProjects).each(function (index, value) {
+                    if (thisElementProjects.indexOf(value) > -1) {
+                        showProject = true;
+                    }
+                });
+                if (showProject == true && showModule == true) {
+                    jQuery(this).addClass("galleryShowThisItem");
+                }
+                $('#galleryItems').isotope({
+                    filter: '.galleryShowThisItem'
+                });
+            });
+
+        }
+
+        jQuery('input[name="modules"]').on("click", updateGalleryFilter);
+        jQuery('input[name="projects"]').on("click", updateGalleryFilter);
+
+        jQuery('#gallerySort').on("change", function () {
+            $('#galleryItems').isotope({sortBy: jQuery(this).val()});
+        });
+
+    });
+</script>
