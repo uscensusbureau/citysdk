@@ -203,6 +203,7 @@ CensusModule.prototype.parseToValidVariable = function (aliasOrVariable,api,year
  * @returns {boolean} Returns TRUE if the alias is normalizable (as marked in the alias dictionary), otherwise, false.
  */
 CensusModule.prototype.isNormalizable = function (alias) {
+
     if (alias in this.aliases) {
         if ("normalizable" in this.aliases[alias]) {
             if (this.aliases[alias].normalizable == true) {
@@ -603,11 +604,13 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
             var variableString = "";
 
             for (var i = 0; i < cows.variables.length; i++) {
+
                 if (CensusModule.prototype.isNormalizable(cows.variables[i])) {
                         // add acs population variable
-                        if (jQuery.inArray("population", cows.variables) < 0) {
+                        if (cows.variables.indexOf("population") < 0) {
                             //We have a variable that is normalizable, but no population in the request.
                             //Grab the population
+
                             cows.variables.push("population");
                         }
                     //We have normalizable variables AND a request for population, we can break the for loop now
@@ -1138,21 +1141,18 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
                             }
 
                             for (var j = 0; j < request.variables.length; j++) {
-                                if(['sf1','sf3'].indexOf(request.api)){
-                                    // Note - sf1/sf3 apis cannot be normalized due to lack of 'population' alias
+
                                     currentVariable = request.variables[j];
                                     var intermediateVar = currentResponseItem[window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year), response[0])];
                                     if(intermediateVar){
                                         currentDataObject[currentVariable] = intermediateVar;
                                     }
 
-                                }else{
-                                    if (response[0][j] == "ANPSADPI") continue;
-                                    currentVariable = CitySDK.prototype.sdkInstance.modules.censusDecennial.parseToAlias(response[0][j], request);
-                                    if(currentVariable){
-                                        currentDataObject[currentVariable] = currentResponseItem[j];
+                                //Variable is Normalizeable
+                                    if (intermediateVar && CitySDK.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
+                                        currentDataObject[currentVariable + "_normalized"] =currentDataObject[currentVariable] /  currentResponseItem[window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[0])];
                                     }
-                                }
+
                             }
 
                             request.data.push(currentDataObject);
@@ -1168,8 +1168,8 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
                             }
 
 
-                            if (CitySDK.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
-                                currentDataObject[currentVariable + "_normalized"] = currentDataObject[currentVariable] / response[1][window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[0])]
+                            if (currentDataObject[currentVariable] && CitySDK.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
+                                currentDataObject[currentVariable + "_normalized"] = currentDataObject[currentVariable] / response[1][window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[1])];
                             }
 
                             //Move it into an array for consistency
