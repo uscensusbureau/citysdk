@@ -1,6 +1,6 @@
 name: CitySDK Project
 markdown: kramdown
-highlighter: pygments
+highlighter: rouge
 safe: true
 baseurl: /citysdk
 exclude: ['.ruby-version', 'node_modules', 'package.json', 'bower.json']
