@@ -418,6 +418,9 @@ title: Census Module Query Builder
         src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
 <script>
 
+
+    var default_year = 2014;
+    
     function requestApiKey() {
         window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
     }
@@ -754,9 +757,9 @@ title: Census Module Query Builder
         if (census.availableDataSets[api].indexOf(selectedYear) > -1) {
             // attempt to keep the currently selected year
             jQuery("#apiyear").val(selectedYear);
-        } else if (census.availableDataSets[api].indexOf(census.DEFAULT_YEAR) > -1) {
+        } else if (census.availableDataSets[api].indexOf(default_year) > -1) {
             // attempt to use the 'default' year defined by the census module
-            jQuery("#apiyear").val(census.DEFAULT_YEAR);
+            jQuery("#apiyear").val(default_year);
         }
 
     }//updateApiYearList
@@ -835,14 +838,14 @@ title: Census Module Query Builder
             updateAliasAndVariableList(jQuery('#dataset').val(), jQuery('#apiyear').val());
         });
 
-        jQuery("#apiyear").val(census.DEFAULT_YEAR);
+        jQuery("#apiyear").val(default_year);
 
         jQuery("#apiyear").on("change", function () {
             updateAliasAndVariableList(jQuery('#dataset').val(), jQuery('#apiyear').val());
         });
 
         // Fil In Variables
-        updateAliasAndVariableList(census.DEFAULT_API, census.DEFAULT_YEAR);
+        updateAliasAndVariableList(census.DEFAULT_API, default_year);
 
         // Make parameter changes immediately be reflected in the displayed request.
         jQuery('.reqparam').change(function () {
