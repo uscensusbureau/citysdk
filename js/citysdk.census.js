@@ -24,7 +24,6 @@ CensusModule.prototype.version = 1.5;
 CensusModule.prototype.minCoreVersionRequired = 1.5;
 
 // Defaults
-CensusModule.prototype.DEFAULT_YEAR = 2014;
 CensusModule.prototype.DEFAULT_LEVEL = "blockGroup";
 CensusModule.prototype.DEFAULT_API = "acs5";
 
