@@ -134,6 +134,6 @@ Checks to see whether local storage is available
 
 
 
-
+**Overview:** This is the core library for the CitySDK.  It houses the ajax mechanics, the caching system, and global data sets (such as state capitals and their coordinate points)
 
 

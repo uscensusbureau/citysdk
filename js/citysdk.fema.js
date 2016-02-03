@@ -1,6 +1,9 @@
 /**
- * This is the CitySDK Module Template's FEMA API module.
+ * @title CitySDK FEMA Module
+ * @module CitySDK FEMA Module
+ * @overview The FEMA Module provides access to FEMA's list of disasters.
  */
+
 
 //Attach a new module object to the CitySDK prototype.
 //It is advised to keep the filenames and module property names the same
@@ -29,7 +32,7 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
- * @returns {boolean} True if enabled, false is not enabled.
+ * @returns {boolean} True if enabled, false if not enabled.
  */
 FEMAModule.prototype.enable = function () {
     if (CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired) {
@@ -113,7 +116,7 @@ FEMAModule.prototype.enable = function () {
  *      }
  * }</code></pre>
  **/
-FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function (request, callback) {
+FEMAModule.prototype.APIRequest = function (request, callback) {
 
     var addedFilter = false;
     var addedSkip = false;
@@ -192,7 +195,7 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = function (request, c
     });
 
 };
-
+FEMAModule.prototype.DisasterDeclarationsSummariesRequest = FEMAModule.prototype.APIRequest;
 /**
  * Tests string to see if it is a valid ISO8601 date.
  *

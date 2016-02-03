@@ -1,4 +1,4 @@
-# Global
+# CitySDK USDA Farmer&#39;s Market Module
 
 
 
@@ -9,7 +9,7 @@
 ## Class: FarmersMarketModule
 Instantiates an instance of the CitySDK Farmer's Market object.
 
-### FarmersMarketModule.enable(apiKey) 
+### CitySDK USDA Farmer&#39;s Market Module.FarmersMarketModule.enable(apiKey) 
 
 Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
 
@@ -17,9 +17,9 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **apiKey**: `string`, The census API key.
 
-**Returns**: `boolean`, True if enabled, false is not enabled.
+**Returns**: `boolean`, True if enabled, false if not enabled.
 
-### FarmersMarketModule.search(request, callback) 
+### CitySDK USDA Farmer&#39;s Market Module.FarmersMarketModule.APIRequest(request, callback) 
 
 Searches near a specified lat/lng or zipcode
 
@@ -31,7 +31,7 @@ Searches near a specified lat/lng or zipcode
 
 **Returns**: `object`, <pre><code>{     results: [         {             id: 11011             marketname: "Farmers Market A"         },         {             id: 4203             marketname: "Farmers Market B"         }     ]}</code></pre>
 
-### FarmersMarketModule.detail(request, callback) 
+### CitySDK USDA Farmer&#39;s Market Module.FarmersMarketModule.detail(request, callback) 
 
 Requests details about the farmer's market with specified id
 

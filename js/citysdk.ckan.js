@@ -1,5 +1,8 @@
 /**
- * This is the CitySDK CKAN Module Template
+ * @title CitySDK CKAN Module
+ * @module CitySDK CKAN Module
+ *
+ *
  */
 
 //Attach a new module object to the CitySDK prototype.
@@ -14,11 +17,24 @@ function CkanModule() {
     this.enabled = false;
 };
 
+
+
+// Endpoint URLS
+CkanModule.prototype.DEFAULT_ENDPOINTS = {};
+CkanModule.prototype.DEFAULT_ENDPOINTS.apiURL =  "https://{url}/api/action/datastore_search_sql?sql=";
+
+
+
+// Version Numbers
+CkanModule.prototype.version = 1.0;
+CkanModule.prototype.minCoreVersionRequired = 1.5;
+
+
 /**
  * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
- * @returns {boolean} True if enabled, false is not enabled.
+ * @returns {boolean} True if enabled, false if not enabled.
  */
 CkanModule.prototype.enable = function() {
     if(CitySDK.prototype.sdkInstance.version >= CkanModule.prototype.minCoreVersionRequired){
@@ -29,10 +45,6 @@ CkanModule.prototype.enable = function() {
         return false;
     }
 };
-
-// Version Numbers
-CkanModule.prototype.version = 1.0;
-CkanModule.prototype.minCoreVersionRequired = 1.5;
 
 
 /**
@@ -82,10 +94,10 @@ CkanModule.prototype.minCoreVersionRequired = 1.5;
  *     }
  * }</code></pre>
  */
-CkanModule.prototype.search = function(request, callback) {
+CkanModule.prototype.APIRequest = function(request, callback) {
     var urlPattern = /({url})/;
 
-    var ckanURL = "https://{url}/api/action/datastore_search_sql?sql=";
+    var ckanURL = CitySDK.prototype.modules.ckan.DEFAULT_ENDPOINTS.apiURL;
 
     ckanURL = ckanURL.replace(urlPattern, request.url);
 
@@ -111,7 +123,7 @@ CkanModule.prototype.search = function(request, callback) {
         }
     );
 };
-
+CkanModule.prototype.search = CkanModule.prototype.APIRequest;
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
 CitySDK.prototype.sdkInstance;

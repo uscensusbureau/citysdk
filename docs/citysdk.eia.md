@@ -1,4 +1,4 @@
-# Global
+# CitySDK EIA API ModuleThis module requires a key from http:&#x2F;&#x2F;www.eia.gov&#x2F;
 
 
 
@@ -9,7 +9,7 @@
 ## Class: EIAModule
 Instantiates an instance of the CitySDK EIA object.
 
-### EIAModule.enable(apiKey) 
+### CitySDK EIA API ModuleThis module requires a key from http:&#x2F;&#x2F;www.eia.gov&#x2F;.EIAModule.enable(apiKey) 
 
 Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
 
@@ -17,9 +17,9 @@ Enable function. Stores the API key for this module and sets it as enabled.  It 
 
 **apiKey**: `string`, The census API key.
 
-**Returns**: `boolean`, True if enabled, false is not enabled.
+**Returns**: `boolean`, True if enabled, false if not enabled.
 
-### EIAModule.categoryRequest(request, callback) 
+### CitySDK EIA API ModuleThis module requires a key from http:&#x2F;&#x2F;www.eia.gov&#x2F;.EIAModule.categoryRequest(request, callback) 
 
 Call which returns category listings from the dataset explorer
 
@@ -30,7 +30,7 @@ Call which returns category listings from the dataset explorer
 **callback**: `function`, Call which returns category listings from the dataset explorer
 
 
-### EIAModule.seriesRequest(request, callback) 
+### CitySDK EIA API ModuleThis module requires a key from http:&#x2F;&#x2F;www.eia.gov&#x2F;.EIAModule.seriesRequest(request, callback) 
 
 Call which returns data from the specified series
 
