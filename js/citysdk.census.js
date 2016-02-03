@@ -217,6 +217,7 @@ CensusModule.prototype.isNormalizable = function (alias) {
 /**
  * Parses the state code in a request object, converting two letter state codes to lat/lng
  * @param {object} request Object representing an api request
+ * @returns {object} returns the request Object with lat and lng populated
  */
 CensusModule.prototype.parseRequestStateCode = function (request) {
     //This supports 2 letter state codes in a request
@@ -225,7 +226,6 @@ CensusModule.prototype.parseRequestStateCode = function (request) {
             if (!("lat" in request) && !("lng" in request)) {
                 request.lat = this.stateCapitals[request.state][0];
                 request.lng = this.stateCapitals[request.state][1];
-                delete request.state;
             } else {
                 delete request.state;
             }
