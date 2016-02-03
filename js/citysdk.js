@@ -32,7 +32,6 @@ function CitySDK() {
         var openRequest = indexedDB.open("CitySDKdb", 1);
 
         openRequest.onupgradeneeded = function (e) {
-            console.log("running onupgradeneeded");
             CitySDK.prototype.CitySDKdb = e.target.result;
 
             if (!CitySDK.prototype.CitySDKdb.objectStoreNames.contains("citySDKCache")) {
