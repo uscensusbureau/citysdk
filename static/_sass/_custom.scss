@@ -160,6 +160,22 @@ header.header {
 
 }
 
+.galleryInputStripe {
+  overflow: hidden;
+  padding: 5px 5px 0 5px;
+}
+
+.galleryInputGroup .galleryInputStripe:nth-child(odd) {
+  background: rgb(242, 242, 242);
+}
+
+.galleryInputStripe > label {
+  margin-top: 5px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+
 .galleryItemsGridView .galleryItem {
   max-width: 370px;
 }
