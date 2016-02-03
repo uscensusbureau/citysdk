@@ -984,7 +984,6 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
  */
 CensusModule.prototype.APIRequest = function (requestIn, callback) {
     var request = JSON.parse(JSON.stringify(requestIn));
-
     if (!("api" in request)) {
         request.api = this.DEFAULT_API;
     }
@@ -992,16 +991,18 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
 
     // Validate the year
         //Check for a year
-        if (!("year" in request)) {
-            request.year = this.availableDataSets[request.api][0];
-        }
+
 
         // Check year against possible years per API type and set default if invalid year is requested.
         if(request.api in this.availableDataSets){
+            var possibleYears = this.availableDataSets[request.api].sort().reverse();
+
             // ACS type query
-            if (this.availableDataSets[request.api].indexOf(request.year.toString()) == -1) {
+            if (!("year" in request)) {
+                request.year = possibleYears[0];
+            }else if (this.availableDataSets[request.api].indexOf(request.year.toString()) == -1) {
                 console.log("Warning: API " + request.api + " does not appear to support " + request.year);
-                request.year = this.availableDataSets[request.api][0];
+                request.year = possibleYears[0];
             }
         }
 
@@ -1074,14 +1075,12 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             request["place_name"] = ("Incorporated Places" in geographies) ? (geographies["Incorporated Places"].length > 0) ? geographies["Incorporated Places"][0]["NAME"] : null : null;
 
             request.geocoded = true;
-
             CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
         });
         return; //We return because the callback will fix our request into FIPs, and then call the request again
     }
 
     // Check to see if geography is complete as required by api
-
     if("geographyValidForAPI" in request){
         if(request.geographyValidForAPI == false){
             callback({});
@@ -1191,10 +1190,11 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             return;
         }
     }else{
-        if ((request.level == "us" && !("geographyValidForAPI" in request)) || "containerGeometry" in request) {
+
+        if ((request.level == "us" && !("geographyValidForAPI" in request) && !("state" in request)) || "containerGeometry" in request) {
 
             //Is the level the US?
-            if (request.level == "us") {
+            if (request.level == "us" ) {
                 //Ok, let's just resubmit it with D.C. as the "state"
                 request.state = "DC";
                 CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
