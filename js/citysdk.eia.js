@@ -39,7 +39,7 @@ EIAModule.prototype.minCoreVersionRequired = 1.5;
 
 // Endpoint URLS
 EIAModule.prototype.DEFAULT_ENDPOINTS = {};
-EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL =  "http://api.eia.gov/";
+EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL =  "//api.eia.gov/";
 
 
 
