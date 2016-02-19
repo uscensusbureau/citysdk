@@ -8,12 +8,181 @@ title: Energy Information Agency Dataset Browser
 <div class="row">
     <div class="col-md-12">
 
-        <h2>Output</h2>
-        <pre id="output"></pre>
-        <h2>Data</h2>
-        <pre id="data" name="data"></pre>
-    </div>
-</div>
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary" role="button">View the Example</a>
+            <a href="source.html" class="btn btn-default" role="button">Source Code</a>
+        </div>
+
+        <h2>Overview</h2>
+        <p>The <a href="http://www.eia.gov/" target="_blank">U.S. Energy Information Administration</a> provides a
+            variety of data sets. To access this data there is a two step process:</p>
+        <ol>
+            <li>Identify the desired data series with the series browser.</li>
+            <li>Request the data series.</li>
+        </ol>
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Browse Categories of Data Series</h3>
+            </div>
+            <div class="panel-body">
+
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#categoryDisplay" aria-controls="categoryDisplay"
+                                                              role="tab" data-toggle="tab">Data Category and Series
+                        Browser</a></li>
+                    <li role="presentation"><a href="#categoryData" aria-controls="categoryData" role="tab"
+                                               data-toggle="tab">Response</a></li>
+                    <li role="presentation"><a href="#categoryCode" aria-controls="categoryCode" role="tab"
+                                               data-toggle="tab">Code Example</a></li>
+                </ul>
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="categoryDisplay">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Browse Categories / Subcategories</h4>
+                                <ol class="breadcrumb">
+
+                                </ol>
+                                <div class="row" id="categoryLists">
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div><!-- end categoryDisplay -->
+                    <div role="tabpanel" class="tab-pane" id="categoryData">
+                        <pre id="categoryDataPre"></pre>
+                    </div><!-- end categoryData -->
+                    <div role="tabpanel" class="tab-pane" id="categoryCode">
+                        <pre>var <var>sdk</var> = new CitySDK();
+var <var>eia</var> = sdk.modules.eia;
+var <var>eiaKey</var> = "YourAPIKey";
+
+	var <var>id</var> = <var id="codeDemoRequestedCategoryID"></var>; // ID of the category desired
+
+eia.categoryRequest({category: id}, function (<var>response</var>) {
+
+                <var>categoryData[id]</var> = <var>response</var>;
+
+                    var NewList = "";
+                    //Render the response here
+                    jQuery.each(categoryData[id]['category']['childcategories'],function(index,value){
+                    NewList += "&lt;a href=\"#"+value.category_id+"\" data-categoryID=\""+value.category_id+"\" class=\"list-group-item\"&gt;"+value.name+"&lt;/a&gt;";
+                    });
+
+                    jQuery(".targetObject").append(NewList);
+
+                    });</pre>
+                    </div><!-- end categoryCode -->
+                </div>
+
+
+            </div>
+        </div><!-- end panel panel-info -->
+
+
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Browse Categories of Data Series</h3>
+            </div>
+            <div class="panel-body">
+
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#dataSeriesDisplay"
+                                                              aria-controls="dataSeriesDisplay" role="tab"
+                                                              data-toggle="tab">Choose a Data Series</a></li>
+                    <li role="presentation"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab"
+                                               data-toggle="tab">Series Data</a></li>
+
+                    <li role="presentation"><a href="#dataSeriesJson" aria-controls="dataSeriesJson" role="tab"
+                                               data-toggle="tab">Raw Data</a></li>
+                    <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab"
+                                               data-toggle="tab">Code Example</a></li>
+                </ul>
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="dataSeriesDisplay">
+
+                        <div class="alert alert-info" role="alert">No data series in selected category.</div>
+
+                        <table class="table table-striped" id="dataSeriesSelectionTable">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Units</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+
+                    </div><!-- end categoryDisplay -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesData">
+                        <div id="dataSeriesResult">
+                            <h2></h2>
+                            <p></p>
+                            <table class="table table-striped">
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div><!-- end dataSeriesData -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesJson">
+                        <pre id="data" name="data"></pre>
+                    </div><!-- end dataSeriesJson -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+    var <var>sdk</var> = new CitySDK();
+    var <var>eia</var> = sdk.modules.eia;
+    var <var>eiaKey</var> = "YourAPIKey";
+
+	var <var>id</var> = <var id="codeDemoRequestedSeriesID"></var>; // ID of the data series desired
+
+eia.seriesRequest({series: id}, function (response) {
+
+            jQuery.each(response.series[0][&#39;data&#39;],function(index,value){
+                jQuery(&quot;#dataSeriesResult table tbody&quot;).append(&quot;&lt;tr&gt;&lt;td&gt;&quot;+value[0]+&quot;&lt;/td&gt;&lt;td&gt;&quot;+value[1]+&quot;&lt;/td&gt;&lt;/tr&gt;&quot;);
+            });
+
+        });
+            </pre>
+                    </div><!-- end dataSeriesCode -->
+                </div>
+
+
+            </div>
+        </div><!-- end panel panel-info -->
+
+
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+
 
 
 <script>
@@ -26,55 +195,182 @@ title: Energy Information Agency Dataset Browser
     var output;
 
     jQuery(document).ready(function () {
-        loadCategory(371);
+        //loadCategory(371);
+        //displayCategory(1817328);
+        displayCategory(371);
+
         output = $('#output');
     });
 
-    function loadCategory(id) {
-        eia.categoryRequest({category: id}, function (response) {
-            output.empty();
-            var data = $('#data');
-            data.empty();
-            output.append('<h2>' + response.category.name + '</h2>');
+    var categoryData = {};
+    var stackSafety = 0;
+    var stackSafetyLimit = 200;
 
-            if ($.isNumeric(response.category.parent_category_id)) {
-                output.append('<p><a href="#" onclick="loadCategory(' + response.category.parent_category_id + ')">&laquo; Back to Parent Category</a></p>')
-            }
+    function getCategory(id, callbackFunction) {
+        if (stackSafety < stackSafetyLimit) {
+            stackSafety++;
 
-            var childcategories = response.category.childcategories;
-            if (childcategories.length > 0) {
-                output.append('<p>Sub-category:</p>');
-                var children = $('<ul></ul>');
-                output.append(children);
-                for (var i = 0; i < childcategories.length; i++) {
-                    children.append('<li><a href="#" onclick="loadCategory(' + childcategories[i].category_id + ')">' + childcategories[i].name + '</a></li>')
-                }
+            eia.categoryRequest({category: id}, function (response) {
+                stackSafety--;
+                categoryData[id] = response;
+                callbackFunction(id);
+            });
+
+        }
+    }// end getCategory
+
+    function getCategoryP(id, cid, callbackFunction) {
+        if (stackSafety < stackSafetyLimit) {
+            stackSafety++;
+
+            eia.categoryRequest({category: id}, function (response) {
+                stackSafety--;
+                categoryData[id] = response;
+                callbackFunction(cid);
+            });
+
+        }
+    }// end getCategory
+
+    function bakeBreadcrumbs(id) {
+        jQuery("#categoryDisplay .breadcrumb").empty();
+        jQuery("#categoryDisplay .breadcrumb").append("<li class='active'>" + categoryData[id]['category']['name'] + "</li>");
+
+        var parentIsPresent = true;
+        var thisParentID = categoryData[id]['category']['parent_category_id'];
+        var loopSafety = 0;
+
+        while (parentIsPresent == true && loopSafety < 100) {
+            if (thisParentID != null && thisParentID in categoryData) {
+
+                jQuery("#categoryDisplay .breadcrumb").prepend("<li><a data-categoryID=\"" + thisParentID + "\" href='#" + thisParentID + "'>" + categoryData[thisParentID]['category']['name'] + "</a></li>");
+                thisParentID = categoryData[thisParentID]['category']['parent_category_id'];
             } else {
-                output.append('<p>No available sub-categories for this category.</p>');
+                parentIsPresent = false;
             }
+            loopSafety++;
+        }
 
-            var childseries = response.category.childseries;
-            if (childseries.length > 0) {
-                output.append('<p>Data series:</p>');
-                var children = $('<ul></ul>');
-                output.append(children);
-                for (var i = 0; i < childseries.length; i++) {
-                    children.append('<li><a href="#data" onclick=\'loadSeries("' + childseries[i].series_id + '")\'>' + childseries[i].name + '</a></li>')
-                }
-            } else {
-                output.append('<p>No available data series for this category.</p>');
-            }
+        jQuery("#categoryDisplay .breadcrumb a").bind("click", function (e) {
+            e.preventDefault();
+            displayCategory(jQuery(this).data("categoryid"));
         });
-    }
-    ;
+
+    }// end bakeBreadcrumbs
+
+
+    function displayCategory(id) {
+        if (stackSafety < stackSafetyLimit) {
+            jQuery(".loading-icon-initialstate").show();
+            jQuery("#codeDemoRequestedCategoryID").text(id);
+            if (id in categoryData) {
+                if (categoryData[id]['category']['parent_category_id'] == null || categoryData[id]['category']['parent_category_id'] in categoryData) {
+
+
+                    // Update the category lists
+                    jQuery("#categoryLists .col-md-6").fadeOut(200, function () {
+                        jQuery(this).remove();
+                    });
+
+                    var ParentList = "";
+                    var ParentID = categoryData[id]['category']['parent_category_id'];
+
+                    if (categoryData[id]['category']['parent_category_id'] in categoryData) {
+                        ParentList = "<div class=\"col-md-6\"><div class='list-group'>";
+                        jQuery.each(categoryData[ParentID]['category']['childcategories'], function (index, value) {
+
+                            if (id == value.category_id) {
+                                var activeClass = "active";
+                                var badgeText = " <span class=\"badge\"><span class=\"glyphicon glyphicon-chevron-right\" aria-hidden=\"true\"></span></span>";
+                            } else {
+                                var activeClass = "";
+                                var badgeText = "";
+                            }
+                            ParentList += "<a href=\"#" + value.category_id + "\" data-categoryID=\"" + value.category_id + "\" class=\"list-group-item " + activeClass + "\">" + value.name + badgeText + "</a>";
+                        });
+
+                        ParentList += "</div></div>";
+                    }
+
+                    var NewList = ParentList + "<div class=\"col-md-6\"><div class='list-group'>";
+                    jQuery.each(categoryData[id]['category']['childcategories'], function (index, value) {
+                        NewList += "<a href=\"#" + value.category_id + "\" data-categoryID=\"" + value.category_id + "\" class=\"list-group-item\">" + value.name + "</a>";
+                    });
+
+                    NewList += "</div></div>";
+
+
+                    // Create Breadcrumbs
+                    bakeBreadcrumbs(id);
+                    jQuery("#categoryLists").append(NewList).fadeIn(400);
+
+                    // Bind update function to category links
+                    jQuery("#categoryLists a").bind("click", function (e) {
+                        e.preventDefault();
+                        displayCategory(jQuery(this).data("categoryid"));
+                    });
+
+
+                    // Render data series
+                    if (categoryData[id]['category']['childseries'].length > 0) {
+                        jQuery("#dataSeriesDisplay .alert").hide();
+                        jQuery("#dataSeriesSelectionTable tbody").empty();
+                        jQuery.each(categoryData[id]['category']['childseries'], function (index, value) {
+                            jQuery("#dataSeriesSelectionTable tbody").append("<tr><td><a data-seriesid=\"" + value.series_id + "\" href='#" + value.series_id + "'>" + value.name + "</a></td><td>" + value.units + "</td></tr>");
+                        });
+
+                        jQuery("#dataSeriesSelectionTable tbody a").bind("click", function (e) {
+                            e.preventDefault();
+                            loadSeries(jQuery(this).data("seriesid"));
+                        });
+
+
+                    }
+
+                    var data = jQuery('#categoryDataPre');
+                    data.empty();
+                    data.append(JSON.stringify(categoryData, null, 4));
+                    jQuery(".loading-icon-initialstate").hide();
+
+
+                } else {
+                    getCategoryP(categoryData[id]['category']['parent_category_id'], id, displayCategory);
+                }
+            } else {
+                getCategory(id, displayCategory);
+            }
+        }
+    }//displayCategory
 
     function loadSeries(id) {
+        jQuery("#dataSeriesDisplay .alert").hide();
+        jQuery(".loading-icon-initialstate").show();
+        jQuery("#dataSeriesResult table tbody").empty();
+        jQuery("#codeDemoRequestedSeriesID").text("\"" + id + "\"");
         eia.seriesRequest({series: id}, function (response) {
+            jQuery('.nav-tabs a[href="#dataSeriesData"]').tab('show');
+
+            jQuery(".loading-icon-initialstate").hide();
+
+            jQuery("#dataSeriesData h2").text(response.series[0]['name']);
+            jQuery("#dataSeriesData p").text(response.series[0]['description']);
+
+            jQuery.each(response.series[0]['data'], function (index, value) {
+                jQuery("#dataSeriesResult table tbody").append("<tr><td>" + value[0] + "</td><td>" + value[1] + "</td></tr>");
+            });
+
+            jQuery("#dataSeriesResult").fadeIn(300);
+
+
             var data = jQuery('#data');
             data.empty();
-            data.append('<h3>Data:</h3>');
             data.append(JSON.stringify(response, null, 4));
         });
     }
     ;
+
+
+
+
+
 </script>
