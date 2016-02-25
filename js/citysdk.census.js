@@ -1381,6 +1381,7 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
 
                         CensusModule.prototype.SUPPLEMENTAL_REQUESTS_IN_FLIGHT++;
                         CitySDK.prototype.sdkInstance.modules.census.APIRequest(suppRequest, function (resp) {
+                            console.log(resp);
                             CensusModule.prototype.SUPPLEMENTAL_REQUESTS_IN_FLIGHT--;
                             for (var property in resp.data[0]) {
                                 if (resp.data[0].hasOwnProperty(property)) {
