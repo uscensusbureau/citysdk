@@ -18,6 +18,9 @@ function CkanModule() {
 };
 
 
+// Cache Lifespan
+CkanModule.prototype.cacheLife = 360000; // One Hour
+
 
 // Endpoint URLS
 CkanModule.prototype.DEFAULT_ENDPOINTS = {};
@@ -75,10 +78,37 @@ CkanModule.prototype.seriesRequest = function(request,callback){
 
     var cacheKey = JSON.stringify(request) + ckanURL.toString();
     CitySDK.prototype.sdkInstance.getCachedData("ckan", "seriesRequest", cacheKey, function (cachedData) {
+        var useCache = false;
+
         if (cachedData != null) {
-            callback(cachedData);
-            return;
-        } else {
+            useCache = true;
+
+
+            if('cachedTimestamp' in cachedData){
+                // Check for lifespan of data
+                var d = new Date();
+                var n = d.getTime();
+
+                if(Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.ckan.cacheLife) < n){
+                    // cache is too old
+                    useCache = false;
+
+                    // delete the cache
+                    CitySDK.prototype.sdkInstance.deleteCachedData("ckan", "seriesRequest", cacheKey);
+                    console.log("deleting");
+                }else{
+                    // cache is new enough
+                    useCache = true;
+                }
+            }
+            if(useCache == true){
+                callback(cachedData);
+                return;
+            }
+
+        }
+
+        if(useCache == false){
 
             if('group' in request){
                 if(request.group == ""){
@@ -104,8 +134,9 @@ CkanModule.prototype.seriesRequest = function(request,callback){
 
             CitySDK.prototype.sdkInstance.jsonpRequest(ckanURL).done(
                 function (response) {
-                    console.log(response);
-                    //response = jQuery.parseJSON(response);
+                    var d2 = new Date();
+                    var n2 = d2.getTime();
+                    response.cachedTimestamp = n2;
                     CitySDK.prototype.sdkInstance.setCachedData("ckan", "seriesRequest", cacheKey, response);
                     callback(response);
                 }
@@ -180,64 +211,108 @@ CkanModule.prototype.tag_list = function(callback){
  * }</code></pre>
  */
 CkanModule.prototype.APIRequest = function(request, callback) {
-    var urlPattern = /({url})/;
+
+
+    var intermediate = JSON.parse(JSON.stringify(request));
+    var request = intermediate;
     var targetURL = this.DEFAULT_ENDPOINTS.apiURL;
     if('url' in request){
         targetURL = request.url;
     }
+    var ckanURL = targetURL;
 
-        // Start building the API URL
-        if("from" in request){
-            request.resource_id = request.from;
-            delete request.from;
-        }
-        var ckanURL = targetURL + "datastore_search?resource_id="+request.resource_id;
+    var cacheKey = JSON.stringify(request) + ckanURL.toString();
+    CitySDK.prototype.sdkInstance.getCachedData("ckan", "APIRequest", cacheKey, function (cachedData) {
+        var useCache = false;
 
 
-        if ('limit' in request) {
-            //Limit results to 1000 records by default
-            ckanURL += '&limit=' + Number(request.limit);
-        }
-    if ('offset' in request) {
-        //Limit results to 1000 records by default
-        ckanURL += '&offset=' + Number(request.offset);
-    }
+        if (cachedData != null) {
+            useCache = true;
 
 
-    if ('fields' in request || 'select' in request || 'variables' in request) {
-        if('variables' in request){
-            request.fields = request.variables;
-            delete request.variables;
-        }
+            if('cachedTimestamp' in cachedData){
+              // Check for lifespan of data
+                var d = new Date();
+                var n = d.getTime();
+                if(Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.ckan.cacheLife) < n){
+                    // cache is too old
+                    useCache = false;
 
-        if(!('fields' in request) && 'select' in request){
-            request.fields = request.select;
-            delete request.select;
-        }
+                    // delete the cache
+                    CitySDK.prototype.sdkInstance.deleteCachedData("ckan", "APIRequest", cacheKey);
+                }else{
+                    // cache is new enough
+                    useCache = true;
+                }
+            }
+            if(useCache == true){
+                callback(cachedData);
+                return;
+            }
 
-        if(Array.isArray(request.fields)){
-            ckanURL += "&fields=" + request.fields.join(",");
-        }else if(typeof request.fields == "string"){
-            ckanURL += "&fields=" + request.fields;
-        }
-    }
-
-    if ('sort' in request) {
-        if(Array.isArray(request.sort)){
-            ckanURL += "&sort=" + request.sort.join(",");
-        }else if(typeof request.fields == "string"){
-            ckanURL += "&sort=" + request.sort;
         }
 
-    }
+        if(useCache == false){
 
 
-    CitySDK.prototype.sdkInstance.jsonpRequest(ckanURL).done(
-        function(response) {
-            //response = jQuery.parseJSON(response);
-            callback(response);
+            // Start building the API URL
+            if ("from" in request) {
+                request.resource_id = request.from;
+                delete request.from;
+            }
+            var ckanURL = targetURL + "datastore_search?resource_id=" + request.resource_id;
+
+
+            if ('limit' in request) {
+                //Limit results to 1000 records by default
+                ckanURL += '&limit=' + Number(request.limit);
+            }
+            if ('offset' in request) {
+                //Limit results to 1000 records by default
+                ckanURL += '&offset=' + Number(request.offset);
+            }
+
+
+            if ('fields' in request || 'select' in request || 'variables' in request) {
+                if ('variables' in request) {
+                    request.fields = request.variables;
+                    delete request.variables;
+                }
+
+                if (!('fields' in request) && 'select' in request) {
+                    request.fields = request.select;
+                    delete request.select;
+                }
+
+                if (Array.isArray(request.fields)) {
+                    ckanURL += "&fields=" + request.fields.join(",");
+                } else if (typeof request.fields == "string") {
+                    ckanURL += "&fields=" + request.fields;
+                }
+            }
+
+            if ('sort' in request) {
+                if (Array.isArray(request.sort)) {
+                    ckanURL += "&sort=" + request.sort.join(",");
+                } else if (typeof request.fields == "string") {
+                    ckanURL += "&sort=" + request.sort;
+                }
+
+            }
+
+
+            CitySDK.prototype.sdkInstance.jsonpRequest(ckanURL).done(
+                function (response) {
+                    var d2 = new Date();
+                    var n2 = d2.getTime();
+                    response.cachedTimestamp = n2;
+                    CitySDK.prototype.sdkInstance.setCachedData("ckan", "APIRequest", cacheKey, response);
+                    callback(response);
+                }
+            );
         }
-    );
+
+    });
 };
 CkanModule.prototype.search = CkanModule.prototype.APIRequest;
 //After this point the module is all up to you

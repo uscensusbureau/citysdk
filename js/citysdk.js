@@ -419,6 +419,16 @@ CitySDK.prototype.deleteCachedData = function (module, functionName, hashKey) {
         return false;
     }
 
+// CitySDKdb CitySDKdb citySDKCache
+    var storeData = {"module": module, "functionName": functionName, "hashKey": hashKey}
+    var openRequest = indexedDB.open("CitySDKdb", 1);
+
+    openRequest.onsuccess = function (e) {
+        CitySDK.prototype.CitySDKdb = e.target.result;
+        var transaction = CitySDK.prototype.CitySDKdb.transaction(["citySDKCache"], "readwrite");
+        var store = transaction.objectStore("citySDKCache");
+        var request = store.delete(IDBKeyRange.only([module, functionName, hashKey]));
+    }
     return true;
 }//deleteCachedData
 
