@@ -683,10 +683,20 @@ title: Census Module Query Builder
         var textarea = jQuery('#rawOutput').text();
         var JSONObject = JSON.parse(textarea);
         var csvString = "";
-        var keys;
+        var keys=[];
         for (var index in JSONObject.data) {
+            // Loop to get the field keys.  It tries to build a complete set based on the actual data
+            var theseKeys = Object.keys(JSONObject.data[index]);
+            for(var thisKey in theseKeys){
+                if(keys.indexOf(theseKeys[thisKey])==-1){
+                    keys.push(theseKeys[thisKey]);
+                }
+            }
+        }
+
+            for (var index in JSONObject.data) {
             if (index == 0) {
-                keys = Object.keys(JSONObject.data[index]);
+                //keys = Object.keys(JSONObject.data[index]);
                 for (var key in keys) {
                     csvString = csvString + keys[key];
                     if (key != (keys.length - 1)) {
@@ -696,9 +706,21 @@ title: Census Module Query Builder
                     }
                 }
             }
-            for (var key in keys) {
                 var dataJSONObject = JSONObject.data[index];
-                csvString = csvString + dataJSONObject[keys[key]];
+
+            for (var key in keys) {
+                if(keys[key] in JSONObject.data[index]){
+                    var newval = JSONObject.data[index][keys[key]];
+                    if(typeof newval == 'string'){
+                        // if this is a string, check for characters that must be escaped
+                        if(newval.indexOf(",") != -1 || newval.indexOf("\"") != -1){
+                            newval = newval.replace("\"","\"\"");
+                            newval = "\""+newval+"\"";
+                        }
+                    }
+
+                    csvString = csvString + newval;
+                }
                 if (key != (keys.length - 1)) {
                     csvString = csvString + ',';
                 } else {
