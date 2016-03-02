@@ -476,8 +476,6 @@ arcgisModule.prototype.search = arcgisModule.prototype.APIRequest;
 
 // This is a function that is used as a processor for APIRequest. It should NEVER be called outside of APIRequest
 arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callback){
-    console.log('starting APIRequestProcessor');
-    console.log(request);
     // Prepare the request url
     var arcURL = url;
     // Add the service base if it does not already exist
@@ -507,6 +505,18 @@ arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callb
     // Populate geometry returns
     arcURL += "&returnGeometry=" + request.returnGeometry + "&returnCentroid=false";
 
+    if ('limit' in request) {
+        //Limit results to 1000 records by default
+        arcURL += '&resultRecordCount=' + Number(request.limit);
+    }else if('resultRecordCount' in request){
+        arcURL += '&resultRecordCount=' + Number(request.resultRecordCount);
+    }
+    if ('offset' in request) {
+        //Limit results to 1000 records by default
+        arcURL += '&resultOffset=' + Number(request.offset);
+    }else if('resultOffset' in request){
+        arcURL += '&resultOffset=' + Number(request.resultOffset);
+    }
 
     // Process the Where Filters
     if('where' in request){
@@ -519,14 +529,8 @@ arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callb
 
 
 
-    console.log(arcURL);
-
-
-
-
     CitySDK.prototype.sdkInstance.jsonpRequest(arcURL).done(
         function (response) {
-            console.log(response);
             if('status' in response || 'features' in response) {
                 var storeMe = true;
                 if('status' in response){

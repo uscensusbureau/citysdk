@@ -51,12 +51,13 @@ function testArcGISModule() {
     request = {
         "api": "Jobs_Proximity_Index",
         "level": "0",
-        "where": "JOBS_IDX > 50 AND JOBS_IDX < 60",
+        "where": "JOBS_IDX > 50 AND JOBS_IDX < 52",
         "variables": [
             "BLOCKGROUPID",
             "JOBS_IDX",
             "AVariableThatDoesNotExist"
         ],
+        'limit': 50
 
     };
     asyncTestsRunning++;
