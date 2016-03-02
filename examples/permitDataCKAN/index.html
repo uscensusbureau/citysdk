@@ -1,0 +1,148 @@
+---
+layout: exampleslayout
+published: true
+title: Building Permits with BLDS & CKAN
+---
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary" role="button">View the Example</a>
+            <a href="source.html" class="btn btn-default" role="button">Source Code</a>
+        </div>
+
+        <h2>Overview</h2>
+        <p>Many cities publish their building permitting data in near-real time using CKAN with data populated according
+            to the BLDS open standard.
+            This code example shows how to use the CitySDK to consume this data.</p>
+
+        <p>See the <a href="http://permitdata.org/">BLDS Github Page</a> for more information.</p>
+
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Select a City & Dataset</h3>
+            </div>
+            <div class="panel-body">
+
+                <form>
+                    <div class="form-group">
+                        <label for="cityDataOrg" class="col-sm-2 control-label">Group</label>
+                        <select class="form-control" id="cityDataOrg">
+
+                        </select>
+                    </div><!-- end form-broup -->
+                    <div class="form-group">
+                        <label for="cityDataSet" class="col-sm-2 control-label">Data Set</label>
+                        <select class="form-control" id="cityDataSet">
+                        </select>
+                    </div><!-- end form-broup -->
+                </form>
+
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">Select a Variables & Sort</h3>
+            </div>
+            <div class="panel-body">
+
+                <form>
+                    <div class="form-group">
+                        <label for="cityDataOrg" class="col-sm-2 control-label">Group</label>
+                        <select class="form-control" id="cityDataOrg">
+
+                        </select>
+                    </div><!-- end form-broup -->
+                    <div class="form-group">
+                        <label for="cityDataSet" class="col-sm-2 control-label">Data Set</label>
+                        <select class="form-control" id="cityDataSet">
+                        </select>
+                    </div><!-- end form-broup -->
+                </form>
+
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+
+<script>
+    var sdk = new CitySDK();
+    var ckan = sdk.modules.ckan;
+    ckan.enable();
+    ckan.DEFAULT_ENDPOINTS.apiURL = "http://www.civicdata.com/api/3/action/";
+    ckan.cacheLife = 8640000;
+
+
+    var orgList = {};
+    var packageList = {};
+    var seriesMeta = {};
+
+    jQuery(document).ready(function () {
+        groupRequest = {
+            "group": 'blds-building-permit-data'
+        };
+        ckan.seriesRequest(groupRequest, function (response) {
+            var ichi = 0;
+            jQuery.each(response.result.packages, function (index, value) {
+                if (!(value.organization.id in orgList)) {
+                    orgList[value.organization.id] = [];
+                    jQuery("#cityDataOrg").append("<option value='" + value.organization.id + "'>" + value.organization.title + "</option>");
+                    if (ichi == 0) {
+                        ichi = value.organization.id;
+                    }
+                }
+                orgList[value.organization.id].push(value.id);
+                packageList[value.id] = value;
+            });
+
+            jQuery('#cityDataOrg').change(function () {
+                selectOrganization(jQuery(this).find("option:selected").val());
+            });
+
+            selectOrganization(ichi);
+
+        });
+    });
+
+
+    function selectOrganization(orgID) {
+        if (orgID in orgList) {
+            jQuery("#cityDataSet").empty();
+            jQuery.each(orgList[orgID], function (index, value) {
+                jQuery("#cityDataSet").append("<option value='" + value + "'>" + packageList[value]['title'] + "</option>");
+            });
+        }
+    } // end selectOrganization
+
+    function getSeriesFieldList(seriesID, callback) {
+        if (seriesID in seriesMeta) {
+            callback(seriesMeta[seriesID]);
+        } else {
+            var request = {
+                'resource_id': seriesID,
+                'limit': 1
+            };
+
+            ckan.APIRequest(request, function (response) {
+
+            });
+        }
+    }//getSeriesFieldList
+
+
+</script>
+
+
+
