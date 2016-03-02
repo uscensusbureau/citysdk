@@ -63,18 +63,23 @@ CkanModule.prototype.enable = function() {
  * Note: You can only request ONE of the below (package/group/tag).
  * If you make a request, select a facet, and leave the value blank, then a full list of that facet's possible values will be returned.
  *  <pre><code>var request = {
- *     "group": 'catalog.opendata.city',
- *     "tag": '"name","streetAddress","postalCode"',
- *     "package": '"e4491e0c-ba09-4cb2-97c1-d466e3e976a5"',
+ *     "group": '',
+ *     "tag": '',
+ *     "package": '',
  * }</code></pre>
  * @param {function} callback
  * @return {object} JSON Object
  * <pre><code></code></pre>
  */
 CkanModule.prototype.seriesRequest = function(request,callback){
-    var intermediate = JSON.parse(JSON.stringify([request,this.DEFAULT_ENDPOINTS.apiURL]));
-    var request = intermediate[0];
-    var ckanURL = intermediate[1];
+    var intermediate = JSON.parse(JSON.stringify(request));
+    var request = intermediate;
+
+    var targetURL = this.DEFAULT_ENDPOINTS.apiURL;
+    if('url' in request){
+        targetURL = request.url;
+    }
+    var ckanURL = targetURL;
 
     var cacheKey = JSON.stringify(request) + ckanURL.toString();
     CitySDK.prototype.sdkInstance.getCachedData("ckan", "seriesRequest", cacheKey, function (cachedData) {
@@ -95,7 +100,6 @@ CkanModule.prototype.seriesRequest = function(request,callback){
 
                     // delete the cache
                     CitySDK.prototype.sdkInstance.deleteCachedData("ckan", "seriesRequest", cacheKey);
-                    console.log("deleting");
                 }else{
                     // cache is new enough
                     useCache = true;

@@ -17,7 +17,7 @@ function testCKANModule() {
 
     asyncTestsRunning++;
     ckan.package_list(function(response){
-        asyncTestsRunning--;
+        asyncTestsRunning++;
         package_list = response.result;
         if(!("help" in response) && !("result" in response) && response.success == true){
             // Generic package list request failed

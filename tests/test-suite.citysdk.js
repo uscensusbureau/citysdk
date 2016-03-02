@@ -17,6 +17,7 @@ function runAllTests(){
     testCKANModule();
     testFEMAModule();
     testfarmersMarketModule();
+    testArcGISModule();
     //testNoaaModule();
 }//runAllTests
 
@@ -57,7 +58,6 @@ function failTest(moduleName,functionName,errorMessage){
     testResultStatus[moduleName] = false;
     testResultStatus['all']=false;
     jQuery(".statusOutput").append("<p>"+moduleName+" : " +functionName+ " : "+errorMessage+"</p>");
-
 }//failTest
 
 
@@ -71,7 +71,6 @@ function updateStatusDisplay(moduleName){
             }else if(testResultStatus[index] === true){
                 jQuery("tr[dataModuleName="+index+"] .testStatus").addClass("bg-success");
                 jQuery("tr[dataModuleName="+index+"] .testStatus > span").text(" Pass");
-
             }
         });
     }
@@ -87,8 +86,7 @@ jQuery(document).ready(function(){
     jQuery("tr[dataModuleName='ckan'] .runTestButton").click(testCKANModule);
     jQuery("tr[dataModuleName='fema'] .runTestButton").click(testFEMAModule);
     jQuery("tr[dataModuleName='farmersMarket'] .runTestButton").click(testfarmersMarketModule);
+    jQuery("tr[dataModuleName='arcgis'] .runTestButton").click(testArcGISModule);
 
     //jQuery("tr[dataModuleName='noaa'] .runTestButton").click(testNoaaModule);
-
-
 });
