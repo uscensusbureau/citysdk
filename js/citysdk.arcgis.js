@@ -527,6 +527,19 @@ arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callb
     }
 
 
+    // Process Geometry
+    request = CitySDK.prototype.parseRequestLatLng(request);
+
+    if('lat' in request && 'lng' in request){
+        if(!('geometryType' in request)){
+            request.geometryType = "esriGeometryPoint";
+        }
+
+        if(request.geometryType == "esriGeometryPoint"){
+            arcURL+="&geometryType=esriGeometryPoint&geometry="+request.lat+","+request.lng;
+        }
+    }
+
 
 
     CitySDK.prototype.sdkInstance.jsonpRequest(arcURL).done(
