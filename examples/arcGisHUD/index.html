@@ -225,18 +225,52 @@ title: HUD Opportunity Data via ArcGIS
                     </div><!-- end dataSeriesJson -->
                     <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
     var <var>sdk</var> = new CitySDK();
-    var <var>eia</var> = sdk.modules.eia;
-    var <var>eiaKey</var> = "YourAPIKey";
+    var <var>arcgis</var> = sdk.modules.arcgis;
 
-	var <var>id</var> = <var id="codeDemoRequestedSeriesID"></var>; // ID of the data series desired
+    arcgis.enable();
 
-eia.seriesRequest({series: id}, function (response) {
+    // Set the server to pull data from
+    arcgis.<var>DEFAULT_ENDPOINTS.apiURL</var> = "//services.arcgis.com/VTyQ9soqVukalItT/";
 
-            jQuery.each(response.series[0][&#39;data&#39;],function(index,value){
-                jQuery(&quot;#dataSeriesResult table tbody&quot;).append(&quot;&lt;tr&gt;&lt;td&gt;&quot;+value[0]+&quot;&lt;/td&gt;&lt;td&gt;&quot;+value[1]+&quot;&lt;/td&gt;&lt;/tr&gt;&quot;);
+	var <var>request</var> = <var id="codeDemoRequestedSeriesID"></var>;
+
+    arcgis.APIRequest(<var>request</var>, function (<var>response</var>) {
+            // Output raw JSON to raw data tab
+            jQuery("#data").text(JSON.stringify(<var>response</var>));
+                        // Output raw JSON to raw data tab
+            jQuery("#data").text(JSON.stringify(<var>response</var>));
+
+            // Output Formatted Data Table Tab
+                        // Create Table Header
+            jQuery("#dataSeriesResult thead tr").empty();
+            var <var>headerFieldList</var> = [];
+            jQuery.each(response.fields, function (<var>index</var>, <var>value</var>) {
+                <var>headerFieldList</var>.push(<var>value.name</var>);
+                jQuery("#dataSeriesResult thead tr").append("<th>" + <var>value.alias</var> + "</th>");
             });
 
-        });
+                        // Add Each Record
+            jQuery("#dataSeriesResult tbody").empty();
+            jQuery.each(response.features, function (<var>index</var>, <var>value</var>) {
+                var <var>newFeature</var> = "<tr>";
+                        jQuery.each(headerFieldList, function (<var>i</var>, <var>v</var>) {
+                        if (<var>v</var> in <var>value.attributes</var>) {
+                        <var>newFeature</var> += "
+                        <td>" + <var>value.attributes[v]</var> + "</td>
+                        ";
+                        } else {
+                        <var>newFeature</var> += "
+                        <td></td>
+                        ";
+                        }
+                        });
+                        newFeature += "
+                    </tr>";
+                jQuery("#dataSeriesResult tbody").append(<var>newFeature</var>);
+            });
+
+    });
+
             </pre>
                     </div><!-- end dataSeriesCode -->
                 </div>
@@ -428,6 +462,8 @@ eia.seriesRequest({series: id}, function (response) {
         }
 
         jQuery("#cenreq").html(JSON.stringify(request, null, 4));
+        jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
+
         return request;
 
     }// end buildRequest
@@ -440,11 +476,8 @@ eia.seriesRequest({series: id}, function (response) {
         toggleLoadingIndicators();
 
         arcgis.APIRequest(request, function (response) {
-            console.log(response);
-
             // Output raw JSON to raw data tab
             jQuery("#data").text(JSON.stringify(response));
-
 
             // Output Formatted Data Table Tab
             jQuery("#dataSeriesResult thead tr").empty();
