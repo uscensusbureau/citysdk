@@ -264,3 +264,33 @@ header.header {
     float: inherit;
   }
 }
+
+/* Open Opportunity Project */
+.openOpportunityBadge {
+  background: url(../img/open-opportunity-hero.jpg) #112e51;
+  background-height: 100%;
+  color: white;
+  text-align: center;
+  padding: 15px 30px;
+  margin-bottom: 10px;
+  background-position: bottom;
+
+  h1, h2, h3, h4, h5, h6 {
+    clear: both;
+    font-family: "Merriweather", "Georgia", "Times New Roman", serif;
+    line-height: 1.3;
+    margin-bottom: .5em;
+    margin-top: 0;
+    a, a:visited {
+      color: white;
+    }
+    a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+  }
+
+  p {
+    font-family: "Merriweather", "Georgia", "Times New Roman", serif;
+  }
+}

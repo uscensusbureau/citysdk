@@ -1,0 +1,511 @@
+---
+layout: exampleslayout
+published: true
+title: HUD Opportunity Data via ArcGIS
+---
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary" role="button">View the Example</a>
+            <a href="source.html" class="btn btn-default" role="button">Source Code</a>
+        </div>
+
+        <h2>Overview</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <p>This example is a demo of how to retrieve data from ArcGIS with the CitySDK. It applies to any ArcGIS
+                    REST API that provides a FeatureService (it does not yet support MapService).</p>
+                <p>The data shown here is part of the Opportunity Project and is provided by <a
+                        href="https://www.huduser.gov/portal/egis/index.html" target="_blank">The Department of Housing
+                    and Urban Development</a>.</p>
+            </div>
+            <div class="col-md-6">
+                <div class="openOpportunityBadge">
+                    <h3><a href="http://uscensusbureau.github.io/opportunity/" target="_blank">The Opportunity
+                        Project</a></h3>
+                    <p>Let's build something amazing together.</p>
+
+                    <a href="https://opportunity-slack.herokuapp.com" target="_blank" class="btn btn-default">Join Us in
+                        Slack <span class="badge"><i class="fa fa-slack fa-fw"></i></span></a>
+                    <a href="https://github.com/uscensusbureau/opportunity" target="_blank" class="btn btn-default">Join
+                        Us on GitHub <span class="badge"><i class="fa fa-github fa-fw"></i></span></a>
+                </div>
+            </div>
+        </div>
+
+
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">1. Select Dataset</h3>
+            </div>
+            <div class="panel-body">
+
+
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+
+                <form class="hideWhileLoading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="featureServiceSelect" class="control-label">Feature Service / Series</label>
+                                <select class="form-control" id="featureServiceSelect">
+
+                                </select>
+                            </div><!-- end form-broup -->
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" checked id="showOnlyOpenOpportunity"> Show Open Opportunity
+                                    Featured Data Only
+                                </label>
+                            </div>
+                        </div><!-- end col-md-6 -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="featureServiceLayerSelect" class="control-label">Layer</label>
+                                <select class="form-control" id="featureServiceLayerSelect">
+                                </select>
+                            </div><!-- end form-broup -->
+                        </div><!-- end col-md-6 -->
+
+                    </div><!-- end row -->
+                </form>
+                <div class="row">
+                    <div class="col-md-12 serviceTextDescription">
+
+                    </div>
+                </div><!-- end row -->
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">2. Select Desired Variables & Filter / Where</h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+
+                <form class="hideWhileLoading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Fields / Variables</h4>
+
+                            <label for="variables">Available Variables</label>
+                            <p>If no variables are selected, ArcGIS will return ALL of them by default.</p>
+                            <select class="form-control" multiple size="15" id="variables"></select>
+                            <p><em>Different services and layers will have different variables available. Displayed
+                                below is the Alias and Variable name (the latter is in brackets []). When building
+                                requests, use the variable name.</em>
+                            </p>
+                        </div><!-- end col-md-6 -->
+                        <div class="col-md-6">
+                            <h4>Filter Results</h4>
+                            <p><em>Results can be narrowed down with a WHERE statement. The syntax follows standard SQL
+                                where clauses. The interactive forms below are for your convienence. When populating a
+                                request object, the where clause should be a string in SQL syntax.</em>
+                            </p>
+                            <div class="whereForms">
+
+                            </div><!-- end whereForms -->
+
+                            <div class="form-group">
+                                <label for="whereString" class="control-label">Where Clause</label>
+                                <textarea class="form-control" rows="5" id="whereString"></textarea>
+                                </select>
+                            </div><!-- end form-group -->
+
+                        </div><!-- end col-md-6 -->
+
+                    </div><!-- end row -->
+                </form>
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">3. Select SDK Call and Submit</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>CitySDK Call Type</h4>
+
+                        <div class="radio">
+                            <label>
+                                <input type="radio" id='APIRequest' name="CitySDKcall" value="APIRequest" checked>
+                                APIRequest
+                            </label>
+                        </div>
+                        <!--<div class="radio">
+                            <label>
+                                <input type="radio" id='GEORequest' name="CitySDKcall" value="GEORequest" >
+                                GEORequest
+                            </label>
+                        </div>-->
+                    </div><!-- end col-md-6 -->
+
+                    <div class="col-md-6">
+                        <h4>Get the Data</h4>
+
+                        <p><a class="btn btn-primary btn-lg" id="btnUpdateData" disabled style="width: 100%;" href="#"
+                              role="button">Update Data</a></p>
+
+                        <div class="loading-icon loading-icon-initialstate"></div>
+
+                    </div>
+                </div><!-- end row -->
+
+
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">The Request</h3>
+
+            </div>
+            <div class="panel-body">
+                <pre id="cenreq"></pre>
+
+
+            </div>
+        </div><!-- end panel panel-success -->
+
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">The Returned Data</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="nav nav-tabs" role="tablist">
+
+                    <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData"
+                                                              role="tab"
+                                                              data-toggle="tab">Formatted Data</a></li>
+
+                    <li role="presentation"><a href="#dataSeriesJson" aria-controls="dataSeriesJson" role="tab"
+                                               data-toggle="tab">Raw Data</a></li>
+                    <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab"
+                                               data-toggle="tab">Code Example</a></li>
+                </ul>
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+                        <div id="dataSeriesResult">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div><!-- end dataSeriesData -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesJson">
+                        <pre id="data" name="data"></pre>
+                    </div><!-- end dataSeriesJson -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+    var <var>sdk</var> = new CitySDK();
+    var <var>eia</var> = sdk.modules.eia;
+    var <var>eiaKey</var> = "YourAPIKey";
+
+	var <var>id</var> = <var id="codeDemoRequestedSeriesID"></var>; // ID of the data series desired
+
+eia.seriesRequest({series: id}, function (response) {
+
+            jQuery.each(response.series[0][&#39;data&#39;],function(index,value){
+                jQuery(&quot;#dataSeriesResult table tbody&quot;).append(&quot;&lt;tr&gt;&lt;td&gt;&quot;+value[0]+&quot;&lt;/td&gt;&lt;td&gt;&quot;+value[1]+&quot;&lt;/td&gt;&lt;/tr&gt;&quot;);
+            });
+
+        });
+            </pre>
+                    </div><!-- end dataSeriesCode -->
+                </div>
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+    </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+
+<script>
+    var sdk = new CitySDK();
+    var arcgis = sdk.modules.arcgis;
+    arcgis.enable();
+
+    arcgis.DEFAULT_ENDPOINTS.apiURL = "//services.arcgis.com/VTyQ9soqVukalItT/";
+    var asyncRequestsInFlight = 0;
+
+    var listOfFeatureServicesToPromote = ['Environmental_Health_Hazard_Index',
+        'Low_Poverty_Index', 'Jobs_Proximity_Index',
+        'Labor_Market_Engagement_Index',
+        'Low_Transportation_Cost_Index',
+        'School_Proficiency_Index',
+        'RECAP_Tract_Current_and_Historic'];
+
+    function toggleFeaturedServices() {
+        if (document.getElementById("showOnlyOpenOpportunity").checked) {
+            var showAll = false;
+        } else {
+            var showAll = true;
+        }
+
+        jQuery("#featureServiceSelect option").each(function (index, value) {
+            if (showAll == false && listOfFeatureServicesToPromote.indexOf(jQuery(value).val()) == -1) {
+                jQuery(value).hide();
+            } else {
+                jQuery(value).show();
+            }
+        });
+        if (showAll == false) {
+            jQuery("#featureServiceSelect option[value='" + listOfFeatureServicesToPromote[0] + "']").prop('selected', true);
+        }
+
+        selectFeatureService(jQuery("#featureServiceSelect").val());
+    }// end toggleFeaturedServices
+
+
+    function toggleLoadingIndicators() {
+
+        if (asyncRequestsInFlight == 0) {
+            jQuery(".loading-icon-initialstate").hide();
+            jQuery(".hideWhileLoading").show();
+        } else {
+            jQuery(".loading-icon-initialstate").show();
+            jQuery(".hideWhileLoading").hide();
+        }
+    }
+
+    function selectFeatureService(api) {
+
+        var request = {'api': api};
+        asyncRequestsInFlight++;
+        toggleLoadingIndicators();
+        arcgis.getLevelDictionary(request, function (response) {
+            jQuery("#featureServiceLayerSelect").empty();
+            var ichi = false;
+            jQuery.each(response.layers, function (index, value) {
+                if (ichi == false) {
+                    jQuery("#featureServiceLayerSelect").append("<option selected=\"selected\" value=\"" + value.id + "\">" + value.id + ": " + value.name.replace(/_/g, " ") + "</option>");
+                    ichi = true;
+                    selectFeatureServiceLevel(value.id);
+                } else {
+                    jQuery("#featureServiceLayerSelect").append("<option value=\"" + value.id + "\">" + value.id + ": " + value.name.replace(/_/g, " ") + "</option>");
+                }
+            });
+            asyncRequestsInFlight--;
+            toggleLoadingIndicators();
+        });
+
+    }// end selectFeatureService
+
+
+    function selectFeatureServiceLevel(level) {
+        var request = {
+            'api': jQuery("#featureServiceSelect").val(),
+            'level': level
+        };
+        asyncRequestsInFlight++;
+        toggleLoadingIndicators();
+        arcgis.getVariableDictionary(request, function (response) {
+            console.log(response);
+
+            // Display Description of Level
+            jQuery(".serviceTextDescription").empty();
+            var serviceTextDescription = "<h4 class='text-primary'>" + response.name + " <span class='label label-default'>" + response.type + "</span></h4>\
+            <p class='text-primary'>" + response.description + "</p>";
+            jQuery(".serviceTextDescription").append(serviceTextDescription);
+
+            // Add variables to selection
+            jQuery("#variables").empty();
+            jQuery.each(response.fields, function (index, value) {
+                jQuery("#variables").append("<option value=\"" + value.name + "\">" + value.alias + " [" + value.name + "]</em></option>");
+            });
+
+            selectVariables();
+
+            jQuery("#btnUpdateData").removeAttr("disabled");
+            asyncRequestsInFlight--;
+            toggleLoadingIndicators();
+        });
+    }// end selectFeatureServiceLevel();
+
+
+    function selectVariables() {
+
+        jQuery(".whereForms").empty();
+        jQuery("#variables option:selected").each(function (n, o) {
+            //variables.push(o.value);
+
+            var newFormOption = '                            <div class="form-group">\
+                    <div class="row">\
+                    <div class="col-sm-4 text-right">\
+                    <label for="whereFormInstance' + o.value + '" class="control-label">' + o.value + '</label>\
+                    </div>\
+                    <div class="col-sm-3">\
+                    <select class="form-control whereFormInstanceComparison" id="whereFormInstanceComparison' + o.value + '">\
+                        <option>=</option>\
+                        <option>></option>\
+                        <option><</option>\
+                    </select>\
+            </div>\
+            <div class="col-sm-5">\
+                    <input type="text" class="whereFormInstanceInput form-control" id="whereFormInstance' + o.value + '" />\
+                    </div>\
+                    </div>\
+                    </div>\
+                    ';
+
+            jQuery(".whereForms").append(newFormOption);
+        });
+
+        jQuery(".whereFormInstanceInput").on('input', buildWhere);
+        jQuery(".whereFormInstanceComparison").change(buildWhere);
+        buildWhere();
+        buildRequest();
+    }// end selectVariables
+
+
+    function buildWhere() {
+        var whereArray = [];
+
+        jQuery(".whereForms > .form-group").each(function (index, value) {
+            var valString = jQuery(value).find(".whereFormInstanceInput").val();
+            if (valString != "") {
+                var thisFieldName = jQuery(value).find("label").text();
+                var thisComparator = jQuery(value).find(".whereFormInstanceComparison").val();
+                if (thisComparator.toUpperCase() == "LIKE" && valString.indexOf("%") == -1) {
+                    whereArray.push(thisFieldName + " " + thisComparator + " " + "%" + valString + "%");
+                } else {
+                    whereArray.push(thisFieldName + " " + thisComparator + " " + valString);
+                }
+            }
+        });
+
+
+        var whereString = whereArray.join(" AND ");
+
+        jQuery("#whereString").text(whereString);
+        buildRequest();
+    }// end buildWhere
+
+
+    function buildRequest() {
+        var request = {};
+
+        request.api = jQuery("#featureServiceSelect").val();
+        request.level = jQuery("#featureServiceLayerSelect").val();
+
+        request.where = jQuery("#whereString").text();
+
+        var selectedVariables = [];
+        jQuery("#variables option:selected").each(function (n, o) {
+            selectedVariables.push(o.value);
+        });
+
+        if (selectedVariables.length > 0) {
+            request.variables = selectedVariables;
+        }
+
+        jQuery("#cenreq").html(JSON.stringify(request, null, 4));
+        return request;
+
+    }// end buildRequest
+
+
+    function submitRequest() {
+        var request = buildRequest();
+
+        asyncRequestsInFlight++;
+        toggleLoadingIndicators();
+
+        arcgis.APIRequest(request, function (response) {
+            console.log(response);
+
+            // Output raw JSON to raw data tab
+            jQuery("#data").text(JSON.stringify(response));
+
+
+            // Output Formatted Data Table Tab
+            jQuery("#dataSeriesResult thead tr").empty();
+            var headerFieldList = [];
+            jQuery.each(response.fields, function (index, value) {
+                headerFieldList.push(value.name);
+                jQuery("#dataSeriesResult thead tr").append("<th>" + value.alias + "</th>");
+            });
+
+            jQuery("#dataSeriesResult tbody").empty();
+            jQuery.each(response.features, function (index, value) {
+                var newFeature = "<tr>";
+                jQuery.each(headerFieldList, function (i, v) {
+                    if (v in value.attributes) {
+                        newFeature += "<td>" + value.attributes[v] + "</td>";
+                    } else {
+                        newFeature += "<td></td>";
+                    }
+                });
+                newFeature += "</tr>";
+                jQuery("#dataSeriesResult tbody").append(newFeature);
+            });
+
+            // Update Code Sample tab
+
+
+            asyncRequestsInFlight--;
+            toggleLoadingIndicators();
+        });
+    }// end submitRequest
+
+
+    jQuery(document).ready(function () {
+        // Populate the Feature Services
+
+        var request = {};
+        arcgis.seriesRequest(request, function (response) {
+
+            jQuery("#featureServiceSelect").empty();
+            jQuery.each(response.services, function (index, value) {
+                jQuery("#featureServiceSelect").append("<option value=\"" + value.name + "\">" + value.name.replace(/_/g, " ") + "</option>");
+            });
+
+            toggleFeaturedServices();
+        });
+        // Get Levels of Feature Service
+
+
+        // Bind Updates/Interactions
+        jQuery("#showOnlyOpenOpportunity").on("click", toggleFeaturedServices);
+        jQuery("#featureServiceSelect").on("change", function () {
+            selectFeatureService(jQuery(this).val());
+        });
+        jQuery("#variables").change(selectVariables);
+        jQuery("#btnUpdateData").on("click", function (e) {
+            e.preventDefault();
+            submitRequest();
+        });
+    });
+
+</script>
+
+
+
