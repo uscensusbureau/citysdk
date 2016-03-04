@@ -459,6 +459,14 @@ arcgisModule.prototype.APIRequest = function(request, callback) {
                     request.variables = CitySDK.prototype.modules.arcgis.validateVariableList(request.order,dataDescription);
                 }
 
+                // Add extent to query
+                /*if(!('geometryType' in request)){
+                    request.geometryType = dataDescription.geometryType;
+                    request.geometry = dataDescription.extent;
+                    delete request.geometry.spatialReference;
+                }*/
+
+
                 // Set return geometry to false as this is an APIRequest
                 request.returnGeometry = "false";
 
@@ -496,11 +504,13 @@ arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callb
 
     // Populate the variables
     if('variables' in request){
-        arcURL += "&outFields=" + encodeURIComponent(request.variables.join(" "));
+        arcURL += "&outFields=" + encodeURIComponent(request.variables.join(", "));
+    }else{
+        arcURL += "&outFields=*";
     }
 
     if('order' in request){
-        arcURL += "&outFields=" + encodeURIComponent(request.order.join(" "));
+        arcURL += "&outFields=" + encodeURIComponent(request.order.join(", "));
     }
     // Populate geometry returns
     arcURL += "&returnGeometry=" + request.returnGeometry + "&returnCentroid=false";
@@ -519,11 +529,11 @@ arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callb
     }
 
     // Process the Where Filters
-    if('where' in request){
-        if(typeof request.where == 'string'){
-            // A single-string where clause detected
-           arcURL+="&where="+encodeURIComponent(request.where);
-        }
+    if('where' in request && request.where != ""){
+        // A single-string where clause detected
+        arcURL+="&where="+encodeURIComponent(request.where);
+    }else{
+        arcURL+="&where="+encodeURIComponent('1=1');
     }
 
 
@@ -538,8 +548,12 @@ arcgisModule.prototype.APIRequestProcessor = function(request,url,response,callb
         if(request.geometryType == "esriGeometryPoint"){
             arcURL+="&geometryType=esriGeometryPoint&geometry="+request.lat+","+request.lng;
         }
+    }else if('geometryType' in request){
+        arcURL+="&geometryType="+request.geometryType;
+        if('geometry' in request){
+            arcURL+="&geometry="+JSON.stringify(request.geometry);
+        }
     }
-
 
 
     CitySDK.prototype.sdkInstance.jsonpRequest(arcURL).done(
