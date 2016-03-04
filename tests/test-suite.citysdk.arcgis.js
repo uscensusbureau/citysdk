@@ -58,7 +58,6 @@ function testArcGISModule() {
             "AVariableThatDoesNotExist"
         ],
         'limit': 50
-
     };
     asyncTestsRunning++;
     arcgis.APIRequest(request,function(response){
