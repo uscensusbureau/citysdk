@@ -294,3 +294,17 @@ header.header {
     font-family: "Merriweather", "Georgia", "Times New Roman", serif;
   }
 }
+
+.openOpportunityBadgeHP {
+  overflow: hidden;
+}
+
+.openOpportunityBadgeHP > .openOpportunityBadge {
+  min-height: 310px;
+  overflow: hidden;
+  display: block;
+  .btn {
+    margin-bottom: 10px;
+    min-width: 90%;
+  }
+}
