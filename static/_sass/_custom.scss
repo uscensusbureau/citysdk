@@ -293,6 +293,10 @@ header.header {
   p {
     font-family: "Merriweather", "Georgia", "Times New Roman", serif;
   }
+  .btn {
+    margin-bottom: 10px;
+    min-width: 90%;
+  }
 }
 
 .openOpportunityBadgeHP {
@@ -303,8 +307,5 @@ header.header {
   min-height: 310px;
   overflow: hidden;
   display: block;
-  .btn {
-    margin-bottom: 10px;
-    min-width: 90%;
-  }
+
 }
