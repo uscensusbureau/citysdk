@@ -1,0 +1,12 @@
+data_module:
+  - module: eia
+project_type: Module
+title: US Department of Energy
+thumbnail: doe.png
+thumbnail_alt: Dept. of Energy
+item_links:
+  - title: "Energy Information Agency"
+    type: github
+    linktype: internal
+    link: /examples/eiaBrowser/
+description: "Access the extensive datasets of the U.S. Energy Information Agency, browse various categories and use their data series in your visualizations."

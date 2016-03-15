@@ -1,0 +1,18 @@
+data_module:
+  - module: census
+  - module: hud
+project_type: Module
+title: Housing and Urban Development
+thumbnail: hud.png
+thumbnail_alt: HUD
+item_links:
+  - title: HUD Module
+    type: github
+    linktype: external
+    link: https://github.com/esridc/citysdk-hud
+
+  - title: "Housing Loans in Pittsburgh"
+    type: github
+    linktype: external
+    link: http://esridc.github.io/citysdk-hud/
+description: "Access data on FHA Loans, HUD Insured Properties, Fair Market Rents and dozens of other datasets related to national housing and property issues. NOTE: This module has been supersceded by the new ArcGIS module which can access even more HUD data sets."

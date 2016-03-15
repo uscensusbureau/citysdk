@@ -1,0 +1,40 @@
+  - id: census
+    short_title: Census
+    title: Census Module
+    documentation_link: /guides/developer/citysdk.census.html
+    internal_module: true
+  - id: ckan
+    short_title: CKAN
+    title: CKAN Module
+    documentation_link: /guides/developer/citysdk.ckan.html
+    internal_module: true
+  - id: fema
+    short_title: FEMA
+    title: FEMA Module
+    documentation_link: /guides/developer/citysdk.fema.html
+    internal_module: true
+  - id: socrata
+    short_title: Socrata
+    title: Socrata Module
+    documentation_link: /guides/developer/citysdk.socrata.html
+    internal_module: true
+  - id: hud
+    short_title: HUD (Legacy)
+    title: HUD Legacy Module
+    documentation_link: https://github.com/esridc/citysdk-hud
+    internal_module: false
+  - id: usda
+    short_title: USDA
+    title: USDA Farmer's Market Module
+    documentation_link: /guides/developer/citysdk.farmersMarket.html
+    internal_module: true
+  - id: eia
+    short_title: EIA
+    title: Energy Information Agency Module
+    documentation_link: /guides/developer/citysdk.eia.html
+    internal_module: true
+  - id: arcgis
+    short_title: ArcGIS
+    title: ESRI / ArcGIS Module
+    documentation_link: /guides/developer/citysdk.arcgis.html
+    internal_module: true

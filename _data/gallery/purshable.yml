@@ -1,0 +1,12 @@
+data_module:
+  - module: usda
+project_type: Project
+title: Purshable
+thumbnail: purshable.png
+thumbnail_alt: Purshable
+item_links:
+  - title: Purshable Website
+    type: link
+    linktype: external
+    link: http://www.purshable.com/
+description: Purshable is a mobile app that will help reduce waste, increase grocer’s profit, and  offer the shopper high quality food at a fraction of the cost.

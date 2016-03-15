@@ -1,0 +1,12 @@
+data_module:
+  - module: census
+project_type: Project
+title: Accessible Places Finder
+thumbnail: accessibility.png
+thumbnail_alt: Accessible Places Finder
+item_links:
+  - title: Accessible Places Finder (prototype)
+    type: app
+    linktype: external
+    link: http://website-mnhomefinder.rhcloud.com/accessibilityscore/
+description: This app aims to help people with disabilities to easily find a place to live or travel in the state of Minnesota that satisfies the specific accessibility needs of this population group.

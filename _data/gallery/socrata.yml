@@ -1,0 +1,17 @@
+data_module:
+  - module: socrata
+project_type: Module
+title: Socrata
+thumbnail: socrata.png
+thumbnail_alt: Socrata
+item_links:
+  - title: Chicago Payroll Query
+    type: github
+    linktype: internal
+    link: /examples/socrataExample/
+
+  - title: "Chicago Crime and Demographics"
+    type: github
+    linktype: internal
+    link: /apps/chicagoCAD/
+description: "The Socrata platform is commonly used by municipal, state, and federal agencies use to distribute their data."

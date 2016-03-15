@@ -1,0 +1,13 @@
+data_module:
+  - module: arcgis
+project_type: Module
+title: ESRI / ArcGIS
+thumbnail: esri.png
+thumbnail_alt: ESRI
+item_links:
+  - title: Opportunity Data from HUD
+    type: github
+    linktype: internl
+    link: /citysdk/examples/arcGisHUD/
+
+description: "Governments, industry leaders, academics, and nongovernmental organizations (NGOs) use ESRI to connect with analytic knowledge they need to make decisions."

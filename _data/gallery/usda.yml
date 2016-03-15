@@ -1,0 +1,12 @@
+data_module:
+  - module: usda
+project_type: Module
+title: US Department of Agriculture
+thumbnail: usda.png
+thumbnail_alt: US Department of Agriculture
+item_links:
+  - title: "Farmer's Markets in California"
+    type: github
+    linktype: internal
+    link: /guides/usingMultipleModules.html
+description: "Discover fresh food near you with the National Farmer's Market directory module."

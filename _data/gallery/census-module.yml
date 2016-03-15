@@ -1,0 +1,18 @@
+data_module:
+  - module: census
+project_type: Module
+title: US Census Bureau
+thumbnail: censuslogo.jpg
+thumbnail_alt: The US Census Bureau
+item_links:
+  - title: Guide to the Census CitySDK
+    type: github
+    linktype: internal
+    link: /guides/censusModule.html
+
+  - title: "Demo: Interactive Query Builder"
+    type: link
+    linktype: internal
+    link: /guides/censusModule/queryBuilder.html
+description: The Census Bureau's mission is to serve as the leading source of quality data about the nation's people and economy.
+

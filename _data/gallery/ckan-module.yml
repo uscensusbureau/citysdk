@@ -1,0 +1,12 @@
+data_module:
+  - module: ckan
+project_type: Module
+title: CKAN
+thumbnail: CKAN_Logo_full_color.png
+thumbnail_alt: CKAN
+item_links:
+  - title: CKAN Reference
+    type: link
+    linktype: external
+    link: http://ckan.org/
+description: The CKAN module allows the CitySDK to consume data published by a CKAN-powered source.

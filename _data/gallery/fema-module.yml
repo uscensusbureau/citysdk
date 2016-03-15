@@ -1,0 +1,12 @@
+data_module:
+  - module: fema
+project_type: Module
+title: FEMA Module
+thumbnail: fema-logo-white.png
+thumbnail_alt: FEMA
+item_links:
+  - title: "Demo: Disaster Declaration Summaries"
+    type: github
+    linktype: internal
+    link: /examples/femaExample/
+description: Access the Disaster Declarations dataset from the Federal Emergency Management Agency to see what emergencies have occurred in your area.
