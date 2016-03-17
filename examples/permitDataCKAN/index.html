@@ -27,11 +27,13 @@ title: Building Permits with BLDS & CKAN
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Select a City & Dataset</h3>
+                <h3 class="panel-title">1. Select a City & Dataset</h3>
             </div>
-            <div class="panel-body">
+            <div class="panel-body city-and-dataset-step">
 
-                <form>
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+                <form class="hideWhileLoading">
                     <div class="form-group">
                         <label for="cityDataOrg" class="col-sm-2 control-label">Group</label>
                         <select class="form-control" id="cityDataOrg">
@@ -44,6 +46,14 @@ title: Building Permits with BLDS & CKAN
                         </select>
                     </div><!-- end form-broup -->
                 </form>
+
+
+                <div class="row">
+                    <div class="col-md-12 serviceTextDescription">
+
+                    </div>
+                </div><!-- end row -->
+
 
             </div><!-- end panel-body -->
         </div><!-- end panel panel-info -->
@@ -51,26 +61,175 @@ title: Building Permits with BLDS & CKAN
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Select a Variables & Sort</h3>
+                <h3 class="panel-title">2. Select Desired Variables & Filter / Where</h3>
             </div>
-            <div class="panel-body">
+            <div class="panel-body variables-and-filter-step">
 
-                <form>
-                    <div class="form-group">
-                        <label for="cityDataOrg" class="col-sm-2 control-label">Group</label>
-                        <select class="form-control" id="cityDataOrg">
+                <div class="loading-icon loading-icon-initialstate"></div>
 
-                        </select>
-                    </div><!-- end form-broup -->
-                    <div class="form-group">
-                        <label for="cityDataSet" class="col-sm-2 control-label">Data Set</label>
-                        <select class="form-control" id="cityDataSet">
-                        </select>
-                    </div><!-- end form-broup -->
+
+                <form class="hideWhileLoading">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Fields / Variables</h4>
+
+                            <label for="variables">Available Variables</label>
+                            <p>If no variables are selected, ArcGIS will return ALL of them by default.</p>
+                            <select class="form-control" multiple size="15" id="variables"></select>
+
+                        </div><!-- end col-md-6 -->
+                        <div class="col-md-6">
+                            <h4>Sort By</h4>
+                            <p><em>Results can be optionally sorted by field.</em>
+                            </p>
+
+                            <select class="form-control" id="fieldSort"></select>
+
+
+                        </div><!-- end col-md-6 -->
+
+                    </div><!-- end row -->
                 </form>
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">3. Select SDK Call and Submit</h3>
+            </div>
+            <div class="panel-body submit-step">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="loading-icon loading-icon-initialstate"></div>
+
+                    </div><!-- end col-md-6 -->
+
+                    <div class="col-md-6">
+                        <h4>Get the Data</h4>
+
+                        <p><a class="btn btn-primary btn-lg" id="btnUpdateData" disabled style="width: 100%;" href="#"
+                              role="button">Update Data</a></p>
+
+                        <div class="loading-icon loading-icon-initialstate"></div>
+
+                    </div>
+                </div><!-- end row -->
+
 
             </div><!-- end panel-body -->
         </div><!-- end panel panel-info -->
+
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">The Request</h3>
+
+            </div>
+            <div class="panel-body">
+                <pre id="cenreq"></pre>
+
+
+            </div>
+        </div><!-- end panel panel-success -->
+
+
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">The Returned Data</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="nav nav-tabs" role="tablist">
+
+                    <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData"
+                                                              role="tab"
+                                                              data-toggle="tab">Formatted Data</a></li>
+
+                    <li role="presentation"><a href="#dataSeriesJson" aria-controls="dataSeriesJson" role="tab"
+                                               data-toggle="tab">Raw Data</a></li>
+                    <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab"
+                                               data-toggle="tab">Code Example</a></li>
+                </ul>
+                <div class="loading-icon loading-icon-initialstate"></div>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+                        <div id="dataSeriesResult">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div><!-- end dataSeriesData -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesJson">
+                        <pre id="data" name="data"></pre>
+                    </div><!-- end dataSeriesJson -->
+                    <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+    var <var>sdk</var> = new CitySDK();
+    var <var>ckan</var> = sdk.modules.ckan;
+
+    ckan.enable();
+
+    // Set the server to pull data from
+    ckan.<var>DEFAULT_ENDPOINTS.apiURL</var> = "https://www.civicdata.com/api/3/action/";
+
+	var <var>request</var> = <var id="codeDemoRequestedSeriesID"></var>;
+
+    ckan.APIRequest(<var>request</var>, function (<var>response</var>) {
+            // Output raw JSON to raw data tab
+            jQuery("#data").text(JSON.stringify(<var>response</var>));
+                        // Output raw JSON to raw data tab
+            jQuery("#data").text(JSON.stringify(<var>response</var>));
+
+            // Output Formatted Data Table Tab
+                        // Create Table Header
+            jQuery("#dataSeriesResult thead tr").empty();
+            var <var>headerFieldList</var> = [];
+            jQuery.each(response.result.fields, function (<var>index</var>, <var>value</var>) {
+                <var>headerFieldList</var>.push(<var>value.id</var>);
+                jQuery("#dataSeriesResult thead tr").append("<th>" + <var>value.id</var> + "</th>");
+            });
+
+                        // Add Each Record
+            jQuery("#dataSeriesResult tbody").empty();
+            jQuery.each(response.result.records, function (<var>index</var>, <var>value</var>) {
+                var <var>newFeature</var> = "<tr>";
+                        jQuery.each(headerFieldList, function (<var>i</var>, <var>v</var>) {
+                        if (<var>v</var> in <var>value</var>) {
+                        <var>newFeature</var> += "
+                        <td>" + <var>value[v]</var> + "</td>
+                        ";
+                        } else {
+                        <var>newFeature</var> += "
+                        <td></td>
+                        ";
+                        }
+                        });
+                        newFeature += "
+                    </tr>";
+                jQuery("#dataSeriesResult tbody").append(<var>newFeature</var>);
+            });
+
+    });
+
+            </pre>
+                    </div><!-- end dataSeriesCode -->
+                </div>
+            </div><!-- end panel-body -->
+        </div><!-- end panel panel-info -->
+
+
+
+
+
 
 
     </div><!-- end col-md-12 -->
@@ -81,7 +240,7 @@ title: Building Permits with BLDS & CKAN
     var sdk = new CitySDK();
     var ckan = sdk.modules.ckan;
     ckan.enable();
-    ckan.DEFAULT_ENDPOINTS.apiURL = "http://www.civicdata.com/api/3/action/";
+    ckan.DEFAULT_ENDPOINTS.apiURL = "//www.civicdata.com/api/3/action/";
     ckan.cacheLife = 8640000;
 
 
@@ -93,8 +252,15 @@ title: Building Permits with BLDS & CKAN
         groupRequest = {
             "group": 'blds-building-permit-data'
         };
+
+        jQuery(".city-and-dataset-step .hideWhileLoading").hide();
+        jQuery(".city-and-dataset-step .loading-icon-initialstate").show();
+        jQuery(".variables-and-filter-step .hideWhileLoading").hide();
+        jQuery(".variables-and-filter-step .loading-icon-initialstate").show();
+
         ckan.seriesRequest(groupRequest, function (response) {
             var ichi = 0;
+            console.log(response.result);
             jQuery.each(response.result.packages, function (index, value) {
                 if (!(value.organization.id in orgList)) {
                     orgList[value.organization.id] = [];
@@ -103,31 +269,69 @@ title: Building Permits with BLDS & CKAN
                         ichi = value.organization.id;
                     }
                 }
-                orgList[value.organization.id].push(value.id);
-                packageList[value.id] = value;
+                orgList[value.organization.id].push(value.resources[0].id);
+                packageList[value.resources[0].id] = value;
             });
 
-            jQuery('#cityDataOrg').change(function () {
-                selectOrganization(jQuery(this).find("option:selected").val());
-            });
+
 
             selectOrganization(ichi);
+            jQuery(".city-and-dataset-step .hideWhileLoading").show();
+            jQuery(".city-and-dataset-step .loading-icon-initialstate").hide();
 
         });
+
+        jQuery('#cityDataOrg').change(function () {
+            selectOrganization(jQuery(this).find("option:selected").val());
+        });
+
+        jQuery('#cityDataSet').change(function () {
+            getSeriesFieldList(jQuery(this).find("option:selected").val(), function (response) {
+                setSeriesFieldList(response);
+            });
+        });
+
+        jQuery("#variables").change(buildRequest);
+        jQuery("#fieldSort").change(buildRequest);
+        jQuery("#btnUpdateData").on("click", function (e) {
+            e.preventDefault();
+            submitRequest();
+        });
+
     });
 
 
     function selectOrganization(orgID) {
+
         if (orgID in orgList) {
             jQuery("#cityDataSet").empty();
+
             jQuery.each(orgList[orgID], function (index, value) {
                 jQuery("#cityDataSet").append("<option value='" + value + "'>" + packageList[value]['title'] + "</option>");
             });
+
+
+            getSeriesFieldList(jQuery("#cityDataSet").find("option:selected").val(), function (response) {
+                setSeriesFieldList(response);
+            });
+
         }
     } // end selectOrganization
 
     function getSeriesFieldList(seriesID, callback) {
+
+        jQuery(".variables-and-filter-step .hideWhileLoading").hide();
+        jQuery(".variables-and-filter-step .loading-icon-initialstate").show();
+
+        jQuery(".serviceTextDescription").empty();
+        var serviceTextDescription = "<h4 class='text-primary'>" + packageList[seriesID]['title'] + "</h4>\
+            <p>Last Updated: " + packageList[seriesID]['revision_timestamp'] + "</p>\
+            <p class='text-primary'>" + packageList[seriesID]['notes'] + "</p>";
+        jQuery(".serviceTextDescription").append(serviceTextDescription);
+
+
         if (seriesID in seriesMeta) {
+            buildRequest();
             callback(seriesMeta[seriesID]);
         } else {
             var request = {
@@ -136,11 +340,90 @@ title: Building Permits with BLDS & CKAN
             };
 
             ckan.APIRequest(request, function (response) {
-
+                //console.log(response);
+                seriesMeta[seriesID] = response.result.fields;
+                buildRequest();
+                callback(seriesMeta[seriesID]);
             });
         }
     }//getSeriesFieldList
 
+
+    function setSeriesFieldList(response) {
+        jQuery("#variables").empty();
+        jQuery("#fieldSort").empty();
+        jQuery("#fieldSort").append("<option value=\"\"></option>");
+
+        jQuery.each(response, function (index, value) {
+            jQuery("#variables").append("<option value=\"" + value.id + "\">" + value.id + "</option>");
+            jQuery("#fieldSort").append("<option value=\"" + value.id + "\">" + value.id + "</option>");
+
+        });
+        jQuery(".variables-and-filter-step .hideWhileLoading").show();
+        jQuery(".variables-and-filter-step .loading-icon-initialstate").hide();
+        jQuery("#btnUpdateData").removeAttr("disabled");
+
+    }// set setSeriesFieldList
+
+
+    function buildRequest() {
+        var request = {};
+
+        request.from = jQuery("#cityDataSet").val();
+
+        var selectedVariables = [];
+        jQuery("#variables option:selected").each(function (n, o) {
+            selectedVariables.push(o.value);
+        });
+
+        if (selectedVariables.length > 0) {
+            request.variables = selectedVariables;
+        }
+
+        var sortBy = jQuery("#fieldSort").val();
+        if (sortBy != "") {
+            request.sort = sortBy;
+        }
+
+        jQuery("#cenreq").html(JSON.stringify(request, null, 4));
+        jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
+
+        return request;
+
+    }
+
+
+    function submitRequest() {
+        var request = buildRequest();
+        ckan.APIRequest(request, function (response) {
+
+            // Output raw JSON to raw data tab
+            jQuery("#data").text(JSON.stringify(response));
+
+            // Output Formatted Data Table Tab
+            jQuery("#dataSeriesResult thead tr").empty();
+            var headerFieldList = [];
+            jQuery.each(response.result.fields, function (index, value) {
+                headerFieldList.push(value.id);
+                jQuery("#dataSeriesResult thead tr").append("<th>" + value.id + "</th>");
+            });
+
+            jQuery("#dataSeriesResult tbody").empty();
+            jQuery.each(response.result.records, function (index, value) {
+                var newFeature = "<tr>";
+                jQuery.each(headerFieldList, function (i, v) {
+                    if (v in value) {
+                        newFeature += "<td>" + value[v] + "</td>";
+                    } else {
+                        newFeature += "<td></td>";
+                    }
+                });
+                newFeature += "</tr>";
+                jQuery("#dataSeriesResult tbody").append(newFeature);
+            });
+
+        });
+    }
 
 </script>
 
