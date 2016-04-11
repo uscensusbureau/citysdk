@@ -11,7 +11,7 @@ function testArcGISModule() {
 
     arcgis.enable();
 
-    arcgis.DEFAULT_ENDPOINTS.apiURL = "http://services.arcgis.com/VTyQ9soqVukalItT/";
+    arcgis.DEFAULT_ENDPOINTS.apiURL = "https://services.arcgis.com/VTyQ9soqVukalItT/";
     asyncTestsRunning++;
     arcgis.seriesRequest(request,function(response){
         asyncTestsRunning--;
