@@ -113,7 +113,7 @@ jQuery(document).ready(function(){
 
 if(document.location.protocol !== "http:"){
     var errorMsg = "<div class=\"alert alert-danger\" role=\"alert\">Warning: Parts of the CitySDK test suite REQUIRE non-SSL communication. View this page with http not https.</div>";
-    jQuery("#citysdk-test-suite h2").after(errorMsg);
+    jQuery("#citysdk-test-suite .errorMessage").append(errorMsg);
 }
 
 });
