@@ -111,9 +111,9 @@ jQuery(document).ready(function(){
         processMonitor(0);
     }
 
-if(document.location.protocol !== "http:"){
+if(document.location.protocol !== "https:"){
     var errorMsg = "<div class=\"alert alert-danger\" role=\"alert\">Warning: Parts of the CitySDK test suite REQUIRE non-SSL communication. View this page with http not https.</div>";
-    jQuery("#citysdk-test-suite h2").insertAfter(errorMsg);
+    jQuery("#citysdk-test-suite h2").after(errorMsg);
 }
 
 });
