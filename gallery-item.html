@@ -50,8 +50,7 @@
             {% for module in site.data.modules %}
             {% if galleryItemModule.module == module.id %}
             {% if module.internal_module == true %}
-            <a href="{{ site.baseurl }}/{{ module.documentation_link }}" class="btn btn-xs btn-info">{{
-                module.short_title }}</a>
+            <a href="{{ site.baseurl }}/{{ module.documentation_link }}" class="btn btn-xs btn-info">{{ module.short_title }}</a>
             {% else %}
             <a href="{{ module.documentation_link }}" class="btn btn-xs btn-default">{{ module.short_title }}</a>
             {% endif %}
