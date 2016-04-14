@@ -16,7 +16,7 @@ jQuery(document).ready(function(){
         var endDateInput = currentDate.toISOString().slice(0,10).replace(/-/g,"-");
         currentDate.setDate(currentDate.getDate()-7);
         var startDateInput = currentDate.toISOString().slice(0,10).replace(/-/g,"-");
-        var url = "https://api.uptimerobot.com/getMonitors?apiKey="+monitorKey+"&format=json&logs=1&responseTimes=1&responseTimesLimit=20&responseTimesAverage=120&responseTimesStartDate="+startDateInput+"&responseTimesEndDate="+endDateInput;
+        var url = "https://api.uptimerobot.com/getMonitors?apiKey="+monitorKey+"&format=json&logs=1&customUptimeRatio=7&responseTimes=1&responseTimesLimit=20&responseTimesAverage=120&responseTimesStartDate="+startDateInput+"&responseTimesEndDate="+endDateInput;
 
         jQuery.ajax({
             type: 'GET',
