@@ -7,12 +7,151 @@ title: GeoRequest using Bing Maps
 
 <div class="row">
     <div class="col-md-12">
-        <div id='mapDiv' style="position:relative; top: 0; left: 0; width:100%; height: 800px;"></div>
+
+        <ul class="nav nav-tabs" role="tablist">
+
+            <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Bing Maps</a></li>
+
+            <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab"
+                                       data-toggle="tab">Code Example</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+                <div id='mapDiv' style="position:relative; top: 0; left: 0; width:100%; height: 800px;"></div>
+
+
+            </div><!-- end dataSeriesData -->
+
+
+
+
+
+            <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+
+&lt;script charset="UTF-8" type="text/javascript"
+                src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"&gt;
+                &lt;/script&gt;
+
+&lt;script type="text/javascript"&gt;
+ var map, dataLayer, infobox;
+        var bingKey = "AklB4zJPwc8gevQHBaUtGrAFzJTnNCtZJc6D0DwXUL6ak6JdQD4pS25IaaStiPxR";
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+        census.enable(citySDKdemoConfiguration.apikey);
+
+        jQuery(document).ready(function () {
+            GetMap();
+        });
+
+        function GetMap() {
+            map = new Microsoft.Maps.Map(document.getElementById("mapDiv"), {
+                credentials: bingKey,
+                center: new Microsoft.Maps.Location(38.9047, -77.0164),
+                zoom: 12
+            });
+
+            dataLayer = new Microsoft.Maps.EntityCollection();
+            map.entities.push(dataLayer);
+
+            var infoboxLayer = new Microsoft.Maps.EntityCollection();
+            map.entities.push(infoboxLayer);
+
+            infobox = new Microsoft.Maps.Infobox(new Microsoft.Maps.Location(0, 0), { visible: false });
+            infoboxLayer.push(infobox);
+
+            getGeoJSON();
+        }
+
+        function getGeoJSON() {
+            console.log("Getting Washington DC GeoJSON and data from CitySDK...");
+
+            var request = {
+                "state": "DC",
+                "level": "tract",
+                "variables": [
+                    "income",
+                    "population"
+                ],
+                sublevel: true,
+                container: "county"
+            };
+
+            census.GEORequest(request, loadGeoJSON);
+        }
+
+        function loadGeoJSON(geojson) {
+            var features = geojson.features;
+
+
+            var mm = Microsoft.Maps;
+            for (var i = 0; i < features.length; i++) {
+                console.log("Processing feature: " + (i+1) + " of " + features.length);
+                var feature = features[i];
+                var coordinates = feature.geometry.coordinates[0];
+                var properties = feature.properties;
+
+                var vertices = [];
+                for(var j = 0; j < coordinates.length; j++) {
+                    vertices.push(new Microsoft.Maps.Location(coordinates[j][1],coordinates[j][0]));
+                }
+
+
+                var polygon = new Microsoft.Maps.Polygon(vertices,
+                        {
+                            fillColor: new Microsoft.Maps.Color(100,100,0,100),
+                            strokeColor: new Microsoft.Maps.Color(200,0,100,100),
+                            strokeThickness: 5
+                        });
+
+                polygon.Metadata = {
+                    "title": "Tract " + feature.properties.NAME,
+                    "description": "Population: " + feature.properties.population + "<br/>Income: " + feature.properties.income
+                };
+
+                // Add the shape to the map
+                dataLayer.push(polygon);
+
+                Microsoft.Maps.Events.addHandler(polygon, 'click', displayInfobox);
+                Microsoft.Maps.Events.addHandler(polygon, 'mouseover', displayInfobox);
+            }
+        };
+
+        function displayInfobox(e){
+            if(e.target){
+                var point = new Microsoft.Maps.Point(e.getX(), e.getY());
+                var loc = map.tryPixelToLocation(point);
+
+                infobox.setLocation(loc);
+
+                var opt = e.target.Metadata;
+
+                if(opt){
+                    if(e.target.getIcon){ //is pushpin
+                        opt.offset = new Microsoft.Maps.Point(0,20);
+                    }else{
+                        opt.offset = new Microsoft.Maps.Point(0,0);
+                    }
+
+                    opt.visible = true;
+                    infobox.setOptions(opt);
+                }
+            }
+        }
+&lt;/script&gt;
+            </pre>
+            </div><!-- end dataSeriesCode -->
+        </div>
+
+
+
+
     </div>
 </div>
 
 
-    <script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+    <script charset="UTF-8" type="text/javascript" src="https://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
 
     <script type="text/javascript">
         var map, dataLayer, infobox;

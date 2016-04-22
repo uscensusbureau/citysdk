@@ -341,3 +341,36 @@ header.header {
   width: 100%;
   overflow: hidden;
 }
+
+#socrataExampleInputForm {
+  .form-group {
+    width:100%;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+  label {
+    min-width: 19%;
+    margin-right: 1%;
+  }
+
+  .form-control {
+    min-width:78%;
+  }
+
+  .btn-primary {
+    margin-bottom: 30px;
+  }
+  .help-block {
+    text-align:right;
+  }
+}
+
+#containerGeographyControlsGet {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+#containerGeographyControlsSet {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}

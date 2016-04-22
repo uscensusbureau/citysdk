@@ -5,12 +5,7 @@ title: Chicago City Payroll using Socrata and SoQL
 ---
 
 
-<div class="row">
-    <div class="btn-group col-md-12">
-        <a href="#" class="btn btn-primary" role="button">View the Example</a>
-        <a href="source.html" class="btn btn-default" role="button">Source Code</a>
-    </div>
-</div>
+
 
 <div class="row">
 
@@ -24,27 +19,121 @@ title: Chicago City Payroll using Socrata and SoQL
             more on how to use these clauses.</p>
 
         <p>Try out some clauses (leave blank to ignore):</p>
+        <form class="form-inline" id="socrataExampleInputForm">
 
-        <p>Where: <input id="where" style="width: 200px;" type="text"/> (i.e. employee_annual_salary>100000 or
-            department='fire')</p>
+        <div class="form-group">
+            <label for="where">Where:</label>
+            <input id="where" class="form-control" type="text" placeholder=""/>
+            <span id="where-helpblock" class="help-block">(i.e. employee_annual_salary>100000 or department='fire')</span>
+        </div>
+        <br />
+            <div class="form-group">
+                <label for="select">Select:</label>
+                <input id="select" class="form-control" type="text" />
+                <span id="select-helpblock" class="help-block">(i.e. department,sum(employee_annual_salary))</span>
+            </div>
+            <br />
+                <div class="form-group">
+                    <label for="group">Group:</label> <input id="group" class="form-control"type="text" />
+                    <span id="group-helpblock" class="help-block">(i.e. department or name)</span>
 
-        <p>Select: <input id="select" style="width: 200px;" type="text"/> (i.e. department,sum(employee_annual_salary))
-        </p>
+                </div>
+            <br />
+                    <div class="form-group">
+                        <label for="q">Search:</label> <input id="q" class="form-control" type="text" />
+                        <span id="q-helpblock" class="help-block">(i.e. John or Rahm)</span>
 
-        <p>Group: <input id="group" style="width: 200px;" type="text"/> (i.e. department or name)</p>
-
-        <p>Search: <input id="q" style="width: 200px;" type="text"/> (i.e. John or Rahm)</p>
-        <input type="submit" onclick="submit()" value="Query"/>
+                    </div>
+            <br />
+        <input type="submit" class="btn btn-large btn-primary" id="socrataSubmit" value="Query"/>
+            </form>
     </div>
 </div>
 
 
 <div class="row">
     <div class="col-md-12">
-        <h3>Output</h3>
+        <ul class="nav nav-tabs" role="tablist">
+
+            <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Raw Output</a></li>
+
+            <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code Example</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
             <pre id="output">
 
             </pre>
+
+            </div><!-- end dataSeriesData -->
+
+
+
+
+
+            <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+
+var sdk, socrata;
+
+    jQuery(document).ready(function () {
+        sdk = new CitySDK();
+        socrata = sdk.modules.socrata;
+        jQuery("#socrataSubmit").on("click",submit);
+    });
+
+
+
+    function submit(e) {
+        var request = {
+            "url": "data.cityofchicago.org",
+            "dataset": "xzkq-xp2w"
+        }
+
+        var where = jQuery('#where');
+        if (where.val().length > 0) {
+            request.where = where.val();
+        }
+
+        var select = jQuery('#select');
+        if (select.val().length > 0) {
+            request.select = select.val();
+        }
+
+        var group = jQuery('#group');
+        if (group.val().length > 0) {
+            request.group = group.val();
+        }
+
+        var q = jQuery('#q');
+        if (q.val().length > 0) {
+            request.q = q.val();
+        }
+
+        socrata.request(request, function (response) {
+            var output = jQuery('#output');
+            output.empty();
+
+            response.forEach(function (entry) {
+                for (var property in entry) {
+                    if (entry.hasOwnProperty(property)) {
+                        output.append("<b>" + property + "</b>: " + entry[property] + "; ");
+                    }
+                }
+                output.append("<br/>");
+            });
+        });
+    }
+
+            </pre>
+            </div><!-- end dataSeriesCode -->
+        </div>
+
+
+
+
+
     </div>
 
 </div>
@@ -52,39 +141,44 @@ title: Chicago City Payroll using Socrata and SoQL
 <script>
     var sdk, socrata;
 
-    $(document).ready(function () {
+    jQuery(document).ready(function () {
         sdk = new CitySDK();
         socrata = sdk.modules.socrata;
+
+        jQuery("#socrataSubmit").on("click",submit);
     });
 
-    function submit() {
+
+
+    function submit(e) {
+        e.preventDefault();
         var request = {
             "url": "data.cityofchicago.org",
             "dataset": "xzkq-xp2w"
         }
 
-        var where = $('#where');
+        var where = jQuery('#where');
         if (where.val().length > 0) {
             request.where = where.val();
         }
 
-        var select = $('#select');
+        var select = jQuery('#select');
         if (select.val().length > 0) {
             request.select = select.val();
         }
 
-        var group = $('#group');
+        var group = jQuery('#group');
         if (group.val().length > 0) {
             request.group = group.val();
         }
 
-        var q = $('#q');
+        var q = jQuery('#q');
         if (q.val().length > 0) {
             request.q = q.val();
         }
 
         socrata.request(request, function (response) {
-            var output = $('#output');
+            var output = jQuery('#output');
             output.empty();
 
             response.forEach(function (entry) {

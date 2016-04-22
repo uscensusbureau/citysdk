@@ -7,10 +7,6 @@ title: Population and Income by Address
 
 
 
-    <div class="btn-group">
-        <a href="#" class="btn btn-primary" role="button">View the Example</a>
-        <a href="source.html" class="btn btn-default" role="button">Source Code</a>
-    </div>
 
         <div>
             <h2>Overview</h2>
@@ -70,8 +66,75 @@ title: Population and Income by Address
 <div class="row">
     <div class="col-md-12">
         <h3>Output</h3>
-        <pre id="output">
+
+
+
+
+        <ul class="nav nav-tabs" role="tablist">
+
+            <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Raw Data</a></li>
+
+            <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code Example</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="dataSeriesData"><pre id="output">
+            </pre></div><!-- end dataSeriesData -->
+
+
+
+
+
+            <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+var sdk, census;
+
+    $(document).ready(function () {
+        sdk = new CitySDK();
+        census = sdk.modules.census;
+        census.enable(citySDKdemoConfiguration.apikey);
+    });
+
+    function submit() {
+        var street = $('#street');
+        var city = $('#city');
+        var state = $('#state');
+
+        var request = {
+            address: {
+                street: street.val(),
+                city: city.val(),
+                state: state.val()
+            },
+
+            variables: [
+                "income",
+                "population"
+            ],
+            level: $("#level option:selected").val()
+        }
+        census.APIRequest(request, function (response) {
+            console.log(response);
+            var output = $('#output');
+            output.empty();
+            output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
+            output.append("Median Income: " + response.data[0].income + "<br/>");
+            output.append("Population: " + response.data[0].population + " </br>");
+            output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
+            output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
+        });
+    }
             </pre>
+            </div><!-- end dataSeriesCode -->
+        </div>
+
+
+
+
+
+
+
+
     </div>
 </div>
 

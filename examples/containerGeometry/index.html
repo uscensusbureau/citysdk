@@ -5,13 +5,6 @@ title: GeoRequest with Arbitrary Boundaries
 ---
 
 
-<div class="row">
-    <div class="btn-group col-md-12">
-        <a href="#" class="btn btn-primary" role="button">View the Example</a>
-        <a href="{{ site.baseurl }}/examples/containerGeometry/source.html" class="btn btn-default" role="button">Source
-            Code</a>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-12">
@@ -26,32 +19,182 @@ title: GeoRequest with Arbitrary Boundaries
 
 <div class="row">
     <div class="col-md-12">
-        <div id="map-canvas" style="height: 500px;"></div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <input type="submit" value="Clear and Draw Triangle" onclick="showTriangle()"/>
-        <input type="submit" value="Get Block Groups" onclick="go('blockGroup')"/>
-        <input type="submit" value="Get Places" onclick="go('place')"/>
-        <input type="submit" value="Get Tracts" onclick="go('tract')"/>
-        <input type="submit" value="Get Counties" onclick="go('county')"/>
-        <input type="submit" value="Get States" onclick="go('state')"/>
-        <br/>
-        <br/>
-        <input type="submit" value="Set container 'geometry'" onclick="setContainer('geometry')"/>
-        <input type="submit" value="Set container 'geometry_within'" onclick="setContainer('geometry_within')"/>
-        <br/>
-        <br/>
-        'geometry' grabs anything that is within or touches the boundary.
-        <br/>
-        <br/>
-        'geometry_within' grabs anything that is entirely contained within the boundary.
+
+        <ul class="nav nav-tabs" role="tablist">
+
+            <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Map</a></li>
+
+            <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code Example</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="map-canvas" style="height: 500px;"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group" role="group" aria-label="" id="containerGeographyControlsGet">
+                            <button type="button" class="btn btn-default btn-primary" onclick="showTriangle()">Clear and Draw Triangle</button>
+                            <button type="button" class="btn btn-default btn-primary" onclick="go('blockGroup')">Get Block Groups</button>
+                            <button type="button" class="btn btn-default btn-primary" onclick="go('place')">Get Places</button>
+                            <button type="button" class="btn btn-default btn-primary" onclick="go('tract')">Get Tracts</button>
+                            <button type="button" class="btn btn-default btn-primary" onclick="go('county')">Get Counties</button>
+                            <button type="button" class="btn btn-default btn-primary" onclick="go('state')">Get States</button>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="" id="containerGeographyControlsSet">
+                            <button type="button" class="btn btn-default btn-info" onclick="setContainer('geometry')">Set container 'geometry'</button>
+                            <button type="button" class="btn btn-default btn-info" onclick="setContainer('geometry_within')">Set container 'geometry_within'</button>
+                        </div>
+
+                        <p>'geometry' grabs anything that is within or touches the boundary.</p>
+                        <p>'geometry_within' grabs anything that is entirely contained within the boundary.</p>
+                    </div>
+                </div>
+
+            </div><!-- end dataSeriesData -->
+
+
+
+
+
+            <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+&lt;script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"&gt;
+&lt;/script>
+    &lt;script>
+        var apiKey, map;
+
+        var sdk = new CitySDK();
+        var census = sdk.modules.census;
+
+        var mode = "geometry";
+
+        var triangleGeojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    -76.62139892578125,
+                                    39.28967134685658
+                                ],
+                                [
+                                    -77.080078125,
+                                    38.89530825492018
+                                ],
+                                [
+                                    -76.48681640625,
+                                    38.96795115401593
+                                ],
+                                [
+                                    -76.62139892578125,
+                                    39.28967134685658
+                                ]
+                            ]
+                        ]
+                    }
+                }
+            ]
+        };
+
+        function getApiKey() {
+            census.enable(citySDKdemoConfiguration.apikey);
+        };
+
+        function clearMap() {
+            map.data.forEach(function(feature) {
+                map.data.remove(feature);
+            });
+        };
+
+        $(document).ready(
+                function() {
+                    getApiKey();
+
+                    var mapOptions = {
+                        center: { lat: 38.91732, lng: -77.2211},
+                        zoom: 7
+                    };
+                    map = new google.maps.Map(document.getElementById('map-canvas'),
+                            mapOptions);
+
+                    map.data.setStyle({
+                        fillColor: 'blue'
+                    });
+
+                    map.data.addGeoJson(triangleGeojson);
+
+                    var infowindow = new google.maps.InfoWindow();
+
+                    map.data.addListener('click', function(event) {
+                        infowindow.setContent(
+                                "&lt;h2&gt;" + event.feature.getProperty("NAME") + "&lt;/h2&gt;&lt;p&gt;Median age: " +
+                                event.feature.getProperty("age") + "&lt;br/&gt;Population: " +
+                                event.feature.getProperty("population") + "&lt;br/&gt;Median income: " +
+                                event.feature.getProperty("income")
+                                + "&lt;/p&gt;"
+                        );
+                        infowindow.setPosition(event.latLng);
+                        infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)});
+                        infowindow.open(map);
+                    });
+                }
+        );
+
+        function go(x) {
+            var request = {
+                variables: [
+                    "age",
+                    "population",
+                    "income"
+                ],
+
+                level: x,
+                sublevel: true,
+                container: mode,
+                containerGeometry: census.GEOtoESRI(triangleGeojson)[0].geometry
+            };
+
+            census.GEORequest(request, function(response) {
+                clearMap();
+                map.data.addGeoJson(response);
+            });
+        }
+
+        function showTriangle() {
+            clearMap();
+            map.data.addGeoJson(triangleGeojson);
+        }
+
+        function setContainer(x) {
+            mode = x;
+        }
+    &lt;/script&gt;
+            </pre>
+            </div><!-- end dataSeriesCode -->
+        </div>
+
+
+
+
+
+
+
+
+
+
     </div>
 </div>
 
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true">
 </script>
     <script>
         var apiKey, map;

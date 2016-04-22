@@ -5,12 +5,6 @@ title: NYC Boroughs using Leaflet JS
 ---
 
 
-<div class="row">
-    <div class="btn-group col-md-12">
-        <a href="#" class="btn btn-primary" role="button">View the Example</a>
-        <a href="source.html" class="btn btn-default" role="button">Source Code</a>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-12">
@@ -28,100 +22,248 @@ title: NYC Boroughs using Leaflet JS
 </div>
 
 
-<div class="row">
-    <div class="col-md-12">
-        <div id="map" style="min-height:400px;"></div>
-    </div>
+
+<ul class="nav nav-tabs" role="tablist">
+
+    <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Map</a></li>
+
+    <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code Example</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div id="map" style="min-height:400px;"></div>
+            </div>
+        </div>
+
+
+        <div class="row" style="margin-top: 1em;">
+            <div class="col-sm-2">
+                <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)"
+                      onclick="plotBorough('Staten Island')" role="button">
+                    <small>Staten Island</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Queens')"
+                      role="button">
+                    <small>Queens</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Brooklyn')"
+                      role="button">
+                    <small>Brooklyn</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Manhattan')"
+                      role="button">
+                    <small>Manhattan</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Bronx')"
+                      role="button">
+                    <small>Bronx</small>
+                </a></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
+                <p><a class="btn btn-success" style="width: 100%;" href="javascript:void(0)" onclick="split('county')"
+                      role="button">
+                    <small>Plot Counties</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-success" style="width: 100%;" href="javascript:void(0)" onclick="split('tract')"
+                      role="button">
+                    <small>Plot Tracts</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-success" style="width: 100%;" href="javascript:void(0)" onclick="split('blockGroup')"
+                      role="button">
+                    <small>Plot Blockgroups</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-warning" style="width: 100%;" href="javascript:void(0)"
+                      onclick="setMode('geometry_within')" role="button">
+                    <small>Within Only</small>
+                </a></p>
+            </div>
+            <div class="col-sm-2">
+                <p><a class="btn btn-warning" style="width: 100%;" href="javascript:void(0)" onclick="setMode('geometry')"
+                      role="button">
+                    <small>Cross-boundaries</small>
+                </a></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2">
+                <p><a class="btn btn-danger" style="width: 100%;" href="javascript:void(0)" onclick="clearMap()" role="button">
+                    <small>Clear Map</small>
+                </a></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <p>Please enter a comma separated list of <a href="{{ site.baseurl }}/guides/censusModule/aliases.html">variables</a>:</p>
+            </div>
+            <div class="col-md-3">
+                <input type="text" id="variableBox" type="text" class="form-control" value='income, population'/>
+            </div>
+        </div>
+
+
+    </div><!-- end dataSeriesData -->
+
+
+    <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+
+&lt;script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"&gt;&lt;/script&gt;
+&lt;script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/&gt;
+
+&lt;script&gt;
+    var apiKey, map, geojsonLayer;
+
+    var ready = false;
+    var NYCgeojson;
+
+    var variables = [];
+
+    var boroughs = {
+        "Staten Island": 0,
+        "Queens": 1,
+        "Brooklyn": 2,
+        "Manhattan": 3,
+        "Bronx": 4
+    };
+
+    var currentBorough = 0;
+
+    jQuery.getJSON("https://cdn.rawgit.com/dwillis/nyc-maps/master/boroughs.geojson", function (response) {
+        ready = true;
+        NYCgeojson = response;
+
+        NYCgeojson.features[boroughs["Staten Island"]].properties.NAME = "Staten Island";
+        NYCgeojson.features[boroughs["Queens"]].properties.NAME = "Queens";
+        NYCgeojson.features[boroughs["Brooklyn"]].properties.NAME = "Brooklyn";
+        NYCgeojson.features[boroughs["Manhattan"]].properties.NAME = "Manhattan";
+        NYCgeojson.features[boroughs["Bronx"]].properties.NAME = "Bronx";
+    });
+
+    var sdk = new CitySDK();
+    var census = sdk.modules.census;
+
+    var mode = "geometry";
+
+    function getApiKey() {
+        census.enable(citySDKdemoConfiguration.apikey);
+    }
+    ;
+
+    $(document).ready(
+            function () {
+                getApiKey();
+
+                map = L.map('map').setView([40.7127, -74.0059], 10);
+
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    attribution: 'Map data &copy; &lt;a href="http://openstreetmap.org"&gt;OpenStreetMap&lt;/a&gt; contributors, &lt;a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA&lt;/a&gt;, Imagery &copy; &lt;a href="http://mapbox.com">Mapbox&lt;/a&gt;',
+                    maxZoom: 18,
+                    id: 'afrasier.mf7424i4',
+                    accessToken: 'pk.eyJ1IjoiYWZyYXNpZXIiLCJhIjoiMjYyYzU5NmQ1YmNiZWE5ODY4YzQ1OTZjMWU3OWI0MGUifQ.jW-UYJNU9AzlrYe-HHIKNQ'
+                }).addTo(map);
+
+
+                geojsonLayer = L.geoJson().addTo(map);
+
+                L.Util.setOptions(geojsonLayer,
+                        {
+                            style: {
+                                "clickable": true,
+                                "color": "#ff7800",
+                                "weight": 2,
+                                "opacity": 0.65
+                            },
+
+                            onEachFeature: function (feature, layer) {
+                                layer.on('click', function (e) {
+                                    var popup = "&lt;h4&gt;" + feature.properties.NAME + "&lt;/h4&gt;";
+                                    variables.forEach(function (v) {
+                                        popup += "&lt;br/&gt;&lt;strong&gt;" + v + "&lt;/strong&gt;: " + feature.properties[v];
+                                    });
+
+                                    layer.bindPopup(popup);
+                                });
+                            }
+
+                        });
+            }
+    );
+    var q;
+    function split(x) {
+        variables = [];
+        $('#variableBox').val().split(",").forEach(function (s) {
+            variables.push(s.trim());
+        });
+
+        var request = {
+            container: mode,
+            containerGeometry: census.GEOtoESRI(NYCgeojson.features[currentBorough]).geometry,
+            sublevel: true,
+            level: x,
+            variables: variables
+        };
+
+        census.GEORequest(request, function (response) {
+            response.features.forEach(function (f) {
+                geojsonLayer.addData(f);
+            });
+        });
+    }
+    ;
+
+    function clearMap() {
+        geojsonLayer.clearLayers();
+    }
+    ;
+
+    function plotBorough(x) {
+        clearMap();
+        currentBorough = boroughs[x];
+
+        geojsonLayer.addData(NYCgeojson.features[currentBorough]);
+    }
+    ;
+
+    function setMode(x) {
+        mode = x;
+    }
+    ;
+&lt;/script&gt;
+
+            </pre>
+    </div><!-- end dataSeriesCode -->
 </div>
 
 
-<div class="row" style="margin-top: 1em;">
-    <div class="col-md-2">
-        <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)"
-              onclick="plotBorough('Staten Island')" role="button">
-            <small>Staten Island</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Queens')"
-              role="button">
-            <small>Queens</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Brooklyn')"
-              role="button">
-            <small>Brooklyn</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Manhattan')"
-              role="button">
-            <small>Manhattan</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-primary" style="width: 100%;" href="javascript:void(0)" onclick="plotBorough('Bronx')"
-              role="button">
-            <small>Bronx</small>
-        </a></p>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-2">
-        <p><a class="btn btn-success" style="width: 100%;" href="javascript:void(0)" onclick="split('county')"
-              role="button">
-            <small>Plot Counties</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-success" style="width: 100%;" href="javascript:void(0)" onclick="split('tract')"
-              role="button">
-            <small>Plot Tracts</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-success" style="width: 100%;" href="javascript:void(0)" onclick="split('blockGroup')"
-              role="button">
-            <small>Plot Blockgroups</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-warning" style="width: 100%;" href="javascript:void(0)"
-              onclick="setMode('geometry_within')" role="button">
-            <small>Within Only</small>
-        </a></p>
-    </div>
-    <div class="col-md-2">
-        <p><a class="btn btn-warning" style="width: 100%;" href="javascript:void(0)" onclick="setMode('geometry')"
-              role="button">
-            <small>Cross-boundaries</small>
-        </a></p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-2">
-        <p><a class="btn btn-danger" style="width: 100%;" href="javascript:void(0)" onclick="clearMap()" role="button">
-            <small>Clear Map</small>
-        </a></p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-3">
-        <p>Please enter a comma separated list of <a
-                href="{{ site.baseurl }}/guides/censusModule/aliases.html">variables</a>:</p>
-    </div>
-    <div class="col-md-3">
-        <input type="text" id="variableBox" type="text" class="form-control" value='income, population'/>
-    </div>
-</div>
-</>
 
 
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
+
+
+
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css"/>
 

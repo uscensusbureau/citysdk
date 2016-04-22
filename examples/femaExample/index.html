@@ -9,10 +9,7 @@ title: FEMA Module - Disaster Declaration Summaries
     <div class="col-md-12">
 
 
-        <div class="btn-group">
-            <a href="#" class="btn btn-primary" role="button">View the Example</a>
-            <a href="source.html" class="btn btn-default" role="button">Source Code</a>
-        </div>
+
 
         <div>
         </div>
@@ -113,31 +110,146 @@ title: FEMA Module - Disaster Declaration Summaries
 
                 <div class="panel panel-success">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Resulting Data</h3>
+                        <h3 class="panel-title">Results</h3>
                     </div>
                     <div class="panel-body">
 
-                        <table id="output" class="display" width="100%">
-                            <thead>
-                            <tr>
-                                <th>Disaster Number</th>
-                                <th>IH Program Declared</th>
-                                <th>IA Program Declared</th>
-                                <th>PA Program Declared</th>
-                                <th>HM Program Declared</th>
-                                <th>State</th>
-                                <th>Declaration Date</th>
-                                <th>Disaster Type</th>
-                                <th>Incident Type</th>
-                                <th>Title</th>
-                                <th>Incident Begin Date</th>
-                                <th>Incident End Date</th>
-                                <th>Disaster Close Out Date</th>
-                                <th>Place Code</th>
-                                <th>Declared County Area</th>
-                            </tr>
-                            </thead>
-                        </table>
+
+                        <ul class="nav nav-tabs" role="tablist">
+
+                            <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Results</a></li>
+
+                            <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code Example</a></li>
+                        </ul>
+
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+                                <table id="output" class="display" width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Disaster Number</th>
+                                        <th>IH Program Declared</th>
+                                        <th>IA Program Declared</th>
+                                        <th>PA Program Declared</th>
+                                        <th>HM Program Declared</th>
+                                        <th>State</th>
+                                        <th>Declaration Date</th>
+                                        <th>Disaster Type</th>
+                                        <th>Incident Type</th>
+                                        <th>Title</th>
+                                        <th>Incident Begin Date</th>
+                                        <th>Incident End Date</th>
+                                        <th>Disaster Close Out Date</th>
+                                        <th>Place Code</th>
+                                        <th>Declared County Area</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+
+                            </div><!-- end dataSeriesData -->
+
+
+
+
+
+                            <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+var sdk, fema, census;
+    var data = [];
+    var table;
+    jQuery(document).ready(function () {
+        sdk = new CitySDK();
+        fema = sdk.modules.fema;
+
+        table = jQuery('#output').DataTable({
+            "autoWidth": false,
+            data: data,
+            columns: [
+                {data: "disasterNumber", "defaultContent": ""},
+                {data: "ihProgramDeclared", "defaultContent": ""},
+                {data: "iaProgramDeclared", "defaultContent": ""},
+                {data: "paProgramDeclared", "defaultContent": ""},
+                {data: "hmProgramDeclared", "defaultContent": ""},
+                {data: "state", "defaultContent": ""},
+                {data: "declarationDate", "defaultContent": ""},
+                {data: "disasterType", "defaultContent": ""},
+                {data: "incidentType", "defaultContent": ""},
+                {data: "title", "defaultContent": ""},
+                {data: "incidentBeginDate", "defaultContent": ""},
+                {data: "incidentEndDate", "defaultContent": ""},
+                {data: "disasterCloseOutDate", "defaultContent": ""},
+                {data: "placeCode", "defaultContent": ""},
+                {data: "declaredCountyArea", "defaultContent": ""}
+            ]
+        });
+        fema.enable();
+
+
+        jQuery("#btnQueryData").click(submitQuery);
+
+    });
+
+    function submitQuery() {
+
+        jQuery(".loading-icon-initialstate").show();
+        var disasterNumber = $('#disasterNumber').val();
+        var county = $('#county').val();
+        var state = $('#state').val();
+        var declarationRangeStart = $('#declarationRangeStart').val();
+        var declarationRangeEnd = $('#declarationRangeEnd').val();
+        var take = $('#take').val();
+        var skip = $('#skip').val();
+
+        var request = {};
+
+        if (disasterNumber) {
+            request.disasterNumber = disasterNumber;
+        }
+        if (state) {
+            request.state = state;
+        }
+        if (county) {
+            request.county = county;
+        }
+        if (declarationRangeStart) {
+            request.declarationRangeStart = declarationRangeStart;
+        }
+        if (declarationRangeEnd) {
+            request.declarationRangeEnd = declarationRangeEnd;
+        }
+        if (take) {
+            request.take = take;
+        }
+        if (skip) {
+            request.skip = skip;
+        }
+
+        fema.DisasterDeclarationsSummariesRequest(request, function (response) {
+            table.clear();
+            table.rows.add(response.DisasterDeclarationsSummaries);
+            table.draw();
+            jQuery(".loading-icon-initialstate").hide();
+        });
+
+        return false;
+    }
+
+    function resetForm() {
+        jQuery('#disasterNumber').val('');
+        jQuery('#county').val('');
+        jQuery('#state').val('');
+        jQuery('#declarationRangeStart').val('');
+        jQuery('#declarationRangeEnd').val('');
+        jQuery('#take').val('');
+        jQuery('#skip').val('');
+    }
+            </pre>
+                            </div><!-- end dataSeriesCode -->
+                        </div>
+
+
+
+
                     </div>
                 </div>
 
@@ -229,12 +341,12 @@ title: FEMA Module - Disaster Declaration Summaries
     }
 
     function resetForm() {
-        $('#disasterNumber').val('');
-        $('#county').val('');
-        $('#state').val('');
-        $('#declarationRangeStart').val('');
-        $('#declarationRangeEnd').val('');
-        $('#take').val('');
-        $('#skip').val('');
+        jQuery('#disasterNumber').val('');
+        jQuery('#county').val('');
+        jQuery('#state').val('');
+        jQuery('#declarationRangeStart').val('');
+        jQuery('#declarationRangeEnd').val('');
+        jQuery('#take').val('');
+        jQuery('#skip').val('');
     }
 </script>
