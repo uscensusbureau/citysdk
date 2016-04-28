@@ -16,6 +16,12 @@ title: CitySDK & API Statuses
 
 <section id="uptimeRobotMonitors">
     <h2>API Uptime Monitors</h2>
+
+<!--
+Monitors Section
+To add/replace monitors, add files in the _data/uptimeRobotMonitors folder.  Each .yml file should contain ONE monitor apiKey for uptimeRobot.
+-->
+
 {% for c in site.data.uptimeRobotMonitors %}
 {% assign id = c[0] %}
 {% include_relative status-monitor.html id=id %}
