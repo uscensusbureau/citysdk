@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "terraformer": "^1.0.5",
-    "terraformer-arcgis-parser": "^1.0.4"
+    "terraformer-arcgis-parser": "^1.0.4",
+    "jquery": "^2.2.3"
   }
 }

@@ -85,7 +85,7 @@ ModuleTemplateModule.prototype.APIRequest = function(request, callback) {
 
             // Submit the request.
             // Note there are several different request functions that can be used here.  See the CitySDK Core for details.
-            CitySDK.prototype.sdkInstance.ajaxRequest(URL).done(
+            CitySdk.ajaxRequest(URL).done(
                 function (response) {
                     response = jQuery.parseJSON(response);
                     CitySDK.prototype.sdkInstance.setCachedData("moduleTemplate", "APIRequest", cacheKey, response);

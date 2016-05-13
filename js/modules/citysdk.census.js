@@ -288,7 +288,7 @@ CensusModule.prototype.getVariableDictionary = function (inapi, inyear, callback
             URL = URL.replace(apiPattern, api);
             URL = URL.replace(yearPattern, year);
 
-            CitySDK.prototype.sdkInstance.ajaxRequest(URL).done(
+            CitySdk.ajaxRequest(URL).done(
                 function (response) {
                     response = jQuery.parseJSON(response);
                     CitySDK.prototype.sdkInstance.setCachedData("census", "getVariableDictionary", cacheKey, response);
@@ -429,7 +429,7 @@ CensusModule.prototype.ZIPtoLatLng = function (inzip, callback) {
 
             tigerURL = tigerURL.replace(zipPattern, zip);
 
-            var request = CitySDK.prototype.sdkInstance.ajaxRequest(tigerURL);
+            var request = CitySdk.ajaxRequest(tigerURL);
 
             request.done(function (response) {
                 response = jQuery.parseJSON(response);
@@ -643,7 +643,7 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
             censusURL = censusURL.replace(tractPattern, cows.tract);
             censusURL = censusURL.replace(placePattern, cows.place);
             censusURL = censusURL.replace(keyPattern, apiKey);
-            var request = CitySDK.prototype.sdkInstance.ajaxRequest(censusURL);
+            var request = CitySdk.ajaxRequest(censusURL);
 
             //Attach a completion event to the promise
             request.done(function (response) {
@@ -1228,7 +1228,7 @@ CensusModule.prototype.validateRequestGeographyVariables = function(requestIn,ca
             // Get geography definition
             var geographyURL = CensusModule.prototype.DEFAULT_ENDPOINTS.censusURL + request.year + "/" + request.api + "/geography.json" ;
 
-            var geographyrequest = CitySDK.prototype.sdkInstance.ajaxRequest(geographyURL);
+            var geographyrequest = CitySdk.ajaxRequest(geographyURL);
 
             geographyrequest.done(function (response) {
                 var geoDefinition = jQuery.parseJSON(response);

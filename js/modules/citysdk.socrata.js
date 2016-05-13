@@ -106,7 +106,7 @@ SocrataModule.prototype.request = function(request, callback) {
         socrataURL += "$$app_token=" + this.applicationToken;
     }
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(socrataURL).done(
+    CitySdk.ajaxRequest(socrataURL).done(
         function(response) {
             response = jQuery.parseJSON(response);
             callback(response);

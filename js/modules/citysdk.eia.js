@@ -66,7 +66,7 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
     categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
     categoryURL = categoryURL.replace(categoryPattern, request.category);
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
+    CitySdk.ajaxRequest(categoryURL).done(function(response) {
         response = jQuery.parseJSON(response);
         callback(response);
     });
@@ -95,7 +95,7 @@ EIAModule.prototype.seriesRequest = function(request, callback) {
     seriesURL = seriesURL.replace(apiKeyPattern, this.apiKey);
     seriesURL = seriesURL.replace(seriesPattern, request.series);
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
+    CitySdk.ajaxRequest(seriesURL).done(function(response) {
         response = jQuery.parseJSON(response);
         callback(response);
     });
