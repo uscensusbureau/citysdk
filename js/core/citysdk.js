@@ -5,6 +5,13 @@
  *
  * @overview This is the core library for the CitySDK.  It houses the ajax mechanics, the caching system,
  * and global data sets (such as state capitals and their coordinate points)
+ *
+ * <br>
+ * <h4>Dependencies</h4>
+ * <ol>
+ *   <li>Terraformer Core</li>
+ *   <li>ArcGIS Parser</li>
+ * </ol>
  */
 
 
