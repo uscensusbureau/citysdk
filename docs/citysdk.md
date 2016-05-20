@@ -1,139 +1,195 @@
-# Global
+<a name="CitySDK"></a>
 
+## CitySDK
+**Kind**: global class  
 
+* [CitySDK](#CitySDK)
+    * [new CitySDK()](#new_CitySDK_new)
+    * [.version](#CitySDK+version)
+    * [.allowCache](#CitySDK+allowCache)
+    * [.modules](#CitySDK+modules) : <code>object</code>
+    * [.ajaxRequest(url)](#CitySDK+ajaxRequest) ⇒ <code>promise</code>
+    * [.jsonpRequest(url)](#CitySDK+jsonpRequest) ⇒ <code>object</code>
+    * [.postRequest(url, data)](#CitySDK+postRequest) ⇒ <code>\*</code>
+    * [.stateNames()](#CitySDK+stateNames) ⇒ <code>object</code>
+    * [.stateCapitals()](#CitySDK+stateCapitals) ⇒ <code>object</code>
+    * [.getStateCapitalCoords(stateString)](#CitySDK+getStateCapitalCoords) ⇒ <code>Array</code>
+    * [.parseRequestLatLng(request)](#CitySDK+parseRequestLatLng) ⇒ <code>object</code>
+    * [.getCachedData(module, hashKey)](#CitySDK+getCachedData) ⇒ <code>object</code>
+    * [.setCachedData(module, hashKey, dataValue)](#CitySDK+setCachedData) ⇒ <code>object</code>
+    * [.deleteCachedData(module, hashKey)](#CitySDK+deleteCachedData) ⇒ <code>object</code>
+    * [.storageAvailable(type)](#CitySDK+storageAvailable) ⇒ <code>boolean</code>
+    * [.ESRItoGEO(esriJSON)](#CitySDK+ESRItoGEO) ⇒ <code>Object</code>
+    * [.GEOtoESRI(geoJSON)](#CitySDK+GEOtoESRI) ⇒ <code>object</code>
 
+<a name="new_CitySDK_new"></a>
 
-
-* * *
-
-## Class: CitySDK
+### new CitySDK()
 Instantiates an instance of the CitySDK object.
 
-**version**:  , Version number of the CitySDK Core
-**allowCache**:  , Toggles whether CitySDK will attempt to cache data to reduce the API call requirements
-**modules**: `object` , Stores each module
-### CitySDK.ajaxRequest(url) 
+<a name="CitySDK+version"></a>
 
+### citySDK.version
+Version number of the CitySDK Core
+
+**Kind**: instance property of <code>[CitySDK](#CitySDK)</code>  
+<a name="CitySDK+allowCache"></a>
+
+### citySDK.allowCache
+Toggles whether CitySDK will attempt to cache data to reduce the API call requirements
+
+**Kind**: instance property of <code>[CitySDK](#CitySDK)</code>  
+<a name="CitySDK+modules"></a>
+
+### citySDK.modules : <code>object</code>
+Stores each module
+
+**Kind**: instance property of <code>[CitySDK](#CitySDK)</code>  
+<a name="CitySDK+ajaxRequest"></a>
+
+### citySDK.ajaxRequest(url) ⇒ <code>promise</code>
 Makes an AJAX call
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>promise</code> - Returns a standard ajax promise  
 
-**url**: `string`, URL to request
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | URL to request |
 
-**Returns**: `promise`, Returns a standard ajax promise
+<a name="CitySDK+jsonpRequest"></a>
 
-### CitySDK.jsonpRequest(url) 
-
+### citySDK.jsonpRequest(url) ⇒ <code>object</code>
 Makes an AJAX call (using jsonp)
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - Returns a standard ajax promise  
 
-**url**: `string`, URL to request
+| Param | Type | Description |
+| --- | --- | --- |
+| url | <code>string</code> | URL to request |
 
-**Returns**: `object`, Returns a standard ajax promise
+<a name="CitySDK+postRequest"></a>
 
-### CitySDK.postRequest(url, data) 
-
+### citySDK.postRequest(url, data) ⇒ <code>\*</code>
 Make an AJAX call (using POST)
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
 
-**url**: `string`, Make an AJAX call (using POST)
+| Param | Type |
+| --- | --- |
+| url | <code>string</code> | 
+| data | <code>object</code> | 
 
-**data**: `object`, Make an AJAX call (using POST)
+<a name="CitySDK+stateNames"></a>
 
-**Returns**: `*`
-
-### CitySDK.stateNames() 
-
+### citySDK.stateNames() ⇒ <code>object</code>
 Returns a list of state names keyed by 2-leter code
 
-**Returns**: `object`, state names keyed by 2-leter code
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - state names keyed by 2-leter code  
+<a name="CitySDK+stateCapitals"></a>
 
-### CitySDK.stateCapitals() 
-
+### citySDK.stateCapitals() ⇒ <code>object</code>
 Returns a Lat & Long of each state's capital
 
-**Returns**: `object`, arrays of Lat & Long of each state's capital keyed by 2-leter code
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - arrays of Lat & Long of each state's capital keyed by 2-leter code  
+<a name="CitySDK+getStateCapitalCoords"></a>
 
-### CitySDK.getStateCapitalCoords(stateString) 
-
+### citySDK.getStateCapitalCoords(stateString) ⇒ <code>Array</code>
 Gets the coordinates of a state's capital from it's name or 2-letter code.
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>Array</code> - Returns 2-position array of Lat & Long for the capital of the state. Returns false if no state is found.  
 
-**stateString**: `string`, Name or 2-letter code of the state (case insensitive)
+| Param | Type | Description |
+| --- | --- | --- |
+| stateString | <code>string</code> | Name or 2-letter code of the state (case insensitive) |
 
-**Returns**: `array`, Returns 2-position array of Lat & Long for the capital of the state. Returns false if no state is found.
+<a name="CitySDK+parseRequestLatLng"></a>
 
-### CitySDK.parseRequestLatLng(request) 
-
+### citySDK.parseRequestLatLng(request) ⇒ <code>object</code>
 Scans the request for alternative ways to specify latitude & longiture and migrates those variables to lat & lng positions.
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - the updated request  
 
-**request**: `object`, the request being made to the module
+| Param | Type | Description |
+| --- | --- | --- |
+| request | <code>object</code> | the request being made to the module |
 
-**Returns**: `object`, the updated request
+<a name="CitySDK+getCachedData"></a>
 
-### CitySDK.getCachedData(module, hashKey) 
-
+### citySDK.getCachedData(module, hashKey) ⇒ <code>object</code>
 Retrieves a value from the cache
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - the value of the cached data.  Returns false if nothing found  
 
-**module**: `string`, name of the CitySDK module
+| Param | Type | Description |
+| --- | --- | --- |
+| module | <code>string</code> | name of the CitySDK module |
+| hashKey | <code>string</code> | this is a key that identifies the data. Each module has its own hashing scheme. |
 
-**hashKey**: `string`, this is a key that identifies the data. Each module has its own hashing scheme.
+<a name="CitySDK+setCachedData"></a>
 
-**Returns**: `object`, the value of the cached data.  Returns false if nothing found
-
-### CitySDK.setCachedData(module, hashKey, dataValue) 
-
+### citySDK.setCachedData(module, hashKey, dataValue) ⇒ <code>object</code>
 Creates and/or Updates a value from the cache
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - the value of the cached data.  Returns false if nothing found  
 
-**module**: `string`, name of the CitySDK module
+| Param | Type | Description |
+| --- | --- | --- |
+| module | <code>string</code> | name of the CitySDK module |
+| hashKey | <code>string</code> | this is a key that identifies the data. Each module has its own hashing scheme. |
+| dataValue | <code>object</code> | this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it. |
 
-**hashKey**: `string`, this is a key that identifies the data. Each module has its own hashing scheme.
+<a name="CitySDK+deleteCachedData"></a>
 
-**dataValue**: `object`, this is the data being stored.  It should be an object that contains both the specific data and any meta information needed to invalidate it.
-
-**Returns**: `object`, the value of the cached data.  Returns false if nothing found
-
-### CitySDK.deleteCachedData(module, hashKey) 
-
+### citySDK.deleteCachedData(module, hashKey) ⇒ <code>object</code>
 Deletes a value from the cache
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>object</code> - the value of the cached data.  Returns false if nothing found  
 
-**module**: `string`, name of the CitySDK module
+| Param | Type | Description |
+| --- | --- | --- |
+| module | <code>string</code> | name of the CitySDK module |
+| hashKey | <code>string</code> | this is a key that identifies the data. Each module has its own hashing scheme. |
 
-**hashKey**: `string`, this is a key that identifies the data. Each module has its own hashing scheme.
+<a name="CitySDK+storageAvailable"></a>
 
-**Returns**: `object`, the value of the cached data.  Returns false if nothing found
-
-### CitySDK.storageAvailable(type) 
-
+### citySDK.storageAvailable(type) ⇒ <code>boolean</code>
 Checks to see whether local storage is available
 
-**Parameters**
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
+**Returns**: <code>boolean</code> - true if storage type is available  
 
-**type**: `string`, the tyoe fo storage being tested. Generally 'localstorage' is used.
+| Param | Type | Description |
+| --- | --- | --- |
+| type | <code>string</code> | the tyoe fo storage being tested. Generally 'localstorage' is used. |
 
-**Returns**: `boolean`, true if storage type is available
+<a name="CitySDK+ESRItoGEO"></a>
 
+### citySDK.ESRItoGEO(esriJSON) ⇒ <code>Object</code>
+Converts ESRI JSON to GeoJSON
 
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
 
-* * *
+| Param | Type |
+| --- | --- |
+| esriJSON | <code>string</code> | 
 
+<a name="CitySDK+GEOtoESRI"></a>
 
+### citySDK.GEOtoESRI(geoJSON) ⇒ <code>object</code>
+Converts geoJSON to ESRI JSONThis is functionally an alias of Terraformer.ArcGIS.convert (see https://github.com/Esri/Terraformer for details)
 
+**Kind**: instance method of <code>[CitySDK](#CitySDK)</code>  
 
-
-
-
-**Overview:** This is the core library for the CitySDK.  It houses the ajax mechanics, the caching system, and global data sets (such as state capitals and their coordinate points)
-
+| Param | Type |
+| --- | --- |
+| geoJSON | <code>string</code> | 
 

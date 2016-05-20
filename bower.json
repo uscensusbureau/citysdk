@@ -1,0 +1,26 @@
+{
+  "name": "citysdk",
+  "homepage": "https://uscensusbureau.github.io/citysdk/",
+  "authors": [
+    "US Census Bureau"
+  ],
+  "description": "Toolbox for civic innovators to connect local and national public data.",
+  "main": "",
+  "keywords": [
+    "citysdk",
+    "city-sdk",
+    "census"
+  ],
+  "license": "CC0-1.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "terraformer": "^1.0.5",
+    "terraformer-arcgis-parser": "^1.0.4"
+  }
+}
