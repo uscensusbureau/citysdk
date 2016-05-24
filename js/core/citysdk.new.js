@@ -1,3 +1,21 @@
+/**
+ * @title CitySDK Core
+ *
+ * @module CitySDK Core
+ *
+ * @overview This is the core library for the CitySDK.  It houses the ajax mechanics, the caching system,
+ * and global data sets (such as state capitals and their coordinate points)
+ * 
+ * @version 1.5
+ *
+ * <br>
+ * <h4>Dependencies</h4>
+ * <ol>
+ *   <li>Terraformer Core</li>
+ *   <li>ArcGIS Parser</li>
+ * </ol>
+ */
+
 import $ from 'jquery';
 import 'terraformer';
 import 'terraformer-arcgis-parser';
@@ -9,9 +27,10 @@ import US_STATES_LATLNG from './us-states-latlng';
 
 import './polyfills';
 
+var VERSION = 1.5;
+
 /**
  * @class
- * @version 1.6
  */
 export default class CitySdk {
 
@@ -21,8 +40,7 @@ export default class CitySdk {
   constructor() {
     let idbSupported = false;
 
-    this.version = 1.6;
-    this.modules = {};
+    this.version = VERSION;
     this.allowCache = false;
     this.cacheSupport = new CacheSupport(this);
 
@@ -92,6 +110,14 @@ export default class CitySdk {
       data: data,
       dataType: "text"
     });
+  }
+  
+  static getStatecapitals() {
+    return US_STATES_LATLNG;
+  }
+  
+  static getStateNames() {
+    return US_STATE_NAMES;
   }
 
   /**
@@ -168,54 +194,6 @@ export default class CitySdk {
   }
 
   /**
-   * @function getCachedData
-   * @description Retrieves a value from the cache
-   * @see {@link CacheSupport.getData}
-   *
-   * @param {string} module name of the CitySDK module
-   * @param {function} func
-   * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
-   * @param {function} callback
-   *
-   * @return {object} the value of the cached data.  Returns false if nothing found
-   *
-   * @todo This function needs to return a promise. This, way there's no need to accept a callback.
-   */
-  getCachedData(module, func, hashKey, callback) {
-    return this.cacheSupport.getData(module, func, hashKey, callback);
-  }
-
-  /**
-   * @function setCachedData
-   * @description Creates and/or Updates a value from the cache
-   *
-   * @param {string} module name of the CitySDK module
-   * @param {string} functionName
-   * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
-   * @param {object} dataValue this is the data being stored.  It should be an object that contains both the
-   * specific data and any meta information needed to invalidate it.
-   *
-   * @return {object} the value of the cached data.  Returns false if nothing found
-   */
-  setCachedData(module, functionName, hashKey, dataValue) {
-    return this.cacheSupport.setData(module, functionName, hashKey, dataValue);
-  }
-
-  /**
-   * @function deleteData
-   * @description Deletes a value from the cache
-   *
-   * @param {string} module name of the CitySDK module
-   * @param {string} functionName
-   * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
-   *
-   * @return {object} the value of the cached data.  Returns false if nothing found
-   */
-  deleteCachedData(module, functionName, hashKey) {
-    return this.cacheSupport.deleteData(module, functionName, hashKey);
-  }
-
-  /**
    * @description Converts ESRI JSON to GeoJSON
    *
    * @param {string} esriJSON
@@ -271,5 +249,53 @@ export default class CitySdk {
    */
   static storageAvailablefunction(type) {
     return CacheSupport.storageAvailablefunction(type);
+  }
+
+  /**
+   * @function getCachedData
+   * @description Retrieves a value from the cache
+   * @see {@link CacheSupport.getData}
+   *
+   * @param {string} module name of the CitySDK module
+   * @param {function} func
+   * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
+   * @param {function} callback
+   *
+   * @return {object} the value of the cached data.  Returns false if nothing found
+   *
+   * @todo This function needs to return a promise. This, way there's no need to accept a callback.
+   */
+  getCachedData(module, func, hashKey, callback) {
+    return this.cacheSupport.getData(module, func, hashKey, callback);
+  }
+
+  /**
+   * @function setCachedData
+   * @description Creates and/or Updates a value from the cache
+   *
+   * @param {string} module name of the CitySDK module
+   * @param {string} functionName
+   * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
+   * @param {object} dataValue this is the data being stored.  It should be an object that contains both the
+   * specific data and any meta information needed to invalidate it.
+   *
+   * @return {object} the value of the cached data.  Returns false if nothing found
+   */
+  setCachedData(module, functionName, hashKey, dataValue) {
+    return this.cacheSupport.setData(module, functionName, hashKey, dataValue);
+  }
+
+  /**
+   * @function deleteData
+   * @description Deletes a value from the cache
+   *
+   * @param {string} module name of the CitySDK module
+   * @param {string} functionName
+   * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
+   *
+   * @return {object} the value of the cached data.  Returns false if nothing found
+   */
+  deleteCachedData(module, functionName, hashKey) {
+    return this.cacheSupport.deleteData(module, functionName, hashKey);
   }
 }

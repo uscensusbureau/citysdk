@@ -35,7 +35,7 @@ CensusModule.prototype.DEFAULT_ENDPOINTS.tigerwebURL = "//tigerweb.geo.census.go
 CensusModule.prototype.DEFAULT_ENDPOINTS.censusURL = "//api.census.gov/data/";
 
 
-//Global variables for supplemental georequests
+// Global variables for supplemental georequests
 CensusModule.prototype.SUPPLEMENTAL_REQUESTS_IN_FLIGHT = 0;
 
 
@@ -124,7 +124,8 @@ CensusModule.prototype.aliases = {"population_1990":{"api":{"sf1":[1990,2010],"s
 
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * Enable function. Stores the API key for this module and sets it as enabled.  
+ * It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
