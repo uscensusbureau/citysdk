@@ -5,7 +5,7 @@ import CitySdk from '../../core/citysdk.new';
 
 import $ from 'jquery';
 
-export class CensusUtils {
+export default class CensusUtils {
   /**
    * Checks to see if a string is in the aliases dictionary and returns the appropriate variable if so.
    * This function is depreciated and not recommended as it does not check to see if a particular alias
