@@ -17,7 +17,7 @@ import requiredVariables from './json/required-variables.json';
 
 import $ from 'jquery';
 
-export class CensusModule {
+export default class CensusModule {
 
   constructor() {
     this.version = properties.version;
@@ -32,6 +32,7 @@ export class CensusModule {
     this.sfSummaryRequest = this.summaryRequest;
 
     this.citysdk = new CitySDK();
+    this.citysdk.modules.census = this;
   }
 
   /**
@@ -159,14 +160,15 @@ export class CensusModule {
         callback(cachedData);
 
       } else {
-        let tigerURL = `${properties.defaultEndPoints.tigerwebURL}tigerWMS_Current/MapServer/2/query?
-        where=ZCTA5%3D${zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=
-        &spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=
-        false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=
-        false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=
-        &returnDistinctValues=false&f=pjson`;
+        let base = `${properties.defaultEndpoints.tigerwebURL}tigerWMS_Current/MapServer/2/query?where=ZCTA5%3D${zip}`;
 
-        let request = CitySdk.ajaxRequest(tigerURL);
+        let fullUrl = base + '&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR='
+            + '&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry='
+            + 'false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly='
+            + 'false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion='
+            + '&returnDistinctValues=false&f=pjson';
+
+        let request = CitySdk.ajaxRequest(fullUrl);
 
         request.done(function(response) {
           response = $.parseJSON(response);
@@ -338,8 +340,8 @@ export class CensusModule {
 
         // Convert the aliased variables
         for (var i = 0; i < cows.variables.length; i++) {
+          let variableIntermediate = CensusUtils.parseToValidVariable(cows.variables[i], cows.api, cows.year);
           if (variableIntermediate) {
-            let variableIntermediate = CensusUtils.parseToValidVariable(cows.variables[i], cows.api, cows.year);
             cows.variables[i] = variableIntermediate;
           }
         }
@@ -395,7 +397,7 @@ export class CensusModule {
   /**
    * Makes a call to the Census TigerWeb API for Geometry.
    * Our spatial reference is 4326
-   * 
+   *
    * @param {object} request
    * @param {function} callback
    */
@@ -496,7 +498,7 @@ export class CensusModule {
       }
     }
 
-    CensusUtils.parseRequestLatLng(request);
+    CitySdk.parseRequestLatLng(request);
 
     let mapserverPattern = /({mapserver})/;
 
@@ -702,7 +704,7 @@ export class CensusModule {
    *          "population"
    *       ]
    *   }
-   *   
+   *
    * @param {object} requestIn The JSON object of the request
    * @param {function} callback A callback, which accepts a response parameter
    */
@@ -884,7 +886,7 @@ export class CensusModule {
                 //We don't have sublevel, so we just grab the single response
                 let currentVariable;
                 let currentDataObject = {};
-                
+
                 for (var i = 0; i < request.variables.length; i++) {
                   currentVariable = request.variables[i];
                   if (CensusUtils.parseToValidVariable(currentVariable, request.api, request.year) !== false) {
@@ -942,7 +944,7 @@ export class CensusModule {
    * @param {object} requestIn
    * @param {function} callback
    */
-  validateRequestGeographyvariables(requestIn, callback) {
+  validateRequestGeographyVariables(requestIn, callback) {
     let module = this;
     let citysdk = this.citysdk;
     let request = JSON.parse(JSON.stringify(requestIn));
@@ -952,7 +954,7 @@ export class CensusModule {
     citysdk.getCachedData("census", "validateRequestGeographyvariables", cacheKey, function(cachedData) {
       if (cachedData != null) {
         // Use cached geography definition
-        request.geographyValidForAPI = module.validateRequestGeographyvariablesProcess(request, cachedData);
+        request.geographyValidForAPI = module.validateRequestGeographyVariablesProcess(request, cachedData);
         callback(request);
 
       } else {
@@ -966,7 +968,7 @@ export class CensusModule {
           if (citysdk.allowCache == true) {
             citysdk.setCachedData("census", "validateRequestGeographyvariables", cacheKey, geoDefinition);
           }
-          request.geographyValidForAPI = module.validateRequestGeographyvariablesProcess(request, geoDefinition);
+          request.geographyValidForAPI = module.validateRequestGeographyVariablesProcess(request, geoDefinition);
           callback(request);
         });
       }
@@ -980,7 +982,7 @@ export class CensusModule {
    * @param {object} request
    * @param {function} geoDefinition
    */
-  validateRequestGeographyvariablesProcess(request, geoDefinition) {
+  validateRequestGeographyVariablesProcess(request, geoDefinition) {
     let found = false;
 
     $.each(geoDefinition['fips'], function(index, value) {
@@ -1058,7 +1060,7 @@ export class CensusModule {
           return;
         }
 
-        if (!("totals" in response)) {
+        if (response && !("totals" in response)) {
           response.totals = {};
         }
 
@@ -1142,5 +1144,98 @@ export class CensusModule {
         module.GEORequest(response, callback);
       });
     }
+  }
+
+  /**
+   * @deprecated Use {@link CensusUtils.isNormalizable} instead.
+   *
+   * @param alias
+   * @returns {boolean}
+   */
+  isNormalizable(alias) {
+    return CensusUtils.isNormalizable(alias);
+  }
+
+  /**
+   * Checks to see if a string is in the aliases dictionary and returns the appropriate variable if so.
+   * This function is depreciated and not recommended as it does not check to see if a particular alias
+   * is valid for a particular api.
+   * e.g. "income" will return "DP03_0064PE"
+   *
+   * If the string is not in the alias dictionary, it will return the same string back. This is useful for
+   * parsing user input. (Either a user requests a variable in the alias dictionary OR a specific variable)
+   *
+   * @param {string} aliasOrVariable A string to parse into a variable string.
+   *
+   * @returns {string} Variable string
+   */
+  parseToVariable(aliasOrVariable) {
+    return CensusUtils.parseToVariable(aliasOrVariable);
+  }
+
+  parseToValidVariable(aliasOrVariable, api, year) {
+    return CensusUtils.parseToValidVariable(aliasOrVariable, api, year);
+  }
+
+  /**
+   * Parses the state code in a request object, converting two letter state codes to lat/lng
+   *
+   * @param {object} request Object representing an api request
+   *
+   * @returns {object} returns the request Object with lat and lng populated
+   */
+  parseRequestStateCode(request) {
+    return CensusUtils.parseRequestStateCode(request);
+  }
+
+  /**
+   * Checks the request object for lat/lng latitude/longitude and x/y fields and moves them to
+   * the appropriate locations for processing by the module
+   *
+   * @param {object} request Object representing an api request
+   */
+  parseRequestLatLng(request) {
+    return CitySdk.parseRequestLatLng(request);
+  }
+
+  /**
+   * Converts ESRI JSON to GeoJSON
+   * This function has been moved to the CitySDK core. An alias remains here for legacy support.
+   *
+   * @param {string} esriJSON
+   *
+   * @returns {{type: string, features: Array}}
+   */
+  ESRItoGEO(esriJSON) {
+    return CitySdk.ESRItoGEO(esriJSON);
+  }
+
+  /**
+   * Converts geoJSON to ESRI JSON
+   * This function has been moved to the CitySDK core. An alias remains here for legacy support.
+   * @param {string} geoJSON
+   * @returns {object}
+   */
+  GEOtoESRI(geoJSON) {
+    return CitySdk.GEOtoESRI(geoJSON);
+  }
+
+  /**
+   * Downloads an API's entire dictionary of variables from the Census
+   * @param {string} inapi
+   * @param {string} inyear
+   * @param {function} callback
+   *
+   * @return {object}
+   */
+  getVariableDictionary(inapi, inyear, callback) {
+    return CensusUtils.getVariableDictionary(inapi, inyear, callback, this.citysdk);
+  }
+
+  /**
+   * @alias for legacy reasons
+   */
+  getACSVariableDictionary(inapi, inyear, callback) {
+    return CensusUtils.getVariableDictionary(inapi, inyear, callback, this.citysdk);
   }
 }

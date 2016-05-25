@@ -1,4 +1,5 @@
 import aliases from './json/aliases.json';
+import stateCapitals from './json/us-states-latlng.json';
 import properties from './json/census.properties.json';
 
 import CitySdk from '../../core/citysdk.new';
@@ -70,8 +71,8 @@ export default class CensusUtils {
    */
   static isNormalizable(alias) {
     if (alias in aliases) {
-      if ("normalizable" in this.aliases[alias]) {
-        if (this.aliases[alias].normalizable == true) {
+      if ("normalizable" in aliases[alias]) {
+        if (aliases[alias].normalizable == true) {
           return true;
         }
       }
@@ -92,8 +93,8 @@ export default class CensusUtils {
     if ("state" in request) {
       if (isNaN(request.state)) {
         if (!("lat" in request) && !("lng" in request)) {
-          request.lat = this.stateCapitals[request.state][0];
-          request.lng = this.stateCapitals[request.state][1];
+          request.lat = stateCapitals[request.state][0];
+          request.lng = stateCapitals[request.state][1];
 
         } else {
           delete request.state;
@@ -102,38 +103,6 @@ export default class CensusUtils {
     }
 
     return request;
-  }
-
-  /**
-   * Checks the request object for lat/lng latitude/longitude and x/y fields and moves them to
-   * the appropriate locations for processing by the module
-   *
-   * @param {object} request Object representing an api request
-   */
-  static parseRequestLatLng(request) {
-    return CitySdk.parseRequestLatLng(request);
-  }
-
-  /**
-   * Converts ESRI JSON to GeoJSON
-   * This function has been moved to the CitySDK core. An alias remains here for legacy support.
-   *
-   * @param {string} esriJSON
-   *
-   * @returns {{type: string, features: Array}}
-   */
-  static ESRItoGEO(esriJSON) {
-    return CitySdk.ESRItoGEO(geoJSON);
-  }
-
-  /**
-   * Converts geoJSON to ESRI JSON
-   * This function has been moved to the CitySDK core. An alias remains here for legacy support.
-   * @param {string} geoJSON
-   * @returns {object}
-   */
-  static GEOtoESRI(geoJSON) {
-    return CitySdk.GEOtoESRI(geoJSON);
   }
 
   /**

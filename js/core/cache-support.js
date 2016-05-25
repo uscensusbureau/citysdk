@@ -47,7 +47,7 @@ export default class CacheSupport {
    * @description Retrieves a value from the cache
    *
    * @param {string} module name of the CitySDK module
-   * @param {function} func
+   * @param {string} functionName
    * @param {string} hashKey this is a key that identifies the data. Each module has its own hashing scheme.
    * @param {function} callback
    *
@@ -55,7 +55,7 @@ export default class CacheSupport {
    *
    * @todo This function needs to return a promise. This, way there's no need to accept a callback.
    */
-  getData(module, func, hashKey, callback) {
+  getData(module, functionName, hashKey, callback) {
     if (typeof module == "undefined" || typeof hashKey == "undefined"
         || module == "" || hashKey == "" || this.allowCache == false) {
 

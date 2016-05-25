@@ -1,6 +1,6 @@
 var gulp = require('gulp');
-var rollup = require('rollup');
 var json = require('rollup-plugin-json');
+var rollup = require('rollup');
 
 var distCorePath = 'dist/core/';
 var distModulePath = 'dist/modules/';
@@ -8,10 +8,7 @@ var distModulePath = 'dist/modules/';
 var corePath = 'js/core/';
 var modulePath = 'js/modules/';
 
-var rollupOpts = {
-  plugins: [json()]
-};
-
+var rollupOpts = {plugins: [json()]};
 var rollupWriteOpts = {
   format: 'umd',
   globals: {
@@ -38,7 +35,7 @@ gulp.task('rollup:census', function() {
   return rollup.rollup(rollupOpts).then(function(bundle) {
     rollupWriteOpts.moduleName = 'CensusModule';
     rollupWriteOpts.dest = distModulePath + 'citysdk.census.js';
-    
+
     bundle.write(rollupWriteOpts);
   });
 });
