@@ -402,9 +402,11 @@ export default class CensusModule {
    * @param {function} callback
    */
   tigerwebRequest(request, callback) {
+    let module = this;
+    let citysdk = this.citysdk;
+
     //This will ensure our coordinates come out properly
     let spatialReferenceCode = 4326;
-    let module = this;
 
     let servers = {
       current: {
@@ -461,7 +463,7 @@ export default class CensusModule {
     //Dictionary of map server codes
     let mapServers = servers[server].mapServers;
 
-    CensusUtils.parseRequestStateCode(request);
+    module.parseRequestStateCode(request);
 
     //Check for zip code
     if ("zip" in request) {
@@ -472,7 +474,6 @@ export default class CensusModule {
           request.lat = response.lat;
           request.lng = response.lng;
           module.tigerwebRequest(request, callback);
-
           return;
         });
       }
@@ -492,13 +493,12 @@ export default class CensusModule {
           request.address.addressMatch = response[0];
 
           module.tigerwebRequest(request, callback);
-
           return;
         })
       }
     }
 
-    CitySdk.parseRequestLatLng(request);
+    module.parseRequestLatLng(request);
 
     let mapserverPattern = /({mapserver})/;
 
@@ -510,7 +510,7 @@ export default class CensusModule {
       inSR: spatialReferenceCode
     };
 
-    let tigerURL = servers[server].url;
+    var tigerURL = servers[server].url;
 
     if ("container" in request && "sublevel" in request) {
       if (!request.sublevel) {
@@ -533,12 +533,13 @@ export default class CensusModule {
         let tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
         let tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
 
-        module.citysdk.getCachedData("census", "tigerwebRequest", cacheKey, function(cachedData) {
+        citysdk.getCachedData("census", "tigerwebRequest", cacheKey, function(cachedData) {
           if (cachedData != null) {
             module.tigerwebRequest(cachedData, callback);
+            return;
 
           } else {
-            module.citysdk.postRequest(tigerURLReq, tigerRequestSubmitted).done(
+            CitySdk.postRequest(tigerURLReq, tigerRequestSubmitted).done(
                 function(response) {
                   let json = $.parseJSON(response);
                   let features = json.features;
@@ -550,12 +551,14 @@ export default class CensusModule {
                     request.containerGeometry = features[0].geometry;
                   }
 
-                  module.citysdk.setCachedData("census", "tigerwebRequest", cacheKey, request);
+                  citysdk.setCachedData("census", "tigerwebRequest", cacheKey, request);
                   module.tigerwebRequest(request, callback);
                 }
             );
           }
         });
+
+        return;
 
       } else {
         //We have a sublevel request with a container, AND we've already grabbed the container's ESRI json
@@ -570,13 +573,14 @@ export default class CensusModule {
         let tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
         let tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
 
-        module.citysdk.getCachedData("census", "tigerwebRequest", cacheKey, function(cachedData) {
+        citysdk.getCachedData("census", "tigerwebRequest", cacheKey, function(cachedData) {
           if (cachedData != null) {
             callback(module.ESRItoGEO(cachedData));
+            return;
 
           } else {
             CitySdk.postRequest(tigerURLReq, tigerRequestSubmitted).done(function(response) {
-              module.citysdk.setCachedData("census", "tigerwebRequest", cacheKey, response);
+              citysdk.setCachedData("census", "tigerwebRequest", cacheKey, response);
               callback(module.ESRItoGEO(response));
             });
           }
@@ -589,13 +593,13 @@ export default class CensusModule {
         delete request.sublevel;
         delete request.container;
         module.tigerwebRequest(request, callback);
+
         return;
       }
 
       //Sublevel, no container
       //Make the container equal to the level, and the sublevel
       request.container = request.level;
-
       switch (request.level) {
         case "us":
           request.level = "state";
@@ -615,6 +619,7 @@ export default class CensusModule {
       }
 
       module.tigerwebRequest(request, callback);
+      return;
 
     } else {
       //We have a sublevel request with a container. We need to grab the container's geography and return it
@@ -628,13 +633,14 @@ export default class CensusModule {
       let tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
       let tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
 
-      module.citysdk.getCachedData("census", "tigerwebRequest", cacheKey, function(cachedData) {
+      citysdk.getCachedData("census", "tigerwebRequest", cacheKey, function(cachedData) {
         if (cachedData != null) {
           callback(module.ESRItoGEO(cachedData));
+          return;
 
         } else {
           CitySdk.postRequest(tigerURLReq, tigerRequestSubmitted).done(function(response) {
-            module.citysdk.setCachedData("census", "tigerwebRequest", cacheKey, response);
+            citysdk.setCachedData("census", "tigerwebRequest", cacheKey, response);
             callback(module.ESRItoGEO(response));
           });
         }
@@ -1049,22 +1055,23 @@ export default class CensusModule {
     };
 
     let request = JSON.parse(JSON.stringify(requestIn));
-
     //First - check if we have a data object in the request OR if we aren't requesting variables
     if ("data" in request || !("variables" in request)) {
       //We have a data object for the request (or there isn't any requested), now we can get the geoJSON for the area
       module.tigerwebRequest(request, function(response) {
-        if (response == false) {
+        if (response === false) {
           // No data returned
           callback(false);
           return;
         }
 
-        if (response && !("totals" in response)) {
+        if (!("totals" in response)) {
           response.totals = {};
         }
 
         //If we have data, let's attach it to the geoJSON
+        let matchedFeature;
+
         if ("data" in request) {
           let totals = response.totals;
           let features = response.features;
@@ -1072,22 +1079,22 @@ export default class CensusModule {
           let variables = request.variables;
 
           for (var i = 0; i < features.length; i++) {
-            let matchedFeature = null;
+            matchedFeature = null;
 
             //TODO: We need to tidy this grep up a bit.
             matchedFeature = $.grep(data, function(e) {
               //Ensure we have a direct match for low level items by comparing the higher level items
-              if (request.level == "blockGroup" || request.level == "tract") {
-                return e[request.level] == features[i].properties[comparisonVariables[request.level]] &&
-                    e["tract"] == features[i].properties[comparisonVariables["tract"]] &&
-                    e["county"] == features[i].properties[comparisonVariables["county"]];
+              if (request.level === "blockGroup" || request.level == "tract") {
+                return e[request.level] === features[i].properties[comparisonVariables[request.level]] &&
+                    e["tract"] === features[i].properties[comparisonVariables["tract"]] &&
+                    e["county"] === features[i].properties[comparisonVariables["county"]];
 
               } else {
-                return e[request.level] == features[i].properties[comparisonVariables[request.level]];
+                return e[request.level] === features[i].properties[comparisonVariables[request.level]];
               }
             });
 
-            if (matchedFeature.length == 0) {
+            if (matchedFeature.length === 0) {
               //Sometimes cities span multiple counties. In this case, we sometimes miss data due to the
               //limited nature of the Census API's geography hierarchy. This will issue supplemental requests
               //to ensure we have data for all of our geojson entities
@@ -1105,6 +1112,7 @@ export default class CensusModule {
               };
 
               module.supplementalRequestsInFlight++;
+
               module.APIRequest(suppRequest, function(resp) {
                 console.log(resp);
                 module.supplementalRequestsInFlight--;
@@ -1117,15 +1125,17 @@ export default class CensusModule {
                 }
               });
 
-            } else if (matchedFeature.length == 1) {
+            } else if (matchedFeature.length === 1) {
               //We have matched the feature's tract to a data tract, move the data over
               matchedFeature = matchedFeature[0];
+
               for (var property in matchedFeature) {
                 if (matchedFeature.hasOwnProperty(property)) {
                   features[i].properties[property] = matchedFeature[property];
                   if ($.inArray(property, variables) >= 0) totals[property] = Number(totals[property]) + (!isNaN(matchedFeature[property])) ? Number(matchedFeature[property]) : 0;
                 }
               }
+
             } else {
               //This usually occurs when a low-level geography entity isn't uniquely identified
               //by the grep. We'll need to add more comparisons to the grep to clear this issue up.
