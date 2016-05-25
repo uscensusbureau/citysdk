@@ -13,7 +13,7 @@ CitySDK.prototype.modules.eia = new EIAModule();
  * @constructor
  */
 function EIAModule() {
-    this.enabled = false;
+  this.enabled = false;
 };
 
 /**
@@ -23,14 +23,14 @@ function EIAModule() {
  * @returns {boolean} True if enabled, false if not enabled.
  */
 EIAModule.prototype.enable = function(apiKey) {
-    this.apiKey = apiKey;
-    if(CitySDK.prototype.sdkInstance.version >= EIAModule.prototype.minCoreVersionRequired){
-        this.enabled = true;
-        return true;
-    }else{
-        this.enabled = false;
-        return false;
-    }
+  this.apiKey = apiKey;
+  if (CitySDK.prototype.sdkInstance.version >= EIAModule.prototype.minCoreVersionRequired) {
+    this.enabled = true;
+    return true;
+  } else {
+    this.enabled = false;
+    return false;
+  }
 };
 
 // Version Numbers
@@ -39,9 +39,7 @@ EIAModule.prototype.minCoreVersionRequired = 1.5;
 
 // Endpoint URLS
 EIAModule.prototype.DEFAULT_ENDPOINTS = {};
-EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL =  "//api.eia.gov/";
-
-
+EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL = "//api.eia.gov/";
 
 /**
  * Call which returns category listings from the dataset explorer
@@ -54,22 +52,22 @@ EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL =  "//api.eia.gov/";
  * @param {function} callback
  */
 EIAModule.prototype.categoryRequest = function(request, callback) {
-    var apiKeyPattern = /({apiKey})/;
-    var categoryPattern = /({category})/;
+  var apiKeyPattern = /({apiKey})/;
+  var categoryPattern = /({category})/;
 
-    var categoryURL = EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL + "category/?api_key={apiKey}&category_id={category}";
+  var categoryURL = EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL + "category/?api_key={apiKey}&category_id={category}";
 
-    if(!("category" in request)) {
-        request.category = 371; //Default - root list of all datasets
-    }
+  if (!("category" in request)) {
+    request.category = 371; //Default - root list of all datasets
+  }
 
-    categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
-    categoryURL = categoryURL.replace(categoryPattern, request.category);
+  categoryURL = categoryURL.replace(apiKeyPattern, this.apiKey);
+  categoryURL = categoryURL.replace(categoryPattern, request.category);
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
-        response = jQuery.parseJSON(response);
-        callback(response);
-    });
+  CitySDK.prototype.sdkInstance.ajaxRequest(categoryURL).done(function(response) {
+    response = jQuery.parseJSON(response);
+    callback(response);
+  });
 
 };
 
@@ -85,20 +83,20 @@ EIAModule.prototype.categoryRequest = function(request, callback) {
  * @param {function} callback
  */
 EIAModule.prototype.seriesRequest = function(request, callback) {
-    var apiKeyPattern = /({apiKey})/;
-    var seriesPattern = /({series})/;
+  var apiKeyPattern = /({apiKey})/;
+  var seriesPattern = /({series})/;
 
-    var seriesURL =  EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL + "series/?api_key={apiKey}&series_id={series}"
+  var seriesURL = EIAModule.prototype.DEFAULT_ENDPOINTS.apiURL + "series/?api_key={apiKey}&series_id={series}"
 
-    if(!("series" in request)) return;
+  if (!("series" in request)) return;
 
-    seriesURL = seriesURL.replace(apiKeyPattern, this.apiKey);
-    seriesURL = seriesURL.replace(seriesPattern, request.series);
+  seriesURL = seriesURL.replace(apiKeyPattern, this.apiKey);
+  seriesURL = seriesURL.replace(seriesPattern, request.series);
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
-        response = jQuery.parseJSON(response);
-        callback(response);
-    });
+  CitySDK.prototype.sdkInstance.ajaxRequest(seriesURL).done(function(response) {
+    response = jQuery.parseJSON(response);
+    callback(response);
+  });
 };
 
 //References to an instance of the SDK should be called as:

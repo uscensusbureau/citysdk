@@ -10,8 +10,8 @@ CitySDK.prototype.modules.socrata = new SocrataModule();
 
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
 function SocrataModule() {
-    this.enabled = false;
-    this.applicationToken = null;
+  this.enabled = false;
+  this.applicationToken = null;
 };
 
 /**
@@ -22,21 +22,19 @@ function SocrataModule() {
  */
 //Enable function. No API key required but is OPTIONAL and can be used as the application token.
 SocrataModule.prototype.enable = function(apiKey) {
-    if(typeof apiKey !== 'undefined'){
-        this.setApplicationToken(apiKey);
-    }
+  if (typeof apiKey !== 'undefined') {
+    this.setApplicationToken(apiKey);
+  }
 
-    if(CitySDK.prototype.sdkInstance.version >= SocrataModule.prototype.minCoreVersionRequired){
-        this.enabled = true;
-        return true;
-    }else{
-        this.enabled = false;
-        return false;
-    }
-
+  if (CitySDK.prototype.sdkInstance.version >= SocrataModule.prototype.minCoreVersionRequired) {
+    this.enabled = true;
+    return true;
+  } else {
+    this.enabled = false;
+    return false;
+  }
 
 };
-
 
 // Version Numbers
 SocrataModule.prototype.version = 1.0;
@@ -85,33 +83,33 @@ SocrataModule.prototype.minCoreVersionRequired = 1.5;
  * @param callback
  */
 SocrataModule.prototype.request = function(request, callback) {
-    var urlPattern = /({url})/;
-    var datasetPattern = /({dataset})/;
+  var urlPattern = /({url})/;
+  var datasetPattern = /({dataset})/;
 
-    var socrataURL = "https://{url}/resource/{dataset}.json";
+  var socrataURL = "https://{url}/resource/{dataset}.json";
 
-    socrataURL = socrataURL.replace(urlPattern, request.url);
-    socrataURL = socrataURL.replace(datasetPattern, request.dataset);
+  socrataURL = socrataURL.replace(urlPattern, request.url);
+  socrataURL = socrataURL.replace(datasetPattern, request.dataset);
 
-    for (var key in request) {
-        if (request.hasOwnProperty(key)) {
-            if(key != "url" && key != "dataset") {
-                if(socrataURL.indexOf("?") < 0) socrataURL+="?";
-                socrataURL += "$" + key + "=" + encodeURIComponent(request[key]) + "&";
-            }
-        }
+  for (var key in request) {
+    if (request.hasOwnProperty(key)) {
+      if (key != "url" && key != "dataset") {
+        if (socrataURL.indexOf("?") < 0) socrataURL += "?";
+        socrataURL += "$" + key + "=" + encodeURIComponent(request[key]) + "&";
+      }
     }
+  }
 
-    if(this.applicationToken) {
-        socrataURL += "$$app_token=" + this.applicationToken;
-    }
+  if (this.applicationToken) {
+    socrataURL += "$$app_token=" + this.applicationToken;
+  }
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(socrataURL).done(
-        function(response) {
-            response = jQuery.parseJSON(response);
-            callback(response);
-        }
-    );
+  CitySDK.prototype.sdkInstance.ajaxRequest(socrataURL).done(
+      function(response) {
+        response = jQuery.parseJSON(response);
+        callback(response);
+      }
+  );
 };
 SocrataModule.prototype.APIRequest = SocrataModule.prototype.request;
 /**
@@ -121,7 +119,7 @@ SocrataModule.prototype.APIRequest = SocrataModule.prototype.request;
  * @param token
  */
 SocrataModule.prototype.setApplicationToken = function(token) {
-    this.applicationToken = token;
+  this.applicationToken = token;
 };
 
 //After this point the module is all up to you
