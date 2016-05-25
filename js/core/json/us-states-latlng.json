@@ -1,8 +1,4 @@
-/**
- * Lat & Long of each state's capital
- * @constant
- */
-const US_STATES_LATLNG = {
+{
   "AL": [32.3617, -86.2792],
   "AK": [58.3, -134.4167],
   "AZ": [33.45, -112.0667],
@@ -54,6 +50,4 @@ const US_STATES_LATLNG = {
   "WV": [38.3472, -81.6333],
   "WI": [43.0667, -89.4000],
   "WY": [41.1456, -104.8019]
-};
-
-export default US_STATES_LATLNG;
+}

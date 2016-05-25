@@ -22,8 +22,8 @@ import 'terraformer-arcgis-parser';
 
 import CacheSupport from './cache-support';
 
-import US_STATE_NAMES from './us-state-names';
-import US_STATES_LATLNG from './us-states-latlng';
+import US_STATE_NAMES from './json/us-state-names.json';
+import US_STATES_LATLNG from './json/us-states-latlng.json';
 
 import './polyfills';
 
@@ -40,6 +40,7 @@ export default class CitySdk {
   constructor() {
     let idbSupported = false;
 
+    this.modules = {};
     this.version = VERSION;
     this.allowCache = false;
     this.cacheSupport = new CacheSupport(this);

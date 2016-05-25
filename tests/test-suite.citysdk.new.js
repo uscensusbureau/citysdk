@@ -1,4 +1,4 @@
-var CitySDK = require("../dist/citysdk.js");
+var CitySDK = require("../dist/core/citysdk.js");
 
 var citysdk = new CitySDK();
 

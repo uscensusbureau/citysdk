@@ -1,8 +1,4 @@
-/**
- * A list of state names keyed by 2-leter code
- * @constant
- */
-const US_STATE_NAMES = {
+{
   "AL": "alabama",
   "AK": "alaska",
   "AZ": "arizona",
@@ -54,6 +50,4 @@ const US_STATE_NAMES = {
   "WV": "west virginia",
   "WI": "wisconsin",
   "WY": "wyoming"
-};
-
-export default US_STATE_NAMES;
+}
