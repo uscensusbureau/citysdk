@@ -250,7 +250,7 @@ CensusModule.prototype.parseRequestLatLng = function (request) {
  * @returns {{type: string, features: Array}}
  */
 CensusModule.prototype.ESRItoGEO = function (esriJSON) {
-    return CitySDK.prototype.ESRItoGEO(geoJSON);
+    return CitySDK.prototype.ESRItoGEO(esriJSON);
 };
 
 /**
