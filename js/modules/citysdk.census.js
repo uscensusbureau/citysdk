@@ -124,7 +124,7 @@ CensusModule.prototype.aliases = {"population_1990":{"api":{"sf1":[1990,2010],"s
 
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  
+ * Enable function. Stores the API key for this module and sets it as enabled.
  * It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
