@@ -22,29 +22,22 @@ curl --user yourApiKey: http://api.census.gov/data/
 
 **Note:** leave the `password` field empty.
 
-## Requesting GeoJSON
+## Endpoints
 
-**PATH:** /citysdk/census/geo
+| Path | Method | Request Data | Description |
+| :--- | :--- | :--- | :--- |
+| `/citysdk/census/geo` | `POST` | `JSON Object` (see the Request Object in Detail section of the CensusModule guide) | Request for retreiving GeoJSON |
+| `/citysdk/census/api` | `POST` | `JSON Object` (see the Request Object in Detail section of the CensusModule guide) | Request for retreicing GeoJSON with Census data|
 
-**METHOD:** POST
+### Examples
 
-**REQUEST DATA:** please see the [Request Object in Detail](http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail) section of the CensusModule guide.
-
-**Example**
+**Requesting GeoJSON**
 
 ```
 curl --user yourApiKey: -X POST -d '{"state": "MD", "level": "state"}' http://api.census.gov/citysdk/census/geo
 ```
 
-## Requesting GeoJSON with data
-
-**PATH:** /citysdk/censsus/api
-
-**METHOD:** POST
-
-**REQUEST DATA:** please see the [Request Object in Detail](http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail) section of the CensusModule guide.
-
-**Example**
+**Requesting GeoJSON with data**
 
 ```
 curl --user yourApiKey: -X POST -d '{"state": "MD", "level": "state"}' http://api.census.gov/citysdk/census/api
