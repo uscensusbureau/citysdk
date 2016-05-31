@@ -121,7 +121,6 @@ tmtags
 ### NetBeans template
 nbproject/private/
 nbbuild/
-dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
