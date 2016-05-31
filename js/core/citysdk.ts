@@ -1,10 +1,9 @@
 import Terraformer = require("terraformer");
 import ArcGIS = require("terraformer-arcgis-parser");
-import Promise = require("promise");
-import request = require("request");
+import $ = require("jquery");
 
-const stateNames = require("../../resources/us-state-names.json");
-const stateCapitalCoordinates = require("../../resources/us-states-latlng.json");
+const stateNames = require("../resources/us-state-names.json");
+const stateCapitalCoordinates = require("../resources/us-states-latlng.json");
 
 Terraformer.ArcGIS = ArcGIS;
 
@@ -26,28 +25,38 @@ export default class CitySdk {
     this.modules = {};
   }
 
-  public get(url: string) {
-    return new Promise((resolve, reject) => {
-      request.get(url, (error: any, response: any) => {
-        if (!error) {
-          resolve(JSON.parse(response.body));
-        } else {
-          reject(error);
-        }
-      });
-    });
+  /**
+   * @function ajaxRequest
+   * @static
+   *
+   * @description Makes an AJAX call
+   *
+   * @param {string} url URL to request
+   *
+   * @return {promise} Returns a standard ajax promise
+   */
+  static ajaxRequest(url) {
+    return $.getJSON(url);
   }
 
-  public post(url: string, data: any) {
-    return new Promise((resolve, reject) => {
-      request.post({url: url, form: data}, (error: any, response: any) => {
-        if (!error) {
-          resolve(JSON.parse(response.body));
-        } else {
-          reject(error);
-        }
-      });
-    })
+  /**
+   * @function postRequest
+   * @static
+   *
+   * @description Make an AJAX call using the POST method
+   *
+   * @param {string} url
+   * @param {object} data
+   *
+   * @returns {*}
+   */
+  static postRequest(url, data) {
+    return $.ajax({
+      type: "POST",
+      url: url,
+      data: data,
+      dataType: "json"
+    });
   }
 
   /**

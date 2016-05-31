@@ -1,10 +1,10 @@
 import CitySdk from "../../core/citysdk";
 
-const aliases = require("../../../resources/aliases.json");
-const servers = require("../../../resources/servers.json");
-const usBoundingBox = require("../../../resources/us-bounds.json");
-const availableDatasets = require("../../../resources/available-datasets.json");
-const requiredVariables = require("../../../resources/required-variables.json");
+const aliases = require("../../resources/aliases.json");
+const servers = require("../../resources/servers.json");
+const usBoundingBox = require("../../resources/us-bounds.json");
+const availableDatasets = require("../../resources/available-datasets.json");
+const requiredVariables = require("../../resources/required-variables.json");
 
 /**
  * @class
@@ -108,21 +108,21 @@ export default class CensusModule {
 
   getVariableDictionary(api, year) {
     let url = `${CensusModule.defaultEndpoints.acsVariableDictionaryURL}${year}/${api}/variables.json`;
-    return this.citysdk.get(url);
+    return CitySdk.ajaxRequest(url);
   }
 
   latLngToFips(lat, lng) {
     let url = `${CensusModule.defaultEndpoints.geoCoderUrl}coordinates`;
     url += `?x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=json`;
 
-    return this.citysdk.get(url);
+    return CitySdk.ajaxRequest(url);
   }
 
   addressToFips(street, city, state) {
     let url = `${CensusModule.defaultEndpoints.geoCoderUrl}address`;
     url += `?street=${street}&city=${city}&state=${state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=json`;
 
-    return this.citysdk.get(url);
+    return CitySdk.ajaxRequest(url);
   }
 
   zipToLatLng(zip) {
@@ -134,7 +134,7 @@ export default class CensusModule {
         + "&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion="
         + "&returnDistinctValues=false&f=json";
 
-    return this.citysdk.get(url);
+    return CitySdk.ajaxRequest(url);
   }
 
   summaryRequest(req) {
@@ -292,7 +292,7 @@ export default class CensusModule {
     var url = CensusModule.defaultEndpoints.censusUrl;
     url += `${req.year}/${req.api}?get=${variableString}&${qualifiers}&key=${this.apikey}`;
 
-    return this.citysdk.get(url);
+    return CitySdk.ajaxRequest(url);
   }
 
   validateRequestGeographyVariables(request, callback) {
@@ -300,7 +300,7 @@ export default class CensusModule {
     let module = this;
     let url = CensusModule.defaultEndpoints.censusUrl + request.year + "/" + request.api + "/geography.json";
 
-    this.citysdk.get(url).then((response: any) => {
+    CitySdk.ajaxRequest(url).then((response: any) => {
       request.geographyValidForAPI = module.validateRequestGeographyVariablesProcess(request, response);
       callback(request);
       return;
@@ -813,7 +813,7 @@ export default class CensusModule {
         tigerRequest.geometryType = "esriGeometryPoint";
         tigerRequest.spatialRel = "esriSpatialRelIntersects";
 
-        this.citysdk.post(tigerURL, tigerRequest).then((json: any) => {
+        CitySdk.postRequest(tigerURL, tigerRequest).then((json: any) => {
           let features = json.features;
 
           // Grab our container ESRI geography, attach it to our request,
@@ -842,7 +842,7 @@ export default class CensusModule {
 
         delete request.containerGeometry;
 
-        this.citysdk.post(tigerURL, tigerRequest).then((response) => {
+        CitySdk.postRequest(tigerURL, tigerRequest).then((response) => {
           callback(this.esriToGeo(response));
         });
       }
@@ -890,7 +890,7 @@ export default class CensusModule {
       tigerRequest.geometryType = "esriGeometryPoint";
       tigerRequest.spatialRel = "esriSpatialRelIntersects";
 
-      this.citysdk.post(tigerURL, tigerRequest).then((response) => {
+      CitySdk.postRequest(tigerURL, tigerRequest).then((response) => {
         callback(this.esriToGeo(response));
       });
     }
