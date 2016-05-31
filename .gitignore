@@ -266,4 +266,5 @@ $RECYCLE.BIN/
 
 node_modules
 bower_components
+/_site
 

@@ -257,10 +257,7 @@ CitySDK.prototype.stateCapitals = function() {
  */
 CitySDK.prototype.getStateCapitalCoords = function(stateString) {
   // No string supplied
-  if (typeof stateString === undefined) {
-    return false;
-  }
-  if (stateString === "" || stateString === null) {
+  if (typeof stateString === "undefined" || !stateString) {
     return false;
   }
 

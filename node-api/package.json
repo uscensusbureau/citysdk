@@ -1,0 +1,45 @@
+{
+  "name": "citysdk-node",
+  "version": "0.0.1",
+  "description": "Toolbox for civic innovators to connect local and national public data.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uscensusbureau/citysdk.git"
+  },
+  "keywords": [
+    "citysdk",
+    "city-sdk",
+    "census"
+  ],
+  "author": "US Census Bureau",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/uscensusbureau/citysdk/issues"
+  },
+  "homepage": "http://uscensusbureau.github.io/citysdk/",
+  "dependencies": {
+    "basic-auth": "^1.0.4",
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4",
+    "promise": "^7.1.1",
+    "request": "^2.72.0",
+    "terraformer": "^1.0.5",
+    "terraformer-arcgis-parser": "^1.0.4",
+    "winston": "^2.2.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-typescript": "^2.13.4",
+    "gulp-uglify": "^1.5.3",
+    "typescript": "^1.8.10"
+  }
+}
