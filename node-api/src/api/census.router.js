@@ -8,9 +8,9 @@ var moduleInstantiated = false;
 var census;
 
 function decodeAuthHeader(req) {
-  // The value is in the format "Basic <base64_api_key:>"
+  // The value is in the format 'Basic <base64_api_key:>'
   // Just want the <base64_api_key> part
-  var authHeader = req.header("Authorization").split(" ");
+  var authHeader = req.header('Authorization').split(' ');
   var base64ApiKey = authHeader[1];
 
   // Decode base64 api key
