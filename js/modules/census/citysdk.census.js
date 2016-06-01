@@ -1,43 +1,24 @@
-import CitySdk from "../../core/citysdk";
+import CitySdk from "../../core/citysdk.new";
 
-const aliases = require("../../resources/aliases.json");
-const servers = require("../../resources/servers.json");
-const usBoundingBox = require("../../resources/us-bounds.json");
-const availableDatasets = require("../../resources/available-datasets.json");
-const requiredVariables = require("../../resources/required-variables.json");
+import aliases from "../../resources/aliases.json";
+import servers from "../../resources/servers.json";
+import usBoundingBox from "../../resources/us-bounds.json";
+import availableDatasets from "../../resources/available-datasets.json";
+import requiredVariables from "../../resources/required-variables.json";
 
 /**
  * @class
  */
 export default class CensusModule {
-  static version: string = "0.0.1";
-
-  static defaultLevel: string = "blockGroup";
-  static defaultApi: string = "acs5";
-
-  static defaultEndpoints: any = {
-    acsVariableDictionaryURL: "http://api.census.gov/data/",
-    geoCoderUrl: "http://geocoding.geo.census.gov/geocoder/geographies/",
-    tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-    censusUrl: "http://api.census.gov/data/"
-  };
-
-  private stateCapitals: any = CitySdk.stateCapitalCoordinates;
-  private supplementalRequestsInFlight: number = 0;
-
-  private apikey: string;
-  private citysdk: CitySdk;
-
-  sfSummaryRequest: Function;
-  acsSummaryRequest: Function;
-  getACSVariableDictionary: Function;
-
   /**
    * @constructs {@link CensusModule}
    *
    * @param apikey
    */
-  constructor(apikey: string) {
+  constructor(apikey) {
+    this.stateCapitals = CitySdk.stateCapitalCoordinates;
+    this.supplementalRequestsInFlight = 0;
+
     this.apikey = apikey;
     this.citysdk = new CitySdk();
 
@@ -46,7 +27,7 @@ export default class CensusModule {
     this.getACSVariableDictionary = this.getVariableDictionary;
   }
 
-  parseToVariable(aliasOrVariable): string {
+  parseToVariable(aliasOrVariable) {
     //If the requested string is an alias, return the appropriate variable from the dictionary
     if (aliasOrVariable in aliases) {
       return aliases[aliasOrVariable].variable;
@@ -56,7 +37,7 @@ export default class CensusModule {
     return aliasOrVariable;
   }
 
-  parseToValidVariable(aliasOrVariable, api, year): string {
+  parseToValidVariable(aliasOrVariable, api, year) {
     //If the requested string is an alias, return the appropriate variable from the dictionary
     if (aliasOrVariable in aliases) {
       if (api in aliases[aliasOrVariable]['api']
@@ -75,11 +56,11 @@ export default class CensusModule {
     return aliasOrVariable;
   }
 
-  isNormalizable(alias): boolean {
+  isNormalizable(alias) {
     return alias in aliases && "normalizable" in aliases[alias] && aliases[alias].normalizable;
   }
 
-  parseRequestStateCode(request): any {
+  parseRequestStateCode(request) {
     //This supports 2 letter state codes in a request
     if ("state" in request && isNaN(request.state)) {
       if (!("lat" in request) && !("lng" in request)) {
@@ -94,16 +75,16 @@ export default class CensusModule {
     return request;
   }
 
-  parseRequestLatLng(request): any {
-    return this.citysdk.parseRequestLatLng(request);
+  parseRequestLatLng(request) {
+    return CitySdk.parseRequestLatLng(request);
   }
 
-  esriToGeo(esriJson): any {
-    return this.citysdk.esriToGeo(esriJson);
+  esriToGeo(esriJson) {
+    return CitySdk.esriToGeo(esriJson);
   }
 
-  geoToEsri(geoJson): any {
-    return this.citysdk.geoToEsri(geoJson);
+  geoToEsri(geoJson) {
+    return CitySdk.geoToEsri(geoJson);
   }
 
   getVariableDictionary(api, year) {
@@ -300,14 +281,14 @@ export default class CensusModule {
     let module = this;
     let url = CensusModule.defaultEndpoints.censusUrl + request.year + "/" + request.api + "/geography.json";
 
-    CitySdk.ajaxRequest(url).then((response: any) => {
+    CitySdk.ajaxRequest(url).then((response) => {
       request.geographyValidForAPI = module.validateRequestGeographyVariablesProcess(request, response);
       callback(request);
       return;
     });
   }
 
-  validateRequestGeographyVariablesProcess(request, geoDefinition): boolean {
+  validateRequestGeographyVariablesProcess(request, geoDefinition) {
     let found = false;
 
     for (var value of geoDefinition.fips) {
@@ -497,8 +478,8 @@ export default class CensusModule {
       if (!("lat" in request) || !("lng" in request)) {
 
         //We have the zip but no lat/lng - parse it and re-call
-        module.zipToLatLng(request.zip).then((response: any) => {
-          response = this.citysdk.parseResponseLatLng(response);
+        module.zipToLatLng(request.zip).then((response) => {
+          response = CitySdk.parseResponseLatLng(response);
 
           request.lat = response.lat;
           request.lng = response.lng;
@@ -514,9 +495,9 @@ export default class CensusModule {
 
       //We have address - but do we have lat/lng?
       if (!("lat" in request) || !("lng" in request)) {
-        let street: string = request.address.street;
-        let city: string = request.address.city;
-        let state: string = request.address.state;
+        let street = request.address.street;
+        let city = request.address.city;
+        let state = request.address.state;
 
         // We have the address but no lat/lng - parse it and re-call
         module.addressToFips(street, city, state).then((response) => {
@@ -540,7 +521,7 @@ export default class CensusModule {
     // Check if we have latitude/longitude values.
     // If we do, call the geocoder and get the appropriate FIPS
     if ("lat" in request && "lng" in request && !("geocoded" in request)) {
-      this.latLngToFips(request.lat, request.lng).then((response: any) => {
+      this.latLngToFips(request.lat, request.lng).then((response) => {
         //TODO: Expand this to support multiple blocks
         let geographies = response.result.geographies;
         let fipsData = geographies["2010 Census Blocks"][0];
@@ -580,7 +561,7 @@ export default class CensusModule {
         // TODO: We need to create an algorithm to determine which API
         // to call for which non-aliased variable.
         // Right now everything is in acs5 summary so it doesn't matter.
-        this.summaryRequest(request).then((response: any) => {
+        this.summaryRequest(request).then((response) => {
           if (request.sublevel) {
             // If sublevel is set to true, our "data" property
             // will be an array of objects for each sublevel item.
@@ -725,8 +706,8 @@ export default class CensusModule {
 
   tigerWebRequest(request, callback) {
     // This will ensure our coordinates come out properly
-    let spatialReferenceCode: number = 4326;
-    let server: string = "current";
+    let spatialReferenceCode = 4326;
+    let server = "current";
 
     if ("mapServer" in request) {
       server = request.mapServer;
@@ -735,7 +716,7 @@ export default class CensusModule {
     }
 
     //Dictionary of map server codes
-    let mapServers: any = servers[server].mapServers;
+    let mapServers = servers[server].mapServers;
 
     this.parseRequestStateCode(request);
 
@@ -744,8 +725,8 @@ export default class CensusModule {
       //We have zip code - but do we have lat/lng?
       if (!("lat" in request) || !("lng" in request)) {
         //We have the zip but no lat/lng - parse it and re-call
-        this.zipToLatLng(request.zip).then((response: any) => {
-          response = this.citysdk.parseResponseLatLng(response);
+        this.zipToLatLng(request.zip).then((response) => {
+          response = CitySdk.parseResponseLatLng(response);
 
           request.lat = response.lat;
           request.lng = response.lng;
@@ -761,9 +742,9 @@ export default class CensusModule {
 
       //We have address - but do we have lat/lng?
       if (!("lat" in request) || !("lng" in request)) {
-        let street: string = request.address.street;
-        let city: string = request.address.city;
-        let state: string = request.address.state;
+        let street = request.address.street;
+        let city = request.address.city;
+        let state = request.address.state;
 
         //We have the address but no lat/lng - parse it and re-call
         this.addressToFips(street, city, state).then((response) => {
@@ -783,8 +764,8 @@ export default class CensusModule {
 
     this.parseRequestLatLng(request);
 
-    let mapserverPattern: string = "{mapserver}";
-    let tigerRequest: any = {
+    let mapserverPattern = "{mapserver}";
+    let tigerRequest = {
       f: "json",
       where: "",
       outFields: "*",
@@ -792,7 +773,7 @@ export default class CensusModule {
       inSR: spatialReferenceCode
     };
 
-    let tigerURL: string = servers[server].url;
+    let tigerURL = servers[server].url;
 
     if ("container" in request && "sublevel" in request) {
       if (!request.sublevel) {
@@ -813,7 +794,7 @@ export default class CensusModule {
         tigerRequest.geometryType = "esriGeometryPoint";
         tigerRequest.spatialRel = "esriSpatialRelIntersects";
 
-        CitySdk.postRequest(tigerURL, tigerRequest).then((json: any) => {
+        CitySdk.postRequest(tigerURL, tigerRequest).then((json) => {
           let features = json.features;
 
           // Grab our container ESRI geography, attach it to our request,
@@ -896,3 +877,14 @@ export default class CensusModule {
     }
   }
 }
+
+CensusModule.version = "0.0.1";
+CensusModule.defaultApi = "acs5";
+CensusModule.defaultLevel = "blockGroup";
+
+CensusModule.defaultEndpoints = {
+  acsVariableDictionaryURL: "http://api.census.gov/data/",
+  geoCoderUrl: "http://geocoding.geo.census.gov/geocoder/geographies/",
+  tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
+  censusUrl: "http://api.census.gov/data/"
+};

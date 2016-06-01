@@ -1,9 +1,9 @@
-import Terraformer = require("terraformer");
-import ArcGIS = require("terraformer-arcgis-parser");
-import $ = require("jquery");
+import Terraformer from "terraformer";
+import ArcGIS from "terraformer-arcgis-parser";
+import $ from "jquery";
 
-const stateNames = require("../resources/us-state-names.json");
-const stateCapitalCoordinates = require("../resources/us-states-latlng.json");
+import stateNames from "../resources/us-state-names.json";
+import stateCapitalCoordinates from "../resources/us-states-latlng.json";
 
 Terraformer.ArcGIS = ArcGIS;
 
@@ -12,16 +12,10 @@ Terraformer.ArcGIS = ArcGIS;
  */
 export default class CitySdk {
 
-  public static version: string = "0.0.1";
-  public static stateNames: any = stateNames;
-  public static stateCapitalCoordinates: any = stateCapitalCoordinates;
-
-  public modules: any;
-
   /**
    * @constructs {@link CitySdk}
    */
-  public constructor() {
+  constructor() {
     this.modules = {};
   }
 
@@ -72,7 +66,7 @@ export default class CitySdk {
    * @return {Array} Returns 2-position array of Lat & Long
    * for the capital of the state. Returns false if no state is found.
    */
-  public getStateCapitalCoords(state: string): Array<Number> {
+  static getStateCapitalCoords(state) {
     // No string supplied
     if (!state) {
       return null;
@@ -110,7 +104,7 @@ export default class CitySdk {
    *
    * @return {object} the updated request
    */
-  public parseRequestLatLng(request: any): any {
+  static parseRequestLatLng(request) {
     // Allow the users to use either x,y; lat,lng;
     // latitude,longitude to specify co-ordinates
     if (!("lat" in request)) {
@@ -138,7 +132,7 @@ export default class CitySdk {
     return request;
   }
 
-  public parseResponseLatLng(response: any): any {
+  static parseResponseLatLng(response) {
     response.lat = parseFloat(response.features[0].attributes.CENTLAT);
     response.lng = parseFloat(response.features[0].attributes.CENTLON);
 
@@ -154,7 +148,7 @@ export default class CitySdk {
    *
    * @todo Use lower camelCase for function name
    */
-  public esriToGeo(esriJson: any): any {
+  static esriToGeo(esriJson) {
     if (!("features" in esriJson)) {
       // data is missing
       return null;
@@ -186,10 +180,14 @@ export default class CitySdk {
    *
    * @todo Use lower camelCase for function name
    */
-  public geoToEsri(geoJson: any): any {
+  static geoToEsri(geoJson) {
     return Terraformer.ArcGIS.convert(geoJson);
   }
 }
+
+CitySdk.version = "0.0.1";
+CitySdk.stateNames = stateNames;
+CitySdk.stateCapitalCoordinates = stateCapitalCoordinates;
 
 
 

@@ -2,23 +2,35 @@ var ts = require('gulp-typescript');
 var del = require('del');
 var gulp = require('gulp');
 var uglify = require('gulp-uglify');
+var rollup = require('rollup');
+var rollupJson = require('rollup-plugin-json');
 
-/*****************************************************************
- *                      Node API tasks                           *
- *****************************************************************/
+/**
+ * Fresh start, delete dist folder.
+ */
+gulp.task('clean', function() {
+  del.sync(['dist']);
+});
+
+
+/*
+ *******************************************************************
+ *                      Node API tasks                             *
+ *******************************************************************
+ */
 
 /**
  * Compile typescript files (core and modules) and
  * copy them to the build directory.
  */
-gulp.task('typescript:node', function() {
-  var tsProject = ts.createProject('tsconfig.json');
-
-  var tsResult = tsProject.src('./node-api/**/*.ts')
-      .pipe(ts(tsProject));
-
-  return tsResult.js
-      .pipe(gulp.dest('./dist/'));
+gulp.task('typescript', function() {
+  return gulp.src(["./node-api/src/**/*.ts"])
+      .pipe(ts({
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": true
+      }))
+      .pipe(gulp.dest("./dist/node-api/"));
 });
 
 /**
@@ -34,8 +46,8 @@ gulp.task('api', function() {
 /**
  * Copy the compiled typescript files up one level under node-api/
  */
-gulp.task('copy:js', ['typescript:node'], function() {
-  return gulp.src('./dist/node-api/src/**/*.js')
+gulp.task('copy:js', ['typescript'], function() {
+  return gulp.src(['./dist/**/*.js', './dist/**/*.js'])
       .pipe(gulp.dest('./dist/node-api/'));
 });
 
@@ -51,47 +63,72 @@ gulp.task('move:js', ['copy:js'], function() {
  * directories inside build.
  */
 gulp.task('copy:json:node', function() {
-  return gulp.src('./node-api/resources/*.json')
-      .pipe(gulp.dest('./dist/resources'));
+  return gulp.src('./node-api/src/resources/*.json')
+      .pipe(gulp.dest('./dist/node-api/resources'));
 });
 
 /**
  * Tasks for building the Node API
  */
-gulp.task('node_api', ['typescript:node', 'api', 'copy:json:node', 'move:js']);
+gulp.task('node_api', ['typescript', 'api', 'copy:json:node']);
 
 /**
  * Watch task for development.
  */
 gulp.task('watch', ['node_api'], function() {
-  gulp.watch('./node-api/src/**/*.ts', ['typescript:node']);
+  gulp.watch('./node-api/src/**/*.ts', ['typescript']);
   gulp.watch('./node-api/src/**/*.json', ['copy:json:node']);
 });
 
 
-/*****************************************************************
- *                      JS SDK Tasks                             *
- *****************************************************************/
+/*
+ *******************************************************************
+ *                      JS SDK Tasks                               *
+ *******************************************************************
+ */
 
-gulp.task('typescript:js', function() {
-  var tsProject = ts.createProject('./tsconfig.json');
+var distCorePath = 'dist/js/core/';
+var distModulePath = 'dist/js/modules/';
 
-  var tsResult = tsProject.src('./js/**/*.ts')
-      .pipe(ts(tsProject));
+var corePath = 'js/core/';
+var modulePath = 'js/modules/';
 
-  return tsResult.js
-      .pipe(gulp.dest('./dist'));
+var rollupOpts = {plugins: [rollupJson()]};
+
+var rollupWriteOpts = {
+  format: 'umd',
+  globals: {
+    'jquery': '$',
+    'terraformer': 'Terraformer',
+    'terraformer-arcgis-parser': 'Terraformer.ArcGIS'
+  }
+};
+
+gulp.task('rollup:core', function() {
+  rollupOpts.entry = corePath + 'citysdk.new.js';
+
+  return rollup.rollup(rollupOpts).then(function(bundle) {
+    rollupWriteOpts.moduleName = 'CitySdk';
+    rollupWriteOpts.dest = distCorePath + 'citysdk.js';
+
+    bundle.write(rollupWriteOpts);
+  });
 });
 
-gulp.task('copy:json:js', function() {
-  return gulp.src('./js/resources/*.json')
-      .pipe(gulp.dest('./dist/resources'));
+gulp.task('rollup:census', function() {
+  rollupOpts.entry = modulePath + 'census/citysdk.census.js';
+
+  return rollup.rollup(rollupOpts).then(function(bundle) {
+    rollupWriteOpts.moduleName = 'CensusModule';
+    rollupWriteOpts.dest = distModulePath + 'citysdk.census.js';
+
+    bundle.write(rollupWriteOpts);
+  });
 });
 
-gulp.task('js_sdk', ['typescript:js', 'copy:json:js']);
-
+gulp.task('rollup', ['rollup:core', 'rollup:census']);
 
 /**
  * Build both Node API and the JS SDK.
  */
-gulp.task('default', ['node_api', 'js_sdk']);
+gulp.task('default', ['clean', 'node_api', 'rollup']);

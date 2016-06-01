@@ -25,7 +25,7 @@ function arcgisModule() {
  */
 arcgisModule.prototype.enable = function(apiKey) {
   this.apiKey = apiKey;
-  if (CitySDK.prototype.sdkInstance.version >= arcgisModule.prototype.minCoreVersionRequired) {
+  if (CitySdk.prototype.sdkInstance.version >= arcgisModule.prototype.minCoreVersionRequired) {
     this.enabled = true;
     return true;
   } else {
@@ -67,7 +67,7 @@ arcgisModule.prototype.seriesRequest = function(request, callback) {
 
   var cacheKey = JSON.stringify(request) + arcURL.toString();
 
-  CitySDK.prototype.sdkInstance.getCachedData("arcgis", "seriesRequest", cacheKey, function(cachedData) {
+  CitySdk.prototype.sdkInstance.getCachedData("arcgis", "seriesRequest", cacheKey, function(cachedData) {
     var useCache = false;
 
     if (cachedData != null) {
@@ -78,12 +78,12 @@ arcgisModule.prototype.seriesRequest = function(request, callback) {
         var d = new Date();
         var n = d.getTime();
 
-        if (Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.arcgis.cacheLife) < n) {
+        if (Number(cachedData.cachedTimestamp) + Number(CitySdk.prototype.modules.arcgis.cacheLife) < n) {
           // cache is too old
           useCache = false;
 
           // delete the cache
-          CitySDK.prototype.sdkInstance.deleteCachedData("arcgis", "seriesRequest", cacheKey);
+          CitySdk.prototype.sdkInstance.deleteCachedData("arcgis", "seriesRequest", cacheKey);
         } else {
           // cache is new enough
           useCache = true;
@@ -98,12 +98,12 @@ arcgisModule.prototype.seriesRequest = function(request, callback) {
 
     if (useCache == false) {
 
-      CitySDK.prototype.sdkInstance.jsonpRequest(arcURL).done(
+      CitySdk.prototype.sdkInstance.jsonpRequest(arcURL).done(
           function(response) {
             var d2 = new Date();
             var n2 = d2.getTime();
             response.cachedTimestamp = n2;
-            CitySDK.prototype.sdkInstance.setCachedData("arcgis", "seriesRequest", cacheKey, response);
+            CitySdk.prototype.sdkInstance.setCachedData("arcgis", "seriesRequest", cacheKey, response);
             callback(response);
           }
       );
@@ -147,7 +147,7 @@ arcgisModule.prototype.getLevelDictionary = function(request, callback) {
 
   var cacheKey = arcURL.toString();
 
-  CitySDK.prototype.sdkInstance.getCachedData("arcgis", "getLevelDictionary", cacheKey, function(cachedData) {
+  CitySdk.prototype.sdkInstance.getCachedData("arcgis", "getLevelDictionary", cacheKey, function(cachedData) {
     var useCache = false;
 
     if (cachedData != null) {
@@ -158,12 +158,12 @@ arcgisModule.prototype.getLevelDictionary = function(request, callback) {
         var d = new Date();
         var n = d.getTime();
 
-        if (Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.arcgis.cacheLife) < n) {
+        if (Number(cachedData.cachedTimestamp) + Number(CitySdk.prototype.modules.arcgis.cacheLife) < n) {
           // cache is too old
           useCache = false;
 
           // delete the cache
-          CitySDK.prototype.sdkInstance.deleteCachedData("arcgis", "getLevelDictionary", cacheKey);
+          CitySdk.prototype.sdkInstance.deleteCachedData("arcgis", "getLevelDictionary", cacheKey);
         } else {
           // cache is new enough
           useCache = true;
@@ -180,7 +180,7 @@ arcgisModule.prototype.getLevelDictionary = function(request, callback) {
       CitySdk.ajaxRequest(arcURL).done(
           function(response) {
             response = jQuery.parseJSON(response);
-            CitySDK.prototype.sdkInstance.setCachedData("census", "getLevelDictionary", cacheKey, response);
+            CitySdk.prototype.sdkInstance.setCachedData("census", "getLevelDictionary", cacheKey, response);
             callback(response);
           }
       );
@@ -233,7 +233,7 @@ arcgisModule.prototype.getVariableDictionary = function(request, callback) {
 
   var cacheKey = arcURL.toString();
 
-  CitySDK.prototype.sdkInstance.getCachedData("arcgis", "getVariableDictionary", cacheKey, function(cachedData) {
+  CitySdk.prototype.sdkInstance.getCachedData("arcgis", "getVariableDictionary", cacheKey, function(cachedData) {
     var useCache = false;
 
     if (cachedData != null) {
@@ -244,12 +244,12 @@ arcgisModule.prototype.getVariableDictionary = function(request, callback) {
         var d = new Date();
         var n = d.getTime();
 
-        if (Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.arcgis.cacheLife) < n) {
+        if (Number(cachedData.cachedTimestamp) + Number(CitySdk.prototype.modules.arcgis.cacheLife) < n) {
           // cache is too old
           useCache = false;
 
           // delete the cache
-          CitySDK.prototype.sdkInstance.deleteCachedData("arcgis", "getVariableDictionary", cacheKey);
+          CitySdk.prototype.sdkInstance.deleteCachedData("arcgis", "getVariableDictionary", cacheKey);
         } else {
           // cache is new enough
           useCache = true;
@@ -266,7 +266,7 @@ arcgisModule.prototype.getVariableDictionary = function(request, callback) {
       CitySdk.ajaxRequest(arcURL).done(
           function(response) {
             response = jQuery.parseJSON(response);
-            CitySDK.prototype.sdkInstance.setCachedData("census", "getVariableDictionary", cacheKey, response);
+            CitySdk.prototype.sdkInstance.setCachedData("census", "getVariableDictionary", cacheKey, response);
             callback(response);
           }
       );
@@ -362,7 +362,7 @@ arcgisModule.prototype.APIRequest = function(request, callback) {
       request.level = request.layer;
     } else {
       var pCallback = callback;
-      CitySDK.prototype.modules.arcgis.getLevelDictionary(request, function(levelDictionary) {
+      CitySdk.prototype.modules.arcgis.getLevelDictionary(request, function(levelDictionary) {
         if ('layers' in levelDictionary) {
           if (Array.isArray(levelDictionary.layers)) {
             request.level = levelDictionary.layers[0];
@@ -383,11 +383,11 @@ arcgisModule.prototype.APIRequest = function(request, callback) {
   var cacheKey = JSON.stringify(request) + arcURL.toString();
   request.cacheKey = cacheKey;
 
-  CitySDK.prototype.sdkInstance.getCachedData("arcgis", "APIRequest", cacheKey, function(cachedData) {
+  CitySdk.prototype.sdkInstance.getCachedData("arcgis", "APIRequest", cacheKey, function(cachedData) {
 
     var useCache = false;
 
-    CitySDK.prototype.modules.arcgis.getVariableDictionary(request, function(dataDescription) {
+    CitySdk.prototype.modules.arcgis.getVariableDictionary(request, function(dataDescription) {
       if (cachedData != null) {
         useCache = true;
 
@@ -405,14 +405,14 @@ arcgisModule.prototype.APIRequest = function(request, callback) {
               useCache = false;
 
               // delete the cache
-              CitySDK.prototype.sdkInstance.deleteCachedData("arcgis", "APIRequest", cacheKey);
+              CitySdk.prototype.sdkInstance.deleteCachedData("arcgis", "APIRequest", cacheKey);
             }
-          } else if (Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.arcgis.cacheLife) < n) {
+          } else if (Number(cachedData.cachedTimestamp) + Number(CitySdk.prototype.modules.arcgis.cacheLife) < n) {
             // cache is too old
             useCache = false;
 
             // delete the cache
-            CitySDK.prototype.sdkInstance.deleteCachedData("arcgis", "APIRequest", cacheKey);
+            CitySdk.prototype.sdkInstance.deleteCachedData("arcgis", "APIRequest", cacheKey);
           } else {
             // cache is new enough
             useCache = true;
@@ -434,11 +434,11 @@ arcgisModule.prototype.APIRequest = function(request, callback) {
           delete request.fields;
         }
         if ('variables' in request) {
-          request.variables = CitySDK.prototype.modules.arcgis.validateVariableList(request.variables, dataDescription);
+          request.variables = CitySdk.prototype.modules.arcgis.validateVariableList(request.variables, dataDescription);
         }
 
         if ('order' in request) {
-          request.variables = CitySDK.prototype.modules.arcgis.validateVariableList(request.order, dataDescription);
+          request.variables = CitySdk.prototype.modules.arcgis.validateVariableList(request.order, dataDescription);
         }
 
         // Add extent to query
@@ -452,7 +452,7 @@ arcgisModule.prototype.APIRequest = function(request, callback) {
         request.returnGeometry = "false";
 
         // Trigger the request processor
-        CitySDK.prototype.modules.arcgis.APIRequestProcessor(request, arcURL, {}, callback);
+        CitySdk.prototype.modules.arcgis.APIRequestProcessor(request, arcURL, {}, callback);
       }
 
     });
@@ -515,7 +515,7 @@ arcgisModule.prototype.APIRequestProcessor = function(request, url, response, ca
   }
 
   // Process Geometry
-  request = CitySDK.prototype.parseRequestLatLng(request);
+  request = CitySdk.prototype.parseRequestLatLng(request);
 
   if ('lat' in request && 'lng' in request) {
     if (!('geometryType' in request)) {
@@ -532,7 +532,7 @@ arcgisModule.prototype.APIRequestProcessor = function(request, url, response, ca
     }
   }
 
-  CitySDK.prototype.sdkInstance.jsonpRequest(arcURL).done(
+  CitySdk.prototype.sdkInstance.jsonpRequest(arcURL).done(
       function(response) {
         if ('status' in response || 'features' in response) {
           var storeMe = true;
@@ -550,7 +550,7 @@ arcgisModule.prototype.APIRequestProcessor = function(request, url, response, ca
             var n2 = d2.getTime();
             response.cachedTimestamp = n2;
             if ('cacheKey' in request) {
-              CitySDK.prototype.sdkInstance.setCachedData("arcgis", "APIRequest", request.cacheKey, response);
+              CitySdk.prototype.sdkInstance.setCachedData("arcgis", "APIRequest", request.cacheKey, response);
             }
             callback(response);
           }
@@ -579,7 +579,7 @@ arcgisModule.prototype.APIRequestProcessor = function(request, url, response, ca
 
 
 //References to an instance of the SDK should be called as:
-CitySDK.prototype.sdkInstance;
+CitySdk.prototype.sdkInstance;
 //And references to this module should be called as
-CitySDK.prototype.modules.arcgis;
+CitySdk.prototype.modules.arcgis;
 //when 'this' is ambiguous

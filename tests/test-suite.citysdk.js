@@ -23,21 +23,21 @@ function runCoreTest() {
   testResultStatus[moduleName] = true;
 
   // getStateCapitalCoords
-  if (CitySDK.getStateCapitalCoords("VirGinia").join() != [37.5333, -77.4667].join()) {
+  if (CitySdk.getStateCapitalCoords("VirGinia").join() != [37.5333, -77.4667].join()) {
     failTest(moduleName, "getStateCapitalCoords", "Failed to retrieve state coordinates for Virginia");
   }
 
-  if (CitySDK.getStateCapitalCoords("VA").join() != [37.5333, -77.4667].join()) {
+  if (CitySdk.getStateCapitalCoords("VA").join() != [37.5333, -77.4667].join()) {
     failTest(moduleName, "getStateCapitalCoords", "Failed to retrieve state coordinates for VA");
   }
 
-  if (CitySDK.getStateCapitalCoords() != null) {
+  if (CitySdk.getStateCapitalCoords() != null) {
     failTest(moduleName, "getStateCapitalCoords", "Failed to return null on empty input");
   }
 
   //parseRequestLatLng
   var request = {"latitude": 100, "longitude": 20};
-  var returnedRequest = CitySDK.parseRequestLatLng(request);
+  var returnedRequest = CitySdk.parseRequestLatLng(request);
   if (returnedRequest.lng != 20 && returnedRequest.lat != 100) {
     failTest(moduleName, "parseRequestLatLng", "Failed to return latitude & longiture");
   }

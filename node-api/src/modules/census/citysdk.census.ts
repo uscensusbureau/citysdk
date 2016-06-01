@@ -1,10 +1,10 @@
 import CitySdk from "../../core/citysdk";
 
-const aliases = require("../../../resources/aliases.json");
-const servers = require("../../../resources/servers.json");
-const usBoundingBox = require("../../../resources/us-bounds.json");
-const availableDatasets = require("../../../resources/available-datasets.json");
-const requiredVariables = require("../../../resources/required-variables.json");
+const aliases = require("../../resources/aliases.json");
+const servers = require("../../resources/servers.json");
+const usBoundingBox = require("../../resources/us-bounds.json");
+const availableDatasets = require("../../resources/available-datasets.json");
+const requiredVariables = require("../../resources/required-variables.json");
 
 /**
  * @class

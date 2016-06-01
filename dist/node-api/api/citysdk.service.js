@@ -1,1 +1,0 @@
-var express=require("express"),bodyParser=require("body-parser"),censusRouter=require("./census.router"),app=express();app.use(bodyParser.json()),app.use("/citysdk/census",censusRouter),app.listen("8080");

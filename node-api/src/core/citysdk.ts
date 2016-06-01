@@ -3,8 +3,8 @@ import ArcGIS = require("terraformer-arcgis-parser");
 import Promise = require("promise");
 import request = require("request");
 
-const stateNames = require("../../resources/us-state-names.json");
-const stateCapitalCoordinates = require("../../resources/us-states-latlng.json");
+const stateNames = require("../resources/us-state-names.json");
+const stateCapitalCoordinates = require("../resources/us-states-latlng.json");
 
 Terraformer.ArcGIS = ArcGIS;
 
