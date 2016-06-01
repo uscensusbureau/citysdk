@@ -9,7 +9,6 @@ router.post('/geo', keyauth, function(req, res) {
   census.geoRequest(req.body, handleResponse);
 
   function handleResponse(response) {
-    winston.info('GEO data received from CensusModule');
     res.json(response);
   }
 });
