@@ -55,7 +55,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 apikey = "your_api_key"
-request_url = "citysdk.commerce.gov/census/api"
+request_url = "http://citysdk.commerce.gov/census/api"
 
 request_obj = {
     "lat": 38.9047,
