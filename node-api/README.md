@@ -30,7 +30,7 @@ curl --user yourApiKey: http://api.census.gov/data/
 
 ## The Request Object
 
-The request object you send with the POST request is just JSON.
+The request object you send using the POST method is just JSON.
 
 | Property | Type | Supported Values | Description |
 | :--- | :--- | :--- | :--- |
