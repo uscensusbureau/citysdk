@@ -21,8 +21,8 @@ gulp.task('typescript', function() {
  * directories inside build.
  */
 gulp.task('copy:json', function() {
-  return gulp.src('src/modules/**/*.json')
-      .pipe(gulp.dest('build/modules'));
+  return gulp.src('src/**/*.json')
+      .pipe(gulp.dest('build'));
 });
 
 /**
