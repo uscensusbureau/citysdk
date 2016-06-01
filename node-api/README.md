@@ -73,6 +73,40 @@ print response.json()
 
 ```
 
+**Result data**
+
+```json
+{
+  "blockGroup": "2", 
+  "zip": "21401", 
+  "level": "state", 
+  "sublevel": false, 
+  "variables": [
+    "NAME", 
+    "B19013_001E", 
+    "B01003_001E"
+  ], 
+  "tract": "706101", 
+  "county": "003", 
+  "state": "24", 
+  "api": "acs5", 
+  "place": "01600", 
+  "year": 2010, 
+  "lat": 38.9898034, 
+  "lng": -76.5501227, 
+  "data": [
+    {
+      "B01003_001E": "5696423", 
+      "NAME": "Maryland", 
+      "B19013_001E": "70647"
+    }
+  ], 
+  "geographyValidForAPI": true, 
+  "place_name": "Annapolis city"
+}
+```
+
+
 **Requesting GeoJSON and Census data using cURL**
 
 ```
