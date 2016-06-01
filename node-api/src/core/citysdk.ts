@@ -30,7 +30,12 @@ export default class CitySdk {
     return new Promise((resolve, reject) => {
       request.get(url, (error: any, response: any) => {
         if (!error) {
-          resolve(JSON.parse(response.body));
+          try {
+            resolve(JSON.parse(response.body));
+          } catch (e) {
+            throw new Error(e);
+          }
+
         } else {
           reject(error);
         }
@@ -42,7 +47,12 @@ export default class CitySdk {
     return new Promise((resolve, reject) => {
       request.post({url: url, form: data}, (error: any, response: any) => {
         if (!error) {
-          resolve(JSON.parse(response.body));
+          try {
+            resolve(JSON.parse(response.body));
+          } catch (e) {
+            throw new Error(e);
+          }
+
         } else {
           reject(error);
         }

@@ -545,21 +545,23 @@ export default class CensusModule {
         let geographies = response.result.geographies;
         let fipsData = geographies["2010 Census Blocks"][0];
 
-        request["state"] = fipsData["STATE"];
-        request["county"] = fipsData["COUNTY"];
-        request["tract"] = fipsData["TRACT"];
-        request["blockGroup"] = fipsData["BLKGRP"];
-        
-        if ("Incorporated Places" in geographies && geographies["Incorporated Places"].length) {
-          request["place"] = geographies["Incorporated Places"][0]["PLACE"];
-          request["place_name"] = geographies["Incorporated Places"][0]["NAME"];
-        } else {
-          request["place"] = null;
-          request["place_name"] = null;
-        }
+        if (fipsData) {
+          request["state"] = fipsData["STATE"];
+          request["county"] = fipsData["COUNTY"];
+          request["tract"] = fipsData["TRACT"];
+          request["blockGroup"] = fipsData["BLKGRP"];
 
-        request.geocoded = true;
-        module.apiRequest(request, callback);
+          if ("Incorporated Places" in geographies && geographies["Incorporated Places"].length) {
+            request["place"] = geographies["Incorporated Places"][0]["PLACE"];
+            request["place_name"] = geographies["Incorporated Places"][0]["NAME"];
+          } else {
+            request["place"] = null;
+            request["place_name"] = null;
+          }
+
+          request.geocoded = true;
+          module.apiRequest(request, callback);
+        }
       });
 
       // We return because the callback will fix our request into FIPs,
