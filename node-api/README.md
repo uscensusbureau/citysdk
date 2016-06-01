@@ -110,5 +110,40 @@ print response.json()
 **Requesting GeoJSON and Census data using cURL**
 
 ```
-curl --user yourApiKey: -X POST -d '{"lat": 38.9047, "lng": -77.0164, "level": "state", "variables": ["income", "population"]}' http://citysdk.commerce.gov/census/api
+curl --user yourApiKey: -X POST \
+-H "Content-Type: application/json" \
+-d '{"lat": 38.9047, "lng": -77.0164, "level": "state", "variables": ["income", "population"]}' \
+http://citysdk.commerce.gov/census/api
+```
+
+**Result data**
+
+```json
+{
+  "lat": 38.9047,
+  "lng": -77.0164,
+  "level": "state",
+  "variables": [
+    "NAME",
+    "B19013_001E",
+    "B01003_001E"
+  ],
+  "api": "acs5",
+  "year": "2014",
+  "sublevel": false,
+  "state": "11",
+  "county": "001",
+  "tract": "004701",
+  "blockGroup": "2",
+  "place": "50000",
+  "place_name": "Washington city",
+  "geographyValidForAPI": true,
+  "data": [
+    {
+      "NAME": "District of Columbia",
+      "B19013_001E": "69235",
+      "B01003_001E": "633736"
+    }
+  ]
+}
 ```
