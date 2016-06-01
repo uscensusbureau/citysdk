@@ -64,7 +64,7 @@ request_obj = {
     "variables": ["income", "population"]
 }
 
-response = requests.post(request_url, auth=HTTPBasicAuth(apikey, None), data=request_obj)
+response = requests.post(request_url, auth=HTTPBasicAuth(apikey, None), json=request_obj)
 
 print response.json()
 
