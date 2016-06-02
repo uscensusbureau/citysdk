@@ -1,16 +1,16 @@
 /**
- * @title CitySDK CKAN Module
- * @module CitySDK CKAN Module
+ * @title CitySdk CKAN Module
+ * @module CitySdk CKAN Module
  *
  *
  */
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.ckan = new CkanModule();
+CitySdk.prototype.modules.ckan = new CkanModule();
 
 /**
- * Instantiates an instance of the CitySDK CKAN object.
+ * Instantiates an instance of the CitySdk CKAN object.
  * @constructor
  */
 function CkanModule() {
@@ -29,13 +29,13 @@ CkanModule.prototype.version = 1.1;
 CkanModule.prototype.minCoreVersionRequired = 1.5;
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
  */
 CkanModule.prototype.enable = function() {
-  if (CitySDK.prototype.sdkInstance.version >= CkanModule.prototype.minCoreVersionRequired) {
+  if (CitySdk.prototype.sdkInstance.version >= CkanModule.prototype.minCoreVersionRequired) {
     this.enabled = true;
     return true;
   } else {
@@ -72,7 +72,7 @@ CkanModule.prototype.seriesRequest = function(request, callback) {
   var ckanURL = targetURL;
 
   var cacheKey = JSON.stringify(request) + ckanURL.toString();
-  CitySDK.prototype.sdkInstance.getCachedData("ckan", "seriesRequest", cacheKey, function(cachedData) {
+  CitySdk.prototype.sdkInstance.getCachedData("ckan", "seriesRequest", cacheKey, function(cachedData) {
     var useCache = false;
 
     if (cachedData != null) {
@@ -83,12 +83,12 @@ CkanModule.prototype.seriesRequest = function(request, callback) {
         var d = new Date();
         var n = d.getTime();
 
-        if (Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.ckan.cacheLife) < n) {
+        if (Number(cachedData.cachedTimestamp) + Number(CitySdk.prototype.modules.ckan.cacheLife) < n) {
           // cache is too old
           useCache = false;
 
           // delete the cache
-          CitySDK.prototype.sdkInstance.deleteCachedData("ckan", "seriesRequest", cacheKey);
+          CitySdk.prototype.sdkInstance.deleteCachedData("ckan", "seriesRequest", cacheKey);
         } else {
           // cache is new enough
           useCache = true;
@@ -125,12 +125,12 @@ CkanModule.prototype.seriesRequest = function(request, callback) {
         ckanURL = ckanURL + "package_list";
       }
 
-      CitySDK.prototype.sdkInstance.jsonpRequest(ckanURL).done(
+      CitySdk.prototype.sdkInstance.jsonpRequest(ckanURL).done(
           function(response) {
             var d2 = new Date();
             var n2 = d2.getTime();
             response.cachedTimestamp = n2;
-            CitySDK.prototype.sdkInstance.setCachedData("ckan", "seriesRequest", cacheKey, response);
+            CitySdk.prototype.sdkInstance.setCachedData("ckan", "seriesRequest", cacheKey, response);
             callback(response);
           }
       );
@@ -213,7 +213,7 @@ CkanModule.prototype.APIRequest = function(request, callback) {
   var ckanURL = targetURL;
 
   var cacheKey = JSON.stringify(request) + ckanURL.toString();
-  CitySDK.prototype.sdkInstance.getCachedData("ckan", "APIRequest", cacheKey, function(cachedData) {
+  CitySdk.prototype.sdkInstance.getCachedData("ckan", "APIRequest", cacheKey, function(cachedData) {
     var useCache = false;
 
     if (cachedData != null) {
@@ -223,12 +223,12 @@ CkanModule.prototype.APIRequest = function(request, callback) {
         // Check for lifespan of data
         var d = new Date();
         var n = d.getTime();
-        if (Number(cachedData.cachedTimestamp) + Number(CitySDK.prototype.modules.ckan.cacheLife) < n) {
+        if (Number(cachedData.cachedTimestamp) + Number(CitySdk.prototype.modules.ckan.cacheLife) < n) {
           // cache is too old
           useCache = false;
 
           // delete the cache
-          CitySDK.prototype.sdkInstance.deleteCachedData("ckan", "APIRequest", cacheKey);
+          CitySdk.prototype.sdkInstance.deleteCachedData("ckan", "APIRequest", cacheKey);
         } else {
           // cache is new enough
           useCache = true;
@@ -287,12 +287,12 @@ CkanModule.prototype.APIRequest = function(request, callback) {
 
       }
 
-      CitySDK.prototype.sdkInstance.jsonpRequest(ckanURL).done(
+      CitySdk.prototype.sdkInstance.jsonpRequest(ckanURL).done(
           function(response) {
             var d2 = new Date();
             var n2 = d2.getTime();
             response.cachedTimestamp = n2;
-            CitySDK.prototype.sdkInstance.setCachedData("ckan", "APIRequest", cacheKey, response);
+            CitySdk.prototype.sdkInstance.setCachedData("ckan", "APIRequest", cacheKey, response);
             callback(response);
           }
       );
@@ -303,7 +303,7 @@ CkanModule.prototype.APIRequest = function(request, callback) {
 CkanModule.prototype.search = CkanModule.prototype.APIRequest;
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
-CitySDK.prototype.sdkInstance;
+CitySdk.prototype.sdkInstance;
 //And references to this module should be called as
-CitySDK.prototype.modules.ckan;
+CitySdk.prototype.modules.ckan;
 //when 'this' is ambiguous

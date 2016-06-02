@@ -1555,14 +1555,14 @@
 
     latLngToFips(lat, lng) {
       let url = `${CensusModule.defaultEndpoints.geoCoderUrl}coordinates`;
-      url += `?x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=json`;
+      url += `?x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp`;
 
       return CitySdk.ajaxRequest(url);
     }
 
     addressToFips(street, city, state) {
       let url = `${CensusModule.defaultEndpoints.geoCoderUrl}address`;
-      url += `?street=${street}&city=${city}&state=${state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=json`;
+      url += `?street=${street}&city=${city}&state=${state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp`;
 
       return CitySdk.ajaxRequest(url);
     }
@@ -2345,7 +2345,7 @@
 
   CensusModule.defaultEndpoints = {
     acsVariableDictionaryURL: "http://api.census.gov/data/",
-    geoCoderUrl: "http://geocoding.geo.census.gov/geocoder/geographies/",
+    geoCoderUrl: "https://geocoding.geo.census.gov/geocoder/geographies/",
     tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
     censusUrl: "http://api.census.gov/data/"
   };

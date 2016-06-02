@@ -1,12 +1,11 @@
-var census = new CensusModule();
 var censusAPIkey = "21ca50e1a3e22cf2b18083748c278199395408ec";
+var census = new CensusModule(censusAPIkey);
 
 function testCensusModule() {
   var moduleName = "census";
   var request = {};
 
   testResultStatus[moduleName] = true;
-  census.enable(censusAPIkey);
 
   // Convert Alias to Variable
   if (census.parseToVariable("employment_labor_force") != "B23025_002E") {
@@ -60,36 +59,36 @@ function testCensusModule() {
     updateStatusDisplay();
   });
 
-  // latLngToFIPS
+  // latLngToFips
   asyncTestsRunning++;
-  census.latLngToFIPS("25.7753", "-80.2089", function(moo) {
+  census.latLngToFips("25.7753", "-80.2089", function(moo) {
     asyncTestsRunning--;
     if (moo.States === null || moo["2010 Census Blocks"] === null) {
-      failTest(moduleName, "latLngToFIPS", "Failed to get FIPS information from coordinate points. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
+      failTest(moduleName, "latLngToFips", "Failed to get FIPS information from coordinate points. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
     } else if (moo.States[0].BASENAME.toLowerCase() != "florida") {
-      failTest(moduleName, "latLngToFIPS", "Failed to get FIPS information from coordinate points");
+      failTest(moduleName, "latLngToFips", "Failed to get FIPS information from coordinate points");
     }
     updateStatusDisplay();
   });
 
-  // addressToFIPS
+  // addressToFips
   asyncTestsRunning++;
-  census.addressToFIPS("777 Lynn Street", "Herndon", "VA", function(response) {
+  census.addressToFips("777 Lynn Street", "Herndon", "VA", function(response) {
     asyncTestsRunning--;
     if (response[0].geographies.States === null) {
-      failTest(moduleName, "addressToFIPS", "Failed to get FIPS information from address. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
+      failTest(moduleName, "addressToFips", "Failed to get FIPS information from address. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
     } else if (response[0].geographies.States[0].BASENAME.toLowerCase() != "virginia") {
-      failTest(moduleName, "addressToFIPS", "Unexpected values returned by function.. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
+      failTest(moduleName, "addressToFips", "Unexpected values returned by function.. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
     }
     updateStatusDisplay();
   });
 
-  // ZIPtoLatLng
+  // zipToLatLng
   asyncTestsRunning++;
-  census.ZIPtoLatLng("20190", function(response) {
+  census.zipToLatLng("20190", function(response) {
     asyncTestsRunning--;
     if (parseFloat(response.lat) != 38.9597752 && parseFloat(response.lng) != -77.3368607) {
-      failTest(moduleName, "ZIPtoLatLng", "Failed to get coordinates from zip code. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
+      failTest(moduleName, "zipToLatLng", "Failed to get coordinates from zip code. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
     }
     updateStatusDisplay();
   });
@@ -110,7 +109,7 @@ function testCensusModule() {
   };
 
   // Tests that require valid FIPS location
-  census.latLngToFIPS("25.7753", "-80.2089", function(geographies) {
+  census.latLngToFips("25.7753", "-80.2089", function(geographies) {
     var fipsData = geographies["2010 Census Blocks"][0];
     request["state"] = fipsData["STATE"];
     request["county"] = fipsData["COUNTY"];
@@ -252,16 +251,15 @@ function testCensusModule() {
       "EMP",
       "ESTAB"
     ];
+    
     census.GEORequest(request, function(response) {
       asyncTestsRunning--;
       if (response != false) {
         failTest(moduleName, "GEORequest", "Function returned data with invalid geographic specification.");
-
       }
+      
       updateStatusDisplay();
-
     });
-
   });
 
   //tigerwebRequest

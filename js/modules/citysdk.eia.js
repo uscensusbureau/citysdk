@@ -1,15 +1,15 @@
 /**
- * @title CitySDK EIA API Module
- * @module CitySDK EIA API Module
+ * @title CitySdk EIA API Module
+ * @module CitySdk EIA API Module
  * This module requires a key from http://www.eia.gov/
  */
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.eia = new EIAModule();
+CitySdk.prototype.modules.eia = new EIAModule();
 
 /**
- * Instantiates an instance of the CitySDK EIA object.
+ * Instantiates an instance of the CitySdk EIA object.
  * @constructor
  */
 function EIAModule() {
@@ -17,14 +17,14 @@ function EIAModule() {
 };
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
  */
 EIAModule.prototype.enable = function(apiKey) {
     this.apiKey = apiKey;
-    if(CitySDK.prototype.sdkInstance.version >= EIAModule.prototype.minCoreVersionRequired){
+    if(CitySdk.prototype.sdkInstance.version >= EIAModule.prototype.minCoreVersionRequired){
         this.enabled = true;
         return true;
     }else{
@@ -102,7 +102,7 @@ EIAModule.prototype.seriesRequest = function(request, callback) {
 };
 
 //References to an instance of the SDK should be called as:
-CitySDK.prototype.sdkInstance;
+CitySdk.prototype.sdkInstance;
 //And references to this module should be called as
-CitySDK.prototype.modules.eia;
+CitySdk.prototype.modules.eia;
 //when 'this' is ambiguous

@@ -1,12 +1,12 @@
 /**
- * @title CitySDK Socrata Module
- * @module CitySDK Socrata Module
+ * @title CitySdk Socrata Module
+ * @module CitySdk Socrata Module
  */
 
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.socrata = new SocrataModule();
+CitySdk.prototype.modules.socrata = new SocrataModule();
 
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
 function SocrataModule() {
@@ -15,7 +15,7 @@ function SocrataModule() {
 };
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  The API Key is optional for the socrata module but if supplied it will be used as an application Token.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * Enable function. Stores the API key for this module and sets it as enabled.  The API Key is optional for the socrata module but if supplied it will be used as an application Token.  It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
@@ -26,7 +26,7 @@ SocrataModule.prototype.enable = function(apiKey) {
         this.setApplicationToken(apiKey);
     }
 
-    if(CitySDK.prototype.sdkInstance.version >= SocrataModule.prototype.minCoreVersionRequired){
+    if(CitySdk.prototype.sdkInstance.version >= SocrataModule.prototype.minCoreVersionRequired){
         this.enabled = true;
         return true;
     }else{
@@ -126,7 +126,7 @@ SocrataModule.prototype.setApplicationToken = function(token) {
 
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
-CitySDK.prototype.sdkInstance;
+CitySdk.prototype.sdkInstance;
 //And references to this module should be called as
-CitySDK.prototype.modules.socrata;
+CitySdk.prototype.modules.socrata;
 //when 'this' is ambiguous

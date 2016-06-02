@@ -1,4 +1,4 @@
-var sdk = new CitySDK();
+var sdk = new CitySdk();
 sdk.allowCache = true;
 //localStorage.clear();
 
@@ -69,13 +69,16 @@ function updateStatusDisplay(moduleName) {
 
 jQuery(document).ready(function() {
 
-  jQuery("tr[dataModuleName='all'] .runTestButton").click(runAllTests);
   jQuery("tr[dataModuleName='core'] .runTestButton").click(runCoreTest);
   jQuery("tr[dataModuleName='census'] .runTestButton").click(testCensusModule);
-  jQuery("tr[dataModuleName='ckan'] .runTestButton").click(testCKANModule);
-  jQuery("tr[dataModuleName='fema'] .runTestButton").click(testFEMAModule);
-  jQuery("tr[dataModuleName='farmersMarket'] .runTestButton").click(testfarmersMarketModule);
-  jQuery("tr[dataModuleName='arcgis'] .runTestButton").click(testArcGISModule);
+
+  // TODO:
+  // Disable other modules until they've been updated to work with the new CitySdk
+  // jQuery("tr[dataModuleName='ckan'] .runTestButton").click(testCKANModule);
+  // jQuery("tr[dataModuleName='fema'] .runTestButton").click(testFEMAModule);
+  // jQuery("tr[dataModuleName='farmersMarket'] .runTestButton").click(testfarmersMarketModule);
+  // jQuery("tr[dataModuleName='arcgis'] .runTestButton").click(testArcGISModule);
+  // jQuery("tr[dataModuleName='all'] .runTestButton").click(runAllTests);
 
   //jQuery("tr[dataModuleName='noaa'] .runTestButton").click(testNoaaModule);
 });

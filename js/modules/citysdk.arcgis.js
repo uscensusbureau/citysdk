@@ -1,15 +1,15 @@
 /**
- * @title CitySDK ArcGIS API Module
- * @module CitySDK ArcGIS API Module
+ * @title CitySdk ArcGIS API Module
+ * @module CitySdk ArcGIS API Module
  * This module requires a key from http://www.arcgis.gov/
  */
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.arcgis = new arcgisModule();
+CitySdk.prototype.modules.arcgis = new arcgisModule();
 
 /**
- * Instantiates an instance of the CitySDK ArcGIS object.
+ * Instantiates an instance of the CitySdk ArcGIS object.
  * @constructor
  */
 function arcgisModule() {
@@ -18,7 +18,7 @@ function arcgisModule() {
 
 /**
  * Enable function. Stores the API key for this module and sets it as enabled.
- * It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.

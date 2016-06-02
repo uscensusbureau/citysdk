@@ -1,16 +1,16 @@
 /**
- * @title  CitySDK Census Module
+ * @title  CitySdk Census Module
  *
  * @overview The Census Module provides access to the various data sets provided by the Census Bureau. This includes several surveys (ACS, Decennial, etc), the geocoder service (convert locations to FIPS locations, and TigerWeb (map shape data).
  *
  *
  */
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.census = new CensusModule();
+CitySdk.prototype.modules.census = new CensusModule();
 /**
- * Instantiates an instance of the CitySDK Census module.
+ * Instantiates an instance of the CitySdk Census module.
  * @constructor
  */
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
@@ -110,7 +110,7 @@ var usBoundingBox = {
  * Dictionary of state codes to state capital coordinates. i.e. "AL" -> 32.3617, -86.2792
  * @type {object} Object with properties of state codes and values of arrays of coordinates
  */
-CensusModule.prototype.stateCapitals = CitySDK.prototype.stateCapitals();
+CensusModule.prototype.stateCapitals = CitySdk.prototype.stateCapitals();
 
 /**
  * Dictionary of aliases, string alias -> object with variable and description
@@ -125,14 +125,14 @@ CensusModule.prototype.aliases = {"population_1990":{"api":{"sf1":[1990,2010],"s
 
 /**
  * Enable function. Stores the API key for this module and sets it as enabled.
- * It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
  */
 CensusModule.prototype.enable = function (apiKey) {
     this.apiKey = apiKey;
-    if(CitySDK.prototype.sdkInstance.version >= CensusModule.prototype.minCoreVersionRequired){
+    if(CitySdk.prototype.sdkInstance.version >= CensusModule.prototype.minCoreVersionRequired){
         this.enabled = true;
         return true;
     }else{
@@ -241,27 +241,27 @@ CensusModule.prototype.parseRequestStateCode = function (request) {
  * @param {object} request Object representing an api request
  */
 CensusModule.prototype.parseRequestLatLng = function (request) {
-    request = CitySDK.prototype.parseRequestLatLng(request);
+    request = CitySdk.prototype.parseRequestLatLng(request);
 };
 
 /**
  * Converts ESRI JSON to GeoJSON
- * This function has been moved to the CitySDK core. An alias remains here for legacy support.
+ * This function has been moved to the CitySdk core. An alias remains here for legacy support.
  * @param {string} esriJSON
  * @returns {{type: string, features: Array}}
  */
 CensusModule.prototype.ESRItoGEO = function (esriJSON) {
-    return CitySDK.prototype.ESRItoGEO(geoJSON);
+    return CitySdk.prototype.ESRItoGEO(geoJSON);
 };
 
 /**
  * Converts geoJSON to ESRI JSON
- * This function has been moved to the CitySDK core. An alias remains here for legacy support.
+ * This function has been moved to the CitySdk core. An alias remains here for legacy support.
  * @param {string} geoJSON
  * @returns {object}
  */
 CensusModule.prototype.GEOtoESRI = function (geoJSON) {
-    return CitySDK.prototype.GEOtoESRI(geoJSON);
+    return CitySdk.prototype.GEOtoESRI(geoJSON);
 };
 
 /**
@@ -277,7 +277,7 @@ CensusModule.prototype.getVariableDictionary = function (inapi, inyear, callback
 
     var cacheKey = api.toString() + year.toString();
 
-    CitySDK.prototype.sdkInstance.getCachedData("census", "getVariableDictionary", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("census", "getVariableDictionary", cacheKey, function (cachedData) {
         if (cachedData != null) {
             callback(cachedData);
             return;
@@ -292,7 +292,7 @@ CensusModule.prototype.getVariableDictionary = function (inapi, inyear, callback
             CitySdk.ajaxRequest(URL).done(
                 function (response) {
                     response = jQuery.parseJSON(response);
-                    CitySDK.prototype.sdkInstance.setCachedData("census", "getVariableDictionary", cacheKey, response);
+                    CitySdk.prototype.sdkInstance.setCachedData("census", "getVariableDictionary", cacheKey, response);
                     callback(response);
                 }
             );
@@ -321,7 +321,7 @@ CensusModule.prototype.latLngToFIPS = function (inlat, inlng, callback) {
     var cacheKey = lat.toString() + lng.toString();
 
     // Check to see if this question is cached
-    CitySDK.prototype.sdkInstance.getCachedData("census", "latLngToFIPS", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("census", "latLngToFIPS", cacheKey, function (cachedData) {
         if (cachedData != null) {
             callback(cachedData);
             return;
@@ -336,13 +336,13 @@ CensusModule.prototype.latLngToFIPS = function (inlat, inlng, callback) {
             geocoderURL = geocoderURL.replace(latPattern, lat);
             geocoderURL = geocoderURL.replace(lngPattern, lng);
             //Make our AJAX request
-            var request = CitySDK.prototype.sdkInstance.jsonpRequest(geocoderURL);
+            var request = CitySdk.prototype.sdkInstance.jsonpRequest(geocoderURL);
 
             //Attach a completion event to the promise
             request.done(function (response) {
                 //Call the callback
-                if (CitySDK.prototype.sdkInstance.allowCache == true) {
-                    CitySDK.prototype.sdkInstance.setCachedData("census", "latLngToFIPS", cacheKey, response.result.geographies);
+                if (CitySdk.prototype.sdkInstance.allowCache == true) {
+                    CitySdk.prototype.sdkInstance.setCachedData("census", "latLngToFIPS", cacheKey, response.result.geographies);
                 }
                 callback(response.result.geographies);
             });
@@ -373,7 +373,7 @@ CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, atfC
     var cacheKey = street.replace(/\W/g, '') + city.replace(/\W/g, '') + state.replace(/\W/g, '');
 
     // Check to see if this question is cached
-    CitySDK.prototype.sdkInstance.getCachedData("census", "addressToFIPS", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("census", "addressToFIPS", cacheKey, function (cachedData) {
         if (cachedData != null) {
             atfCallback(cachedData);
             return;
@@ -394,12 +394,12 @@ CensusModule.prototype.addressToFIPS = function (instreet, incity, instate, atfC
             geocoderURL = encodeURI(geocoderURL);
 
             //Make the call
-            var request = CitySDK.prototype.sdkInstance.jsonpRequest(geocoderURL);
+            var request = CitySdk.prototype.sdkInstance.jsonpRequest(geocoderURL);
 
             //Send to the callback
             request.done(function (response) {
-                if (CitySDK.prototype.sdkInstance.allowCache == true) {
-                    CitySDK.prototype.sdkInstance.setCachedData("census", "addressToFIPS", cacheKey, response.result.addressMatches);
+                if (CitySdk.prototype.sdkInstance.allowCache == true) {
+                    CitySdk.prototype.sdkInstance.setCachedData("census", "addressToFIPS", cacheKey, response.result.addressMatches);
                 }
                 atfCallback(response.result.addressMatches);
             });
@@ -419,7 +419,7 @@ CensusModule.prototype.ZIPtoLatLng = function (inzip, callback) {
     var cacheKey = zip.toString();
 
     // Check to see if this question is cached
-    CitySDK.prototype.sdkInstance.getCachedData("census", "ZIPtoLatLng", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("census", "ZIPtoLatLng", cacheKey, function (cachedData) {
         if (cachedData != null) {
             callback(cachedData);
             return;
@@ -445,8 +445,8 @@ CensusModule.prototype.ZIPtoLatLng = function (inzip, callback) {
                         returnValue.lng = response.features[0].attributes.CENTLON;
                     }
                 }
-                if (CitySDK.prototype.sdkInstance.allowCache == true) {
-                    CitySDK.prototype.sdkInstance.setCachedData("census", "ZIPtoLatLng", cacheKey, returnValue);
+                if (CitySdk.prototype.sdkInstance.allowCache == true) {
+                    CitySdk.prototype.sdkInstance.setCachedData("census", "ZIPtoLatLng", cacheKey, returnValue);
                 }
                 callback(returnValue);
             })
@@ -469,7 +469,7 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
     var apiKey = this.apiKey;
 
     // Check to see if this question is cached
-    CitySDK.prototype.sdkInstance.getCachedData("census", "summaryRequest", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("census", "summaryRequest", cacheKey, function (cachedData) {
         if (cachedData != null) {
             callback(cachedData);
             return;
@@ -650,7 +650,7 @@ CensusModule.prototype.summaryRequest = function (request, callback) {
             request.done(function (response) {
                 //Turn it into json
                 var jsonObject = jQuery.parseJSON(response);
-                CitySDK.prototype.sdkInstance.setCachedData("census", "summaryRequest", cacheKey, jsonObject);
+                CitySdk.prototype.sdkInstance.setCachedData("census", "summaryRequest", cacheKey, jsonObject);
 
                 //Call the callback
                 callback(jsonObject);
@@ -738,7 +738,7 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
             this.ZIPtoLatLng(request.zip, function (response) {
                 request.lat = response.lat;
                 request.lng = response.lng;
-                CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+                CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
                 return;
             });
         }
@@ -757,7 +757,7 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
                 //Attach this "matched address" to the request address object so the user knows what we're using
                 request.address.addressMatch = response[0];
 
-                CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+                CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
                 return;
             })
         }
@@ -782,7 +782,7 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
             //They submitted a sublevel flag but it's false... remove the unnecessary flags and re-request
             delete request.sublevel;
             delete request.container;
-            CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+            CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
             return;
         }
 
@@ -796,25 +796,25 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
             var cacheKey = tigerURL.toString().replace(/\W/g, '') + JSON.stringify(tigerRequest).replace(/\W/g, '');
             var tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
             var tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
-            CitySDK.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
+            CitySdk.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
                 if (cachedData != null) {
-                    CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(cachedData, callback);
+                    CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(cachedData, callback);
                     return;
                 } else {
 
-                    CitySDK.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(
+                    CitySdk.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(
                         function (response) {
                             var json = jQuery.parseJSON(response);
                             var features = json.features;
                             //Grab our container ESRI geography, attach it to our request, and call this function again.
                             if (request.container == "us") {
-                                request.containerGeometry = CitySDK.prototype.sdkInstance.modules.census.GEOtoESRI(usBoundingBox)[0].geometry;
+                                request.containerGeometry = CitySdk.prototype.sdkInstance.modules.census.GEOtoESRI(usBoundingBox)[0].geometry;
                             } else {
                                 request.containerGeometry = features[0].geometry;
                             }
-                            CitySDK.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, request);
+                            CitySdk.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, request);
 
-                            CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+                            CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
                         }
                     );
                 }
@@ -832,14 +832,14 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
             var cacheKey = tigerURL.toString().replace(/\W/g, '') + JSON.stringify(tigerRequest).replace(/\W/g, '');
             var tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
             var tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
-            CitySDK.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
+            CitySdk.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
                 if (cachedData != null) {
-                    callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(cachedData));
+                    callback(CitySdk.prototype.sdkInstance.modules.census.ESRItoGEO(cachedData));
                     return;
                 } else {
-                    CitySDK.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(function (response) {
-                            CitySDK.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, response);
-                            callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(response));
+                    CitySdk.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(function (response) {
+                            CitySdk.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, response);
+                            callback(CitySdk.prototype.sdkInstance.modules.census.ESRItoGEO(response));
                         });
                 }
             });
@@ -849,7 +849,7 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
             //They submitted a sublevel flag but it's false... remove the unnecessary flags and re-request
             delete request.sublevel;
             delete request.container;
-            CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+            CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
             return;
         }
         //Sublevel, no container
@@ -874,7 +874,7 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
         }
         ;
 
-        CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
+        CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, callback);
         return;
     } else {
         //We have a sublevel request with a container. We need to grab the container's geography and return it
@@ -887,16 +887,16 @@ CensusModule.prototype.tigerwebRequest = function (request, callback) {
         var cacheKey = tigerURL.toString().replace(/\W/g, '') + JSON.stringify(tigerRequest).replace(/\W/g, '');
         var tigerURLReq = JSON.parse(JSON.stringify(tigerURL));
         var tigerRequestSubmitted = JSON.parse(JSON.stringify(tigerRequest));
-        CitySDK.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
+        CitySdk.prototype.sdkInstance.getCachedData("census", "tigerwebRequest", cacheKey, function (cachedData) {
             if (cachedData != null) {
-                callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(cachedData));
+                callback(CitySdk.prototype.sdkInstance.modules.census.ESRItoGEO(cachedData));
                 return;
             } else {
-                CitySDK.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(
+                CitySdk.prototype.sdkInstance.postRequest(tigerURLReq, tigerRequestSubmitted).done(
                     function (response) {
-                        CitySDK.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, response);
+                        CitySdk.prototype.sdkInstance.setCachedData("census", "tigerwebRequest", cacheKey, response);
 
-                        callback(CitySDK.prototype.sdkInstance.modules.census.ESRItoGEO(response));
+                        callback(CitySdk.prototype.sdkInstance.modules.census.ESRItoGEO(response));
                     });
             }
         });
@@ -1020,7 +1020,7 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             this.ZIPtoLatLng(request.zip, function (response) {
                 request.lat = response.lat;
                 request.lng = response.lng;
-                CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
+                CitySdk.prototype.sdkInstance.modules.census.APIRequest(request, callback);
                 return;
             });
         }
@@ -1039,7 +1039,7 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
                 //Attach this "matched address" to the request address object so the user knows what we're using
                 request.address.addressMatch = response[0];
 
-                CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
+                CitySdk.prototype.sdkInstance.modules.census.APIRequest(request, callback);
                 return;
             })
         }
@@ -1062,7 +1062,7 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             request["place_name"] = ("Incorporated Places" in geographies) ? (geographies["Incorporated Places"].length > 0) ? geographies["Incorporated Places"][0]["NAME"] : null : null;
 
             request.geocoded = true;
-            CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
+            CitySdk.prototype.sdkInstance.modules.census.APIRequest(request, callback);
         });
         return; //We return because the callback will fix our request into FIPs, and then call the request again
     }
@@ -1128,14 +1128,14 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
                             for (var j = 0; j < request.variables.length; j++) {
 
                                     currentVariable = request.variables[j];
-                                    var intermediateVar = currentResponseItem[window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year), response[0])];
+                                    var intermediateVar = currentResponseItem[window.jQuery.inArray(CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year), response[0])];
                                     if(intermediateVar){
                                         currentDataObject[currentVariable] = intermediateVar;
                                     }
 
                                 //Variable is Normalizeable
-                                    if (intermediateVar && CitySDK.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
-                                        currentDataObject[currentVariable + "_normalized"] =currentDataObject[currentVariable] /  currentResponseItem[window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[0])];
+                                    if (intermediateVar && CitySdk.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
+                                        currentDataObject[currentVariable + "_normalized"] =currentDataObject[currentVariable] /  currentResponseItem[window.jQuery.inArray(CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[0])];
                                     }
 
                             }
@@ -1148,13 +1148,13 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
                         var currentDataObject = {};
                         for (var i = 0; i < request.variables.length; i++) {
                             currentVariable = request.variables[i];
-                            if(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year)!== false){
-                                currentDataObject[currentVariable] = response[1][window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year), response[0])];
+                            if(CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year)!== false){
+                                currentDataObject[currentVariable] = response[1][window.jQuery.inArray(CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable(currentVariable,request.api,request.year), response[0])];
                             }
 
 
-                            if (currentDataObject[currentVariable] && CitySDK.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
-                                currentDataObject[currentVariable + "_normalized"] = currentDataObject[currentVariable] / response[1][window.jQuery.inArray(CitySDK.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[1])];
+                            if (currentDataObject[currentVariable] && CitySdk.prototype.sdkInstance.modules.census.isNormalizable(currentVariable) && CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year) !== false) {
+                                currentDataObject[currentVariable + "_normalized"] = currentDataObject[currentVariable] / response[1][window.jQuery.inArray(CitySdk.prototype.sdkInstance.modules.census.parseToValidVariable("population",request.api,request.year), response[1])];
                             }
 
                             //Move it into an array for consistency
@@ -1181,7 +1181,7 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
             if (request.level == "us" ) {
                 //Ok, let's just resubmit it with D.C. as the "state"
                 request.state = "DC";
-                CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, callback);
+                CitySdk.prototype.sdkInstance.modules.census.APIRequest(request, callback);
             }
 
             //We have some container geometry but no specific location, let the supplemental requests handle the variables
@@ -1194,8 +1194,8 @@ CensusModule.prototype.APIRequest = function (requestIn, callback) {
 
             return;
         }else{
-            CitySDK.prototype.sdkInstance.modules.census.validateRequestGeographyVariables(request,function(response){
-                CitySDK.prototype.sdkInstance.modules.census.APIRequest(response, callback);
+            CitySdk.prototype.sdkInstance.modules.census.validateRequestGeographyVariables(request,function(response){
+                CitySdk.prototype.sdkInstance.modules.census.APIRequest(response, callback);
             });
         }
     }
@@ -1218,7 +1218,7 @@ CensusModule.prototype.validateRequestGeographyVariables = function(requestIn,ca
     var cacheKey = "apiGeography"+request.year.toString()+request.api.toString();
 
     // Check to see if this question is cached
-    CitySDK.prototype.sdkInstance.getCachedData("census", "validateRequestGeographyVariables", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("census", "validateRequestGeographyVariables", cacheKey, function (cachedData) {
         if (cachedData != null) {
             // Use cached geography definition
             request.geographyValidForAPI = CensusModule.prototype.validateRequestGeographyVariablesProcess(request,cachedData);
@@ -1234,8 +1234,8 @@ CensusModule.prototype.validateRequestGeographyVariables = function(requestIn,ca
             geographyrequest.done(function (response) {
                 var geoDefinition = jQuery.parseJSON(response);
 
-                if (CitySDK.prototype.sdkInstance.allowCache == true) {
-                    CitySDK.prototype.sdkInstance.setCachedData("census", "validateRequestGeographyVariables", cacheKey, geoDefinition);
+                if (CitySdk.prototype.sdkInstance.allowCache == true) {
+                    CitySdk.prototype.sdkInstance.setCachedData("census", "validateRequestGeographyVariables", cacheKey, geoDefinition);
                 }
                 request.geographyValidForAPI = CensusModule.prototype.validateRequestGeographyVariablesProcess(request,geoDefinition);
                 callback(request);
@@ -1317,7 +1317,7 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
     //First - check if we have a data object in the request OR if we aren't requesting variables
     if ("data" in request || !("variables" in request)) {
         //We have a data object for the request (or there isn't any requested), now we can get the geoJSON for the area
-        CitySDK.prototype.sdkInstance.modules.census.tigerwebRequest(request, function (response) {
+        CitySdk.prototype.sdkInstance.modules.census.tigerwebRequest(request, function (response) {
             if(response == false){
                 // No data returned
                 callback(false);
@@ -1365,7 +1365,7 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
                         };
 
                         CensusModule.prototype.SUPPLEMENTAL_REQUESTS_IN_FLIGHT++;
-                        CitySDK.prototype.sdkInstance.modules.census.APIRequest(suppRequest, function (resp) {
+                        CitySdk.prototype.sdkInstance.modules.census.APIRequest(suppRequest, function (resp) {
                             console.log(resp);
                             CensusModule.prototype.SUPPLEMENTAL_REQUESTS_IN_FLIGHT--;
                             for (var property in resp.data[0]) {
@@ -1397,8 +1397,8 @@ CensusModule.prototype.GEORequest = function (requestIn, callback) {
         });
     } else {
         //We do not have the requested variables - let's get them
-        CitySDK.prototype.sdkInstance.modules.census.APIRequest(request, function (response) {
-            CitySDK.prototype.sdkInstance.modules.census.GEORequest(response, callback);
+        CitySdk.prototype.sdkInstance.modules.census.APIRequest(request, function (response) {
+            CitySdk.prototype.sdkInstance.modules.census.GEORequest(response, callback);
         });
     }
 };

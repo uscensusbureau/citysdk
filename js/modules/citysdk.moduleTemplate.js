@@ -1,15 +1,15 @@
 /**
- * @title CitySDK ExampleTemplate Module
- * @module CitySDK ExampleTemplate Module
+ * @title CitySdk ExampleTemplate Module
+ * @module CitySdk ExampleTemplate Module
  * @overview This is a template that module builders can use to make new modules.
  */
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.moduleTemplate = new ModuleTemplateModule();
+CitySdk.prototype.modules.moduleTemplate = new ModuleTemplateModule();
 
 /**
- * Instantiates an instance of the CitySDK FEMA object.
+ * Instantiates an instance of the CitySdk FEMA object.
  * @constructor
  */
 function ModuleTemplateModule() {
@@ -28,14 +28,14 @@ ModuleTemplateModule.prototype.minCoreVersionRequired = 1.5;
 
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
  */
 ModuleTemplateModule.prototype.enable = function(apiKey) {
     this.apiKey = apiKey;
-    if (CitySDK.prototype.sdkInstance.version >= this.minCoreVersionRequired) {
+    if (CitySdk.prototype.sdkInstance.version >= this.minCoreVersionRequired) {
         this.enabled = true;
         return true;
     } else {
@@ -65,7 +65,7 @@ ModuleTemplateModule.prototype.enable = function(apiKey) {
 ModuleTemplateModule.prototype.APIRequest = function(request, callback) {
     var cacheKey = "unique key to determine how to cache the returned data";
 
-    CitySDK.prototype.sdkInstance.getCachedData("moduleTemplate", "APIRequest", cacheKey, function (cachedData) {
+    CitySdk.prototype.sdkInstance.getCachedData("moduleTemplate", "APIRequest", cacheKey, function (cachedData) {
         if (cachedData != null) {
             // Caching is enabled AND cached data is found
             /*
@@ -81,14 +81,14 @@ ModuleTemplateModule.prototype.APIRequest = function(request, callback) {
             // Caching is disabled OR no cache data is found.
 
             // Build the request URL as needed.
-            var URL = CitySDK.prototype.modules.moduleTemplate.DEFAULT_ENDPOINTS.apiURL;  // DO NOT HARDCODE A URL INTO THE FUNCTION
+            var URL = CitySdk.prototype.modules.moduleTemplate.DEFAULT_ENDPOINTS.apiURL;  // DO NOT HARDCODE A URL INTO THE FUNCTION
 
             // Submit the request.
-            // Note there are several different request functions that can be used here.  See the CitySDK Core for details.
+            // Note there are several different request functions that can be used here.  See the CitySdk Core for details.
             CitySdk.ajaxRequest(URL).done(
                 function (response) {
                     response = jQuery.parseJSON(response);
-                    CitySDK.prototype.sdkInstance.setCachedData("moduleTemplate", "APIRequest", cacheKey, response);
+                    CitySdk.prototype.sdkInstance.setCachedData("moduleTemplate", "APIRequest", cacheKey, response);
                     callback(response);
                 }
             );
@@ -100,7 +100,7 @@ ModuleTemplateModule.prototype.APIRequest = function(request, callback) {
 
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
-CitySDK.prototype.sdkInstance;
+CitySdk.prototype.sdkInstance;
 //And references to this module should be called as
-CitySDK.prototype.modules.moduleTemplate;
+CitySdk.prototype.modules.moduleTemplate;
 //when 'this' is ambiguous
