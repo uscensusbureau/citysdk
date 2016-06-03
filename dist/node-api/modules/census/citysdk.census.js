@@ -143,7 +143,6 @@ var CensusModule = (function () {
                         qualifiers += "&in=";
                         cascade = true;
                     }
-                    break;
                 case "tract":
                     // If sublevel, add the appropriate for and attach the in
                     // We also check the cascade tag so we don't do this twice.
@@ -159,7 +158,6 @@ var CensusModule = (function () {
                     else {
                         qualifiers += "+";
                     }
-                    break;
                 case "county":
                     // If sublevel, add the appropriate for and attach the in
                     // We also check the cascade tag so we don't do this twice.
@@ -175,7 +173,6 @@ var CensusModule = (function () {
                     else {
                         qualifiers += "+";
                     }
-                    break;
                 case "place":
                     // If sublevel, add the appropriate for and attach the in
                     // Check for cascade so we don't do this twice
@@ -188,7 +185,6 @@ var CensusModule = (function () {
                         qualifiers += "place:" + req.place + "&in=";
                         cascade = true;
                     }
-                    break;
                 case "state":
                     // If sublevel, add the appropriate for and attach the in
                     // We also check the cascade tag so we don't do this twice.
@@ -436,11 +432,11 @@ var CensusModule = (function () {
                 // We have the address but no lat/lng - parse it and re-call
                 module.addressToFips(street, city, state).then(function (response) {
                     // Take the first matched address
-                    request.lat = response[0].coordinates.y;
-                    request.lng = response[0].coordinates.x;
+                    request.lat = response.result.addressMatches[0].coordinates.y;
+                    request.lng = response.result.addressMatches[0].coordinates.x;
                     // Attach this "matched address" to the request address object
                     // so the user knows what we're using
-                    request.address.addressMatch = response[0];
+                    request.address.addressMatch = response.result.addressMatches[0];
                     module.apiRequest(request, callback);
                     return;
                 });

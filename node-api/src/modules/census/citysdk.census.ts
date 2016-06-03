@@ -16,10 +16,10 @@ export default class CensusModule {
   static defaultApi: string = "acs5";
 
   static defaultEndpoints: any = {
-    acsVariableDictionaryURL: "https://api.census.gov/data/",
-    geoCoderUrl: "https://geocoding.geo.census.gov/geocoder/geographies/",
+    acsVariableDictionaryURL: "http://api.census.gov/data/",
+    geoCoderUrl: "http://geocoding.geo.census.gov/geocoder/geographies/",
     tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-    censusUrl: "https://api.census.gov/data/"
+    censusUrl: "http://api.census.gov/data/"
   };
 
   private stateCapitals: any = CitySdk.stateCapitalCoordinates;
@@ -515,14 +515,14 @@ export default class CensusModule {
         let state: string = request.address.state;
 
         // We have the address but no lat/lng - parse it and re-call
-        module.addressToFips(street, city, state).then((response) => {
+        module.addressToFips(street, city, state).then((response: any) => {
           // Take the first matched address
-          request.lat = response[0].coordinates.y;
-          request.lng = response[0].coordinates.x;
+          request.lat = response.result.addressMatches[0].coordinates.y;
+          request.lng = response.result.addressMatches[0].coordinates.x;
 
           // Attach this "matched address" to the request address object
           // so the user knows what we're using
-          request.address.addressMatch = response[0];
+          request.address.addressMatch = response.result.addressMatches[0];
 
           module.apiRequest(request, callback);
           return;
