@@ -1,17 +1,17 @@
 /**
- * @title CitySDK FEMA Module
- * @module CitySDK FEMA Module
+ * @title CitySdk FEMA Module
+ * @module CitySdk FEMA Module
  * @overview The FEMA Module provides access to FEMA's list of disasters.
  */
 
 
-//Attach a new module object to the CitySDK prototype.
+//Attach a new module object to the CitySdk prototype.
 //It is advised to keep the filenames and module property names the same
-CitySDK.prototype.modules.fema = new FEMAModule();
+CitySdk.prototype.modules.fema = new FEMAModule();
 
 //Module object definition. Every module should have an "enabled" property and an "enable"  function.
 /**
- * Instantiates an instance of the CitySDK FEMA object.
+ * Instantiates an instance of the CitySdk FEMA object.
  * @constructor
  */
 function FEMAModule() {
@@ -29,13 +29,13 @@ FEMAModule.prototype.minCoreVersionRequired = 1.5;
 
 
 /**
- * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySDK core's version number to the minimum number required as specified for this module.
+ * Enable function. Stores the API key for this module and sets it as enabled.  It will also compare the CitySdk core's version number to the minimum number required as specified for this module.
  *
  * @param {string} apiKey The census API key.
  * @returns {boolean} True if enabled, false if not enabled.
  */
 FEMAModule.prototype.enable = function () {
-    if (CitySDK.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired) {
+    if (CitySdk.prototype.sdkInstance.version >= FEMAModule.prototype.minCoreVersionRequired) {
         this.enabled = true;
         return true;
     } else {
@@ -120,7 +120,7 @@ FEMAModule.prototype.APIRequest = function (request, callback) {
 
     var addedFilter = false;
     var addedSkip = false;
-    var disasterURL = CitySDK.prototype.modules.fema.DEFAULT_ENDPOINTS.apiURL;
+    var disasterURL = CitySdk.prototype.modules.fema.DEFAULT_ENDPOINTS.apiURL;
 
     if ("disasterNumber" in request && Number(request.disasterNumber)) {
         if (!addedFilter) {
@@ -152,7 +152,7 @@ FEMAModule.prototype.APIRequest = function (request, callback) {
         }
     }
 
-    if ("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
+    if ("declarationRangeStart" in request && CitySdk.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeStart)) {
         var dateObjectdeclarationRangeStart = new Date(request.declarationRangeStart);
         if (!addedFilter) {
             disasterURL += "$filter=";
@@ -162,7 +162,7 @@ FEMAModule.prototype.APIRequest = function (request, callback) {
             disasterURL += " and declarationDate ge '" + dateObjectdeclarationRangeStart.toISOString() + "'";
         }
     }
-    if ("declarationRangeStart" in request && CitySDK.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
+    if ("declarationRangeStart" in request && CitySdk.prototype.sdkInstance.modules.fema.isIso8601Date(request.declarationRangeEnd)) {
         var dateObjectdeclarationRangeEnd = new Date(request.declarationRangeEnd);
 
         if (!addedFilter) {
@@ -189,7 +189,7 @@ FEMAModule.prototype.APIRequest = function (request, callback) {
         disasterURL += "$top=" + Number(request.take); //Default - root list of all datasets
     }
 
-    CitySDK.prototype.sdkInstance.ajaxRequest(disasterURL).done(function (response) {
+    CitySdk.ajaxRequest(disasterURL).done(function (response) {
         response = jQuery.parseJSON(response);
         callback(response);
     });
@@ -203,7 +203,7 @@ FEMAModule.prototype.DisasterDeclarationsSummariesRequest = FEMAModule.prototype
  * @returns {boolean} True if valid ISO 8601 date.
  */
 FEMAModule.prototype.isIso8601Date = function (dateString) {
-    return CitySDK.prototype.sdkInstance.modules.fema.iso8601reg.test(dateString);
+    return CitySdk.prototype.sdkInstance.modules.fema.iso8601reg.test(dateString);
 };
 
 
@@ -235,7 +235,7 @@ if (!Date.prototype.toISOString) {
 
 //After this point the module is all up to you
 //References to an instance of the SDK should be called as:
-CitySDK.prototype.sdkInstance;
+CitySdk.prototype.sdkInstance;
 //And references to this module should be called as
-CitySDK.prototype.modules.fema;
+CitySdk.prototype.modules.fema;
 //when 'this' is ambiguous
