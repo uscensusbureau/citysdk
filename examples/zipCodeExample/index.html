@@ -6,133 +6,128 @@ title: Population and Income by Zipcode
 
 
 <div class="row">
-    <div class="col-md-12">
+  <div class="col-md-12">
 
 
-        <h2>Overview</h2>
+    <h2>Overview</h2>
 
-        <p>This example allows you to enter a zip code and return population and income information that corresponds to
-            the location. You may specify how granular you want the return value, by choosing Tract, State, County,
-            Block Group, or Incorporated Place. </p>
+    <p>This example allows you to enter a zip code and return population and income information that corresponds to
+       the location. You may specify how granular you want the return value, by choosing Tract, State, County,
+       Block Group, or Incorporated Place. </p>
 
 
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">1. Select Zipcode and Geography</h3>
+      </div>
+      <div class="panel-body">
 
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h3 class="panel-title">1. Select Zipcode and Geography</h3>
+        <div class="loading-icon loading-icon-initialstate"></div>
+
+        <form class="hideWhileLoading">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="zipcode">Zipcode</label>
+              <input type="text" id="zipcode" class="form-control"/>
             </div>
-            <div class="panel-body">
-
-                <div class="loading-icon loading-icon-initialstate"></div>
-
-                <form class="hideWhileLoading">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="zipcode">Zipcode</label>
-                            <input type="text" id="zipcode" class="form-control"/>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="level">Geography Level</label>
-                            <select id="level" class="form-control">
-                                <option value="tract" selected>Tract</option>
-                                <option value="state">State</option>
-                                <option value="county">County</option>
-                                <option value="blockGroup">Block Group</option>
-                                <option value="place">Incorporated Place</option>
-                            </select>
-                        </div>
-
-                    </div>
-
-
-                </form>
-
-            </div><!-- end panel-body -->
-        </div><!-- end panel panel-info -->
-
-
-
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h3 class="panel-title">2. Submit</h3>
+            <div class="col-md-6">
+              <label for="level">Geography Level</label>
+              <select id="level" class="form-control">
+                <option value="state">State</option>
+                <option value="county">County</option>
+                <option value="tract" selected>Tract</option>
+                <option value="blockGroup">Block Group</option>
+                <option value="place">Incorporated Place</option>
+              </select>
             </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-6" id="errorHaus">
-                    </div><!-- end col-md-6 -->
 
-                    <div class="col-md-6">
-                        <h4>Get the Data</h4>
-
-                        <p><a class="btn btn-primary btn-lg" id="queryPopulationIncomeByZipcode" style="width: 100%;" href="#" role="button">Update Data</a></p>
-
-                        <div class="loading-icon loading-icon-initialstate"></div>
-
-                    </div>
-                </div><!-- end row -->
+          </div>
 
 
-            </div><!-- end panel-body -->
-        </div><!-- end panel panel-info -->
+        </form>
+
+      </div><!-- end panel-body -->
+    </div><!-- end panel panel-info -->
 
 
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">2. Submit</h3>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-6" id="errorHaus">
+          </div><!-- end col-md-6 -->
+
+          <div class="col-md-6">
+            <h4>Get the Data</h4>
+
+            <p><a class="btn btn-primary btn-lg" id="queryPopulationIncomeByZipcode" style="width: 100%;" href="#"
+                  role="button">Update Data</a></p>
+
+            <div class="loading-icon loading-icon-initialstate"></div>
+
+          </div>
+        </div><!-- end row -->
 
 
+      </div><!-- end panel-body -->
+    </div><!-- end panel panel-info -->
 
 
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <h3 class="panel-title">The Request</h3>
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">The Request</h3>
 
+      </div>
+      <div class="panel-body">
+        <pre id="cenreq"></pre>
+
+
+      </div>
+    </div><!-- end panel panel-success -->
+
+
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">The Returned Data</h3>
+      </div>
+      <div class="panel-body">
+        <ul class="nav nav-tabs" role="tablist">
+
+          <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData"
+                                                    role="tab"
+                                                    data-toggle="tab">Formatted Data</a></li>
+
+          <li role="presentation"><a href="#dataSeriesJson" aria-controls="dataSeriesJson" role="tab"
+                                     data-toggle="tab">Raw Data</a></li>
+          <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab"
+                                     data-toggle="tab">Code Example</a></li>
+        </ul>
+        <div class="loading-icon loading-icon-initialstate"></div>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
+            <div id="dataSeriesResult">
+              <table class="table table-striped">
+                <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+              </table>
             </div>
-            <div class="panel-body">
-                <pre id="cenreq"></pre>
 
-
-            </div>
-        </div><!-- end panel panel-success -->
-
-
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <h3 class="panel-title">The Returned Data</h3>
-            </div>
-            <div class="panel-body">
-                <ul class="nav nav-tabs" role="tablist">
-
-                    <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData"
-                                                              role="tab"
-                                                              data-toggle="tab">Formatted Data</a></li>
-
-                    <li role="presentation"><a href="#dataSeriesJson" aria-controls="dataSeriesJson" role="tab"
-                                               data-toggle="tab">Raw Data</a></li>
-                    <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab"
-                                               data-toggle="tab">Code Example</a></li>
-                </ul>
-                <div class="loading-icon loading-icon-initialstate"></div>
-
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="dataSeriesData">
-                        <div id="dataSeriesResult">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Field</th>
-                                    <th>Value</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </div><!-- end dataSeriesData -->
-                    <div role="tabpanel" class="tab-pane" id="dataSeriesJson">
-                        <pre id="data" name="data"></pre>
-                    </div><!-- end dataSeriesJson -->
-                    <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+          </div><!-- end dataSeriesData -->
+          <div role="tabpanel" class="tab-pane" id="dataSeriesJson">
+            <pre id="data" name="data"></pre>
+          </div><!-- end dataSeriesJson -->
+          <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
 <var>sdk</var> = new CitySDK();
 <var>census</var> = <var>sdk</var>.modules.census;
 <var>census</var>.enable(citySDKdemoConfiguration.apikey);
@@ -143,84 +138,80 @@ var <var>request</var> = <var id="codeDemoRequestedSeriesID"></var>
     jQuery("#data").text(JSON.stringify(<var>response</var>, null, 4));
 });
             </pre>
-                    </div><!-- end dataSeriesCode -->
-                </div>
-            </div><!-- end panel-body -->
-        </div><!-- end panel panel-info -->
+          </div><!-- end dataSeriesCode -->
+        </div>
+      </div><!-- end panel-body -->
+    </div><!-- end panel panel-info -->
 
 
-
-
-    </div>
+  </div>
 </div>
 
 
 <script>
-    var sdk, census;
+  var sdk, census;
 
-    jQuery(document).ready(function () {
-        sdk = new CitySDK();
-        census = sdk.modules.census;
-        census.enable(citySDKdemoConfiguration.apikey);
+  jQuery(document).ready(function() {
+    sdk = new CitySdk();
+    census = new CensusModule(citySDKdemoConfiguration.apikey);
 
-        jQuery("#queryPopulationIncomeByZipcode").click(queryPopulationIncomeByZipcode);
+    jQuery("#queryPopulationIncomeByZipcode").click(queryPopulationIncomeByZipcode);
 
-        jQuery("#zipcode").on("keyup",function(){
-            var request = buildRequest();
-            jQuery("#cenreq").html(JSON.stringify(request, null, 4));
-            jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
-
-        });
-        jQuery("#level").on("change",function(){
-            var request = buildRequest();
-            jQuery("#cenreq").html(JSON.stringify(request, null, 4));
-            jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
-        });
+    jQuery("#zipcode").on("keyup", function() {
+      var request = buildRequest();
+      jQuery("#cenreq").html(JSON.stringify(request, null, 4));
+      jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
 
     });
+    jQuery("#level").on("change", function() {
+      var request = buildRequest();
+      jQuery("#cenreq").html(JSON.stringify(request, null, 4));
+      jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
+    });
 
+  });
 
-    function buildRequest(){
-        var zip = jQuery('#zipcode');
+  function buildRequest() {
+    var zip = jQuery('#zipcode');
 
-        var request = {
-            zip: zip.val(),
-            variables: [
-                "income",
-                "population"
-            ],
-            level: jQuery("#level option:selected").val()
-        }
-        return request;
+    var request = {
+      zip: zip.val(),
+      variables: [
+        "income",
+        "population"
+      ],
+      level: jQuery("#level option:selected").val()
+    };
+    return request;
+  }
+
+  function queryPopulationIncomeByZipcode(e) {
+    e.preventDefault();
+
+    var request = buildRequest();
+    jQuery("#cenreq").html(JSON.stringify(request, null, 4));
+    jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
+
+    if (request.zip == "") {
+      jQuery("#errorHaus").append("<div class=\"alert alert-warning\" role=\"alert\">You must enter a zipcode</div>");
+    } else {
+      jQuery("#errorHaus").empty();
+
+      census.apiRequest(request, function(response) {
+        var output = $('#dataSeriesResult tbody');
+        jQuery("#data").text(JSON.stringify(response, null, 4));
+
+        output.empty();
+        var tableRows = "<tr><td>ZIP</td><td>" + response.zip + "</td></tr>";
+        var income = response.data[0][census.aliases.income.variable];
+        var population = response.data[0][census.aliases.population.variable];
+
+        tableRows = tableRows + "<tr><td>Coordinates</td><td>" + response.lat + ", " + response.lng + "</td></tr>";
+        tableRows = tableRows + "<tr><td>Median Income</td><td>" + income + "</td></tr>";
+        tableRows = tableRows + "<tr><td>Population</td><td>" + population + "</td></tr>";
+
+        output.append(tableRows);
+      });
     }
-
-
-    function queryPopulationIncomeByZipcode(e) {
-        e.preventDefault();
-
-        var request = buildRequest();
-        jQuery("#cenreq").html(JSON.stringify(request, null, 4));
-        jQuery("#codeDemoRequestedSeriesID").html(JSON.stringify(request, null, 4));
-
-        if(request.zip == ""){
-            jQuery("#errorHaus").append("<div class=\"alert alert-warning\" role=\"alert\">You must enter a zipcode</div>");
-        }else{
-            jQuery("#errorHaus").empty();
-
-            census.APIRequest(request, function (response) {
-                var output = $('#dataSeriesResult tbody');
-                jQuery("#data").text(JSON.stringify(response, null, 4));
-
-                output.empty();
-                var tableRows = "<tr><td>ZIP</td><td>"+response.zip+"</td></tr>";
-                tableRows = tableRows + "<tr><td>Coordinates</td><td>"+ response.lat + ", " + response.lng +"</td></tr>";
-                tableRows = tableRows + "<tr><td>Median Income</td><td>"+response.data[0].income+"</td></tr>";
-                tableRows = tableRows + "<tr><td>Population</td><td>"+response.data[0].population+"</td></tr>";
-                output.append(tableRows);
-
-            });
-        }
-
-
-    }
+  }
 </script>
