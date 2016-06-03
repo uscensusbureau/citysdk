@@ -16,10 +16,10 @@ export default class CensusModule {
   static defaultApi: string = "acs5";
 
   static defaultEndpoints: any = {
-    acsVariableDictionaryURL: "http://api.census.gov/data/",
-    geoCoderUrl: "http://geocoding.geo.census.gov/geocoder/geographies/",
+    acsVariableDictionaryURL: "https://api.census.gov/data/",
+    geoCoderUrl: "https://geocoding.geo.census.gov/geocoder/geographies/",
     tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-    censusUrl: "http://api.census.gov/data/"
+    censusUrl: "https://api.census.gov/data/"
   };
 
   private stateCapitals: any = CitySdk.stateCapitalCoordinates;
@@ -191,7 +191,6 @@ export default class CensusModule {
             cascade = true;
           }
 
-          break;
         case "tract":
           // If sublevel, add the appropriate for and attach the in
           // We also check the cascade tag so we don't do this twice.
@@ -209,7 +208,6 @@ export default class CensusModule {
             qualifiers += "+";
           }
 
-          break;
         case "county":
           // If sublevel, add the appropriate for and attach the in
           // We also check the cascade tag so we don't do this twice.
@@ -226,7 +224,6 @@ export default class CensusModule {
             qualifiers += "+";
           }
 
-          break;
         case "place":
           // If sublevel, add the appropriate for and attach the in
           // Check for cascade so we don't do this twice
@@ -240,7 +237,6 @@ export default class CensusModule {
             cascade = true;
           }
 
-          break;
         case "state":
           // If sublevel, add the appropriate for and attach the in
           // We also check the cascade tag so we don't do this twice.

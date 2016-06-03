@@ -240,9 +240,27 @@
      *
      * @param {string} url URL to request
      *
-     * @return {promise} Returns a standard ajax promise
+     * @param {boolean} jsonp
+     *
+   * @return {promise} Returns a standard ajax promise
      */
-    static ajaxRequest(url) {
+    static ajaxRequest(url, jsonp) {
+      if (jsonp) {
+        var deferred = $.Deferred();
+
+        $.ajax({
+          url: url,
+          method: "GET",
+          dataType: "jsonp",
+
+          success: function(response) {
+            deferred.resolve(response);
+          }
+        });
+
+        return deferred.promise();
+      }
+
       return $.getJSON(url);
     }
 
@@ -1550,21 +1568,21 @@
 
     getVariableDictionary(api, year) {
       let url = `${CensusModule.defaultEndpoints.acsVariableDictionaryURL}${year}/${api}/variables.json`;
-      return CitySdk.ajaxRequest(url);
+      return CitySdk.ajaxRequest(url, false);
     }
 
     latLngToFips(lat, lng) {
       let url = `${CensusModule.defaultEndpoints.geoCoderUrl}coordinates`;
       url += `?x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp`;
 
-      return CitySdk.ajaxRequest(url);
+      return CitySdk.ajaxRequest(url, true);
     }
 
     addressToFips(street, city, state) {
       let url = `${CensusModule.defaultEndpoints.geoCoderUrl}address`;
       url += `?street=${street}&city=${city}&state=${state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp`;
 
-      return CitySdk.ajaxRequest(url);
+      return CitySdk.ajaxRequest(url, true);
     }
 
     zipToLatLng(zip) {
@@ -1576,7 +1594,7 @@
           + "&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion="
           + "&returnDistinctValues=false&f=json";
 
-      return CitySdk.ajaxRequest(url);
+      return CitySdk.ajaxRequest(url, false);
     }
 
     summaryRequest(req) {
@@ -1633,7 +1651,6 @@
               cascade = true;
             }
 
-            break;
           case "tract":
             // If sublevel, add the appropriate for and attach the in
             // We also check the cascade tag so we don't do this twice.
@@ -1651,7 +1668,6 @@
               qualifiers += "+";
             }
 
-            break;
           case "county":
             // If sublevel, add the appropriate for and attach the in
             // We also check the cascade tag so we don't do this twice.
@@ -1668,7 +1684,6 @@
               qualifiers += "+";
             }
 
-            break;
           case "place":
             // If sublevel, add the appropriate for and attach the in
             // Check for cascade so we don't do this twice
@@ -1682,7 +1697,6 @@
               cascade = true;
             }
 
-            break;
           case "state":
             // If sublevel, add the appropriate for and attach the in
             // We also check the cascade tag so we don't do this twice.
@@ -1734,7 +1748,7 @@
       var url = CensusModule.defaultEndpoints.censusUrl;
       url += `${req.year}/${req.api}?get=${variableString}&${qualifiers}&key=${this.apikey}`;
 
-      return CitySdk.ajaxRequest(url);
+      return CitySdk.ajaxRequest(url, false);
     }
 
     validateRequestGeographyVariables(request, callback) {
@@ -2344,10 +2358,10 @@
   CensusModule.defaultLevel = "blockGroup";
 
   CensusModule.defaultEndpoints = {
-    acsVariableDictionaryURL: "http://api.census.gov/data/",
+    acsVariableDictionaryURL: "https://api.census.gov/data/",
     geoCoderUrl: "https://geocoding.geo.census.gov/geocoder/geographies/",
     tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-    censusUrl: "http://api.census.gov/data/"
+    censusUrl: "https://api.census.gov/data/"
   };
 
   return CensusModule;

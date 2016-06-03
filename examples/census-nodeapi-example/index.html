@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Node API Example</title>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+          integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<script>
+  var apiBase = "http://localhost:3000/citysdk/census/";
+  var request = {
+    state: "MD",
+    tract: "city",
+    level: "state",
+    variables: ["population"]
+  };
+
+  var states;
+  var stateCapitals;
+
+  function getStates() {
+    var deferred = $.Deferred();
+
+    $.get(apiBase + "states", function(response) {
+      states = response;
+      deferred.resolve(states);
+    });
+
+    return deferred.promise();
+  }
+
+  function getStateCapitals() {
+    var deferred = $.Deferred();
+
+    $.get(apiBase + "state-capitals", function(response) {
+      stateCapitals = response;
+      deferred.resolve(response);
+    });
+
+    return deferred.promise();
+  }
+
+  function getPopulations() {
+    var size = Object.keys(states).length;
+    var result = [];
+    var requestCount = 0;
+    var deferred = $.Deferred();
+
+//    $.ajax({
+//      url: apiBase + "api",
+//      type: "POST",
+//      data: JSON.stringify(request),
+//
+//      success: function(response) {
+//        requestCount++;
+//        result.push(response);
+//
+//        console.log(response);
+//        deferred.resolve(result);
+//      },
+//
+//      headers: {
+//        "Authorization": "Basic " + btoa("88c69cd2d93fae30723c3ec3546d66521f339255:"),
+//        "Content-Type": "application/json"
+//      }
+//    });
+
+    for (var state in states) {
+      request.state = state;
+
+      $.ajax({
+        url: apiBase + "api",
+        type: "POST",
+        data: JSON.stringify(request),
+
+        success: function(response) {
+          requestCount++;
+          result.push(response);
+
+          if (requestCount === size) {
+            deferred.resolve(result);
+          }
+        },
+
+        headers: {
+          "Authorization": "Basic " + btoa("88c69cd2d93fae30723c3ec3546d66521f339255:"),
+          "Content-Type": "application/json"
+        }
+      });
+    }
+
+    return deferred.promise();
+  }
+
+  function populateTable(data) {
+    console.log(data);
+  }
+
+  getStates()
+      .then(getStateCapitals)
+      .then(getPopulations)
+      .then(populateTable);
+
+</script>
+</body>
+</html>

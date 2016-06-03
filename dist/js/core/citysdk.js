@@ -240,9 +240,27 @@
      *
      * @param {string} url URL to request
      *
-     * @return {promise} Returns a standard ajax promise
+     * @param {boolean} jsonp
+     *
+   * @return {promise} Returns a standard ajax promise
      */
-    static ajaxRequest(url) {
+    static ajaxRequest(url, jsonp) {
+      if (jsonp) {
+        var deferred = $.Deferred();
+
+        $.ajax({
+          url: url,
+          method: "GET",
+          dataType: "jsonp",
+
+          success: function(response) {
+            deferred.resolve(response);
+          }
+        });
+
+        return deferred.promise();
+      }
+
       return $.getJSON(url);
     }
 

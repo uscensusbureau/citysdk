@@ -35,10 +35,10 @@ function testCensusModule() {
 
   // getACSVariableDictionary
   asyncTestsRunning++;
-  census.getACSVariableDictionary("acs5", 2013, function(result) {
+  census.getACSVariableDictionary("acs5", 2013).then(function(result) {
     asyncTestsRunning--;
-    if (typeof result.variables != undefined) {
-      if (typeof result.variables.B23025_006E == undefined) {
+    if (result.variables) {
+      if (!result.variables.B23025_006E) {
         failTest(moduleName, "getACSVariableDictionary", "ACS5 2013 Variable array exists but one or more variables is missing.");
       }
     } else {
@@ -47,10 +47,10 @@ function testCensusModule() {
   });
 
   asyncTestsRunning++;
-  census.getACSVariableDictionary("acs1", 2014, function(result) {
+  census.getACSVariableDictionary("acs1", 2014).then(function(result) {
     asyncTestsRunning--;
-    if (typeof result.variables != undefined) {
-      if (typeof result.variables.B24126_438E == undefined) {
+    if (result.variables) {
+      if (!result.variables.B24126_438E) {
         failTest(moduleName, "getACSVariableDictionary", "ACS5 2013 Variable array exists but one or more variables is missing.");
       }
     } else {
@@ -61,11 +61,11 @@ function testCensusModule() {
 
   // latLngToFips
   asyncTestsRunning++;
-  census.latLngToFips("25.7753", "-80.2089", function(moo) {
+  census.latLngToFips(25.7753, -80.2089).then(function(moo) {
     asyncTestsRunning--;
-    if (moo.States === null || moo["2010 Census Blocks"] === null) {
+    if (moo.result.geographies.States === null || moo.result.geographies["2010 Census Blocks"] === null) {
       failTest(moduleName, "latLngToFips", "Failed to get FIPS information from coordinate points. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
-    } else if (moo.States[0].BASENAME.toLowerCase() != "florida") {
+    } else if (moo.result.geographies.States[0].BASENAME.toLowerCase() != "florida") {
       failTest(moduleName, "latLngToFips", "Failed to get FIPS information from coordinate points");
     }
     updateStatusDisplay();
@@ -73,11 +73,11 @@ function testCensusModule() {
 
   // addressToFips
   asyncTestsRunning++;
-  census.addressToFips("777 Lynn Street", "Herndon", "VA", function(response) {
+  census.addressToFips("777 Lynn Street", "Herndon", "VA").then(function(response) {
     asyncTestsRunning--;
-    if (response[0].geographies.States === null) {
+    if (response.result.addressMatches[0].geographies.States === null) {
       failTest(moduleName, "addressToFips", "Failed to get FIPS information from address. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
-    } else if (response[0].geographies.States[0].BASENAME.toLowerCase() != "virginia") {
+    } else if (response.result.addressMatches[0].geographies.States[0].BASENAME.toLowerCase() != "virginia") {
       failTest(moduleName, "addressToFips", "Unexpected values returned by function.. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
     }
     updateStatusDisplay();
@@ -85,7 +85,7 @@ function testCensusModule() {
 
   // zipToLatLng
   asyncTestsRunning++;
-  census.zipToLatLng("20190", function(response) {
+  census.zipToLatLng("20190").then(function(response) {
     asyncTestsRunning--;
     if (parseFloat(response.lat) != 38.9597752 && parseFloat(response.lng) != -77.3368607) {
       failTest(moduleName, "zipToLatLng", "Failed to get coordinates from zip code. Note: it is possible that the Geocoder service may not be returning the valid data. Re-run test.");
@@ -96,8 +96,8 @@ function testCensusModule() {
   asyncTestsRunning++;
   request = {
     "level": "state",
-    "lat": "25.7753",
-    "lng": "-80.2089",
+    "lat": 25.7753,
+    "lng": -80.2089,
     "year": 2013,
     "api": "acs1",
     "sublevel": true,
@@ -109,7 +109,8 @@ function testCensusModule() {
   };
 
   // Tests that require valid FIPS location
-  census.latLngToFips("25.7753", "-80.2089", function(geographies) {
+  census.latLngToFips(25.7753, -80.2089).then(function(response) {
+    var geographies = response.result.geographies;
     var fipsData = geographies["2010 Census Blocks"][0];
     request["state"] = fipsData["STATE"];
     request["county"] = fipsData["COUNTY"];
@@ -124,11 +125,12 @@ function testCensusModule() {
 
     });
 
-    census.acsSummaryRequest(request, function(response) {
+    census.acsSummaryRequest(request).then(function(response) {
       asyncTestsRunning--;
       if (response[1][2] != "189255") {
         failTest(moduleName, "acsSummaryRequest", "2013 ACS1 State Level with sublevel Request Failed");
       }
+
       updateStatusDisplay();
     });
 
@@ -143,25 +145,24 @@ function testCensusModule() {
       "commute_time_other"
     ];
 
-    census.acsSummaryRequest(request, function(response) {
+    census.acsSummaryRequest(request).then(function(response) {
       asyncTestsRunning--;
 
       if (response[1][4] != "2600861") {
         failTest(moduleName, "acsSummaryRequest", "2014 ACS5 County Level Request Failed: Population variable not included in data");
       }
-      updateStatusDisplay();
 
+      updateStatusDisplay();
     });
 
     asyncTestsRunning++;
-
-    census.GEORequest(request, function(response) {
+    census.geoRequest(request, function(response) {
       asyncTestsRunning--;
       if (response['features'][0]['properties']['COUNTY'] != "086" && response['features'][0]['geometry']['coordinates'][1][0] != "-80.44061099982213") {
-        failTest(moduleName, "GEORequest", "Failed to retrieve GEO Request");
+        failTest(moduleName, "geoRequest", "Failed to retrieve GEO Request");
       }
-      updateStatusDisplay();
 
+      updateStatusDisplay();
     });
 
     asyncTestsRunning++;
@@ -175,13 +176,13 @@ function testCensusModule() {
       "race_south_american_uruguayan_2010"
     ];
 
-    census.summaryRequest(request, function(response) {
+    census.summaryRequest(request).then(function(response) {
       asyncTestsRunning--;
       if (response[1][1] != "2496435") {
         failTest(moduleName, "summaryRequest", "2010 SF1 County Level Request Failed: Population variable not included in data or not correct");
       }
-      updateStatusDisplay();
 
+      updateStatusDisplay();
     });
 
     asyncTestsRunning++;
@@ -194,13 +195,13 @@ function testCensusModule() {
       "age_3_to_4_1990"
     ];
 
-    census.summaryRequest(request, function(response) {
+    census.summaryRequest(request).then(function(response) {
       asyncTestsRunning--;
       if (response[1][1] != "11382895") {
         failTest(moduleName, "summaryRequest", "1990 SF1 State Level Request Failed: Population variable not included in data or not correct");
       }
-      updateStatusDisplay();
 
+      updateStatusDisplay();
     });
 
     asyncTestsRunning++;
@@ -213,13 +214,12 @@ function testCensusModule() {
       "ESTAB"
     ];
 
-    census.summaryRequest(request, function(response) {
+    census.summaryRequest(request).then(function(response) {
       asyncTestsRunning--;
       if (response[1][0] != "4238403" && response[1][2] != "55") {
         failTest(moduleName, "summaryRequest", "2007 Economic Census Request Failed: Population variable not included in data or not correct");
       }
       updateStatusDisplay();
-
     });
 
     asyncTestsRunning++;
@@ -232,13 +232,13 @@ function testCensusModule() {
       "ESTAB"
     ];
 
-    census.APIRequest(request, function(response) {
+    census.apiRequest(request, function(response) {
       asyncTestsRunning--;
       if (response['data'][0]['EMP'] != "0" && response['data'][0]['ESTAB'] != "55") {
-        failTest(moduleName, "APIRequest", "APIRequest 2007 Economic Census Request Failed: ESTAB variable not included in data or not correct");
+        failTest(moduleName, "apiRequest", "apiRequest 2007 Economic Census Request Failed: ESTAB variable not included in data or not correct");
       }
-      updateStatusDisplay();
 
+      updateStatusDisplay();
     });
 
     asyncTestsRunning++;
@@ -251,13 +251,13 @@ function testCensusModule() {
       "EMP",
       "ESTAB"
     ];
-    
-    census.GEORequest(request, function(response) {
+
+    census.geoRequest(request, function(response) {
       asyncTestsRunning--;
       if (response != false) {
-        failTest(moduleName, "GEORequest", "Function returned data with invalid geographic specification.");
+        failTest(moduleName, "geoRequest", "Function returned data with invalid geographic specification.");
       }
-      
+
       updateStatusDisplay();
     });
   });

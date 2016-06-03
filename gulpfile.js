@@ -3,6 +3,7 @@ var del = require('del');
 var gulp = require('gulp');
 var uglify = require('gulp-uglify');
 var rollup = require('rollup');
+var replace = require('gulp-replace');
 var rollupJson = require('rollup-plugin-json');
 
 /**
@@ -39,6 +40,8 @@ gulp.task('typescript', function() {
  */
 gulp.task('api', function() {
   return gulp.src('./node-api/src/api/*.js')
+      .pipe(replace('../../../dist/modules/census/citysdk.census', '../modules/census/citysdk.census'))
+      .pipe(replace('../../../dist/core/citysdk', '../core/citysdk'))
       .pipe(uglify())
       .pipe(gulp.dest('./dist/node-api/api/'));
 });

@@ -164,6 +164,12 @@ var CitySdk = (function () {
     CitySdk.prototype.geoToEsri = function (geoJson) {
         return Terraformer.ArcGIS.convert(geoJson);
     };
+    CitySdk.prototype.getStates = function () {
+        return stateNames;
+    };
+    CitySdk.prototype.getStateCapitals = function () {
+        return stateCapitalCoordinates;
+    };
     CitySdk.version = "0.0.1";
     CitySdk.stateNames = stateNames;
     CitySdk.stateCapitalCoordinates = stateCapitalCoordinates;

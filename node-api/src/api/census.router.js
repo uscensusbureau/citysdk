@@ -1,7 +1,9 @@
 var express = require('express');
 var keyauth = require('./auth.service');
-var CensusModule = require('../../build/modules/census/citysdk.census');
+var CitySdk = require('../../../dist/node-api/core/citysdk');
+var CensusModule = require('../../../dist/node-api/modules/census/citysdk.census');
 
+var citysdk = new CitySdk.default();
 var router = express.Router();
 
 var moduleInstantiated = false;
@@ -43,6 +45,14 @@ router.post('/api', keyauth, function(req, res) {
   getModuleInstance(req).apiRequest(req.body, function(response) {
     res.json(response);
   });
+});
+
+router.get('/states', function(req, res) {
+  res.json(citysdk.getStates());
+});
+
+router.get('/state-capitals', function(req, res) {
+  res.json(citysdk.getStateCapitals());
 });
 
 module.exports = router;
