@@ -77,9 +77,12 @@
           strokeThickness: 5
         });
 
+        var income = feature.properties[census.aliases.income.variable];
+        var population = feature.properties[census.aliases.population.variable];
+
         polygon.Metadata = {
           "title": "Tract " + feature.properties.NAME,
-          "description": "Population: " + feature.properties.B19013_001E + "<br/>Income: " + feature.properties.B01003_001E
+          "description": "Population: " + population + "<br/>Income: " + income
         };
 
         // Add the shape to the map

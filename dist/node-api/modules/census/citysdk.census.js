@@ -17,6 +17,11 @@ var CensusModule = (function () {
     function CensusModule(apikey) {
         this.stateCapitals = citysdk_1.default.stateCapitalCoordinates;
         this.supplementalRequestsInFlight = 0;
+        this.aliases = aliases;
+        this.servers = servers;
+        this.usBoundingBox = usBoundingBox;
+        this.availableDatasets = availableDatasets;
+        this.requiredVariables = requiredVariables;
         this.apikey = apikey;
         this.citysdk = new citysdk_1.default();
         this.sfSummaryRequest = this.summaryRequest;

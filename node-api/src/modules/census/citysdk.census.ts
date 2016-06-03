@@ -28,6 +28,12 @@ export default class CensusModule {
   private apikey: string;
   private citysdk: CitySdk;
 
+  aliases: any;
+  servers: any;
+  usBoundingBox: any;
+  availableDatasets: any;
+  requiredVariables: any;
+
   sfSummaryRequest: Function;
   acsSummaryRequest: Function;
   getACSVariableDictionary: Function;
@@ -38,6 +44,12 @@ export default class CensusModule {
    * @param apikey
    */
   constructor(apikey: string) {
+    this.aliases = aliases;
+    this.servers = servers;
+    this.usBoundingBox = usBoundingBox;
+    this.availableDatasets = availableDatasets;
+    this.requiredVariables = requiredVariables;
+
     this.apikey = apikey;
     this.citysdk = new CitySdk();
 

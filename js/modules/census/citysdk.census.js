@@ -16,6 +16,12 @@ export default class CensusModule {
    * @param apikey
    */
   constructor(apikey) {
+    this.aliases = aliases;
+    this.servers = servers;
+    this.usBoundingBox = usBoundingBox;
+    this.availableDatasets = availableDatasets;
+    this.requiredVariables = requiredVariables;
+    
     this.stateCapitals = CitySdk.stateCapitalCoordinates;
     this.supplementalRequestsInFlight = 0;
 
