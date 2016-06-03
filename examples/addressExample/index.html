@@ -5,13 +5,12 @@ title: Population and Income by Address
 ---
 
 
-
-
-
-        <div>
-            <h2>Overview</h2>
-            <p>This example demonstrates how to make a GeoRequest using an Address.  The return values include lat/lon corresponding to the address, income, and population.  Matching information is also provided to show how an address relates to entities like Census tracts, block groups, and counties.</p>
-        </div>
+<div>
+  <h2>Overview</h2>
+  <p>This example demonstrates how to make a GeoRequest using an Address. The return values include lat/lon
+     corresponding to the address, income, and population. Matching information is also provided to show how an address
+     relates to entities like Census tracts, block groups, and counties.</p>
+</div>
 
 
 <!-- <div class="alert alert-dismissable alert-info">
@@ -23,70 +22,62 @@ title: Population and Income by Address
              <p>Enter your Census API key here <input type="text" id="api"/></p>
         </div>-->
 
-        <div class="row">
-            <div class="col-md-2">
-                Street Address:
-            </div>
-            <div class="col-md-7">
-                <input type="text" id="street" value="18 F Street NW"/>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-2">
-                City:
-            </div>
-            <div class="col-md-7">
-                <input type="text" id="city" value="Washington"/>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-2">
-                State:
-            </div>
-            <div class="col-md-7">
-                <input type="text" id="state" value="DC"/>
-            </div>
-        </div>
-
 <div class="row">
-    <div class="col-md-12">
-        <select id="level">
-            <option value="tract" selected>Tract</option>
-            <option value="state">State</option>
-            <option value="county">County</option>
-            <option value="blockGroup">Block Group</option>
-            <option value="place">Incorporated Place</option>
-        </select>
-
-        <input type="button" class="btn btn-primary" onclick="submit()" value="Query"/>
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="street">Street address:</label>
+      <input type="text" id="street" value="18 F Street NW" class="form-control">
     </div>
+
+    <div class="form-group">
+      <label for="city">City:</label>
+      <input type="text" id="city" value="Washington" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="state">State:</label>
+      <input type="text" id="state" value="DC" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="level">Level:</label>
+      <select id="level" class="form-control">
+        <option value="state">State</option>
+        <option value="county">County</option>
+        <option value="tract" selected>Tract</option>
+        <option value="blockGroup">Block Group</option>
+        <option value="place">Incorporated Place</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-primary" onclick="submit()" value="Query">Query</button>
+  </div>
 </div>
+
 <div class="row">
-    <div class="col-md-12">
-        <h3>Output</h3>
+  <div class="col-md-12">
+    <h3>Output</h3>
+    <ul class="nav nav-tabs" role="tablist">
+
+      <li role="presentation" class="active">
+        <a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">
+          Raw Data
+        </a>
+      </li>
+
+      <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code
+                                                                                                                    Example</a>
+      </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="dataSeriesData"><pre id="output">
+            </pre>
+      </div><!-- end dataSeriesData -->
 
 
-
-
-        <ul class="nav nav-tabs" role="tablist">
-
-            <li role="presentation" class="active"><a href="#dataSeriesData" aria-controls="dataSeriesData" role="tab" data-toggle="tab">Raw Data</a></li>
-
-            <li role="presentation"><a href="#dataSeriesCode" aria-controls="dataSeriesCode" role="tab" data-toggle="tab">Code Example</a></li>
-        </ul>
-
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="dataSeriesData"><pre id="output">
-            </pre></div><!-- end dataSeriesData -->
-
-
-
-
-
-            <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
+      <div role="tabpanel" class="tab-pane" id="dataSeriesCode"><pre>
 var sdk, census;
 
     $(document).ready(function () {
@@ -125,56 +116,49 @@ var sdk, census;
         });
     }
             </pre>
-            </div><!-- end dataSeriesCode -->
-        </div>
-
-
-
-
-
-
-
-
+      </div><!-- end dataSeriesCode -->
     </div>
+  </div>
 </div>
-
-
 <script>
-    var sdk, census;
+  var census;
 
-    $(document).ready(function () {
-        sdk = new CitySDK();
-        census = sdk.modules.census;
-        census.enable(citySDKdemoConfiguration.apikey);
+  $(document).ready(function() {
+    census = new CensusModule(citySDKdemoConfiguration.apikey);
+  });
+
+  function submit(e) {
+    var street = $('#street');
+    var city = $('#city');
+    var state = $('#state');
+
+    var request = {
+      address: {
+        street: street.val(),
+        city: city.val(),
+        state: state.val()
+      },
+
+      variables: [
+        "income",
+        "population"
+      ],
+      level: $("#level option:selected").val()
+    };
+
+    census.apiRequest(request, function(response) {
+      var output = $('#output');
+      var income = response.data[0][census.aliases.income.variable];
+      var population = response.data[0][census.aliases.population.variable];
+
+      console.log(response);
+      output.empty();
+
+      output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
+      output.append("Median Income: " + income + "<br/>");
+      output.append("Population: " + population + " </br>");
+      output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
+      output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
     });
-
-    function submit() {
-        var street = $('#street');
-        var city = $('#city');
-        var state = $('#state');
-
-        var request = {
-            address: {
-                street: street.val(),
-                city: city.val(),
-                state: state.val()
-            },
-
-            variables: [
-                "income",
-                "population"
-            ],
-            level: $("#level option:selected").val()
-        }
-        census.APIRequest(request, function (response) {
-            console.log(response);
-            var output = $('#output');
-            output.empty();
-            output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
-            output.append("Median Income: " + response.data[0].income + "<br/>");
-            output.append("Population: " + response.data[0].population + " </br>");
-            output.append("<br/><br/><br/>Here's the address object we sent and what matched:<br/><br/>");
-            output.append("Address: " + JSON.stringify(response.address, null, 4) + "<br/>");
-        });
-    }
+  }
 </script>
