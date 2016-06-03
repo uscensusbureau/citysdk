@@ -503,9 +503,11 @@ export default class CensusModule {
 
         // We have the address but no lat/lng - parse it and re-call
         module.addressToFips(street, city, state).then((response) => {
+          var matchedAddress = response.result.addressMatches[0];
+
           // Take the first matched address
-          request.lat = response[0].coordinates.y;
-          request.lng = response[0].coordinates.x;
+          request.lat = matchedAddress.coordinates.y;
+          request.lng = matchedAddress.coordinates.x;
 
           // Attach this "matched address" to the request address object
           // so the user knows what we're using
