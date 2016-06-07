@@ -55,7 +55,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 apikey = "your_api_key"
-request_url = "http://citysdk.cds.commerce.gov/citysdk/census/api"
+request_url = "http://citysdk.commerce.gov/citysdk/census/api"
 
 request_obj = {
   'zip': '21401',
@@ -113,7 +113,7 @@ print response.json()
 curl --user yourApiKey: -X POST \
 -H "Content-Type: application/json" \
 -d '{"lat": 38.9047, "lng": -77.0164, "level": "state", "variables": ["income", "population"]}' \
-http://citysdk.cds.commerce.gov/citysdk/census/api
+http://citysdk.commerce.gov/citysdk/census/api
 ```
 
 **Result data**
