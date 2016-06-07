@@ -16,7 +16,7 @@ Authorization: Basic <your_api_key>
 **Example with cURL**
 
 ```
-curl --user yourApiKey: http://citysdk.cds.commerce.gov/citysdk/
+curl --user yourApiKey: http://citysdk.commerce.gov/citysdk/
 ```
 
 **Note:** leave the `password` field empty.
