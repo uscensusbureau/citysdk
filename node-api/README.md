@@ -23,10 +23,15 @@ curl --user yourApiKey: http://api.census.gov/data/
 
 ## Endpoints
 
+**Base URL:** http://citysdk.commerce.gov
+
 | Path | Method | Request Data | Description |
 | :--- | :--- | :--- | :--- |
-| `/citysdk/census/geo` | `POST` | `JSON` [Request object](http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail) | Returns GeoJSON data
-| `/citysdk/census/api` | `POST` | `JSON` [Request object](http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail) | Returns GeoJSON with Census data |
+| `/census/geo` | `POST` | `JSON` [Request object](http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail) | Returns GeoJSON data
+| `/census/api` | `POST` | `JSON` [Request object](http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail) | Returns GeoJSON with Census data |
+| `/census/aliases` | `GET` |  | Returns a map of alias -> variable |
+| `/census/alias-to-variable` | `GET` | Comma separated aliases. Example: `?aliases=income,population` | Returns a map of alias -> variable for the given parameter values |
+| `/census/variable-to-alias` | `GET` | Comma separated variables. Example: `?variables=P0010001,P0110022` | Returns a map of variable -> alias for the given parameter values |
 
 ## The Request Object
 
