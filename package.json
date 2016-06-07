@@ -35,6 +35,7 @@
     "request": "^2.72.0",
     "terraformer": "^1.0.5",
     "terraformer-arcgis-parser": "^1.0.4",
+    "uuid": "^2.0.2",
     "winston": "^2.2.0"
   },
   "devDependencies": {
