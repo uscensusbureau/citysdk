@@ -40,6 +40,6 @@ function testfarmersMarketModule() {
 
   updateStatusDisplay();
 
-}// testCensusModule
+}// censusModuleTest
 
 

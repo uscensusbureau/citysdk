@@ -69,6 +69,6 @@ function testArcGISModule() {
 
   updateStatusDisplay();
 
-}// testCensusModule
+}// censusModuleTest
 
 
