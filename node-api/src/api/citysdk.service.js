@@ -12,6 +12,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use('/citysdk/census', censusRouter);
+app.use('/census', censusRouter);
 
 app.listen('3000');

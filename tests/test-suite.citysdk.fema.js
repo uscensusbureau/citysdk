@@ -47,6 +47,6 @@ function testFEMAModule() {
 
   updateStatusDisplay();
 
-}// testCensusModule
+}// censusModuleTest
 
 

@@ -10,7 +10,7 @@ function runAllTests() {
   // Run all the tests
   testResultStatus['all'] = true;
   runCoreTest();
-  testCensusModule();
+  censusModuleTest();
   testCKANModule();
   testFEMAModule();
   testfarmersMarketModule();
@@ -70,7 +70,7 @@ function updateStatusDisplay(moduleName) {
 jQuery(document).ready(function() {
 
   jQuery("tr[dataModuleName='core'] .runTestButton").click(runCoreTest);
-  jQuery("tr[dataModuleName='census'] .runTestButton").click(testCensusModule);
+  jQuery("tr[dataModuleName='census'] .runTestButton").click(censusModuleTest);
 
   // TODO:
   // Disable other modules until they've been updated to work with the new CitySdk

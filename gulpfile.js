@@ -40,7 +40,7 @@ gulp.task('typescript', function() {
  */
 gulp.task('api', function() {
   return gulp.src('./node-api/src/api/*.js')
-      .pipe(replace('../../../dist/modules/census/citysdk.census', '../modules/census/citysdk.census'))
+      .pipe(replace('../../../dist/modules/census/citysdk.census', '../modules/census/census.citysdk'))
       .pipe(replace('../../../dist/core/citysdk', '../core/citysdk'))
       .pipe(uglify())
       .pipe(gulp.dest('./dist/node-api/api/'));
@@ -119,11 +119,11 @@ gulp.task('rollup:core', function() {
 });
 
 gulp.task('rollup:census', function() {
-  rollupOpts.entry = modulePath + 'census/citysdk.census.js';
+  rollupOpts.entry = modulePath + 'census/census.citysdk.js';
 
   return rollup.rollup(rollupOpts).then(function(bundle) {
     rollupWriteOpts.moduleName = 'CensusModule';
-    rollupWriteOpts.dest = distModulePath + 'citysdk.census.js';
+    rollupWriteOpts.dest = distModulePath + 'census.citysdk.js';
 
     bundle.write(rollupWriteOpts);
   });

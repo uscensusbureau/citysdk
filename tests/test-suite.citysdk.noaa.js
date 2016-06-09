@@ -25,4 +25,4 @@ function testNoaaModule() {
 
   updateStatusDisplay();
 
-}// testCensusModule
+}// censusModuleTest

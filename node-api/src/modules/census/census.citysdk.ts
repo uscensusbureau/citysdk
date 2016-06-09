@@ -33,6 +33,7 @@ export default class CensusModule {
   usBoundingBox: any;
   availableDatasets: any;
   requiredVariables: any;
+  variableToAliasMap: any = {};
 
   sfSummaryRequest: Function;
   acsSummaryRequest: Function;
@@ -56,6 +57,57 @@ export default class CensusModule {
     this.sfSummaryRequest = this.summaryRequest;
     this.acsSummaryRequest = this.summaryRequest;
     this.getACSVariableDictionary = this.getVariableDictionary;
+
+    this.createVariableToAliasMap();
+  }
+
+  getAliases(): any {
+    return this.aliases;
+  }
+
+  variableToAlias(variables): any {
+    let variableToAliasMap = {};
+    
+    if (variables && variables.length) {
+      if (Object.keys(this.variableToAliasMap).length === 0) {
+        this.createVariableToAliasMap();
+      }
+
+      for (let variable of variables) {
+        variableToAliasMap[variable] = this.variableToAliasMap[variable];
+      }
+
+      return variableToAliasMap;
+
+    } else {
+      throw new Error('Invalid list of variables. Make sure multiple variables are comma separated.');
+    }
+  }
+
+  aliasToVariable(_aliases): any {
+    let aliasToVariableMap = {};
+
+    if (_aliases && _aliases.length) {
+      for (let alias of _aliases) {
+        aliasToVariableMap[alias] = this.aliases[alias];
+      }
+    } else {
+      throw new Error('Invalid list of aliases. Make sure multiple aliases are comma separated.');
+    }
+
+    return aliasToVariableMap;
+  }
+
+  private createVariableToAliasMap() {
+    for (var alias in aliases) {
+      var variable = aliases[alias].variable;
+
+      this.variableToAliasMap[variable] = {
+        alias: alias,
+        api: aliases[alias].api,
+        description: aliases[alias].description
+      };
+    }
   }
 
   parseToVariable(aliasOrVariable): string {

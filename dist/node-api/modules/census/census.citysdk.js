@@ -17,6 +17,7 @@ var CensusModule = (function () {
     function CensusModule(apikey) {
         this.stateCapitals = citysdk_1.default.stateCapitalCoordinates;
         this.supplementalRequestsInFlight = 0;
+        this.variableToAliasMap = {};
         this.aliases = aliases;
         this.servers = servers;
         this.usBoundingBox = usBoundingBox;
@@ -27,7 +28,50 @@ var CensusModule = (function () {
         this.sfSummaryRequest = this.summaryRequest;
         this.acsSummaryRequest = this.summaryRequest;
         this.getACSVariableDictionary = this.getVariableDictionary;
+        this.createVariableToAliasMap();
     }
+    CensusModule.prototype.getAliases = function () {
+        return this.aliases;
+    };
+    CensusModule.prototype.variableToAlias = function (variables) {
+        var variableToAliasMap = {};
+        if (variables && variables.length) {
+            if (Object.keys(this.variableToAliasMap).length === 0) {
+                this.createVariableToAliasMap();
+            }
+            for (var _i = 0, variables_1 = variables; _i < variables_1.length; _i++) {
+                var variable = variables_1[_i];
+                variableToAliasMap[variable] = this.variableToAliasMap[variable];
+            }
+            return variableToAliasMap;
+        }
+        else {
+            throw new Error('Invalid list of variables. Make sure multiple variables are comma separated.');
+        }
+    };
+    CensusModule.prototype.aliasToVariable = function (_aliases) {
+        var aliasToVariableMap = {};
+        if (_aliases && _aliases.length) {
+            for (var _i = 0, _aliases_1 = _aliases; _i < _aliases_1.length; _i++) {
+                var alias = _aliases_1[_i];
+                aliasToVariableMap[alias] = this.aliases[alias];
+            }
+        }
+        else {
+            throw new Error('Invalid list of aliases. Make sure multiple aliases are comma separated.');
+        }
+        return aliasToVariableMap;
+    };
+    CensusModule.prototype.createVariableToAliasMap = function () {
+        for (var alias in aliases) {
+            var variable = aliases[alias].variable;
+            this.variableToAliasMap[variable] = {
+                alias: alias,
+                api: aliases[alias].api,
+                description: aliases[alias].description
+            };
+        }
+    };
     CensusModule.prototype.parseToVariable = function (aliasOrVariable) {
         //If the requested string is an alias, return the appropriate variable from the dictionary
         if (aliasOrVariable in aliases) {
@@ -302,7 +346,7 @@ var CensusModule = (function () {
                     var totals_1 = response.totals;
                     var features_1 = response.features;
                     var data = request.data;
-                    var variables_1 = request.variables;
+                    var variables_2 = request.variables;
                     var matchedFeature = void 0;
                     var _loop_1 = function(i) {
                         //TODO: We need to tidy this grep up a bit.
@@ -330,7 +374,7 @@ var CensusModule = (function () {
                                 "level": request.level,
                                 "year": request.year,
                                 "api": request.api,
-                                "variables": variables_1,
+                                "variables": variables_2,
                                 "featuresIndex": i
                             };
                             module.supplementalRequestsInFlight++;
@@ -340,7 +384,7 @@ var CensusModule = (function () {
                                 for (var property in resp.data[0]) {
                                     if (resp.data[0].hasOwnProperty(property)) {
                                         features_1[resp.featuresIndex].properties[property] = resp.data[0][property];
-                                        if (variables_1.indexOf(property) !== -1) {
+                                        if (variables_2.indexOf(property) !== -1) {
                                             totals_1[property] = Number(totals_1[property]) >= 0 ? Number(resp.data[0][property]) : 0;
                                         }
                                     }
@@ -353,7 +397,7 @@ var CensusModule = (function () {
                             for (var property in matchedFeature) {
                                 if (matchedFeature.hasOwnProperty(property)) {
                                     features_1[i].properties[property] = matchedFeature[property];
-                                    if (variables_1.indexOf(property) !== -1) {
+                                    if (variables_2.indexOf(property) !== -1) {
                                         totals_1[property] = Number(totals_1[property]) >= 0 ? Number(matchedFeature[property]) : 0;
                                     }
                                 }
