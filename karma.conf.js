@@ -13,12 +13,12 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js',
-      'http://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js',
-      'http://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js',
-      'dist/js/core/citysdk.js',
-      'dist/js/modules/census.citysdk.js',
-      'tests/censusModuleSpec.js'
+      'https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.sdk',
+      'http://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.sdk',
+      'http://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.sdk',
+      'dist/sdk/core/citysdk.js',
+      'dist/sdk/modules/census.citysdk.js',
+      'test/censusModuleSpec.js'
     ],
 
     // list of files to exclude
@@ -44,7 +44,7 @@ module.exports = function(config) {
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
-    // enable / disable watching file and executing tests whenever any file changes
+    // enable / disable watching file and executing test whenever any file changes
     autoWatch: false,
 
     // start these browsers
@@ -52,7 +52,7 @@ module.exports = function(config) {
     browsers: ['Chrome'],
 
     // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
+    // if true, Karma captures browsers, runs the test and exits
     singleRun: false,
 
     // Concurrency level
