@@ -887,8 +887,8 @@ CensusModule.defaultApi = "acs5";
 CensusModule.defaultLevel = "blockGroup";
 
 CensusModule.defaultEndpoints = {
-  acsVariableDictionaryURL: "https://services.census.gov/data/",
+  acsVariableDictionaryURL: "https://api.census.gov/data/",
   geoCoderUrl: "https://geocoding.geo.census.gov/geocoder/geographies/",
   tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-  censusUrl: "https://services.census.gov/data/"
+  censusUrl: "https://api.census.gov/data/"
 };
