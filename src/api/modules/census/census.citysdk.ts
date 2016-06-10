@@ -16,10 +16,10 @@ export default class CensusModule {
   static defaultApi: string = "acs5";
 
   static defaultEndpoints: any = {
-    acsVariableDictionaryURL: "http://services.census.gov/data/",
+    acsVariableDictionaryURL: "http://api.census.gov/data/",
     geoCoderUrl: "http://geocoding.geo.census.gov/geocoder/geographies/",
     tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-    censusUrl: "http://services.census.gov/data/"
+    censusUrl: "http://api.census.gov/data/"
   };
 
   private stateCapitals: any = CitySdk.stateCapitalCoordinates;
