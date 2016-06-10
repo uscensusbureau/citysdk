@@ -31,6 +31,19 @@ gulp.task('copy:resources', function() {
 });
 
 // ----------------------------------------------------------------------
+// Task: Watch
+//
+// Watches the typescript and json files in src/api and excutes the build
+// task if a change is detected.
+// ----------------------------------------------------------------------
+gulp.task('watch', ['build:api', 'build:sdk'], function() {
+  gulp.watch('./src/api/**/*.ts', ['compile:typescript']);
+  gulp.watch('./src/sdk/core/*.js', ['compile:core']);
+  gulp.watch('./src/sdk/modules/census/*.js', ['compile:census']);
+  gulp.watch('./src/resources/*.json', ['copy:resources']);
+});
+
+// ----------------------------------------------------------------------
 // Task: Default
 //
 // Cleans the dist directory and builds both the Node API and JS SDK
@@ -84,16 +97,6 @@ gulp.task('build:api', [
   'copy:resources'
 ]);
 
-// ----------------------------------------------------------------------
-// Task: Watch
-//
-// Watches the typescript and json files in src/api and excutes the build
-// task if a change is detected.
-// ----------------------------------------------------------------------
-gulp.task('watch', ['build:api'], function() {
-  gulp.watch('./src/api/**/*.ts', ['compile:typescript']);
-  gulp.watch('./src/api/**/*.json', ['copy:resources']);
-});
 
  /***********************************************************************
  *                            JS SDK tasks                              *
