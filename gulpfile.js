@@ -1,12 +1,13 @@
 var ts = require('gulp-typescript');
 var del = require('del');
 var gulp = require('gulp');
+var babel = require('rollup-plugin-babel');
 var uglify = require('gulp-uglify');
 var rollup = require('rollup');
 var replace = require('gulp-replace');
 var rollupJson = require('rollup-plugin-json');
 
- /***********************************************************************
+/***********************************************************************
  *                            Shared tasks                              *
  /***********************************************************************/
 
@@ -50,8 +51,7 @@ gulp.task('watch', ['build:api', 'build:sdk'], function() {
 // ----------------------------------------------------------------------
 gulp.task('default', ['clean', 'build:api', 'build:sdk']);
 
-
- /***********************************************************************
+/***********************************************************************
  *                           Node API tasks                            *
  /***********************************************************************/
 
@@ -97,18 +97,20 @@ gulp.task('build:api', [
   'copy:resources'
 ]);
 
-
- /***********************************************************************
+/***********************************************************************
  *                            JS SDK tasks                              *
  /***********************************************************************/
 
-var distCorePath = 'dist/sdk/core/';
-var distModulePath = 'dist/sdk/modules/';
 
 var corePath = 'src/sdk/core/';
-var modulePath = 'src/sdk/modules/';
+var distCorePath = 'dist/sdk/core/';
 
-var rollupOpts = {plugins: [rollupJson()]};
+var rollupOpts = {
+  plugins: [
+    rollupJson(),
+    babel({exclude: 'node_modules/**'})
+  ]
+};
 
 var rollupWriteOpts = {
   format: 'umd',
@@ -116,41 +118,32 @@ var rollupWriteOpts = {
     'jquery': '$',
     'terraformer': 'Terraformer',
     'terraformer-arcgis-parser': 'Terraformer.ArcGIS'
-  }
+  },
+  sourceMap: true
+};
+
+var rollItUp = function(filename, moduleName) {
+  rollupOpts.entry = corePath + filename;
+
+  return rollup.rollup(rollupOpts).then(function(bundle) {
+    rollupWriteOpts.moduleName = moduleName;
+    rollupWriteOpts.dest = distCorePath + filename;
+    bundle.write(rollupWriteOpts);
+  });
 };
 
 // ----------------------------------------------------------------------
-// Task: Compile: Core
-//
-// Uses the rollup to compile the ES6 core module into browser compatible
-// javascript
-// ----------------------------------------------------------------------
-gulp.task('compile:core', function() {
-  rollupOpts.entry = corePath + 'citysdk.new.js';
-
-  return rollup.rollup(rollupOpts).then(function(bundle) {
-    rollupWriteOpts.moduleName = 'CitySdk';
-    rollupWriteOpts.dest = distCorePath + 'citysdk.js';
-
-    bundle.write(rollupWriteOpts);
-  });
-});
-
-// ----------------------------------------------------------------------
-// Task: Compile: Census
+// Task: Compile: CensusGeoRequest
 //
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:census', function() {
-  rollupOpts.entry = modulePath + 'census/census.citysdk.js';
+gulp.task('compile:CensusGeoRequest', function() {
+  return rollItUp('census-geo-request.js', 'CensusGeoRequest');
+});
 
-  return rollup.rollup(rollupOpts).then(function(bundle) {
-    rollupWriteOpts.moduleName = 'CensusModule';
-    rollupWriteOpts.dest = distModulePath + 'census.citysdk.js';
-
-    bundle.write(rollupWriteOpts);
-  });
+gulp.task('compile:CensusTigerwebRequest', function() {
+  return rollItUp('census-tigerweb-request.js', 'CensusTigerwebRequest');
 });
 
 // ----------------------------------------------------------------------
@@ -158,4 +151,7 @@ gulp.task('compile:census', function() {
 //
 // Compiles both core and census modules using rollup.
 // ----------------------------------------------------------------------
-gulp.task('build:sdk', ['compile:core', 'compile:census']);
+gulp.task('build:sdk', [
+  'compile:CensusGeoRequest',
+  'compile:CensusTigerwebRequest'
+]);

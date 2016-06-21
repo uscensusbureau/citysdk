@@ -13,12 +13,16 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.sdk',
-      'http://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.sdk',
-      'http://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.sdk',
-      'dist/sdk/core/citysdk.js',
-      'dist/sdk/modules/census.citysdk.js',
-      'test/censusModuleSpec.js'
+      // External dependencies
+      'lib/jquery.min.js',
+      'lib/terraformer.min.js',
+      'lib/terraformer-arcgis-parser.min.js',
+
+      // Core modules and test files
+      'dist/sdk/core/census-geo-request.js',
+      'dist/sdk/core/census-tigerweb-request.js',
+      'test/core/census-geo-request/census-geo-request-spec.js',
+      'test/core/census-tigerweb-request/get-container-geometry-spec.js'
     ],
 
     // list of files to exclude
@@ -26,7 +30,9 @@ module.exports = function(config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {},
+    preprocessors: {
+      '**/*.js': ['sourcemap']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -61,7 +67,8 @@ module.exports = function(config) {
 
     plugins: [
       'karma-chrome-launcher',
-      'karma-jasmine'
+      'karma-jasmine',
+      'karma-sourcemap-loader'
     ]
   });
 };

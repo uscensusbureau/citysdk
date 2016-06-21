@@ -1,4 +1,4 @@
-import CitySdk from "../../core/citysdk.new";
+import CitySdk from "../../core/citysdk";
 
 import aliases from "../../../resources/aliases.json";
 import servers from "../../../resources/servers.json";
@@ -113,169 +113,11 @@ export default class CensusModule {
   }
 
   zipToLatLng(zip) {
-    let url = `${CensusModule.defaultEndpoints.tigerwebUrl}tigerWMS_Current/MapServer/2/`;
-
-    url += `query?where=ZCTA5%3D${zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR`
-        + "=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=false"
-        + "&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields="
-        + "&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion="
-        + "&returnDistinctValues=false&f=json";
-
-    return CitySdk.ajaxRequest(url, false);
+    
   }
 
   summaryRequest(req) {
-    let qualifiers = "for=";
-    let cascade = false;
-
-    if (req.sublevel) {
-      let level = (req.level === "blockGroup") ? "block+group" : req.level;
-
-      switch (req.container) {
-        case "us":
-          qualifiers += level + ":*";
-          break;
-        case "place":
-        case "state":
-          qualifiers += level + `:*&in=state:${req.state}`;
-          if (req.level == "blockGroup") {
-            qualifiers += `+county:${req.county}`;
-          }
-          break;
-        case "county":
-          qualifiers += level + `:*&in=county:${req.county}+state:${req.state}`;
-          break;
-        case "tract":
-          qualifiers += level + `:*&in=tract:${req.tract}+county:${req.county}+state:${req.state}`;
-          break;
-      }
-    }
-
-    // Only do this if the previous switch had no effect
-    // (i.e. no contianer)
-    if (qualifiers == "for=") {
-      switch (req.level) {
-        case "us":
-          // If sublevel, add the appropriate for and attach the in
-          if (req.sublevel) {
-            qualifiers += "state:*";
-            cascade = true;
-          } else {
-            qualifiers += "us:1";
-          }
-
-          break;
-        case "blockGroup":
-          if (req.sublevel) {
-            // Can't do this. No levels beneath. We'll set the sublevel to false here
-            req.sublevel = false;
-          }
-
-          qualifiers += `block+Group:${req.blockGroup}`;
-
-          if (!cascade) {
-            qualifiers += "&in=";
-            cascade = true;
-          }
-
-        case "tract":
-          // If sublevel, add the appropriate for and attach the in
-          // We also check the cascade tag so we don't do this twice.
-          if (req.sublevel && !cascade) {
-            qualifiers += "block+Group:*&in=";
-            cascade = true;
-          }
-
-          qualifiers += `tract:${req.tract}`;
-
-          if (!cascade) {
-            qualifiers += "&in=";
-            cascade = true;
-          } else {
-            qualifiers += "+";
-          }
-
-        case "county":
-          // If sublevel, add the appropriate for and attach the in
-          // We also check the cascade tag so we don't do this twice.
-          if (req.sublevel && !cascade) {
-            qualifiers += "tract:*&in=";
-            cascade = true;
-          }
-
-          qualifiers += `county:${req.county}`;
-          if (!cascade) {
-            qualifiers += "&in=";
-            cascade = true;
-          } else {
-            qualifiers += "+";
-          }
-
-        case "place":
-          // If sublevel, add the appropriate for and attach the in
-          // Check for cascade so we don't do this twice
-          if (req.sublevel && !cascade) {
-            qualifiers += "place:*&in=";
-            cascade = true;
-
-          } else if (!cascade) {
-            //We only use place in the for, for the moment
-            qualifiers += `place:${req.place}&in=`;
-            cascade = true;
-          }
-
-        case "state":
-          // If sublevel, add the appropriate for and attach the in
-          // We also check the cascade tag so we don't do this twice.
-          if (req.sublevel && !cascade) {
-            qualifiers += "county:*&in=";
-            cascade = true;
-          }
-
-          qualifiers += `state:${req.state}`;
-          break;
-      }
-    }
-
-    for (var i = 0; i < req.variables.length; i++) {
-      if (this.isNormalizable(req.variables[i])) {
-        // add acs population variable
-        if (req.variables.indexOf("population") < 0) {
-          //We have a variable that is normalizable, but no population in the request.
-          //Grab the population
-          req.variables.push("population");
-        }
-
-        //We have normalizable variables AND a request for population, we can break the for loop now
-        break;
-      }
-    }
-
-    // Convert the aliased variables
-    for (var i = 0; i < req.variables.length; i++) {
-      var variableIntermediate = this.parseToValidVariable(req.variables[i], req.api, req.year);
-      if (variableIntermediate) {
-        req.variables[i] = variableIntermediate;
-      }
-    }
     
-    // Add the Required Variables
-    if (requiredVariables.hasOwnProperty(req.api) && requiredVariables[req.api].hasOwnProperty(req.year)) {
-      for (var i = 0; i < requiredVariables[req.api][req.year].length; i++) {
-        if (req.variables.indexOf(requiredVariables[req.api][req.year][i]) == -1) {
-          req.variables.unshift(requiredVariables[req.api][req.year][i]);
-        }
-      }
-    }
-
-    // Add the variables to request string
-    let variableString = req.variables.join(",");
-
-    // URL for ACS5 request (summary file)
-    var url = CensusModule.defaultEndpoints.censusUrl;
-    url += `${req.year}/${req.api}?get=${variableString}&${qualifiers}&key=${this.apikey}`;
-
-    return CitySdk.ajaxRequest(url, false);
   }
 
   validateRequestGeographyVariables(request, callback) {
@@ -887,8 +729,8 @@ CensusModule.defaultApi = "acs5";
 CensusModule.defaultLevel = "blockGroup";
 
 CensusModule.defaultEndpoints = {
-  acsVariableDictionaryURL: "https://services.census.gov/data/",
+  acsVariableDictionaryURL: "https://api.census.gov/data/",
   geoCoderUrl: "https://geocoding.geo.census.gov/geocoder/geographies/",
   tigerwebUrl: "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/",
-  censusUrl: "https://services.census.gov/data/"
+  censusUrl: "https://api.census.gov/data/"
 };
