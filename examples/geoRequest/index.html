@@ -103,9 +103,9 @@ title: GeoRequests and Supplemental Requests
           <label for="level">Level</label>
 
           <select class="reqparam form-control" id="level" aria-describedby="level-helpblock">
-            <option value="tract">tract</option>
-            <option value="blockGroup">blockGroup</option>
+            <option value="blockGroup" selected>blockGroup</option>
             <option value="place">place</option>
+            <option value="tract">tract</option>
           </select>
         </div>
       </div>
@@ -318,7 +318,7 @@ title: GeoRequests and Supplemental Requests
 
   </div>
 </div>
-
+<script src="https://maps.googleapis.com/maps/api/js?callback=initialize" async defer></script>
 <script>
   var map;
   var sdk;
@@ -473,4 +473,3 @@ title: GeoRequests and Supplemental Requests
     //END CITYSDK REQUEST
   }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?callback=initialize" async defer></script>

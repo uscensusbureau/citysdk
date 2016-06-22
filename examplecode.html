@@ -4,84 +4,96 @@ published: true
 title: Population and Income by Zipcode
 ---
 
-
 <div class="row">
-    <div class="col-md-12">
+  <div class="col-md-12">
 
-        <div class="btn-group">
-            <a href="#" class="btn btn-primary" role="button">View the Example</a>
-            <a href="{{ site.baseurl }}/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source
-                Code</a>
-        </div>
+    <div class="btn-group">
+      <a href="#" class="btn btn-primary" role="button">View the Example</a>
+      <a href="{{ site.baseurl }}/examples/zipCodeExample/source.html" class="btn btn-default" role="button">Source
+                                                                                                             Code</a>
+    </div>
 
 
-        <h2>Overview</h2>
+    <h2>Overview</h2>
 
-        <p>This example allows you to enter a zip code and return population and income information that corresponds to
-            the location. You may specify how granular you want the return value, by choosing Tract, State, County,
-            Block Group, or Incorporated Place. </p>
+    <p>This example allows you to enter a zip code and return population and income information that corresponds to
+       the location. You may specify how granular you want the return value, by choosing Tract, State, County,
+       Block Group, or Incorporated Place. </p>
 
-        <form>
-            <label for="zipcode">Zipcode</label>
-            <input type="text" id="zipcode"/>
-            <label for="level">Geography Level</label>
-            <select id="level">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">Parameters</div>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-6">
+          <form>
+            <div class="form-group">
+              <label for="zipcode">Zipcode</label>
+              <input type="text" class="form-control" id="zipcode">
+            </div>
+            <div class="form-group">
+              <label for="level">Geography Level</label>
+              <select id="level" class="form-control">
                 <option value="tract" selected>Tract</option>
                 <option value="state">State</option>
                 <option value="county">County</option>
                 <option value="blockGroup">Block Group</option>
                 <option value="place">Incorporated Place</option>
-            </select>
-            <input type="button" class="btn btn-primary" id="queryPopulationIncomeByZipcode" value="Query"/>
-        </form>
+              </select>
+            </div>
+            <button type="button" class="btn btn-primary btn-block" id="queryPopulationIncomeByZipcode">Query</button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-
-        <div class="row">
-            <div class="col-md-12">
-                <h3>Output</h3>
+  <div class="col-md-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <div class="panel-title">Output</div>
+      </div>
+      <div class="panel-body">
         <pre id="output">
         </pre>
-            </div>
-        </div>
-
+      </div>
     </div>
+  </div>
 </div>
 
 
 <script>
-    var sdk, census;
+  var sdk, census;
 
-    jQuery(document).ready(function () {
-        sdk = new CitySDK();
-        census = sdk.modules.census;
-        census.enable(citySDKdemoConfiguration.apikey);
+  jQuery(document).ready(function() {
+    sdk = new CitySdk();
+    census = new CensusModule(citySDKdemoConfiguration.apikey);
 
-        jQuery("#queryPopulationIncomeByZipcode").click(queryPopulationIncomeByZipcode);
+    jQuery("#queryPopulationIncomeByZipcode").click(queryPopulationIncomeByZipcode);
 
+  });
+
+  function queryPopulationIncomeByZipcode(e) {
+    e.preventDefault();
+    var zip = $('#zipcode');
+
+    var request = {
+      zip: zip.val(),
+      variables: [
+        "income",
+        "population"
+      ],
+      level: $("#level option:selected").val()
+    };
+
+    census.apiRequest(request, function(response) {
+      var output = $('#output');
+      output.empty();
+      output.append("ZIP: " + response.zip + "<br/>");
+      output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
+      output.append("Median Income: " + response.data[0].income + "<br/>");
+      output.append("Population: " + response.data[0].population + " </br>");
     });
-
-    function queryPopulationIncomeByZipcode(e) {
-        e.preventDefault();
-        var zip = $('#zipcode');
-
-        var request = {
-            zip: zip.val(),
-            variables: [
-                "income",
-                "population"
-            ],
-            level: $("#level option:selected").val()
-        }
-        census.APIRequest(request, function (response) {
-            var output = $('#output');
-            output.empty();
-            output.append("ZIP: " + response.zip + "<br/>");
-            output.append("Coordinates: " + response.lat + ", " + response.lng + " <br/>");
-            output.append("Median Income: " + response.data[0].income + "<br/>");
-            output.append("Population: " + response.data[0].population + " </br>");
-        });
-    }
+  }
 </script>

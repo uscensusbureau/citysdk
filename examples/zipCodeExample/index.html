@@ -8,89 +8,55 @@ title: Population and Income by Zipcode
 <div class="row">
   <div class="col-md-12">
 
-
     <h2>Overview</h2>
 
     <p>This example allows you to enter a zip code and return population and income information that corresponds to
        the location. You may specify how granular you want the return value, by choosing Tract, State, County,
        Block Group, or Incorporated Place. </p>
 
-
     <div class="panel panel-info">
       <div class="panel-heading">
-        <h3 class="panel-title">1. Select Zipcode and Geography</h3>
+        <div class="panel-title">Query</div>
       </div>
       <div class="panel-body">
-
         <div class="loading-icon loading-icon-initialstate"></div>
-
-        <form class="hideWhileLoading">
-          <div class="row">
-            <div class="col-md-6">
-              <label for="zipcode">Zipcode</label>
-              <input type="text" id="zipcode" class="form-control"/>
-            </div>
-            <div class="col-md-6">
-              <label for="level">Geography Level</label>
-              <select id="level" class="form-control">
-                <option value="state">State</option>
-                <option value="county">County</option>
-                <option value="tract" selected>Tract</option>
-                <option value="blockGroup">Block Group</option>
-                <option value="place">Incorporated Place</option>
-              </select>
-            </div>
-
-          </div>
-
-
-        </form>
-
-      </div><!-- end panel-body -->
-    </div><!-- end panel panel-info -->
-
-
-    <div class="panel panel-info">
-      <div class="panel-heading">
-        <h3 class="panel-title">2. Submit</h3>
-      </div>
-      <div class="panel-body">
         <div class="row">
-          <div class="col-md-6" id="errorHaus">
-          </div><!-- end col-md-6 -->
+          <div class="col-md-6">
+            <h4>Enter zipcode and select state</h4>
+            <hr>
+            <form class="hideWhileLoading">
+              <div class="form-group">
+                <label for="zipcode">Zipcode</label>
+                <input type="text" id="zipcode" class="form-control"/>
+              </div>
+              <div class="form-group">
+                <label for="level">Geography Level</label>
+                <select id="level" class="form-control">
+                  <option value="state" selected>State</option>
+                  <option value="county">County</option>
+                  <option value="tract">Tract</option>
+                  <option value="blockGroup">Block Group</option>
+                  <option value="place">Incorporated Place</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <button class="btn btn-primary btn-block" id="queryPopulationIncomeByZipcode">Submit</button>
+              </div>
+            </form>
+          </div>
 
           <div class="col-md-6">
-            <h4>Get the Data</h4>
-
-            <p><a class="btn btn-primary btn-lg" id="queryPopulationIncomeByZipcode" style="width: 100%;" href="#"
-                  role="button">Update Data</a></p>
-
-            <div class="loading-icon loading-icon-initialstate"></div>
-
+            <h4>Request Object</h4>
+            <hr>
+            <pre id="cenreq">Nothing yet...</pre>
           </div>
-        </div><!-- end row -->
-
-
+        </div>
       </div><!-- end panel-body -->
     </div><!-- end panel panel-info -->
 
-
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title">The Request</h3>
-
-      </div>
-      <div class="panel-body">
-        <pre id="cenreq"></pre>
-
-
-      </div>
-    </div><!-- end panel panel-success -->
-
-
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        <h3 class="panel-title">The Returned Data</h3>
+        <h3 class="panel-title">Result</h3>
       </div>
       <div class="panel-body">
         <ul class="nav nav-tabs" role="tablist">
@@ -142,12 +108,8 @@ var <var>request</var> = <var id="codeDemoRequestedSeriesID"></var>
         </div>
       </div><!-- end panel-body -->
     </div><!-- end panel panel-info -->
-
-
   </div>
 </div>
-
-
 <script>
   var sdk, census;
 

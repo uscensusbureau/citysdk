@@ -2,7 +2,7 @@ name: CitySDK Project
 markdown: kramdown
 highlighter: rouge
 safe: true
-baseurl: /citysdk
+baseurl: '/citysdk'
 exclude: ['.ruby-version', 'node_modules', 'package.json', 'bower.json']
 sass:
   sass_dir: static/_sass
