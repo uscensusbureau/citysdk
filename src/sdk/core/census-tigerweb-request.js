@@ -72,7 +72,7 @@ export default class CensusTigerwebRequest {
       request.tigerwebApi = defaultTigerwebApi;
     }
 
-    request.tigerwebApiInfo = servers[api];
+    request.tigerwebApiInfo = servers[request.tigerwebApi];
     request.tigerwebRequest = {
       f: "json",
       where: "",
@@ -90,7 +90,7 @@ export default class CensusTigerwebRequest {
     };
 
     let onRequestSuccess = (response) => {
-      dfr.resolve({response: CitySdk.esriToGeo(response), request: request});
+      dfr.resolve(CitySdk.esriToGeo(response));
     };
 
     if (request.container && sublevelRequested && !request.containerGeometry) {

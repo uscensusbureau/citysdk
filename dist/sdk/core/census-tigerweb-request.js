@@ -558,7 +558,7 @@
           _request.tigerwebApi = defaultTigerwebApi;
         }
 
-        _request.tigerwebApiInfo = servers[api];
+        _request.tigerwebApiInfo = servers[_request.tigerwebApi];
         _request.tigerwebRequest = {
           f: "json",
           where: "",
@@ -576,7 +576,7 @@
         };
 
         var onRequestSuccess = function onRequestSuccess(response) {
-          dfr.resolve({ response: CitySdk.esriToGeo(response), request: _request });
+          dfr.resolve(CitySdk.esriToGeo(response));
         };
 
         if (_request.container && sublevelRequested && !_request.containerGeometry) {

@@ -89,3 +89,25 @@ describe('getGeoData', function() {
     expect(result.hasOwnProperty('containerGeometry')).toBe(true);
   });
 });
+
+describe('request', function() {
+  var request = {
+    lat: 32.3617,
+    lng: -86.2792,
+    level: 'state',
+    container: 'state'
+  };
+
+  var result;
+
+  beforeEach(function(done) {
+    CensusTigerwebRequest.request(request).then(function(response) {
+      result = response;
+      done();
+    });
+  });
+
+  it('should return a result with the features field', function() {
+    expect(result.hasOwnProperty('features')).toBe(true);
+  });
+});
