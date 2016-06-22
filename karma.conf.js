@@ -14,15 +14,18 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       // External dependencies
-      'lib/jquery.min.js',
-      'lib/terraformer.min.js',
-      'lib/terraformer-arcgis-parser.min.js',
+      {pattern: 'lib/*.js', watched: false},
 
-      // Core modules and test files
+      // Core modules
       'dist/sdk/core/census-geo-request.js',
       'dist/sdk/core/census-tigerweb-request.js',
+
+      // Tests
       'test/core/census-geo-request/census-geo-request-spec.js',
-      'test/core/census-tigerweb-request/get-container-geometry-spec.js'
+      'test/core/census-tigerweb-request/get-container-geometry-spec.js',
+
+      // Source maps
+      {pattern: 'dist/**/*.js.map', included: false, served: true, watched: false, nocache: true}
     ],
 
     // list of files to exclude
