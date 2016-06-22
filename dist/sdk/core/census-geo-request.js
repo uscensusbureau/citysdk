@@ -909,7 +909,7 @@
 	          if (requiredFields) {
 	            dfr.reject(new Error('Request is missing required fields: ' + requiredFields + '.'));
 	          } else {
-	            dfr.reject(new Error('Invalid level "' + level + ' for this request."'));
+	            dfr.reject(new Error('Invalid level "' + level + '" for this request.'));
 	          }
 	        }
 	      }, onRequestError);

@@ -142,16 +142,44 @@ gulp.task('compile:CensusGeoRequest', function() {
   return rollItUp('census-geo-request.js', 'CensusGeoRequest');
 });
 
+// ----------------------------------------------------------------------
+// Task: Compile: CensusTigerwebRequest
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
 gulp.task('compile:CensusTigerwebRequest', function() {
   return rollItUp('census-tigerweb-request.js', 'CensusTigerwebRequest');
 });
 
 // ----------------------------------------------------------------------
+// Task: Compile: CensusRequestValidator
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CensusRequestValidator', function() {
+  return rollItUp('census-request-validator.js', 'CensusRequestValidator');
+});
+
+// ----------------------------------------------------------------------
+// Task: Compile: CensusRequestUtils
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CensusRequestUtils', function() {
+  return rollItUp('census-request-utils.js', 'CensusRequestUtils');
+});
+
+// ----------------------------------------------------------------------
 // Task: Build: SDK
 //
-// Compiles both core and census modules using rollup.
+// Compiles all core modules using rollup.
 // ----------------------------------------------------------------------
 gulp.task('build:sdk', [
   'compile:CensusGeoRequest',
-  'compile:CensusTigerwebRequest'
+  'compile:CensusTigerwebRequest',
+  'compile:CensusRequestValidator',
+  'compile:CensusRequestUtils'
 ]);

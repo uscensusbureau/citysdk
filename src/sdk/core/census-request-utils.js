@@ -27,7 +27,7 @@ export default class CensusRequestUtils {
     // If the requested string is an alias, return the appropriate variable from the dictionary
     if (aliasOrVariable in aliases) {
       if (api in aliases[aliasOrVariable]['api']
-          && aliases[aliasOrVariable]['api'][api].indexOf(parseInt(year)) != -1) {
+          && aliases[aliasOrVariable]['api'][api].indexOf(parseInt(year)) !== -1) {
 
         // Alias found and is valid for selected API & year combination
         return aliases[aliasOrVariable].variable;
