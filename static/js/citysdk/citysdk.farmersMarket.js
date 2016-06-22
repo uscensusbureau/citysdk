@@ -34,7 +34,7 @@ FarmersMarketModule.prototype.enable = function () {
 };
 // Endpoint URLS
 FarmersMarketModule.prototype.DEFAULT_ENDPOINTS = {};
-FarmersMarketModule.prototype.DEFAULT_ENDPOINTS.apiURL = "http://search.ams.usda.gov/farmersmarkets/v1/data.svc/";
+FarmersMarketModule.prototype.DEFAULT_ENDPOINTS.apiURL = "https://search.ams.usda.gov/farmersmarkets/v1/data.svc/";
 
 // Version Numbers
 FarmersMarketModule.prototype.version = 1.0;
