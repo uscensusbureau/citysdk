@@ -12,9 +12,9 @@ export default class CensusTigerwebRequest {
 
   static getContainerGeometry(request) {
     let dfr = $.Deferred();
-    let mapServer = request.tigerwebApi.mapServers[request.container];
-    let tigerwebUrl = request.tigerwebApi.url.replace('{mapserver}', mapServer);
-    let tigerwebRequest = request.tigerwebApi.request;
+    let mapServer = request.tigerwebApiInfo.mapServers[request.container];
+    let tigerwebUrl = request.tigerwebApiInfo.url.replace('{mapserver}', mapServer);
+    let tigerwebRequest = request.tigerwebRequest;
 
     tigerwebRequest.geometry = request.lng + "," + request.lat;
     tigerwebRequest.geometryType = "esriGeometryPoint";
@@ -45,9 +45,9 @@ export default class CensusTigerwebRequest {
     // We have a sublevel request with a container,
     // AND we've already grabbed the container's ESRI json
     let dfr = $.Deferred();
-    let mapServer = request.tigerwebApi.mapServers[request.level];
-    let tigerwebRequest = request.tigerwebApi.request;
-    let tigerwebUrl = request.tigerwebApi.url.replace('{mapserver}', mapServer);
+    let mapServer = request.tigerwebApiInfo.mapServers[request.level];
+    let tigerwebUrl = request.tigerwebApiInfo.url.replace('{mapserver}', mapServer);
+    let tigerwebRequest = request.tigerwebRequest;
     
     let onRequestError = (reason) => {
       dfr.reject(reason);
@@ -68,15 +68,12 @@ export default class CensusTigerwebRequest {
   }
 
   static request(request) {
-    let dfr = $.Deferred();
-    let api = request.tigerwebApi;
-
-    if (!api) {
-      api = defaultTigerwebApi;
+    if (!request.tigerwebApi) {
+      request.tigerwebApi = defaultTigerwebApi;
     }
 
-    request.tigerwebApi = servers[api];
-    request.tigerwebApi.request = {
+    request.tigerwebApiInfo = servers[api];
+    request.tigerwebRequest = {
       f: "json",
       where: "",
       outFields: "*",
@@ -86,6 +83,8 @@ export default class CensusTigerwebRequest {
 
     const sublevelRequested = request.hasOwnProperty('sublevel') && request.sublevel;
 
+    let dfr = $.Deferred();
+    
     let onRequestError = (reason) => {
       dfr.reject(reason);
     };
@@ -122,9 +121,9 @@ export default class CensusTigerwebRequest {
           .then(onRequestSuccess, onRequestError);
     }
     else {
-      let mapServer = request.tigerwebApi.mapServers[request.level];
-      let tigerwebUrl = request.tigerwebApi.url.replace('{mapserver}', mapServer);
-      let tigerwebRequest = request.tigerwebApi.request;
+      let mapServer = request.tigerwebApiInfo.mapServers[request.level];
+      let tigerwebUrl = request.tigerwebApiInfo.url.replace('{mapserver}', mapServer);
+      let tigerwebRequest = request.tigerwebRequest;
 
       tigerwebRequest.geometry = request.lng + "," + request.lat;
       tigerwebRequest.geometryType = "esriGeometryPoint";

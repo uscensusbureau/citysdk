@@ -1355,9 +1355,9 @@
 	    key: 'getContainerGeometry',
 	    value: function getContainerGeometry(request) {
 	      var dfr = $.Deferred();
-	      var mapServer = request.tigerwebApi.mapServers[request.container];
-	      var tigerwebUrl = request.tigerwebApi.url.replace('{mapserver}', mapServer);
-	      var tigerwebRequest = request.tigerwebApi.request;
+	      var mapServer = request.tigerwebApiInfo.mapServers[request.container];
+	      var tigerwebUrl = request.tigerwebApiInfo.url.replace('{mapserver}', mapServer);
+	      var tigerwebRequest = request.tigerwebRequest;
 
 	      tigerwebRequest.geometry = request.lng + "," + request.lat;
 	      tigerwebRequest.geometryType = "esriGeometryPoint";
@@ -1389,9 +1389,9 @@
 	      // We have a sublevel request with a container,
 	      // AND we've already grabbed the container's ESRI json
 	      var dfr = $.Deferred();
-	      var mapServer = request.tigerwebApi.mapServers[request.level];
-	      var tigerwebRequest = request.tigerwebApi.request;
-	      var tigerwebUrl = request.tigerwebApi.url.replace('{mapserver}', mapServer);
+	      var mapServer = request.tigerwebApiInfo.mapServers[request.level];
+	      var tigerwebUrl = request.tigerwebApiInfo.url.replace('{mapserver}', mapServer);
+	      var tigerwebRequest = request.tigerwebRequest;
 
 	      var onRequestError = function onRequestError(reason) {
 	        dfr.reject(reason);
@@ -1411,15 +1411,12 @@
 	  }, {
 	    key: 'request',
 	    value: function request(_request) {
-	      var dfr = $.Deferred();
-	      var api = _request.tigerwebApi;
-
-	      if (!api) {
-	        api = defaultTigerwebApi;
+	      if (!_request.tigerwebApi) {
+	        _request.tigerwebApi = defaultTigerwebApi;
 	      }
 
-	      _request.tigerwebApi = servers[api];
-	      _request.tigerwebApi.request = {
+	      _request.tigerwebApiInfo = servers[api];
+	      _request.tigerwebRequest = {
 	        f: "json",
 	        where: "",
 	        outFields: "*",
@@ -1428,6 +1425,8 @@
 	      };
 
 	      var sublevelRequested = _request.hasOwnProperty('sublevel') && _request.sublevel;
+
+	      var dfr = $.Deferred();
 
 	      var onRequestError = function onRequestError(reason) {
 	        dfr.reject(reason);
@@ -1459,9 +1458,9 @@
 
 	        this.getContainerGeometry(_request).then(CensusTigerwebRequest.getGeoData, onRequestError).then(onRequestSuccess, onRequestError);
 	      } else {
-	        var mapServer = _request.tigerwebApi.mapServers[_request.level];
-	        var tigerwebUrl = _request.tigerwebApi.url.replace('{mapserver}', mapServer);
-	        var tigerwebRequest = _request.tigerwebApi.request;
+	        var mapServer = _request.tigerwebApiInfo.mapServers[_request.level];
+	        var tigerwebUrl = _request.tigerwebApiInfo.url.replace('{mapserver}', mapServer);
+	        var tigerwebRequest = _request.tigerwebRequest;
 
 	        tigerwebRequest.geometry = _request.lng + "," + _request.lat;
 	        tigerwebRequest.geometryType = "esriGeometryPoint";
@@ -1570,8 +1569,8 @@
 	              // Ensure we have a direct match for low level items by comparing the higher level items
 	              if (request.level === "blockGroup" || request.level === "tract") {
 	                var levelMatch = d[request.level] === f.properties[comparisonVariables[request.level]];
-	                var tractMatch = d["tract"] === f.properties[comparisonVariables["tract"]];
-	                var countyMatch = d["county"] === f.properties[comparisonVariables["county"]];
+	                var tractMatch = d["tract"] === f.properties.TRACT;
+	                var countyMatch = d["county"] === f.properties.COUNTY;
 
 	                return levelMatch && tractMatch && countyMatch;
 	              } else {

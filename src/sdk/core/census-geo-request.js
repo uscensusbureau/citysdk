@@ -91,8 +91,8 @@ export default class CensusGeoRequest {
           // Ensure we have a direct match for low level items by comparing the higher level items
           if (request.level === "blockGroup" || request.level === "tract") {
             let levelMatch = d[request.level] === f.properties[comparisonVariables[request.level]];
-            let tractMatch = d["tract"] === f.properties[comparisonVariables["tract"]];
-            let countyMatch = d["county"] === f.properties[comparisonVariables["county"]];
+            let tractMatch = d["tract"] === f.properties.TRACT;
+            let countyMatch = d["county"] === f.properties.COUNTY;
 
             return levelMatch && tractMatch && countyMatch;
 
