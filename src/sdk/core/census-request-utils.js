@@ -2,7 +2,6 @@ import $ from 'jquery';
 
 import CitySdk from './citysdk';
 
-import config from '../../resources/config.json';
 import aliases from '../../resources/aliases.json';
 import stateCapitalsLatLng from '../../resources/us-states-latlng.json';
 
@@ -68,8 +67,10 @@ export default class CensusRequestUtils {
 
   static getLatLngFromZipcode(zip) {
     let dfr = $.Deferred();
+    let url = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-debt/277-modularize-request-functions/src/' +
+        'resources/zipcode-to-coordinates.json';
 
-    $.getJSON(config.zcta.use).then(function(coordinates) {
+    $.getJSON(url).then(function(coordinates) {
       dfr.resolve(coordinates[zip]);
     });
 
