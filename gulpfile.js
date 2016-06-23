@@ -181,5 +181,6 @@ gulp.task('build:sdk', [
   'compile:CensusGeoRequest',
   'compile:CensusTigerwebRequest',
   'compile:CensusRequestValidator',
-  'compile:CensusRequestUtils'
+  'compile:CensusRequestUtils',
+  'copy:resources'
 ]);

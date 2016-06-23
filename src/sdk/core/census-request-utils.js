@@ -2,6 +2,7 @@ import $ from 'jquery';
 
 import CitySdk from './citysdk';
 
+import config from '../../resources/config.json';
 import aliases from '../../resources/aliases.json';
 import stateCapitalsLatLng from '../../resources/us-states-latlng.json';
 
@@ -65,20 +66,14 @@ export default class CensusRequestUtils {
     return latlng;
   }
 
-  // TODO:
-  // Census has a zipcode -> coordinates file (2010 Census Gazetter Files) that can be downloaded.
-  // See the The ZIP Code Tabulation Areas section for the download link. Might be helpful to write
-  // a quick script that downloads, unzips and converts the file into json.
   static getLatLngFromZipcode(zip) {
-    let url = `${defaultEndpoints.tigerwebUrl}tigerWMS_Current/MapServer/2/`;
+    let dfr = $.Deferred();
 
-    url += `query?where=ZCTA5%3D${zip}&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR`
-        + '=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=CENTLAT%2CCENTLON&returnGeometry=false'
-        + '&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields='
-        + '&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion='
-        + '&returnDistinctValues=false&f=json';
+    $.getJSON(config.zcta.use).then(function(coordinates) {
+      dfr.resolve(coordinates[zip]);
+    });
 
-    return CitySdk.ajaxRequest(url, false);
+    return dfr.promise();
   }
 
   static getLatLngFromAddress(address) {

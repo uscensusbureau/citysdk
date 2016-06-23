@@ -1,3 +1,5 @@
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
+
 describe('parseToVariable', function() {
   it('should return the census code "income"', function() {
     var variable = CensusRequestUtils.parseToVariable('income');
@@ -37,10 +39,17 @@ describe('getLatLngFromStateCode', function() {
 
 describe('getLatLngFromZipcode', function() {
   var zip = '20876';
+  var result;
+
+  beforeEach(function(done) {
+    CensusRequestUtils.getLatLngFromZipcode(zip).then(function(response) {
+      result = response;
+      done();
+    });
+  });
 
   it ('should return the correct coordinates for the state capital', function() {
-    var coordinate = CensusRequestUtils.getLatLngFromZipcode(zip);
-    
+    expect(result.length).toEqual(2);
   });
 });
 

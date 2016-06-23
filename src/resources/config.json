@@ -1,0 +1,9 @@
+{
+  "zcta": {
+    "urls": {
+      "test": "http://localhost:8000/src/resources/zipcode-to-coordinates.json",
+      "prod": ""
+    },
+    "use": "http://localhost:8000/src/resources/zipcode-to-coordinates.json"
+  }
+}
