@@ -14,8 +14,6 @@ var servers = {
   }
 };
 
-
-
 describe('getContainerGeometry', function() {
   var request = {
     lat: 32.3617,
