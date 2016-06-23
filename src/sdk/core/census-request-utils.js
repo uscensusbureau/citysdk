@@ -77,66 +77,65 @@ export default class CensusRequestUtils {
     return dfr.promise();
   }
 
+  /**
+   * Takes an address object with the fields "street", "city", "state", and "zip".
+   * Either city and state or zip must be provided with the street.
+   *
+   * @param address
+   *
+   * @returns {promise}
+   */
   static getLatLngFromAddress(address) {
     let url = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
-    let separator = '';
 
     // Address is required. If address is not present,
     // then the request will fail.
-    if (address.street) {
-      url += `street=${address.street}`;
-      separator = '&';
+    if (!address.street) {
+      throw new Error('Invalid address! The required field "street" is missing.')
     }
 
-    // The address must contain city and state,
-    // or just the zip.
-    if (address.city) {
-      url += `${separator}city=${address.city}`;
-      
-      if (!separator) {
-        separator = '&';
-      }
+    if (!address.city && !address.state && !address.zip) {
+      throw new Error('Invalid address! "city" and "state" or "zip" must be provided.');
     }
-    
-    if (address.state) {
-      url += `${separator}state=${address.state}`;
 
-      if (!separator) {
-        separator = '&';
-      }
-    }
-    
+    url += `&street=${address.street}`;
+
     if (address.zip) {
-      url += `${separator}zip=${address.zip}`;
+      url += `&zip=${address.zip}`;
     }
-    
+    else if (address.city && address.state) {
+      url += `&city=${address.city}&state=${address.state}`;
+    }
+    else {
+      throw new Error('Invalid address! "city" and "state" or "zip" must be provided.');
+    }
+
     return CitySdk.ajaxRequest(url, true);
   }
 
   static getLatLng(request) {
-    let deferred = $.Deferred();
+    let dfr = $.Deferred();
 
-    function error(reason) {
-      deferred.reject(reason);
+    function onRequestError(reason) {
+      dfr.reject(reason);
     }
 
     if (request.address) {
       CensusRequestUtils.getLatLngFromAddress(request.address).then((response) => {
-        let coordinates = response.addressMatches[0].coordinates;
+        let coordinates = response.result.addressMatches[0].coordinates;
         request.lat = coordinates.y;
         request.lng = coordinates.x;
 
-        deferred.resolve(request);
-      }, error);
+        dfr.resolve(request);
+      }, onRequestError);
 
     } else if (request.zip) {
-      CensusRequestUtils.getLatLngFromZipcode(request.zip).then((response) => {
-        let coordinates = response.features[0].attributes;
-        request.lat = parseFloat(coordinates.CENTLAT);
-        request.lng = parseFloat(coordinates.CENTLON);
-        
-        deferred.resolve(request);
-      }, error);
+      CensusRequestUtils.getLatLngFromZipcode(request.zip).then((coordinates) => {
+        request.lat = coordinates[1];
+        request.lng = coordinates[0];
+
+        dfr.resolve(request);
+      }, onRequestError);
 
     } else if (request.state) {
       // Since this function returns a promise
@@ -149,14 +148,14 @@ export default class CensusRequestUtils {
         request.lat = coordinates[0];
         request.lng = coordinates[1];
 
-        deferred.resolve(request);
+        dfr.resolve(request);
       }, 0);
 
     } else {
-      deferred.reject(new Error("One of 'address', 'state' or 'zip' must be provided."));
+      dfr.reject(new Error("One of 'address', 'state' or 'zip' must be provided."));
     }
 
-    return deferred.promise();
+    return dfr.promise();
   }
 
   static getFipsFromLatLng(request) {
@@ -172,7 +171,7 @@ export default class CensusRequestUtils {
     // Benchmark id: 4 = Public_AR_Current
     // Vintage id: 4 = Current_Current
     url += `x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,84,86&format=jsonp`;
-    
+
     CitySdk.ajaxRequest(url, true).then((response) => {
       let geographies = response.result.geographies;
 
@@ -200,8 +199,12 @@ export default class CensusRequestUtils {
 
     return dfr.promise();
   }
-  
+
   static getGeographyVariables(request) {
+    if (!request.api || !request.year) {
+      throw new Error('Invalid request! "year" and "api" fields must be provided.');
+    }
+    
     let url = `${defaultEndpoints.censusUrl}${request.year}/${request.api}/geography.json`;
     return CitySdk.ajaxRequest(url, false);
   }

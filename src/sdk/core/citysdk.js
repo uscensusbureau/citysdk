@@ -33,7 +33,7 @@ export default class CitySdk {
    */
   static ajaxRequest(url, jsonp) {
     if (jsonp) {
-      var deferred = $.Deferred();
+      var dfr = $.Deferred();
 
       $.ajax({
         url: url,
@@ -41,11 +41,15 @@ export default class CitySdk {
         dataType: "jsonp",
 
         success: function(response) {
-          deferred.resolve(response);
+          dfr.resolve(response);
+        },
+
+        error: function(reason) {
+          dfr.reject(reason);
         }
       });
 
-      return deferred.promise();
+      return dfr.promise();
     }
 
     return $.getJSON(url);

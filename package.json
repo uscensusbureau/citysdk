@@ -30,7 +30,7 @@
     "basic-auth": "^1.0.4",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "jquery": "^3.0.0",
+    "jquery": "2.2.4",
     "promise": "^7.1.1",
     "request": "^2.72.0",
     "terraformer": "^1.0.5",

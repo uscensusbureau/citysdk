@@ -278,7 +278,7 @@
       key: "ajaxRequest",
       value: function ajaxRequest(url, jsonp) {
         if (jsonp) {
-          var deferred = $.Deferred();
+          var dfr = $.Deferred();
 
           $.ajax({
             url: url,
@@ -286,11 +286,15 @@
             dataType: "jsonp",
 
             success: function success(response) {
-              deferred.resolve(response);
+              dfr.resolve(response);
+            },
+
+            error: function error(reason) {
+              dfr.reject(reason);
             }
           });
 
-          return deferred.promise();
+          return dfr.promise();
         }
 
         return $.getJSON(url);

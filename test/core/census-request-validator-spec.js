@@ -67,7 +67,7 @@ describe('validateGeoVariables with invalid level', function() {
           result = response;
           done();
         })
-        .catch(function(error) {
+        .fail(function(error) {
           result = error;
           done();
         });
