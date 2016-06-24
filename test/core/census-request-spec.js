@@ -49,9 +49,9 @@ describe('aliasToVariable with multiple aliases', function() {
 
 describe('request', function() {
   var request = {
-    level: 'county',
+    level: 'state',
     zip: 21701,
-    variables: ['population'],
+    variables: ['income', 'population'],
     apikey: '88c69cd2d93fae30723c3ec3546d66521f339255'
   };
 
