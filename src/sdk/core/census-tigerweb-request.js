@@ -90,7 +90,7 @@ export default class CensusTigerwebRequest {
     };
 
     let onRequestSuccess = (response) => {
-      dfr.resolve(CitySdk.esriToGeo(response));
+      dfr.resolve({response: CitySdk.esriToGeo(response), request: request});
     };
 
     if (request.container && sublevelRequested && !request.containerGeometry) {

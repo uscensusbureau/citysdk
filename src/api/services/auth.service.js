@@ -1,7 +1,7 @@
 var request = require('request');
 var basicAuth = require('basic-auth');
 
-module.exports = function(req, res, next) {
+export function validateApiKey(req, res, next) {
   var apikey = basicAuth(req);
 
   function unauthorized(res) {
@@ -36,4 +36,19 @@ module.exports = function(req, res, next) {
       return unauthorized(res);
     }
   });
-};
+}
+
+export function decodeAuthHeader(req) {
+  // The value is in the format 'Basic <base64_api_key:>'
+  // Just want the <base64_api_key> part
+  var authHeader = req.header('Authorization').split(' ');
+  var base64ApiKey = authHeader[1];
+
+  // Decode base64 services key
+  var stringBuffer = new Buffer(base64ApiKey, 'base64');
+
+  // The auth format is in the format username:password but we don't
+  // use password and the services key is used as the username.
+  // Here we're just extracting the username (services key) part.
+  return stringBuffer.toString().split(':')[0];
+}

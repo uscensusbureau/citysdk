@@ -585,7 +585,7 @@
         };
 
         var onRequestSuccess = function onRequestSuccess(response) {
-          dfr.resolve(CitySdk.esriToGeo(response));
+          dfr.resolve({ response: CitySdk.esriToGeo(response), request: _request });
         };
 
         if (_request.container && sublevelRequested && !_request.containerGeometry) {

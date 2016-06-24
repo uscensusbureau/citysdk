@@ -23,6 +23,7 @@ module.exports = function(config) {
       'dist/sdk/core/census-request-validator.js',
       'dist/sdk/core/census-request-utils.js',
       'dist/sdk/core/census-summary-request.js',
+      'dist/sdk/core/census-request.js',
       'dist/sdk/core/citysdk.js',
 
       // Tests
@@ -30,6 +31,7 @@ module.exports = function(config) {
       'test/core/census-tigerweb-request-spec.js',
       'test/core/census-request-utils-spec.js',
       'test/core/census-summary-request-spec.js',
+      'test/core/census-request-spec.js',
       'test/core/citysdk-spec.js',
 
       // Source maps

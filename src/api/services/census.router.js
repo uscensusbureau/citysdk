@@ -1,5 +1,6 @@
+import {decodeAuthHeader, validateApiKey} from './auth.service';
+
 var express = require('express');
-var keyauth = require('./auth.service.js');
 var CitySdk = require('../../../dist/api/core/citysdk');
 var CensusModule = require('../../../dist/api/modules/census/census.citysdk');
 
@@ -8,21 +9,6 @@ var router = express.Router();
 
 var moduleInstantiated = false;
 var census;
-
-function decodeAuthHeader(req) {
-  // The value is in the format 'Basic <base64_api_key:>'
-  // Just want the <base64_api_key> part
-  var authHeader = req.header('Authorization').split(' ');
-  var base64ApiKey = authHeader[1];
-
-  // Decode base64 services key
-  var stringBuffer = new Buffer(base64ApiKey, 'base64');
-
-  // The auth format is in the format username:password but we don't
-  // use password and the services key is used as the username.
-  // Here we're just extracting the username (services key) part.
-  return stringBuffer.toString().split(':')[0];
-}
 
 function getModuleInstance(req) {
   if (!moduleInstantiated) {
@@ -35,7 +21,7 @@ function getModuleInstance(req) {
   return census;
 }
 
-router.post('/', keyauth, function(req, res) {
+router.post('/', validateApiKey, function(req, res) {
   getModuleInstance(req).geoRequest(req.body, function(response) {
     res.json(response);
   });

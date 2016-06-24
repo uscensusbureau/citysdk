@@ -106,6 +106,8 @@ describe('request', function() {
   });
 
   it('should return a result with the features field', function() {
-    expect(result.hasOwnProperty('features')).toBe(true);
+    expect(result.hasOwnProperty('response')).toBe(true);
+    expect(result.hasOwnProperty('request')).toBe(true);
+    expect(result.response.hasOwnProperty('features')).toBe(true);
   });
 });
