@@ -133,6 +133,16 @@ var rollItUp = function(filename, moduleName) {
 };
 
 // ----------------------------------------------------------------------
+// Task: Compile: CitySdk
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CitySdk', function() {
+  return rollItUp('citysdk.js', 'CitySdk');
+});
+
+// ----------------------------------------------------------------------
 // Task: Compile: CensusGeoRequest
 //
 // Uses the rollup to compile the ES6 census module into browser
@@ -188,6 +198,7 @@ gulp.task('compile:CensusSummaryRequest', function() {
 // Compiles all core modules using rollup.
 // ----------------------------------------------------------------------
 gulp.task('build:sdk', [
+  'compile:CitySdk',
   'compile:CensusGeoRequest',
   'compile:CensusTigerwebRequest',
   'compile:CensusRequestValidator',

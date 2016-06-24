@@ -1,9 +1,9 @@
-import Terraformer from "terraformer";
-import ArcGIS from "terraformer-arcgis-parser";
-import $ from "jquery";
+import $ from 'jquery';
+import Terraformer from 'terraformer';
+import ArcGIS from 'terraformer-arcgis-parser';
 
-import stateNames from "../../resources/us-state-names.json";
-import stateCapitalCoordinates from "../../resources/us-states-latlng.json";
+import stateNames from '../../resources/us-state-names.json';
+import stateCapitalCoordinates from '../../resources/us-states-latlng.json';
 
 Terraformer.ArcGIS = ArcGIS;
 
@@ -28,8 +28,7 @@ export default class CitySdk {
    * @param {string} url URL to request
    *
    * @param {boolean} jsonp
-   *
- * @return {promise} Returns a standard ajax promise
+   * @return {JQueryPromise}
    */
   static ajaxRequest(url, jsonp) {
     if (jsonp) {
@@ -37,8 +36,8 @@ export default class CitySdk {
 
       $.ajax({
         url: url,
-        method: "GET",
-        dataType: "jsonp",
+        method: 'GET',
+        dataType: 'jsonp',
 
         success: function(response) {
           dfr.resolve(response);
@@ -68,10 +67,10 @@ export default class CitySdk {
    */
   static postRequest(url, data) {
     return $.ajax({
-      type: "POST",
+      type: 'POST',
       url: url,
       data: data,
-      dataType: "json"
+      dataType: 'json'
     });
   }
 
@@ -79,8 +78,8 @@ export default class CitySdk {
    * @function getStateCapitalCoords
    * @static
    *
-   * @description Gets the coordinates of a state"s capital
-   * from it"s name or 2-letter code.
+   * @description Gets the coordinates of a state's capital
+   * from it's name or 2-letter code.
    *
    * @param {string} state Name or 2-letter code of the state
    * (case insensitive)
@@ -125,27 +124,29 @@ export default class CitySdk {
    * @param {object} request the request being made to the module
    *
    * @return {object} the updated request
+   * 
+   * @deprecated
    */
   static parseRequestLatLng(request) {
     // Allow the users to use either x,y; lat,lng;
     // latitude,longitude to specify co-ordinates
-    if (!("lat" in request)) {
-      if ("latitude" in request) {
+    if (!('lat' in request)) {
+      if ('latitude' in request) {
         request.lat = request.latitude;
         delete request.latitude;
 
-      } else if ("y" in request) {
+      } else if ('y' in request) {
         request.lat = request.y;
         delete request.y;
       }
     }
 
-    if (!("lng" in request)) {
-      if ("longitude" in request) {
+    if (!('lng' in request)) {
+      if ('longitude' in request) {
         request.lng = request.longitude;
         delete request.longitude;
 
-      } else if ("x" in request) {
+      } else if ('x' in request) {
         request.lng = request.x;
         delete request.x;
       }
@@ -154,6 +155,12 @@ export default class CitySdk {
     return request;
   }
 
+  /**
+   * @deprecated
+   *
+   * @param response
+   * @returns {*}
+   */
   static parseResponseLatLng(response) {
     response.lat = parseFloat(response.features[0].attributes.CENTLAT);
     response.lng = parseFloat(response.features[0].attributes.CENTLON);
@@ -167,11 +174,9 @@ export default class CitySdk {
    * @param {string} esriJson
    *
    * @returns {{type: string, features: Array}}
-   *
-   * @todo Use lower camelCase for function name
    */
   static esriToGeo(esriJson) {
-    if (!("features" in esriJson)) {
+    if (!('features' in esriJson)) {
       // data is missing
       return null;
     }
@@ -179,8 +184,8 @@ export default class CitySdk {
     let features = esriJson.features;
 
     let geojson = {
-      "type": "FeatureCollection",
-      "features": []
+      'type': 'FeatureCollection',
+      'features': []
     };
 
     for (var i = 0; i < features.length; i++) {
@@ -199,15 +204,13 @@ export default class CitySdk {
    * @param {string} geoJson
    *
    * @returns {object}
-   *
-   * @todo Use lower camelCase for function name
    */
   static geoToEsri(geoJson) {
     return Terraformer.ArcGIS.convert(geoJson);
   }
 }
 
-CitySdk.version = "0.0.1";
+CitySdk.version = '0.0.1';
 CitySdk.stateNames = stateNames;
 CitySdk.stateCapitalCoordinates = stateCapitalCoordinates;
 

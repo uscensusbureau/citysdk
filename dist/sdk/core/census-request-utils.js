@@ -269,21 +269,20 @@
 	   * @param {string} url URL to request
 	   *
 	   * @param {boolean} jsonp
-	   *
-	  * @return {promise} Returns a standard ajax promise
+	   * @return {JQueryPromise}
 	   */
 
 
 	  createClass(CitySdk, null, [{
-	    key: "ajaxRequest",
+	    key: 'ajaxRequest',
 	    value: function ajaxRequest(url, jsonp) {
 	      if (jsonp) {
 	        var dfr = $.Deferred();
 
 	        $.ajax({
 	          url: url,
-	          method: "GET",
-	          dataType: "jsonp",
+	          method: 'GET',
+	          dataType: 'jsonp',
 
 	          success: function success(response) {
 	            dfr.resolve(response);
@@ -313,13 +312,13 @@
 	     */
 
 	  }, {
-	    key: "postRequest",
+	    key: 'postRequest',
 	    value: function postRequest(url, data) {
 	      return $.ajax({
-	        type: "POST",
+	        type: 'POST',
 	        url: url,
 	        data: data,
-	        dataType: "json"
+	        dataType: 'json'
 	      });
 	    }
 
@@ -327,8 +326,8 @@
 	     * @function getStateCapitalCoords
 	     * @static
 	     *
-	     * @description Gets the coordinates of a state"s capital
-	     * from it"s name or 2-letter code.
+	     * @description Gets the coordinates of a state's capital
+	     * from it's name or 2-letter code.
 	     *
 	     * @param {string} state Name or 2-letter code of the state
 	     * (case insensitive)
@@ -338,7 +337,7 @@
 	     */
 
 	  }, {
-	    key: "getStateCapitalCoords",
+	    key: 'getStateCapitalCoords',
 	    value: function getStateCapitalCoords(state) {
 	      // No string supplied
 	      if (!state) {
@@ -379,25 +378,25 @@
 	     */
 
 	  }, {
-	    key: "parseRequestLatLng",
+	    key: 'parseRequestLatLng',
 	    value: function parseRequestLatLng(request) {
 	      // Allow the users to use either x,y; lat,lng;
 	      // latitude,longitude to specify co-ordinates
-	      if (!("lat" in request)) {
-	        if ("latitude" in request) {
+	      if (!('lat' in request)) {
+	        if ('latitude' in request) {
 	          request.lat = request.latitude;
 	          delete request.latitude;
-	        } else if ("y" in request) {
+	        } else if ('y' in request) {
 	          request.lat = request.y;
 	          delete request.y;
 	        }
 	      }
 
-	      if (!("lng" in request)) {
-	        if ("longitude" in request) {
+	      if (!('lng' in request)) {
+	        if ('longitude' in request) {
 	          request.lng = request.longitude;
 	          delete request.longitude;
-	        } else if ("x" in request) {
+	        } else if ('x' in request) {
 	          request.lng = request.x;
 	          delete request.x;
 	        }
@@ -406,7 +405,7 @@
 	      return request;
 	    }
 	  }, {
-	    key: "parseResponseLatLng",
+	    key: 'parseResponseLatLng',
 	    value: function parseResponseLatLng(response) {
 	      response.lat = parseFloat(response.features[0].attributes.CENTLAT);
 	      response.lng = parseFloat(response.features[0].attributes.CENTLON);
@@ -420,14 +419,12 @@
 	     * @param {string} esriJson
 	     *
 	     * @returns {{type: string, features: Array}}
-	     *
-	     * @todo Use lower camelCase for function name
 	     */
 
 	  }, {
-	    key: "esriToGeo",
+	    key: 'esriToGeo',
 	    value: function esriToGeo(esriJson) {
-	      if (!("features" in esriJson)) {
+	      if (!('features' in esriJson)) {
 	        // data is missing
 	        return null;
 	      }
@@ -435,8 +432,8 @@
 	      var features = esriJson.features;
 
 	      var geojson = {
-	        "type": "FeatureCollection",
-	        "features": []
+	        'type': 'FeatureCollection',
+	        'features': []
 	      };
 
 	      for (var i = 0; i < features.length; i++) {
@@ -455,12 +452,10 @@
 	     * @param {string} geoJson
 	     *
 	     * @returns {object}
-	     *
-	     * @todo Use lower camelCase for function name
 	     */
 
 	  }, {
-	    key: "geoToEsri",
+	    key: 'geoToEsri',
 	    value: function geoToEsri(geoJson) {
 	      return Terraformer.ArcGIS.convert(geoJson);
 	    }
@@ -468,7 +463,7 @@
 	  return CitySdk;
 	}();
 
-	CitySdk.version = "0.0.1";
+	CitySdk.version = '0.0.1';
 	CitySdk.stateNames = stateNames;
 	CitySdk.stateCapitalCoordinates = stateCapitalCoordinates;
 
