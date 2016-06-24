@@ -375,6 +375,8 @@
 	     * @param {object} request the request being made to the module
 	     *
 	     * @return {object} the updated request
+	     * 
+	     * @deprecated
 	     */
 
 	  }, {
@@ -404,6 +406,14 @@
 
 	      return request;
 	    }
+
+	    /**
+	     * @deprecated
+	     *
+	     * @param response
+	     * @returns {*}
+	     */
+
 	  }, {
 	    key: 'parseResponseLatLng',
 	    value: function parseResponseLatLng(response) {
