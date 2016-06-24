@@ -13,7 +13,7 @@ module.exports = function(req, res, next) {
     return unauthorized(res);
   }
 
-  var keyValidationUrl = 'http://services.census.gov/data/?key=' + apikey.name;
+  var keyValidationUrl = 'http://api.census.gov/data/?key=' + apikey.name;
 
   request.get(keyValidationUrl, function(error, response) {
     if (error) {

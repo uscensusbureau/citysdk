@@ -173,6 +173,16 @@ gulp.task('compile:CensusRequestUtils', function() {
 });
 
 // ----------------------------------------------------------------------
+// Task: Compile: CensusSummaryRequest
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CensusSummaryRequest', function() {
+  return rollItUp('census-summary-request.js', 'CensusSummaryRequest');
+});
+
+// ----------------------------------------------------------------------
 // Task: Build: SDK
 //
 // Compiles all core modules using rollup.
@@ -182,5 +192,6 @@ gulp.task('build:sdk', [
   'compile:CensusTigerwebRequest',
   'compile:CensusRequestValidator',
   'compile:CensusRequestUtils',
+  'compile:CensusSummaryRequest',
   'copy:resources'
 ]);

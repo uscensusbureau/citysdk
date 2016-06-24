@@ -35,14 +35,8 @@ function getModuleInstance(req) {
   return census;
 }
 
-router.post('/geo', keyauth, function(req, res) {
+router.post('/', keyauth, function(req, res) {
   getModuleInstance(req).geoRequest(req.body, function(response) {
-    res.json(response);
-  });
-});
-
-router.post('/services', keyauth, function(req, res) {
-  getModuleInstance(req).apiRequest(req.body, function(response) {
     res.json(response);
   });
 });

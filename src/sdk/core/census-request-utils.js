@@ -12,6 +12,15 @@ const defaultEndpoints = {
   censusUrl: 'https://api.census.gov/data/'
 };
 
+// TODO:
+// Need to update this URL once the branch is merged into master.
+// Instead of pointing to a branch it should probably point to a
+// release tag.
+const zctaJsonUrl = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-debt/277-modularize-request-functions/src/resources/zipcode-to-coordinates.json';
+
+const fipsGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?';
+const addressGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
+
 export default class CensusRequestUtils {
   static parseToVariable(aliasOrVariable) {
     // If the requested string is an alias, return the appropriate variable from the dictionary
@@ -67,10 +76,8 @@ export default class CensusRequestUtils {
 
   static getLatLngFromZipcode(zip) {
     let dfr = $.Deferred();
-    let url = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-debt/277-modularize-request-functions/src/' +
-        'resources/zipcode-to-coordinates.json';
 
-    $.getJSON(url).then(function(coordinates) {
+    $.getJSON(zctaJsonUrl).then(function(coordinates) {
       dfr.resolve(coordinates[zip]);
     });
 
@@ -86,7 +93,7 @@ export default class CensusRequestUtils {
    * @returns {promise}
    */
   static getLatLngFromAddress(address) {
-    let url = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
+    let url = addressGeocoderUrl;
 
     // Address is required. If address is not present,
     // then the request will fail.
@@ -138,11 +145,9 @@ export default class CensusRequestUtils {
       }, onRequestError);
 
     } else if (request.state) {
-      // Since this function returns a promise
-      // we want this to be an asynchronous call.
-      // Therefore, we wrap in a setTimout() since
-      // it allows the function to return before
-      // the code inside the setTimeout is excecuted.
+      // Since this function returns a promise we want this to be an asynchronous
+      // call. Therefore, we wrap in a setTimout() since it allows the function to
+      // return before the code inside the setTimeout is excecuted.
       setTimeout(() => {
         let coordinates = CensusRequestUtils.getLatLngFromStateCode(request.state);
         request.lat = coordinates[0];
@@ -162,7 +167,7 @@ export default class CensusRequestUtils {
     let lat = request.lat;
     let lng = request.lng;
     let dfr = $.Deferred();
-    let url = `https://geocoding.geo.census.gov/geocoder/geographies/coordinates?`;
+    let url = fipsGeocoderUrl;
 
     let onRequestError = (reason) => {
       dfr.reject(reason);

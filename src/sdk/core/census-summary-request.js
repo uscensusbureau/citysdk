@@ -18,7 +18,7 @@ export default class CensusSummaryRequest {
     request.data = [];
 
     if (request.sublevel) {
-      // If sublevel is set to true, our "data" property
+      // If sublevel is set to true, our 'data' property
       // will be an array of objects for each sublevel item.
       let currentVariable;
       let currentResponseItem;
@@ -28,38 +28,38 @@ export default class CensusSummaryRequest {
         currentDataObject = {};
         currentResponseItem = response[i];
 
-        if (['sf1', 'sf3'].indexOf(request.api) && request.year.toString() == "1990") {
+        if (['sf1', 'sf3'].indexOf(request.api) && request.year.toString() == '1990') {
           // Hardcoded rule for decennial survey of 1990
-          currentDataObject["name"] = currentResponseItem[response[0].indexOf("ANPSADPI")];
+          currentDataObject['name'] = currentResponseItem[response[0].indexOf('ANPSADPI')];
         } else {
           // ACS survey & SF survey not 1990
-          currentDataObject["name"] = currentResponseItem[response[0].indexOf("NAME")];
+          currentDataObject['name'] = currentResponseItem[response[0].indexOf('NAME')];
         }
 
-        let stateIndex = response[0].indexOf("state");
-        let countyIndex = response[0].indexOf("county");
-        let tractIndex = response[0].indexOf("tract");
-        let blockGroupIndex = response[0].indexOf("block group");
-        let placeIndex = response[0].indexOf("place");
+        let stateIndex = response[0].indexOf('state');
+        let countyIndex = response[0].indexOf('county');
+        let tractIndex = response[0].indexOf('tract');
+        let blockGroupIndex = response[0].indexOf('block group');
+        let placeIndex = response[0].indexOf('place');
 
         if (stateIndex >= 0) {
-          currentDataObject["state"] = currentResponseItem[stateIndex];
+          currentDataObject['state'] = currentResponseItem[stateIndex];
         }
 
         if (countyIndex >= 0) {
-          currentDataObject["county"] = currentResponseItem[countyIndex];
+          currentDataObject['county'] = currentResponseItem[countyIndex];
         }
 
         if (tractIndex >= 0) {
-          currentDataObject["tract"] = currentResponseItem[tractIndex];
+          currentDataObject['tract'] = currentResponseItem[tractIndex];
         }
 
         if (blockGroupIndex >= 0) {
-          currentDataObject["blockGroup"] = currentResponseItem[blockGroupIndex];
+          currentDataObject['blockGroup'] = currentResponseItem[blockGroupIndex];
         }
 
         if (placeIndex >= 0) {
-          currentDataObject["place"] = currentResponseItem[placeIndex];
+          currentDataObject['place'] = currentResponseItem[placeIndex];
         }
 
         for (let j = 0; j < request.variables.length; j++) {
@@ -75,11 +75,11 @@ export default class CensusSummaryRequest {
 
           // Variable is Normalizeable
           if (intermediateVar && CensusRequestUtils.isNormalizable(currentVariable)
-              && CensusRequestUtils.parseToValidVariable("population", request.api, request.year)) {
+              && CensusRequestUtils.parseToValidVariable('population', request.api, request.year)) {
 
-            let validVariable = CensusRequestUtils.parseToValidVariable("population", request.api, request.year);
+            let validVariable = CensusRequestUtils.parseToValidVariable('population', request.api, request.year);
             let index = response[0].indexOf(validVariable);
-            let property = currentVariable + "_normalized";
+            let property = currentVariable + '_normalized';
 
             currentDataObject[property] = currentDataObject[currentVariable] / currentResponseItem[index];
           }
@@ -103,11 +103,11 @@ export default class CensusSummaryRequest {
         }
 
         if (currentDataObject[currentVariable] && CensusRequestUtils.isNormalizable(currentVariable)
-            && CensusRequestUtils.parseToValidVariable("population", request.api, request.year)) {
+            && CensusRequestUtils.parseToValidVariable('population', request.api, request.year)) {
 
-          let validVariable = CensusRequestUtils.parseToValidVariable("population", request.api, request.year);
+          let validVariable = CensusRequestUtils.parseToValidVariable('population', request.api, request.year);
           let index = response[1].indexOf(validVariable);
-          let property = currentVariable + "_normalized";
+          let property = currentVariable + '_normalized';
 
           currentDataObject[property] = currentDataObject[currentVariable] / response[1][index];
         }
@@ -270,7 +270,9 @@ export default class CensusSummaryRequest {
       }
 
       // Convert the aliased variables
-      let variableIntermediate = CensusRequestUtils.parseToValidVariable(request.variables[i], request.api, request.year);
+      let variableIntermediate = CensusRequestUtils
+          .parseToValidVariable(request.variables[i], request.api, request.year);
+      
       if (variableIntermediate) {
         request.variables[i] = variableIntermediate;
       }

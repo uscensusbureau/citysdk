@@ -481,6 +481,15 @@
 	  censusUrl: 'https://api.census.gov/data/'
 	};
 
+	// TODO:
+	// Need to update this URL once the branch is merged into master.
+	// Instead of pointing to a branch it should probably point to a
+	// release tag.
+	var zctaJsonUrl = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-debt/277-modularize-request-functions/src/resources/zipcode-to-coordinates.json';
+
+	var fipsGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?';
+	var addressGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
+
 	var CensusRequestUtils = function () {
 	  function CensusRequestUtils() {
 	    classCallCheck(this, CensusRequestUtils);
@@ -546,9 +555,8 @@
 	    key: 'getLatLngFromZipcode',
 	    value: function getLatLngFromZipcode(zip) {
 	      var dfr = $.Deferred();
-	      var url = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-debt/277-modularize-request-functions/src/' + 'resources/zipcode-to-coordinates.json';
 
-	      $.getJSON(url).then(function (coordinates) {
+	      $.getJSON(zctaJsonUrl).then(function (coordinates) {
 	        dfr.resolve(coordinates[zip]);
 	      });
 
@@ -567,7 +575,7 @@
 	  }, {
 	    key: 'getLatLngFromAddress',
 	    value: function getLatLngFromAddress(address) {
-	      var url = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
+	      var url = addressGeocoderUrl;
 
 	      // Address is required. If address is not present,
 	      // then the request will fail.
@@ -616,11 +624,9 @@
 	          dfr.resolve(request);
 	        }, onRequestError);
 	      } else if (request.state) {
-	        // Since this function returns a promise
-	        // we want this to be an asynchronous call.
-	        // Therefore, we wrap in a setTimout() since
-	        // it allows the function to return before
-	        // the code inside the setTimeout is excecuted.
+	        // Since this function returns a promise we want this to be an asynchronous
+	        // call. Therefore, we wrap in a setTimout() since it allows the function to
+	        // return before the code inside the setTimeout is excecuted.
 	        setTimeout(function () {
 	          var coordinates = CensusRequestUtils.getLatLngFromStateCode(request.state);
 	          request.lat = coordinates[0];
@@ -640,7 +646,7 @@
 	      var lat = request.lat;
 	      var lng = request.lng;
 	      var dfr = $.Deferred();
-	      var url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?';
+	      var url = fipsGeocoderUrl;
 
 	      var onRequestError = function onRequestError(reason) {
 	        dfr.reject(reason);
@@ -991,7 +997,7 @@
 	      request.data = [];
 
 	      if (request.sublevel) {
-	        // If sublevel is set to true, our "data" property
+	        // If sublevel is set to true, our 'data' property
 	        // will be an array of objects for each sublevel item.
 	        var currentVariable = void 0;
 	        var currentResponseItem = void 0;
@@ -1001,38 +1007,38 @@
 	          currentDataObject = {};
 	          currentResponseItem = response[i];
 
-	          if (['sf1', 'sf3'].indexOf(request.api) && request.year.toString() == "1990") {
+	          if (['sf1', 'sf3'].indexOf(request.api) && request.year.toString() == '1990') {
 	            // Hardcoded rule for decennial survey of 1990
-	            currentDataObject["name"] = currentResponseItem[response[0].indexOf("ANPSADPI")];
+	            currentDataObject['name'] = currentResponseItem[response[0].indexOf('ANPSADPI')];
 	          } else {
 	            // ACS survey & SF survey not 1990
-	            currentDataObject["name"] = currentResponseItem[response[0].indexOf("NAME")];
+	            currentDataObject['name'] = currentResponseItem[response[0].indexOf('NAME')];
 	          }
 
-	          var stateIndex = response[0].indexOf("state");
-	          var countyIndex = response[0].indexOf("county");
-	          var tractIndex = response[0].indexOf("tract");
-	          var blockGroupIndex = response[0].indexOf("block group");
-	          var placeIndex = response[0].indexOf("place");
+	          var stateIndex = response[0].indexOf('state');
+	          var countyIndex = response[0].indexOf('county');
+	          var tractIndex = response[0].indexOf('tract');
+	          var blockGroupIndex = response[0].indexOf('block group');
+	          var placeIndex = response[0].indexOf('place');
 
 	          if (stateIndex >= 0) {
-	            currentDataObject["state"] = currentResponseItem[stateIndex];
+	            currentDataObject['state'] = currentResponseItem[stateIndex];
 	          }
 
 	          if (countyIndex >= 0) {
-	            currentDataObject["county"] = currentResponseItem[countyIndex];
+	            currentDataObject['county'] = currentResponseItem[countyIndex];
 	          }
 
 	          if (tractIndex >= 0) {
-	            currentDataObject["tract"] = currentResponseItem[tractIndex];
+	            currentDataObject['tract'] = currentResponseItem[tractIndex];
 	          }
 
 	          if (blockGroupIndex >= 0) {
-	            currentDataObject["blockGroup"] = currentResponseItem[blockGroupIndex];
+	            currentDataObject['blockGroup'] = currentResponseItem[blockGroupIndex];
 	          }
 
 	          if (placeIndex >= 0) {
-	            currentDataObject["place"] = currentResponseItem[placeIndex];
+	            currentDataObject['place'] = currentResponseItem[placeIndex];
 	          }
 
 	          for (var j = 0; j < request.variables.length; j++) {
@@ -1047,11 +1053,11 @@
 	            }
 
 	            // Variable is Normalizeable
-	            if (intermediateVar && CensusRequestUtils.isNormalizable(currentVariable) && CensusRequestUtils.parseToValidVariable("population", request.api, request.year)) {
+	            if (intermediateVar && CensusRequestUtils.isNormalizable(currentVariable) && CensusRequestUtils.parseToValidVariable('population', request.api, request.year)) {
 
-	              var _validVariable = CensusRequestUtils.parseToValidVariable("population", request.api, request.year);
+	              var _validVariable = CensusRequestUtils.parseToValidVariable('population', request.api, request.year);
 	              var _index = response[0].indexOf(_validVariable);
-	              var property = currentVariable + "_normalized";
+	              var property = currentVariable + '_normalized';
 
 	              currentDataObject[property] = currentDataObject[currentVariable] / currentResponseItem[_index];
 	            }
@@ -1074,11 +1080,11 @@
 	            _currentDataObject[_currentVariable] = response[1][_index2];
 	          }
 
-	          if (_currentDataObject[_currentVariable] && CensusRequestUtils.isNormalizable(_currentVariable) && CensusRequestUtils.parseToValidVariable("population", request.api, request.year)) {
+	          if (_currentDataObject[_currentVariable] && CensusRequestUtils.isNormalizable(_currentVariable) && CensusRequestUtils.parseToValidVariable('population', request.api, request.year)) {
 
-	            var _validVariable3 = CensusRequestUtils.parseToValidVariable("population", request.api, request.year);
+	            var _validVariable3 = CensusRequestUtils.parseToValidVariable('population', request.api, request.year);
 	            var _index3 = response[1].indexOf(_validVariable3);
-	            var _property = _currentVariable + "_normalized";
+	            var _property = _currentVariable + '_normalized';
 
 	            _currentDataObject[_property] = _currentDataObject[_currentVariable] / response[1][_index3];
 	          }
@@ -1263,6 +1269,7 @@
 
 	        // Convert the aliased variables
 	        var variableIntermediate = CensusRequestUtils.parseToValidVariable(_request.variables[_i2], _request.api, _request.year);
+
 	        if (variableIntermediate) {
 	          _request.variables[_i2] = variableIntermediate;
 	        }
@@ -1293,40 +1300,6 @@
 	    }
 	  }]);
 	  return CensusSummaryRequest;
-	}();
-
-	var CensusRequest = function () {
-	  function CensusRequest(apikey) {
-	    classCallCheck(this, CensusRequest);
-
-	    this.apikey = apikey;
-	  }
-
-	  createClass(CensusRequest, null, [{
-	    key: 'request',
-	    value: function request(_request) {
-	      var dfr = $.Deferred();
-
-	      var onRequestError = function onRequestError(reason) {
-	        dfr.reject(reason);
-	      };
-
-	      var onRequestSuccess = function onRequestSuccess(response) {
-	        dfr.resolve(response);
-	      };
-
-	      _request = CensusRequestValidator.validate(_request);
-
-	      if (!_request.lat && !_request.lng) {
-	        // Get the coordinates, then using the coordinates, get
-	        // the FIPS codes for state, tract, county and blockGroup.
-	        CensusRequestUtils.getLatLng(_request).then(CensusRequestUtils.getFipsFromLatLng, onRequestError).then(CensusRequestValidator.validateGeoVariables, onRequestError).then(CensusSummaryRequest.request, onRequestError).then(onRequestSuccess, onRequestError);
-	      }
-
-	      return dfr.promise();
-	    }
-	  }]);
-	  return CensusRequest;
 	}();
 
 	var current = { "url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_Current/MapServer/{mapserver}/query", "mapServers": { "state": 84, "county": 86, "tract": 8, "blockGroup": 10, "blocks": 12, "place": 28 } };
@@ -1477,6 +1450,46 @@
 	    }
 	  }]);
 	  return CensusTigerwebRequest;
+	}();
+
+	var CensusRequest = function () {
+	  function CensusRequest(apikey) {
+	    classCallCheck(this, CensusRequest);
+
+	    this.apikey = apikey;
+	  }
+
+	  createClass(CensusRequest, null, [{
+	    key: 'request',
+	    value: function request(_request) {
+	      var dfr = $.Deferred();
+
+	      var onRequestError = function onRequestError(reason) {
+	        dfr.reject(reason);
+	      };
+
+	      var onRequestSuccess = function onRequestSuccess(response) {
+	        dfr.resolve(response);
+	      };
+
+	      var onRequestHasLatLng = function onRequestHasLatLng(request) {
+	        CensusRequestUtils.getFipsFromLatLng(request).then(CensusRequestValidator.validateGeoVariables, onRequestError).then(CensusSummaryRequest.request, onRequestError).then(CensusTigerwebRequest.request, onRequestError).then(CensusGeoRequest.handleTigerwebResponse, onRequestError).then(onRequestSuccess, onRequestError);
+	      };
+
+	      _request = CensusRequestValidator.validate(_request);
+
+	      if (!_request.lat && !_request.lng) {
+	        // Get the coordinates, then using the coordinates, get
+	        // the FIPS codes for state, tract, county and blockGroup.
+	        CensusRequestUtils.getLatLng(_request).then(onRequestHasLatLng, onRequestError);
+	      } else {
+	        onRequestHasLatLng(_request);
+	      }
+
+	      return dfr.promise();
+	    }
+	  }]);
+	  return CensusRequest;
 	}();
 
 	var CensusGeoRequest = function () {
