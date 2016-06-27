@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/uscensusbureau/citysdk.png?label=ready&title=Ready)](https://waffle.io/uscensusbureau/citysdk)
 # CitySDK #
 
 This readme is a work in progress. For an overview of the project, please visit [https://uscensusbureau.github.io/citysdk](https://uscensusbureau.github.io/citysdk)
