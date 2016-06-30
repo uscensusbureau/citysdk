@@ -7,9 +7,10 @@ var replace = require('gulp-replace');
 var rollupJson = require('rollup-plugin-json');
 var rollupBabel = require('rollup-plugin-babel');
 
-/***********************************************************************
- *                            Shared tasks                              *
- /***********************************************************************/
+
+/************************************************************************
+ *                            Common tasks                              *
+/************************************************************************/
 
 // ----------------------------------------------------------------------
 // Task: Clean: All
@@ -31,6 +32,11 @@ gulp.task('copy:resources', function() {
       .pipe(gulp.dest('dist/resources'));
 });
 
+gulp.task('copy:citysdk', ['build:sdk'], function() {
+  return gulp.src('dist/sdk/core/citysdk.js')
+      .pipe(gulp.dest('.'));
+});
+
 // ----------------------------------------------------------------------
 // Task: Watch
 //
@@ -47,11 +53,13 @@ gulp.task('watch', ['build:services', 'build:sdk'], function() {
 //
 // Cleans the dist directory and builds both the Node API and JS SDK
 // ----------------------------------------------------------------------
-gulp.task('default', ['clean', 'build:sdk', 'build:services']);
+gulp.task('default', ['clean', 'build:sdk', 'build:services', 'copy:citysdk']);
+
 
 /***********************************************************************
  *                           Node API tasks                            *
- /***********************************************************************/
+/***********************************************************************/
+
 // ----------------------------------------------------------------------
 // Task: Build: Services
 //
@@ -63,10 +71,10 @@ gulp.task('build:services', function() {
       .pipe(gulp.dest('dist/api/services'));
 });
 
-/***********************************************************************
- *                            JS SDK tasks                              *
- /***********************************************************************/
 
+/***********************************************************************
+ *                            JS SDK tasks                             *
+/***********************************************************************/
 
 var corePath = 'src/sdk/core/';
 var distCorePath = 'dist/sdk/core/';

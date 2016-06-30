@@ -2,7 +2,7 @@
 
 var express = require('express');
 var bodyParser = require('body-parser');
-var censusRouter = require('./census.router');
+var citysdkRouter = require('./citysdk.router');
 
 var app = express();
 
@@ -14,5 +14,5 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use('/', censusRouter);
+app.use('/', citysdkRouter);
 app.listen('3000');
