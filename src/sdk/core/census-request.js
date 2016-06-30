@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import Promise from 'promise';
 
 import CensusGeoRequest from './census-geo-request';
 import CensusRequestUtils from './census-request-utils';
@@ -53,37 +53,31 @@ export default class CensusRequest {
   }
 
   static request(request) {
-    let dfr = $.Deferred();
-
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
-    };
-
-    let onRequestSuccess = (response) => {
-      dfr.resolve(response);
-    };
-
-    let onRequestHasLatLng = (request) => {
-      CensusRequestUtils.getFipsFromLatLng(request)
-          .then(CensusRequestValidator.validateGeoVariables, onRequestError)
-          .then(CensusSummaryRequest.request, onRequestError)
-          .then(CensusTigerwebRequest.request, onRequestError)
-          .then(CensusGeoRequest.handleTigerwebResponse, onRequestError)
-          .then(onRequestSuccess, onRequestError);
-    };
-
     request = CensusRequestValidator.validate(request);
 
-    if (!request.lat && !request.lng) {
-      // Get the coordinates, then using the coordinates, get
-      // the FIPS codes for state, tract, county and blockGroup.
-      CensusRequestUtils.getLatLng(request)
-          .then(onRequestHasLatLng, onRequestError);
+    let promiseHandler = (resolve, reject) => {
+      let onRequestHasLatLng = (request) => {
+        CensusRequestUtils.getFipsFromLatLng(request)
+            .then(CensusRequestValidator.validateGeoVariables)
+            .then(CensusSummaryRequest.request)
+            .then(CensusTigerwebRequest.request)
+            .then(CensusGeoRequest.handleTigerwebResponse)
+            .then((response) => resolve(response))
+            .catch((reason) => reject(reason));
+      };
 
-    } else {
-      onRequestHasLatLng(request);
-    }
+      if (!request.lat && !request.lng) {
+        // Get the coordinates, then using the coordinates, get
+        // the FIPS codes for state, tract, county and blockGroup.
+        CensusRequestUtils.getLatLng(request)
+            .then(onRequestHasLatLng)
+            .catch((reason) => reject(reason));
 
-    return dfr.promise();
+      } else {
+        onRequestHasLatLng(request);
+      }
+    };
+
+    return new Promise(promiseHandler);
   }
 }

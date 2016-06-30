@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import Promise from 'promise';
 
 import CensusRequest from './census-request';
 import CensusSummaryRequest from './census-summary-request';
@@ -8,14 +8,14 @@ export default class CensusGeoRequest {
 
   static supplementalRequest(req, res, featureIndex) {
     let i = featureIndex;
-    let dfr = $.Deferred();
-
     let features = res.features;
     let variables = req.variables;
 
-    //Sometimes cities span multiple counties. In this case, we sometimes miss data due to the
-    //limited nature of the Census API's geography hierarchy. This will issue supplemental requests
-    //to ensure we have data for all of our geojson entities
+    // Sometimes cities span multiple counties. In this case,
+    // we sometimes miss data due to the limited nature of
+    // the Census API's geography hierarchy. This will issue
+    // supplemental requests to ensure we have data for all of
+    // our geojson entities
     let suppRequest = {
       state: features[i].properties['STATE'],
       tract: features[i].properties['TRACT'],
@@ -32,32 +32,35 @@ export default class CensusGeoRequest {
       apikey: req.apikey
     };
 
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
-    };
+    let promiseHandler = (resolve, reject) => {
+      let censusSummaryRequest = CensusSummaryRequest.request(suppRequest);
 
-    CensusSummaryRequest.request(suppRequest).then((response) => {
-      for (let property in response.data[0]) {
-        if (response.data[0].hasOwnProperty(property)) {
-          features[response.featuresIndex].properties[property] = response.data[0][property];
+      censusSummaryRequest.then((response) => {
+        for (let property in response.data[0]) {
+          if (response.data[0].hasOwnProperty(property)) {
+            features[response.featuresIndex].properties[property] = response.data[0][property];
 
-          if (variables.indexOf(property) !== -1) {
-            res.totals[property] = Number(res.totals[property]) >= 0 ? Number(response.data[0][property]) : 0;
+            if (variables.indexOf(property) !== -1) {
+              res.totals[property] = Number(res.totals[property]) >= 0 ? Number(response.data[0][property]) : 0;
+            }
           }
         }
-      }
 
-      dfr.resolve(response);
+        resolve(response);
+      });
 
-    }, onRequestError);
+      censusSummaryRequest.catch((reason) => {
+        reject(reason);
+      });
+    };
 
-    return dfr.promise();
+    return new Promise(promiseHandler);
   }
 
   static handleTigerwebResponse(tigerwebResponse) {
-    let dfr = $.Deferred();
     let request = tigerwebResponse.request;
     let response = tigerwebResponse.response;
+    let supplementalRequests = [];
 
     // Reference dictionary of levels -> geocoder response variables
     let comparisonVariables = {
@@ -65,14 +68,6 @@ export default class CensusGeoRequest {
       'place': 'PLACE',
       'county': 'COUNTY',
       'blockGroup': 'BLKGRP'
-    };
-
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
-    };
-
-    let onRequestSuccess = (response) => {
-      dfr.resolve(response);
     };
 
     if (!response.totals) {
@@ -87,7 +82,6 @@ export default class CensusGeoRequest {
       let features = response.features;
 
       let matchedFeature;
-      let supplementalRequests = [];
 
       features.forEach((f, i) => {
         matchedFeature = data.filter((d) => {
@@ -108,64 +102,54 @@ export default class CensusGeoRequest {
           supplementalRequests.push(CensusGeoRequest.supplementalRequest(request, response, i))
 
         } else if (matchedFeature.length === 1) {
-          setTimeout(() => {
-            // We have matched the feature's tract to a data tract, move the data over
-            matchedFeature = matchedFeature[0];
+          // We have matched the feature's tract to a data tract, move the data over
+          matchedFeature = matchedFeature[0];
 
-            for (let property in matchedFeature) {
-              if (matchedFeature.hasOwnProperty(property)) {
-                f.properties[property] = matchedFeature[property];
+          for (let property in matchedFeature) {
+            if (matchedFeature.hasOwnProperty(property)) {
+              f.properties[property] = matchedFeature[property];
 
-                if (variables.indexOf(property) !== -1) {
-                  totals[property] = Number(totals[property]) >= 0 ? Number(matchedFeature[property]) : 0;
-                }
+              if (variables.indexOf(property) !== -1) {
+                totals[property] = Number(totals[property]) >= 0 ? Number(matchedFeature[property]) : 0;
               }
             }
-
-            onRequestSuccess(response);
-          }, 0);
+          }
 
         } else {
-          setTimeout(() => {
-            // This usually occurs when a low-level geography entity isn't uniquely identified
-            // by the grep. We'll need to add more comparisons to the grep to clear this issue up.
-            console.log('Multiple matched features: ');
-            console.log(f);
-            console.log(matchedFeature);
-            onRequestSuccess(response);
-          }, 0);
+          // This usually occurs when a low-level geography entity isn't uniquely identified
+          // by the grep. We'll need to add more comparisons to the grep to clear this issue up.
+          console.log('Multiple matched features: ');
+          console.log(f);
+          console.log(matchedFeature);
         }
       });
-
-      // If supplemental requests were needed, wait for all
-      // to finish. Or else, the promise could be resolved
-      // prematurely.
-      if (supplementalRequests.length) {
-        $.when.apply($, supplementalRequests).done(() => {
-          onRequestSuccess(response);
-        }, onRequestError)
-      }
     }
 
-    return dfr.promise();
+    let promiseHandler = (resolve, reject) => {
+      // If supplemental requests were needed, wait for all
+      // to finish.
+      if (supplementalRequests.length) {
+        Promise.all(supplementalRequests)
+            .then(() => resolve(response))
+            .catch((reason) => reject(reason))
+
+      } else {
+        setTimeout(() => resolve(response), 0);
+      }
+    };
+
+    return new Promise(promiseHandler);
   }
 
   static request(request) {
-    let dfr = $.Deferred();
-
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
+    let promiseHandler = (resolve, reject) => {
+      CensusRequest.request(request)
+          .then(CensusTigerwebRequest.request)
+          .then(CensusGeoRequest.handleTigerwebResponse)
+          .then((response) => resolve(response))
+          .catch((reason) => reject(reason));
     };
 
-    let onRequestSuccess = (response) => {
-      dfr.resolve(response);
-    };
-
-    CensusRequest.request(request)
-        .then(CensusTigerwebRequest.request, onRequestError)
-        .then(CensusGeoRequest.handleTigerwebResponse, onRequestError)
-        .then(onRequestSuccess, onRequestError);
-
-    return dfr.promise();
+    return new Promise(promiseHandler);
   }
 }

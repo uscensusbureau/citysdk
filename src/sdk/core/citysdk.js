@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Terraformer from 'terraformer';
 import ArcGIS from 'terraformer-arcgis-parser';
 
@@ -17,61 +16,6 @@ export default class CitySdk {
    */
   constructor() {
     this.modules = {};
-  }
-
-  /**
-   * @function ajaxRequest
-   * @static
-   *
-   * @description Makes an AJAX call
-   *
-   * @param {string} url URL to request
-   *
-   * @param {boolean} jsonp
-   * @return {JQueryPromise}
-   */
-  static ajaxRequest(url, jsonp) {
-    if (jsonp) {
-      var dfr = $.Deferred();
-
-      $.ajax({
-        url: url,
-        method: 'GET',
-        dataType: 'jsonp',
-
-        success: function(response) {
-          dfr.resolve(response);
-        },
-
-        error: function(reason) {
-          dfr.reject(reason);
-        }
-      });
-
-      return dfr.promise();
-    }
-
-    return $.getJSON(url);
-  }
-
-  /**
-   * @function postRequest
-   * @static
-   *
-   * @description Make an AJAX call using the POST method
-   *
-   * @param {string} url
-   * @param {object} data
-   *
-   * @returns {*}
-   */
-  static postRequest(url, data) {
-    return $.ajax({
-      type: 'POST',
-      url: url,
-      data: data,
-      dataType: 'json'
-    });
   }
 
   /**
@@ -111,61 +55,6 @@ export default class CitySdk {
 
     // Nothing was found
     return null;
-  }
-
-  /**
-   * @function parseRequestLatLng
-   * @static
-   *
-   * @description Scans the request for alternative ways
-   * to specify latitude & longiture and migrates those
-   * variables to lat & lng positions.
-   *
-   * @param {object} request the request being made to the module
-   *
-   * @return {object} the updated request
-   * 
-   * @deprecated
-   */
-  static parseRequestLatLng(request) {
-    // Allow the users to use either x,y; lat,lng;
-    // latitude,longitude to specify co-ordinates
-    if (!('lat' in request)) {
-      if ('latitude' in request) {
-        request.lat = request.latitude;
-        delete request.latitude;
-
-      } else if ('y' in request) {
-        request.lat = request.y;
-        delete request.y;
-      }
-    }
-
-    if (!('lng' in request)) {
-      if ('longitude' in request) {
-        request.lng = request.longitude;
-        delete request.longitude;
-
-      } else if ('x' in request) {
-        request.lng = request.x;
-        delete request.x;
-      }
-    }
-
-    return request;
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param response
-   * @returns {*}
-   */
-  static parseResponseLatLng(response) {
-    response.lat = parseFloat(response.features[0].attributes.CENTLAT);
-    response.lng = parseFloat(response.features[0].attributes.CENTLON);
-
-    return response;
   }
 
   /**
@@ -209,11 +98,3 @@ export default class CitySdk {
     return Terraformer.ArcGIS.convert(geoJson);
   }
 }
-
-CitySdk.version = '0.0.1';
-CitySdk.stateNames = stateNames;
-CitySdk.stateCapitalCoordinates = stateCapitalCoordinates;
-
-
-
-

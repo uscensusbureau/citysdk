@@ -189,7 +189,7 @@ FEMAModule.prototype.APIRequest = function (request, callback) {
         disasterURL += "$top=" + Number(request.take); //Default - root list of all datasets
     }
 
-    CitySdk.ajaxRequest(disasterURL).done(function (response) {
+    CitySdk.get(disasterURL).done(function (response) {
         response = jQuery.parseJSON(response);
         callback(response);
     });

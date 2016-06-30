@@ -1,6 +1,6 @@
-import $ from 'jquery';
+import Promise from 'promise';
 
-import CitySdk from './citysdk';
+import CitySdkHttp from './citysdk-http';
 import CensusRequestUtils from './census-request-utils';
 
 import requiredVariables from '../../resources/required-variables.json';
@@ -122,12 +122,6 @@ export default class CensusSummaryRequest {
   }
 
   static request(request) {
-    let dfr = $.Deferred();
-
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
-    };
-
     let cascade = false;
     let qualifiers = 'for=';
 
@@ -294,11 +288,14 @@ export default class CensusSummaryRequest {
     var url = defaultEndpoints.censusUrl;
     url += `${request.year}/${request.api}?get=${variableString}&${qualifiers}&key=${request.apikey}`;
 
-    CitySdk.ajaxRequest(url, false).then((response) => {
-      request = CensusSummaryRequest.parseSummaryResponse(request, response);
-      dfr.resolve(request);
-    }, onRequestError);
+    let promiseHandler = (resolve, reject) => {
+      CitySdkHttp.get(url, false).then((response) => {
+        request = CensusSummaryRequest.parseSummaryResponse(request, response);
+        resolve(request);
+        
+      }).catch((reason) => reject(reason));
+    };
 
-    return dfr.promise();
+    return new Promise(promiseHandler);
   }
 }

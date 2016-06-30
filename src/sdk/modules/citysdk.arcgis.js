@@ -177,7 +177,7 @@ arcgisModule.prototype.getLevelDictionary = function(request, callback) {
     }
 
     if (useCache == false) {
-      CitySdk.ajaxRequest(arcURL).done(
+      CitySdk.get(arcURL).done(
           function(response) {
             response = jQuery.parseJSON(response);
             CitySdk.prototype.sdkInstance.setCachedData("census", "getLevelDictionary", cacheKey, response);
@@ -263,7 +263,7 @@ arcgisModule.prototype.getVariableDictionary = function(request, callback) {
     }
 
     if (useCache == false) {
-      CitySdk.ajaxRequest(arcURL).done(
+      CitySdk.get(arcURL).done(
           function(response) {
             response = jQuery.parseJSON(response);
             CitySdk.prototype.sdkInstance.setCachedData("census", "getVariableDictionary", cacheKey, response);

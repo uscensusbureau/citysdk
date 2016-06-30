@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import Promise from 'promise';
 
 import CensusRequestUtils from './census-request-utils';
 
@@ -71,60 +71,56 @@ export default class CensusRequestValidator {
   }
   
   static validateGeoVariables(request) {
-    let dfr = $.Deferred();
-    
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
-    };
-    
-    CensusRequestUtils.getGeographyVariables(request).then((response) => {
-      let fips = response.fips;
-      let level = request.level;
-      let valid = false;
-      let requiredFields;
+    let promiseHandler = (resolve, reject) => {
+      CensusRequestUtils.getGeographyVariables(request).then((response) => {
+        let fips = response.fips;
+        let level = request.level;
+        let valid = false;
+        let requiredFields;
 
-      if (level === 'blockGroup') {
-        level = 'block group'
-      }
+        if (level === 'blockGroup') {
+          level = 'block group'
+        }
 
-      for (let value of fips) {
-        if (value.name === level) {
-          valid = true;
-          let requires = value.requires;
+        for (let value of fips) {
+          if (value.name === level) {
+            valid = true;
+            let requires = value.requires;
 
-          if (requires && requires.length) {
-            for (let required of requires) {
-              if (!request.hasOwnProperty(required)) {
-                valid = false;
-                break;
+            if (requires && requires.length) {
+              for (let required of requires) {
+                if (!request.hasOwnProperty(required)) {
+                  valid = false;
+                  break;
+                }
               }
             }
+
+            // Required fields are missing in the request.
+            // Save them so that we can inform the user by
+            // adding them to the error.
+            if (!valid) {
+              requiredFields = requires.join(', ');
+            }
+
+            break;
           }
-          
-          // Required fields are missing in the request.
-          // Save them so that we can inform the user by
-          // adding them to the error.
-          if (!valid) {
-            requiredFields = requires.join(', ');
-          }
-          
-          break;
         }
-      }
-      
-      request.geographyValidForAPI = valid;
-      
-      if (valid) {
-        dfr.resolve(request);
-      } else {
-        if (requiredFields) {
-          dfr.reject(new Error(`Request is missing required fields: ${requiredFields}.`));
+
+        request.geographyValidForAPI = valid;
+
+        if (valid) {
+          resolve(request);
         } else {
-          dfr.reject(new Error(`Invalid level "${level}" for this request.`));
+          if (requiredFields) {
+            reject(new Error(`Request is missing required fields: ${requiredFields}.`));
+          } else {
+            reject(new Error(`Invalid level "${level}" for this request.`));
+          }
         }
-      }
-    }, onRequestError);
-    
-    return dfr.promise();
+      }).catch((reason) => reject(reason));
+    };
+
+    return new Promise(promiseHandler);
   }
 }

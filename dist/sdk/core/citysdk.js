@@ -1,10 +1,9 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery'), require('terraformer'), require('terraformer-arcgis-parser')) :
-	typeof define === 'function' && define.amd ? define(['jquery', 'terraformer', 'terraformer-arcgis-parser'], factory) :
-	(global.CitySdk = factory(global.$,global.Terraformer,global.Terraformer.ArcGIS));
-}(this, function ($,Terraformer,ArcGIS) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('terraformer'), require('terraformer-arcgis-parser')) :
+	typeof define === 'function' && define.amd ? define(['terraformer', 'terraformer-arcgis-parser'], factory) :
+	(global.CitySdk = factory(global.Terraformer,global.Terraformer.ArcGIS));
+}(this, function (Terraformer,ArcGIS) { 'use strict';
 
-	$ = 'default' in $ ? $['default'] : $;
 	Terraformer = 'default' in Terraformer ? Terraformer['default'] : Terraformer;
 	ArcGIS = 'default' in ArcGIS ? ArcGIS['default'] : ArcGIS;
 
@@ -261,82 +260,21 @@
 	  }
 
 	  /**
-	   * @function ajaxRequest
+	   * @function getStateCapitalCoords
 	   * @static
 	   *
-	   * @description Makes an AJAX call
+	   * @description Gets the coordinates of a state's capital
+	   * from it's name or 2-letter code.
 	   *
-	   * @param {string} url URL to request
+	   * @param {string} state Name or 2-letter code of the state
+	   * (case insensitive)
 	   *
-	   * @param {boolean} jsonp
-	   * @return {JQueryPromise}
+	   * @return {Array} Returns 2-position array of Lat & Long
+	   * for the capital of the state. Returns false if no state is found.
 	   */
 
 
 	  createClass(CitySdk, null, [{
-	    key: 'ajaxRequest',
-	    value: function ajaxRequest(url, jsonp) {
-	      if (jsonp) {
-	        var dfr = $.Deferred();
-
-	        $.ajax({
-	          url: url,
-	          method: 'GET',
-	          dataType: 'jsonp',
-
-	          success: function success(response) {
-	            dfr.resolve(response);
-	          },
-
-	          error: function error(reason) {
-	            dfr.reject(reason);
-	          }
-	        });
-
-	        return dfr.promise();
-	      }
-
-	      return $.getJSON(url);
-	    }
-
-	    /**
-	     * @function postRequest
-	     * @static
-	     *
-	     * @description Make an AJAX call using the POST method
-	     *
-	     * @param {string} url
-	     * @param {object} data
-	     *
-	     * @returns {*}
-	     */
-
-	  }, {
-	    key: 'postRequest',
-	    value: function postRequest(url, data) {
-	      return $.ajax({
-	        type: 'POST',
-	        url: url,
-	        data: data,
-	        dataType: 'json'
-	      });
-	    }
-
-	    /**
-	     * @function getStateCapitalCoords
-	     * @static
-	     *
-	     * @description Gets the coordinates of a state's capital
-	     * from it's name or 2-letter code.
-	     *
-	     * @param {string} state Name or 2-letter code of the state
-	     * (case insensitive)
-	     *
-	     * @return {Array} Returns 2-position array of Lat & Long
-	     * for the capital of the state. Returns false if no state is found.
-	     */
-
-	  }, {
 	    key: 'getStateCapitalCoords',
 	    value: function getStateCapitalCoords(state) {
 	      // No string supplied
@@ -362,65 +300,6 @@
 
 	      // Nothing was found
 	      return null;
-	    }
-
-	    /**
-	     * @function parseRequestLatLng
-	     * @static
-	     *
-	     * @description Scans the request for alternative ways
-	     * to specify latitude & longiture and migrates those
-	     * variables to lat & lng positions.
-	     *
-	     * @param {object} request the request being made to the module
-	     *
-	     * @return {object} the updated request
-	     * 
-	     * @deprecated
-	     */
-
-	  }, {
-	    key: 'parseRequestLatLng',
-	    value: function parseRequestLatLng(request) {
-	      // Allow the users to use either x,y; lat,lng;
-	      // latitude,longitude to specify co-ordinates
-	      if (!('lat' in request)) {
-	        if ('latitude' in request) {
-	          request.lat = request.latitude;
-	          delete request.latitude;
-	        } else if ('y' in request) {
-	          request.lat = request.y;
-	          delete request.y;
-	        }
-	      }
-
-	      if (!('lng' in request)) {
-	        if ('longitude' in request) {
-	          request.lng = request.longitude;
-	          delete request.longitude;
-	        } else if ('x' in request) {
-	          request.lng = request.x;
-	          delete request.x;
-	        }
-	      }
-
-	      return request;
-	    }
-
-	    /**
-	     * @deprecated
-	     *
-	     * @param response
-	     * @returns {*}
-	     */
-
-	  }, {
-	    key: 'parseResponseLatLng',
-	    value: function parseResponseLatLng(response) {
-	      response.lat = parseFloat(response.features[0].attributes.CENTLAT);
-	      response.lng = parseFloat(response.features[0].attributes.CENTLON);
-
-	      return response;
 	    }
 
 	    /**
@@ -472,10 +351,6 @@
 	  }]);
 	  return CitySdk;
 	}();
-
-	CitySdk.version = '0.0.1';
-	CitySdk.stateNames = stateNames;
-	CitySdk.stateCapitalCoordinates = stateCapitalCoordinates;
 
 	return CitySdk;
 

@@ -1,6 +1,7 @@
-import $ from 'jquery';
+import Promise from 'promise';
 
 import CitySdk from './citysdk';
+import CitySdkHttp from './citysdk-http';
 
 import aliases from '../../resources/aliases.json';
 import stateCapitalsLatLng from '../../resources/us-states-latlng.json';
@@ -75,13 +76,11 @@ export default class CensusRequestUtils {
   }
 
   static getLatLngFromZipcode(zip) {
-    let dfr = $.Deferred();
-
-    $.getJSON(zctaJsonUrl).then(function(coordinates) {
-      dfr.resolve(coordinates[zip]);
+    return new Promise((resolve, reject) => {
+      CitySdkHttp.get(zctaJsonUrl, false)
+          .then((coordinates) => resolve(coordinates[zip]))
+          .catch((reason) => reject(reason));
     });
-
-    return dfr.promise();
   }
 
   /**
@@ -117,92 +116,83 @@ export default class CensusRequestUtils {
       throw new Error('Invalid address! "city" and "state" or "zip" must be provided.');
     }
 
-    return CitySdk.ajaxRequest(url, true);
+    return CitySdkHttp.get(url, true);
   }
 
   static getLatLng(request) {
-    let dfr = $.Deferred();
+    let promiseHandler = (resolve, reject) => {
+      if (request.address) {
+        CensusRequestUtils.getLatLngFromAddress(request.address).then((response) => {
+          let coordinates = response.result.addressMatches[0].coordinates;
+          request.lat = coordinates.y;
+          request.lng = coordinates.x;
+          resolve(request);
 
-    function onRequestError(reason) {
-      dfr.reject(reason);
-    }
+        }).catch((reason) => reject(reason));
 
-    if (request.address) {
-      CensusRequestUtils.getLatLngFromAddress(request.address).then((response) => {
-        let coordinates = response.result.addressMatches[0].coordinates;
-        request.lat = coordinates.y;
-        request.lng = coordinates.x;
+      } else if (request.zip) {
+        CensusRequestUtils.getLatLngFromZipcode(request.zip).then((coordinates) => {
+          request.lat = coordinates[1];
+          request.lng = coordinates[0];
+          resolve(request);
 
-        dfr.resolve(request);
-      }, onRequestError);
+        }).catch((reason) => reject(reason));
 
-    } else if (request.zip) {
-      CensusRequestUtils.getLatLngFromZipcode(request.zip).then((coordinates) => {
-        request.lat = coordinates[1];
-        request.lng = coordinates[0];
+      } else if (request.state) {
+        // Since this function returns a promise we want this to be an asynchronous
+        // call. Therefore, we wrap in a setTimout() since it allows the function to
+        // return before the code inside the setTimeout is excecuted.
+        setTimeout(() => {
+          let coordinates = CensusRequestUtils.getLatLngFromStateCode(request.state);
+          request.lat = coordinates[0];
+          request.lng = coordinates[1];
 
-        dfr.resolve(request);
-      }, onRequestError);
+          resolve(request);
+        }, 0);
 
-    } else if (request.state) {
-      // Since this function returns a promise we want this to be an asynchronous
-      // call. Therefore, we wrap in a setTimout() since it allows the function to
-      // return before the code inside the setTimeout is excecuted.
-      setTimeout(() => {
-        let coordinates = CensusRequestUtils.getLatLngFromStateCode(request.state);
-        request.lat = coordinates[0];
-        request.lng = coordinates[1];
+      } else {
+        reject(new Error("One of 'address', 'state' or 'zip' must be provided."));
+      }
+    };
 
-        dfr.resolve(request);
-      }, 0);
-
-    } else {
-      dfr.reject(new Error("One of 'address', 'state' or 'zip' must be provided."));
-    }
-
-    return dfr.promise();
+    return new Promise(promiseHandler);
   }
 
   static getFipsFromLatLng(request) {
     let lat = request.lat;
     let lng = request.lng;
-    let dfr = $.Deferred();
     let url = fipsGeocoderUrl;
-
-    let onRequestError = (reason) => {
-      dfr.reject(reason);
-    };
 
     // Benchmark id: 4 = Public_AR_Current
     // Vintage id: 4 = Current_Current
     url += `x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,84,86&format=jsonp`;
 
-    CitySdk.ajaxRequest(url, true).then((response) => {
-      let geographies = response.result.geographies;
+    let promiseHandler = (resolve, reject) => {
+      CitySdkHttp.get(url, true).then((response) => {
+        let geographies = response.result.geographies;
 
-      // The 2010 Census Blocks object seems to have
-      // the FIPS codes for all the level we need.
-      let fips = geographies['2010 Census Blocks'][0];
+        // The 2010 Census Blocks object seems to have
+        // the FIPS codes for all the level we need.
+        let fips = geographies['2010 Census Blocks'][0];
 
-      // FIPS codes
-      request.state = fips.STATE;
-      request.tract = fips.TRACT;
-      request.county = fips.COUNTY;
-      request.blockGroup = fips.BLKGRP;
+        // FIPS codes
+        request.state = fips.STATE;
+        request.tract = fips.TRACT;
+        request.county = fips.COUNTY;
+        request.blockGroup = fips.BLKGRP;
 
-      // Check if this location is Incorporated. If so, then get the FIPS code.
-      if (geographies['Incorporated Places'] && geographies['Incorporated Places'].length) {
-        request.place = geographies['Incorporated Places'][0].PLACE;
-        request.place_name = geographies['Incorporated Places'][0].NAME;
-      }
+        // Check if this location is Incorporated. If so, then get the FIPS code.
+        if (geographies['Incorporated Places'] && geographies['Incorporated Places'].length) {
+          request.place = geographies['Incorporated Places'][0].PLACE;
+          request.place_name = geographies['Incorporated Places'][0].NAME;
+        }
 
-      request.geocoded = true;
+        request.geocoded = true;
+        resolve(request);
+      }).catch((reason) => reject(reason));
+    };
 
-      dfr.resolve(request);
-
-    }, onRequestError);
-
-    return dfr.promise();
+    return new Promise(promiseHandler);
   }
 
   static getGeographyVariables(request) {
@@ -211,6 +201,6 @@ export default class CensusRequestUtils {
     }
     
     let url = `${defaultEndpoints.censusUrl}${request.year}/${request.api}/geography.json`;
-    return CitySdk.ajaxRequest(url, false);
+    return CitySdkHttp.get(url, false);
   }
 }

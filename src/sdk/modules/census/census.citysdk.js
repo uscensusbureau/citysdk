@@ -95,21 +95,21 @@ export default class CensusModule {
 
   getVariableDictionary(api, year) {
     let url = `${CensusModule.defaultEndpoints.acsVariableDictionaryURL}${year}/${api}/variables.json`;
-    return CitySdk.ajaxRequest(url, false);
+    return CitySdk.get(url, false);
   }
 
   latLngToFips(lat, lng) {
     let url = `${CensusModule.defaultEndpoints.geoCoderUrl}coordinates`;
     url += `?x=${lng}&y=${lat}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp`;
 
-    return CitySdk.ajaxRequest(url, true);
+    return CitySdk.get(url, true);
   }
 
   addressToFips(street, city, state) {
     let url = `${CensusModule.defaultEndpoints.geoCoderUrl}address`;
     url += `?street=${street}&city=${city}&state=${state}&benchmark=4&vintage=4&layers=8,12,28,86,84&format=jsonp`;
 
-    return CitySdk.ajaxRequest(url, true);
+    return CitySdk.get(url, true);
   }
 
   zipToLatLng(zip) {
@@ -125,7 +125,7 @@ export default class CensusModule {
     let module = this;
     let url = CensusModule.defaultEndpoints.censusUrl + request.year + "/" + request.api + "/geography.json";
 
-    CitySdk.ajaxRequest(url).then((response) => {
+    CitySdk.get(url).then((response) => {
       request.geographyValidForAPI = module.validateRequestGeographyVariablesProcess(request, response);
       callback(request);
       return;
@@ -640,7 +640,7 @@ export default class CensusModule {
         tigerRequest.geometryType = "esriGeometryPoint";
         tigerRequest.spatialRel = "esriSpatialRelIntersects";
 
-        CitySdk.postRequest(tigerURL, tigerRequest).then((json) => {
+        CitySdk.post(tigerURL, tigerRequest).then((json) => {
           let features = json.features;
 
           // Grab our container ESRI geography, attach it to our request,
@@ -669,7 +669,7 @@ export default class CensusModule {
 
         delete request.containerGeometry;
 
-        CitySdk.postRequest(tigerURL, tigerRequest).then((response) => {
+        CitySdk.post(tigerURL, tigerRequest).then((response) => {
           callback(this.esriToGeo(response));
         });
       }
@@ -717,7 +717,7 @@ export default class CensusModule {
       tigerRequest.geometryType = "esriGeometryPoint";
       tigerRequest.spatialRel = "esriSpatialRelIntersects";
 
-      CitySdk.postRequest(tigerURL, tigerRequest).then((response) => {
+      CitySdk.post(tigerURL, tigerRequest).then((response) => {
         callback(this.esriToGeo(response));
       });
     }

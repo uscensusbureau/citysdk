@@ -1,11 +1,11 @@
-var ts = require('gulp-typescript');
 var del = require('del');
 var gulp = require('gulp');
-var babel = require('rollup-plugin-babel');
+var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
 var rollup = require('rollup');
 var replace = require('gulp-replace');
 var rollupJson = require('rollup-plugin-json');
+var rollupBabel = require('rollup-plugin-babel');
 
 /***********************************************************************
  *                            Shared tasks                              *
@@ -37,10 +37,8 @@ gulp.task('copy:resources', function() {
 // Watches the typescript and json files in src/api and excutes the build
 // task if a change is detected.
 // ----------------------------------------------------------------------
-gulp.task('watch', ['build:api', 'build:sdk'], function() {
-  gulp.watch('./src/api/**/*.ts', ['compile:typescript']);
+gulp.task('watch', ['build:services', 'build:sdk'], function() {
   gulp.watch('./src/sdk/core/*.js', ['compile:core']);
-  gulp.watch('./src/sdk/modules/census/*.js', ['compile:census']);
   gulp.watch('./src/resources/*.json', ['copy:resources']);
 });
 
@@ -49,53 +47,21 @@ gulp.task('watch', ['build:api', 'build:sdk'], function() {
 //
 // Cleans the dist directory and builds both the Node API and JS SDK
 // ----------------------------------------------------------------------
-gulp.task('default', ['clean', 'build:api', 'build:sdk']);
+gulp.task('default', ['clean', 'build:sdk', 'build:services']);
 
 /***********************************************************************
  *                           Node API tasks                            *
  /***********************************************************************/
-
 // ----------------------------------------------------------------------
-// Task: Compile: Typescript
+// Task: Build: Services
 //
-// Compile typescript files (core and modules) and
-// copy them to the build directory.
+// Cleans the dist directory and builds both the Node API and JS SDK
 // ----------------------------------------------------------------------
-gulp.task('compile:typescript', function() {
-  return gulp.src('./src/api/**/*.ts')
-      .pipe(ts({'target': 'es5', 'module': 'commonjs', 'sourceMap': true}))
-      .pipe(gulp.dest('dist/api'));
+gulp.task('build:services', function() {
+  return gulp.src('src/api/services/*.js')
+      .pipe(babel({presets: ['es2015']}))
+      .pipe(gulp.dest('dist/api/services'));
 });
-
-// ----------------------------------------------------------------------
-// Task: Replace: Filepath
-//
-// Rename the filepath in the services modules to point to the census
-// modules in the dist directory.
-// ----------------------------------------------------------------------
-gulp.task('rename:filepaths', function() {
-  var oldCensusModule = '../../../dist/api/modules/census/census.citysdk';
-  var newCensusModule = '../modules/census/census.citysdk';
-
-  var oldCoreModule = '../../../dist/api/core/citysdk';
-  var newCoreModule = '../core/citysdk';
-
-  return gulp.src('./src/api/services/*.js')
-      .pipe(replace(oldCensusModule, newCensusModule))
-      .pipe(replace(oldCoreModule, newCoreModule))
-      .pipe(gulp.dest('./dist/api/services/'));
-});
-
-// ----------------------------------------------------------------------
-// Task: Build: API
-//
-// Executes all tasks required to buld the Node API.
-// ----------------------------------------------------------------------
-gulp.task('build:api', [
-  'compile:typescript',
-  'rename:filepaths',
-  'copy:resources'
-]);
 
 /***********************************************************************
  *                            JS SDK tasks                              *
@@ -108,7 +74,7 @@ var distCorePath = 'dist/sdk/core/';
 var rollupOpts = {
   plugins: [
     rollupJson(),
-    babel({exclude: 'node_modules/**'})
+    rollupBabel({exclude: 'node_modules/**'})
   ]
 };
 
@@ -116,6 +82,7 @@ var rollupWriteOpts = {
   format: 'umd',
   globals: {
     'jquery': '$',
+    'promise': 'Promise',
     'terraformer': 'Terraformer',
     'terraformer-arcgis-parser': 'Terraformer.ArcGIS'
   },

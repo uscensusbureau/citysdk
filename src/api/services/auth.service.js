@@ -1,21 +1,21 @@
-var request = require('request');
-var basicAuth = require('basic-auth');
+const request = require('request');
+const basicAuth = require('basic-auth');
 
 export function validateApiKey(req, res, next) {
-  var apikey = basicAuth(req);
+  let apikey = basicAuth(req);
 
   function unauthorized(res) {
     res.set('WWW-Authenticate', 'Basic realm=Authorization Required');
-    return res.send(401);
+    return res.sendStatus(401);
   }
 
   if (!apikey || !apikey.name) {
     return unauthorized(res);
   }
 
-  var keyValidationUrl = 'http://api.census.gov/data/?key=' + apikey.name;
+  let keyValidationUrl = 'http://api.census.gov/data/?key=' + apikey.name;
 
-  request.get(keyValidationUrl, function(error, response) {
+  request.get(keyValidationUrl, (error, response) => {
     if (error) {
       return unauthorized(res);
     }
@@ -41,11 +41,11 @@ export function validateApiKey(req, res, next) {
 export function decodeAuthHeader(req) {
   // The value is in the format 'Basic <base64_api_key:>'
   // Just want the <base64_api_key> part
-  var authHeader = req.header('Authorization').split(' ');
-  var base64ApiKey = authHeader[1];
+  let authHeader = req.header('Authorization').split(' ');
+  let base64ApiKey = authHeader[1];
 
   // Decode base64 services key
-  var stringBuffer = new Buffer(base64ApiKey, 'base64');
+  let stringBuffer = new Buffer(base64ApiKey, 'base64');
 
   // The auth format is in the format username:password but we don't
   // use password and the services key is used as the username.

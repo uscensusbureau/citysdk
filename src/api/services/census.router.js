@@ -1,54 +1,28 @@
-import {decodeAuthHeader, validateApiKey} from './auth.service';
+const express = require('express');
 
-var express = require('express');
-var CitySdk = require('../../../dist/api/core/citysdk');
-var CensusModule = require('../../../dist/api/modules/census/census.citysdk');
+const CensusRequest = require('../../sdk/core/census-request');
+const validateApiKey = require('./auth.service').validateApiKey;
+const decodeAuthHeader = require('./auth.service').decodeAuthHeader;
 
-var citysdk = new CitySdk.default();
-var router = express.Router();
+let router = express.Router();
 
-var moduleInstantiated = false;
-var census;
-
-function getModuleInstance(req) {
-  if (!moduleInstantiated) {
-    var apikey = decodeAuthHeader(req);
-
-    census = new CensusModule.default(apikey);
-    return census;
-  }
-
-  return census;
-}
-
-router.post('/', validateApiKey, function(req, res) {
-  getModuleInstance(req).geoRequest(req.body, function(response) {
-    res.json(response);
+router.post('/', validateApiKey, (req, res) => {
+  req.body.apikey = decodeAuthHeader(req);
+  CensusRequest.request(req.body).then((response) => {
+    res.json(response)
   });
 });
 
-router.get('/states', function(req, res) {
-  res.json(citysdk.getStates());
-});
-
-router.get('/state-capitals', function(req, res) {
-  res.json(citysdk.getStateCapitals());
-});
-
-router.get('/aliases', function(req, res) {
-  res.json(getModuleInstance(req).getAliases());
-});
-
-router.get('/variable-to-alias', function(req, res) {
+router.get('/variable-to-alias', (req, res) => {
   function sendError(message) {
-    res.status(400).send(message);
+    res.sendStatus(400).send(message);
   }
 
   if (req.query && req.query.variables) {
     var variables = req.query.variables.split(',');
 
     try {
-      var response = getModuleInstance(req).variableToAlias(variables);
+      var response = CensusRequest.variableToAlias(variables);
       res.json(response);
     } catch (e) {
       sendError(e);
@@ -59,16 +33,16 @@ router.get('/variable-to-alias', function(req, res) {
   }
 });
 
-router.get('/alias-to-variable', function(req, res) {
+router.get('/alias-to-variable', (req, res) => {
   function sendError(message) {
-    res.status(400).send(message);
+    res.sendStatus(400).send(message);
   }
   
   if (req.query && req.query.aliases) {
     var aliases = req.query.aliases.split(',');
     
     try {
-      var response = getModuleInstance(req).aliasToVariable(aliases);
+      var response = CensusRequest.aliasToVariable(aliases);
       res.json(response);
     } catch (e) {
       sendError(e);
