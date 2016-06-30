@@ -27,7 +27,7 @@ into the SDK, saving the developer from having to do it herself.
 
 ## Getting Started
 
-CitySdk is available as an API _and_ SDK. If you want to use the API, then read the API documentation.
+CitySdk is available as an API _and_ SDK. If you want to use the API, then read the [API documentation](src/api/README.md).
 
 To use the JavaScript SDK, you'll need to add four dependencies:
 
@@ -36,9 +36,35 @@ To use the JavaScript SDK, you'll need to add four dependencies:
 3. Terraformer
 4. Terraformer ArcGIS Parser
 
+Make sure the `script` tag for CitySdk is the last one.
+
 ```
 <script src="https://www.promisejs.org/polyfills/promise-6.1.0.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="https://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js"></script>
 <script src="https://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js"></script>
+<script src="https://raw.githubusercontent.com/uscensusbureau/citysdk/0.2.0/citysdk.js"></script>
+```
+
+Once you have all that in place you can start using CitySdk:
+
+```
+<script>
+    let request = {
+        "zip": "21701",
+        "variables": ["income", "population"],
+        "level": "county",
+        "sublevel": true,
+        "state": "MD",
+        "container": "state"
+    };
+    
+    let data;
+    
+    CitySdk.request(request).then((response) => doSomethingWithData(response));
+    
+    function doSomethingWithData(data) {
+        // Do something
+    }
+</script>
 ```
