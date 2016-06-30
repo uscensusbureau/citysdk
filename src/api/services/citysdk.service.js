@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const censusRouter = require('./census.router');
+const citysdkRouter = require('./citysdk.router');
 
 let app = express();
 
@@ -12,5 +12,5 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', censusRouter);
+app.use('/', citysdkRouter);
 app.listen('3000');

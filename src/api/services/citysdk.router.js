@@ -1,6 +1,6 @@
 const express = require('express');
 
-const CensusRequest = require('../../sdk/core/census-request');
+const CitySdk = require('../../sdk/core/citysdk');
 const validateApiKey = require('./auth.service').validateApiKey;
 const decodeAuthHeader = require('./auth.service').decodeAuthHeader;
 
@@ -8,7 +8,7 @@ let router = express.Router();
 
 router.post('/', validateApiKey, (req, res) => {
   req.body.apikey = decodeAuthHeader(req);
-  CensusRequest.request(req.body).then((response) => {
+  CitySdk.request(req.body).then((response) => {
     res.json(response)
   });
 });
@@ -22,7 +22,7 @@ router.get('/variable-to-alias', (req, res) => {
     var variables = req.query.variables.split(',');
 
     try {
-      var response = CensusRequest.variableToAlias(variables);
+      var response = CitySdk.variableToAlias(variables);
       res.json(response);
     } catch (e) {
       sendError(e);
@@ -42,7 +42,7 @@ router.get('/alias-to-variable', (req, res) => {
     var aliases = req.query.aliases.split(',');
     
     try {
-      var response = CensusRequest.aliasToVariable(aliases);
+      var response = CitySdk.aliasToVariable(aliases);
       res.json(response);
     } catch (e) {
       sendError(e);
