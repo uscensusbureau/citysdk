@@ -1,6 +1,6 @@
 import Promise from 'promise';
 
-import CensusRequestUtils from './census-request-utils';
+import CitySdkRequestUtils from './citysdk-request-utils';
 
 import availableDatasets from '../../resources/available-datasets.json';
 
@@ -13,7 +13,7 @@ const defaultSublevel = false;
 // Valid levels
 const levels = new Set(['blockGroup', 'tract', 'county', 'state', 'us', 'place']);
 
-export default class CensusRequestValidator {
+export default class CitySdkRequestValidator {
   constructor() {}
 
   static validateApi(request) {
@@ -72,7 +72,7 @@ export default class CensusRequestValidator {
   
   static validateGeoVariables(request) {
     let promiseHandler = (resolve, reject) => {
-      CensusRequestUtils.getGeographyVariables(request).then((response) => {
+      CitySdkRequestUtils.getGeographyVariables(request).then((response) => {
         let fips = response.fips;
         let level = request.level;
         let valid = false;

@@ -15,7 +15,7 @@ describe('censusSummaryRequest', function() {
   var result;
   
   beforeEach(function(done) {
-    CensusSummaryRequest.request(request).then(function(response) {
+    CitySdkSummaryRequest.request(request).then(function(response) {
       result = response;
       done();
     });

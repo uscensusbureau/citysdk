@@ -110,23 +110,13 @@ gulp.task('compile:CitySdk', function() {
 });
 
 // ----------------------------------------------------------------------
-// Task: Compile: CensusRequest
-//
-// Uses the rollup to compile the ES6 census module into browser
-// compatible javascript
-// ----------------------------------------------------------------------
-gulp.task('compile:CensusRequest', function() {
-  return rollItUp('census-request.js', 'CensusRequest');
-});
-
-// ----------------------------------------------------------------------
 // Task: Compile: CensusGeoRequest
 //
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:CensusGeoRequest', function() {
-  return rollItUp('census-geo-request.js', 'CensusGeoRequest');
+gulp.task('compile:CitySdkGeoRequest', function() {
+  return rollItUp('citysdk-geo-request.js', 'CitySdkGeoRequest');
 });
 
 // ----------------------------------------------------------------------
@@ -135,8 +125,8 @@ gulp.task('compile:CensusGeoRequest', function() {
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:CensusTigerwebRequest', function() {
-  return rollItUp('census-tigerweb-request.js', 'CensusTigerwebRequest');
+gulp.task('compile:CitySdkTigerwebRequest', function() {
+  return rollItUp('citysdk-tigerweb-request.js', 'CitySdkTigerwebRequest');
 });
 
 // ----------------------------------------------------------------------
@@ -145,8 +135,8 @@ gulp.task('compile:CensusTigerwebRequest', function() {
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:CensusRequestValidator', function() {
-  return rollItUp('census-request-validator.js', 'CensusRequestValidator');
+gulp.task('compile:CitySdkRequestValidator', function() {
+  return rollItUp('citysdk-request-validator.js', 'CitySdkRequestValidator');
 });
 
 // ----------------------------------------------------------------------
@@ -155,8 +145,8 @@ gulp.task('compile:CensusRequestValidator', function() {
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:CensusRequestUtils', function() {
-  return rollItUp('census-request-utils.js', 'CensusRequestUtils');
+gulp.task('compile:CitySdkRequestUtils', function() {
+  return rollItUp('citysdk-request-utils.js', 'CitySdkRequestUtils');
 });
 
 // ----------------------------------------------------------------------
@@ -165,8 +155,8 @@ gulp.task('compile:CensusRequestUtils', function() {
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:CensusSummaryRequest', function() {
-  return rollItUp('census-summary-request.js', 'CensusSummaryRequest');
+gulp.task('compile:CitySdkSummaryRequest', function() {
+  return rollItUp('citysdk-summary-request.js', 'CitySdkSummaryRequest');
 });
 
 // ----------------------------------------------------------------------
@@ -176,11 +166,10 @@ gulp.task('compile:CensusSummaryRequest', function() {
 // ----------------------------------------------------------------------
 gulp.task('build:sdk', [
   'compile:CitySdk',
-  'compile:CensusRequest',
-  'compile:CensusGeoRequest',
-  'compile:CensusTigerwebRequest',
-  'compile:CensusRequestValidator',
-  'compile:CensusRequestUtils',
-  'compile:CensusSummaryRequest',
+  'compile:CitySdkGeoRequest',
+  'compile:CitySdkTigerwebRequest',
+  'compile:CitySdkRequestValidator',
+  'compile:CitySdkRequestUtils',
+  'compile:CitySdkSummaryRequest',
   'copy:resources'
 ]);

@@ -1,6 +1,6 @@
 describe('validateApi', function() {
   var request = {};
-  CensusRequestValidator.validateApi(request);
+  CitySdkRequestValidator.validateApi(request);
 
   it('should modify request to have a default api', function() {
     expect(request.api).toBe('acs5');
@@ -11,13 +11,13 @@ describe('validateApiYear', function() {
   var request = {};
 
   it('should only validate if the api field exists', function() {
-    CensusRequestValidator.validateApiYear(request);
+    CitySdkRequestValidator.validateApiYear(request);
     expect(request.hasOwnProperty('year')).toBe(false);
   });
 
   it('should modify request to have a valid year for acst', function() {
     request.api = 'acs5';
-    CensusRequestValidator.validateApiYear(request);
+    CitySdkRequestValidator.validateApiYear(request);
 
     expect(request.hasOwnProperty('year')).toBe(true);
     expect(request.year).toBeDefined();
@@ -27,14 +27,14 @@ describe('validateApiYear', function() {
 describe('validateLevel', function() {
   it('should change the level field to have a valid value', function() {
     var request = {level: 'invalid level'};
-    CensusRequestValidator.validateLevel(request);
+    CitySdkRequestValidator.validateLevel(request);
 
     expect(request.level).toBe('blockGroup');
   });
 
   it('should add the level field if it is missing', function() {
     var request = {};
-    CensusRequestValidator.validateLevel(request);
+    CitySdkRequestValidator.validateLevel(request);
 
     expect(request.level).toBe('blockGroup');
   })
@@ -43,7 +43,7 @@ describe('validateLevel', function() {
 describe('validateSublevel', function() {
   it('should add the default sublevel value of false', function() {
     var request = {};
-    CensusRequestValidator.validateSublevel(request);
+    CitySdkRequestValidator.validateSublevel(request);
 
     expect(request.sublevel).toBe(false);
   });
@@ -61,7 +61,7 @@ describe('validateGeoVariables with invalid level', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestValidator.validateGeoVariables(request)
+    CitySdkRequestValidator.validateGeoVariables(request)
         .then(function(response) {
           // Should not get here.
           result = response;
@@ -89,7 +89,7 @@ describe('validateGeoVariables with valid level', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestValidator.validateGeoVariables(request).then(function(response) {
+    CitySdkRequestValidator.validateGeoVariables(request).then(function(response) {
       result = response;
       done();
     });

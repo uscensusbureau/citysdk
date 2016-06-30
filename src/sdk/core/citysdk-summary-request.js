@@ -1,7 +1,7 @@
 import Promise from 'promise';
 
 import CitySdkHttp from './citysdk-http';
-import CensusRequestUtils from './census-request-utils';
+import CitySdkRequestUtils from './citysdk-request-utils';
 
 import requiredVariables from '../../resources/required-variables.json';
 
@@ -12,7 +12,7 @@ const defaultEndpoints = {
   censusUrl: 'https://api.census.gov/data/'
 };
 
-export default class CensusSummaryRequest {
+export default class CitySdkSummaryRequest {
 
   static parseSummaryResponse(request, response) {
     request.data = [];
@@ -65,7 +65,7 @@ export default class CensusSummaryRequest {
         for (let j = 0; j < request.variables.length; j++) {
           currentVariable = request.variables[j];
 
-          let validVariable = CensusRequestUtils.parseToValidVariable(currentVariable, request.api, request.year);
+          let validVariable = CitySdkRequestUtils.parseToValidVariable(currentVariable, request.api, request.year);
           let index = response[0].indexOf(validVariable);
           let intermediateVar = currentResponseItem[index];
 
@@ -74,10 +74,10 @@ export default class CensusSummaryRequest {
           }
 
           // Variable is Normalizeable
-          if (intermediateVar && CensusRequestUtils.isNormalizable(currentVariable)
-              && CensusRequestUtils.parseToValidVariable('population', request.api, request.year)) {
+          if (intermediateVar && CitySdkRequestUtils.isNormalizable(currentVariable)
+              && CitySdkRequestUtils.parseToValidVariable('population', request.api, request.year)) {
 
-            let validVariable = CensusRequestUtils.parseToValidVariable('population', request.api, request.year);
+            let validVariable = CitySdkRequestUtils.parseToValidVariable('population', request.api, request.year);
             let index = response[0].indexOf(validVariable);
             let property = currentVariable + '_normalized';
 
@@ -95,17 +95,17 @@ export default class CensusSummaryRequest {
       for (let i = 0; i < request.variables.length; i++) {
         currentVariable = request.variables[i];
 
-        if (CensusRequestUtils.parseToValidVariable(currentVariable, request.api, request.year)) {
-          let validVariable = CensusRequestUtils.parseToValidVariable(currentVariable, request.api, request.year);
+        if (CitySdkRequestUtils.parseToValidVariable(currentVariable, request.api, request.year)) {
+          let validVariable = CitySdkRequestUtils.parseToValidVariable(currentVariable, request.api, request.year);
           let index = response[0].indexOf(validVariable);
 
           currentDataObject[currentVariable] = response[1][index];
         }
 
-        if (currentDataObject[currentVariable] && CensusRequestUtils.isNormalizable(currentVariable)
-            && CensusRequestUtils.parseToValidVariable('population', request.api, request.year)) {
+        if (currentDataObject[currentVariable] && CitySdkRequestUtils.isNormalizable(currentVariable)
+            && CitySdkRequestUtils.parseToValidVariable('population', request.api, request.year)) {
 
-          let validVariable = CensusRequestUtils.parseToValidVariable('population', request.api, request.year);
+          let validVariable = CitySdkRequestUtils.parseToValidVariable('population', request.api, request.year);
           let index = response[1].indexOf(validVariable);
           let property = currentVariable + '_normalized';
 
@@ -235,7 +235,7 @@ export default class CensusSummaryRequest {
     }
 
     for (let variable of request.variables) {
-      if (CensusRequestUtils.isNormalizable(variable)) {
+      if (CitySdkRequestUtils.isNormalizable(variable)) {
         // add acs population variable
         if (request.variables.indexOf('population') < 0) {
           //We have a variable that is normalizable, but no population in the request.
@@ -252,7 +252,7 @@ export default class CensusSummaryRequest {
     let hasPopulation = false;
     
     for (let i = 0; i < variables.length; i++) {
-      if (CensusRequestUtils.isNormalizable(variables[i]) && !hasPopulation) {
+      if (CitySdkRequestUtils.isNormalizable(variables[i]) && !hasPopulation) {
         // add acs population variable
         if (request.variables.indexOf('population') < 0) {
           //We have a variable that is normalizable, but no population in the request.
@@ -264,7 +264,7 @@ export default class CensusSummaryRequest {
       }
 
       // Convert the aliased variables
-      let variableIntermediate = CensusRequestUtils
+      let variableIntermediate = CitySdkRequestUtils
           .parseToValidVariable(request.variables[i], request.api, request.year);
       
       if (variableIntermediate) {
@@ -290,7 +290,7 @@ export default class CensusSummaryRequest {
 
     let promiseHandler = (resolve, reject) => {
       CitySdkHttp.get(url, false).then((response) => {
-        request = CensusSummaryRequest.parseSummaryResponse(request, response);
+        request = CitySdkSummaryRequest.parseSummaryResponse(request, response);
         resolve(request);
         
       }).catch((reason) => reject(reason));

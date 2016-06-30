@@ -1,10 +1,10 @@
 import Promise from 'promise';
 
-import CensusRequest from './census-request';
-import CensusSummaryRequest from './census-summary-request';
-import CensusTigerwebRequest from './census-tigerweb-request';
+import CitySdk from './citysdk';
+import CitySdkSummaryRequest from './citysdk-summary-request';
+import CitySdkTigerwebRequest from './citysdk-tigerweb-request';
 
-export default class CensusGeoRequest {
+export default class CitySdkGeoRequest {
 
   static supplementalRequest(req, res, featureIndex) {
     let i = featureIndex;
@@ -33,7 +33,7 @@ export default class CensusGeoRequest {
     };
 
     let promiseHandler = (resolve, reject) => {
-      let censusSummaryRequest = CensusSummaryRequest.request(suppRequest);
+      let censusSummaryRequest = CitySdkSummaryRequest.request(suppRequest);
 
       censusSummaryRequest.then((response) => {
         for (let property in response.data[0]) {
@@ -99,7 +99,7 @@ export default class CensusGeoRequest {
         });
 
         if (matchedFeature.length === 0) {
-          supplementalRequests.push(CensusGeoRequest.supplementalRequest(request, response, i))
+          supplementalRequests.push(CitySdkGeoRequest.supplementalRequest(request, response, i))
 
         } else if (matchedFeature.length === 1) {
           // We have matched the feature's tract to a data tract, move the data over
@@ -143,9 +143,9 @@ export default class CensusGeoRequest {
 
   static request(request) {
     let promiseHandler = (resolve, reject) => {
-      CensusRequest.request(request)
-          .then(CensusTigerwebRequest.request)
-          .then(CensusGeoRequest.handleTigerwebResponse)
+      CitySdk.request(request)
+          .then(CitySdkTigerwebRequest.request)
+          .then(CitySdkGeoRequest.handleTigerwebResponse)
           .then((response) => resolve(response))
           .catch((reason) => reject(reason));
     };

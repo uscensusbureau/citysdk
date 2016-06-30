@@ -35,7 +35,7 @@ describe('getContainerGeometry', function() {
   var result;
   
   beforeEach(function(done) {
-    CensusTigerwebRequest.getContainerGeometry(request).then(function(response) {
+    CitySdkTigerwebRequest.getContainerGeometry(request).then(function(response) {
       result = response;
       done();
     });
@@ -72,7 +72,7 @@ describe('getGeoData', function() {
   var result;
   
   beforeEach(function(done) {
-    CensusTigerwebRequest.getContainerGeometry(request).then(function(response) {
+    CitySdkTigerwebRequest.getContainerGeometry(request).then(function(response) {
       result = response;
       done();
     });
@@ -99,7 +99,7 @@ describe('request', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusTigerwebRequest.request(request).then(function(response) {
+    CitySdkTigerwebRequest.request(request).then(function(response) {
       result = response;
       done();
     });

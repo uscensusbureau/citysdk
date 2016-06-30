@@ -2,13 +2,13 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
 describe('parseToVariable', function() {
   it('should return the census code "income"', function() {
-    var variable = CensusRequestUtils.parseToVariable('income');
+    var variable = CitySdkRequestUtils.parseToVariable('income');
     expect(typeof variable).toBe('string');
   });
 
   it('should return the input if it doesnt find a matching alias', function() {
     var alias = 'B00094_3944922111';
-    var variable = CensusRequestUtils.parseToVariable(alias);
+    var variable = CitySdkRequestUtils.parseToVariable(alias);
     expect(variable).toBe(alias);
   });
 });
@@ -18,7 +18,7 @@ describe('parseToValidVariable', function() {
   var year = 2014;
   var alias = 'population';
 
-  var variable = CensusRequestUtils.parseToValidVariable(alias, api, year);
+  var variable = CitySdkRequestUtils.parseToValidVariable(alias, api, year);
 
   it('should return variable if the input api and year have a match', function() {
     expect(variable).toBe('B01003_001E');
@@ -29,7 +29,7 @@ describe('getLatLngFromStateCode', function() {
   var state = 'MD';
 
   it ('should return the correct coordinates for the state capital', function() {
-    var coordinates = CensusRequestUtils.getLatLngFromStateCode(state);
+    var coordinates = CitySdkRequestUtils.getLatLngFromStateCode(state);
 
     expect(coordinates.length).toEqual(2);
     expect(coordinates[0]).toEqual(38.9786);
@@ -42,7 +42,7 @@ describe('getLatLngFromZipcode', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLngFromZipcode(zip).then(function(response) {
+    CitySdkRequestUtils.getLatLngFromZipcode(zip).then(function(response) {
       result = response;
       done();
     });
@@ -59,7 +59,7 @@ describe('getLatLngFromAddress without zip, city and state', function() {
   };
 
   it ('should throw an error asking for zip or city and state', function() {
-    expect(function() {CensusRequestUtils.getLatLngFromAddress(address)})
+    expect(function() {CitySdkRequestUtils.getLatLngFromAddress(address)})
         .toThrow(new Error('Invalid address! "city" and "state" or "zip" must be provided.'));
   });
 });
@@ -71,7 +71,7 @@ describe('getLatLngFromAddress using street and city only', function() {
   };
 
   it ('should throw an error because both city AND state are required', function() {
-    expect(function() {CensusRequestUtils.getLatLngFromAddress(address)})
+    expect(function() {CitySdkRequestUtils.getLatLngFromAddress(address)})
         .toThrow(new Error('Invalid address! "city" and "state" or "zip" must be provided.'));
   });
 });
@@ -87,7 +87,7 @@ describe('getLatLngFromAddress using zip, city and state', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLngFromAddress(address).then(function(response) {
+    CitySdkRequestUtils.getLatLngFromAddress(address).then(function(response) {
       result = response;
       done();
     });
@@ -111,7 +111,7 @@ describe('getLatLngFromAddress using city and state', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLngFromAddress(address).then(function(response) {
+    CitySdkRequestUtils.getLatLngFromAddress(address).then(function(response) {
       result = response;
       done();
     });
@@ -136,7 +136,7 @@ describe('getLatLng using request with address', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLng(request).then(function(response) {
+    CitySdkRequestUtils.getLatLng(request).then(function(response) {
       result = response;
       done();
     });
@@ -156,7 +156,7 @@ describe('getLatLng using request with zip', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLng(request).then(function(response) {
+    CitySdkRequestUtils.getLatLng(request).then(function(response) {
       result = response;
       done();
     });
@@ -176,7 +176,7 @@ describe('getLatLng using request with state', function() {
   var result;
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLng(request).then(function(response) {
+    CitySdkRequestUtils.getLatLng(request).then(function(response) {
       result = response;
       done();
     });
@@ -192,7 +192,7 @@ describe('getFipsFromLatLng', function() {
   var request = {state: 'MD'};
 
   beforeEach(function(done) {
-    CensusRequestUtils.getLatLng(request).then(function(response) {
+    CitySdkRequestUtils.getLatLng(request).then(function(response) {
       request = response;
       done();
     });
@@ -202,7 +202,7 @@ describe('getFipsFromLatLng', function() {
     var result;
 
     beforeEach(function(done) {
-      CensusRequestUtils.getFipsFromLatLng(request).then(function(response) {
+      CitySdkRequestUtils.getFipsFromLatLng(request).then(function(response) {
         result = response;
         done();
       });
@@ -219,7 +219,7 @@ describe('getFipsFromLatLng', function() {
 
 describe('getGeographyVariables without api and year', function() {
   it('should throw and error asking for api and year', function() {
-    expect(function() {CensusRequestUtils.getGeographyVariables({})})
+    expect(function() {CitySdkRequestUtils.getGeographyVariables({})})
         .toThrow(new Error('Invalid request! "year" and "api" fields must be provided.'));
   });
 });
@@ -229,7 +229,7 @@ describe('getGeographyVariables without api and year', function() {
   var result;
   
   beforeEach(function(done) {
-    CensusRequestUtils.getGeographyVariables(request).then(function(response) {
+    CitySdkRequestUtils.getGeographyVariables(request).then(function(response) {
       result = response;
       done();
     });

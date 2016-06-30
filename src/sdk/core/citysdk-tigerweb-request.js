@@ -9,7 +9,7 @@ import usBoundingBox from '../../resources/us-bounds.json';
 const defaultTigerwebApi = 'current';
 const spatialReferenceCode = 4326;
 
-export default class CensusTigerwebRequest {
+export default class CitySdkTigerwebRequest {
 
   static getContainerGeometry(request) {
     let mapServer = request.tigerwebApiInfo.mapServers[request.container];
@@ -80,8 +80,8 @@ export default class CensusTigerwebRequest {
 
     let promiseHandler = (resolve, reject) => {
       if (request.container && sublevelRequested && !request.containerGeometry) {
-        CensusTigerwebRequest.getContainerGeometry(request)
-            .then(CensusTigerwebRequest.getGeoData)
+        CitySdkTigerwebRequest.getContainerGeometry(request)
+            .then(CitySdkTigerwebRequest.getGeoData)
             .then((response) => resolve({response: CitySdk.esriToGeo(response), request: request}))
             .catch((reason) => reject(reason));
         
@@ -104,7 +104,7 @@ export default class CensusTigerwebRequest {
         }
 
         this.getContainerGeometry(request)
-            .then(CensusTigerwebRequest.getGeoData)
+            .then(CitySdkTigerwebRequest.getGeoData)
             .then((response) => resolve({response: CitySdk.esriToGeo(response), request: request}))
             .catch((reason) => reject(reason));
         

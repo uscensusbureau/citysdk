@@ -19,19 +19,17 @@ module.exports = function(config) {
       {pattern: 'node_modules/terraformer-arcgis-parser/terraformer-arcgis-parser.min.js', watched: false, nocache: false},
 
       // Core modules
-      'dist/sdk/core/census-tigerweb-request.js',
-      'dist/sdk/core/census-request-validator.js',
-      'dist/sdk/core/census-request-utils.js',
-      'dist/sdk/core/census-summary-request.js',
-      'dist/sdk/core/census-request.js',
+      'dist/sdk/core/citysdk-tigerweb-request.js',
+      'dist/sdk/core/citysdk-request-validator.js',
+      'dist/sdk/core/citysdk-request-utils.js',
+      'dist/sdk/core/citysdk-summary-request.js',
       'dist/sdk/core/citysdk.js',
 
       // Tests
-      'test/core/census-request-validator-spec.js',
-      'test/core/census-tigerweb-request-spec.js',
-      'test/core/census-request-utils-spec.js',
-      'test/core/census-summary-request-spec.js',
-      'test/core/census-request-spec.js',
+      'test/core/citysdk-request-validator-spec.js',
+      'test/core/citysdk-tigerweb-request-spec.js',
+      'test/core/citysdk-request-utils-spec.js',
+      'test/core/citysdk-summary-request-spec.js',
       'test/core/citysdk-spec.js',
 
       // Source maps

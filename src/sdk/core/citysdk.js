@@ -1,21 +1,61 @@
+import Promise from 'promise';
 import Terraformer from 'terraformer';
 import ArcGIS from 'terraformer-arcgis-parser';
 
+import CitySdkGeoRequest from './citysdk-geo-request';
+import CitySdkRequestUtils from './citysdk-request-utils';
+import CitySdkSummaryRequest from './citysdk-summary-request';
+import CitySdkTigerwebRequest from './citysdk-tigerweb-request';
+import CitySdkRequestValidator from './citysdk-request-validator';
+
+import aliases from '../../resources/aliases.json';
 import stateNames from '../../resources/us-state-names.json';
+import variableToAliasMap from '../../resources/var-alias-map.json';
 import stateCapitalCoordinates from '../../resources/us-states-latlng.json';
 
 Terraformer.ArcGIS = ArcGIS;
 
-/**
- * @class
- */
 export default class CitySdk {
 
-  /**
-   * @constructs {@link CitySdk}
-   */
-  constructor() {
-    this.modules = {};
+  static getAliases() {
+    return aliases;
+  }
+
+  static variableToAlias(variables) {
+    if(Object.prototype.toString.call(variables) !== '[object Array]') {
+      variables = [variables];
+    }
+    
+    let result = {};
+
+    if (variables && variables.length) {
+      for (let variable of variables) {
+        result[variable] = variableToAliasMap[variable];
+      }
+
+      return result;
+
+    } else {
+      throw new Error('Invalid list of variables. Make sure multiple variables are comma separated.');
+    }
+  }
+
+  static aliasToVariable(_aliases) {
+    if(Object.prototype.toString.call(_aliases) !== '[object Array]') {
+      _aliases = [_aliases];
+    }
+    
+    let result = {};
+
+    if (_aliases && _aliases.length) {
+      for (let alias of _aliases) {
+        result[alias] = aliases[alias];
+      }
+    } else {
+      throw new Error('Invalid list of aliases. Make sure multiple aliases are comma separated.');
+    }
+
+    return result;
   }
 
   /**
@@ -96,5 +136,34 @@ export default class CitySdk {
    */
   static geoToEsri(geoJson) {
     return Terraformer.ArcGIS.convert(geoJson);
+  }
+
+  static request(request) {
+    request = CitySdkRequestValidator.validate(request);
+
+    let promiseHandler = (resolve, reject) => {
+      let onRequestHasLatLng = (request) => {
+        CitySdkRequestUtils.getFipsFromLatLng(request)
+            .then(CitySdkRequestValidator.validateGeoVariables)
+            .then(CitySdkSummaryRequest.request)
+            .then(CitySdkTigerwebRequest.request)
+            .then(CitySdkGeoRequest.handleTigerwebResponse)
+            .then((response) => resolve(response))
+            .catch((reason) => reject(reason));
+      };
+
+      if (!request.lat && !request.lng) {
+        // Get the coordinates, then using the coordinates, get
+        // the FIPS codes for state, tract, county and blockGroup.
+        CitySdkRequestUtils.getLatLng(request)
+            .then(onRequestHasLatLng)
+            .catch((reason) => reject(reason));
+
+      } else {
+        onRequestHasLatLng(request);
+      }
+    };
+
+    return new Promise(promiseHandler);
   }
 }

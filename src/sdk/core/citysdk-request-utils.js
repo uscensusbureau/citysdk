@@ -22,7 +22,7 @@ const zctaJsonUrl = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-de
 const fipsGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?';
 const addressGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
 
-export default class CensusRequestUtils {
+export default class CitySdkRequestUtils {
   static parseToVariable(aliasOrVariable) {
     // If the requested string is an alias, return the appropriate variable from the dictionary
     if (aliasOrVariable in aliases) {
@@ -122,7 +122,7 @@ export default class CensusRequestUtils {
   static getLatLng(request) {
     let promiseHandler = (resolve, reject) => {
       if (request.address) {
-        CensusRequestUtils.getLatLngFromAddress(request.address).then((response) => {
+        CitySdkRequestUtils.getLatLngFromAddress(request.address).then((response) => {
           let coordinates = response.result.addressMatches[0].coordinates;
           request.lat = coordinates.y;
           request.lng = coordinates.x;
@@ -131,7 +131,7 @@ export default class CensusRequestUtils {
         }).catch((reason) => reject(reason));
 
       } else if (request.zip) {
-        CensusRequestUtils.getLatLngFromZipcode(request.zip).then((coordinates) => {
+        CitySdkRequestUtils.getLatLngFromZipcode(request.zip).then((coordinates) => {
           request.lat = coordinates[1];
           request.lng = coordinates[0];
           resolve(request);
@@ -143,7 +143,7 @@ export default class CensusRequestUtils {
         // call. Therefore, we wrap in a setTimout() since it allows the function to
         // return before the code inside the setTimeout is excecuted.
         setTimeout(() => {
-          let coordinates = CensusRequestUtils.getLatLngFromStateCode(request.state);
+          let coordinates = CitySdkRequestUtils.getLatLngFromStateCode(request.state);
           request.lat = coordinates[0];
           request.lng = coordinates[1];
 
