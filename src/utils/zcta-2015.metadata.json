@@ -1,0 +1,8 @@
+{
+  "startLine": 2,
+  "fields": [
+    {"inputName": "GEOID", "outputName": "zip", "offset": 0},
+    {"inputName": "INTPTLAT", "outputName": "lat", "offset": 5},
+    {"inputName": "INTPTLONG", "outputName": "lng", "offset": 6}
+  ]
+}
