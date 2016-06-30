@@ -13,12 +13,27 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'https://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.sdk',
-      'http://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.sdk',
-      'http://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.sdk',
+      // External dependencies
+      {pattern: 'node_modules/jquery/dist/jquery.min.js', watched: false, nocache: false},
+      {pattern: 'node_modules/terraformer/terraformer.min.js', watched: false, nocache: false},
+      {pattern: 'node_modules/terraformer-arcgis-parser/terraformer-arcgis-parser.min.js', watched: false, nocache: false},
+
+      // Core modules
+      'dist/sdk/core/citysdk-tigerweb-request.js',
+      'dist/sdk/core/citysdk-request-validator.js',
+      'dist/sdk/core/citysdk-request-utils.js',
+      'dist/sdk/core/citysdk-summary-request.js',
       'dist/sdk/core/citysdk.js',
-      'dist/sdk/modules/census.citysdk.js',
-      'test/censusModuleSpec.js'
+
+      // Tests
+      'test/core/citysdk-request-validator-spec.js',
+      'test/core/citysdk-tigerweb-request-spec.js',
+      'test/core/citysdk-request-utils-spec.js',
+      'test/core/citysdk-summary-request-spec.js',
+      'test/core/citysdk-spec.js',
+
+      // Source maps
+      {pattern: 'dist/**/*.js.map', included: false, served: true, watched: false, nocache: true}
     ],
 
     // list of files to exclude
@@ -26,7 +41,9 @@ module.exports = function(config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {},
+    preprocessors: {
+      '**/*.js': ['sourcemap']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -61,7 +78,8 @@ module.exports = function(config) {
 
     plugins: [
       'karma-chrome-launcher',
-      'karma-jasmine'
+      'karma-jasmine',
+      'karma-sourcemap-loader'
     ]
   });
 };

@@ -10,7 +10,11 @@ Source code can be found in the js directory.
 
 ## Intro
 
-Through our City SDK, we are aiming to provide a user-friendly "toolbox" for civic hackers to connect local and national public data. The creation of the SDK came out of the desire to make it easier to use the Census API for common tasks that our developer community asked for. We have been engaging developers around the country for the past two years and have observed how they use the API and have built the most commonly needed functionalities built on top of our API right into the SDK, saving the developer from having to do it herself. 
+Through our City SDK, we are aiming to provide a user-friendly "toolbox" for civic hackers to connect local and national
+public data. The creation of the SDK came out of the desire to make it easier to use the Census API for common tasks
+that our developer community asked for. We have been engaging developers around the country for the past two years and
+have observed how they use the API and have built the most commonly needed functionalities built on top of our API right
+into the SDK, saving the developer from having to do it herself. 
 
 ## Features
 - Never have to figure out what your FIPS code is again! Just pass in lat/longs, we handle the translation. Only have ZIP codes? No problem, we translate those too. 
@@ -21,10 +25,46 @@ Through our City SDK, we are aiming to provide a user-friendly "toolbox" for civ
 - We’ve provided a starting list of aliases for some of our most popular variables (most aliases are in the American Community Survey [ACS5]) 
 - More coming soon! (you may also add to our issues using the [#user stories](https://github.com/uscensusbureau/citysdk/issues?q=is%3Aopen+is%3Aissue+label%3A%22user+stories%22) label to make feature requests)
 
+## Getting Started
 
+CitySdk is available as an API _and_ SDK. If you want to use the API, then read the [API documentation](src/api/README.md).
 
+To use the JavaScript SDK, you'll need to add four dependencies:
 
+1. JQuery
+2. ES6 Promise Polyfill
+3. Terraformer
+4. Terraformer ArcGIS Parser
 
+Make sure the `script` tag for CitySdk is the last one.
 
+```
+<script src="https://www.promisejs.org/polyfills/promise-6.1.0.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js"></script>
+<script src="https://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js"></script>
+<script src="https://raw.githubusercontent.com/uscensusbureau/citysdk/0.2.0/citysdk.js"></script>
+```
 
+Once you have all that in place you can start using CitySdk:
 
+```
+<script>
+    let request = {
+        "zip": "21701",
+        "variables": ["income", "population"],
+        "level": "county",
+        "sublevel": true,
+        "state": "MD",
+        "container": "state"
+    };
+    
+    let data;
+    
+    CitySdk.request(request).then((response) => doSomethingWithData(response));
+    
+    function doSomethingWithData(data) {
+        // Do something
+    }
+</script>
+```

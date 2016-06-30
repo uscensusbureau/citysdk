@@ -16,7 +16,7 @@ Authorization: Basic <your_api_key>
 **Example with cURL**
 
 ```
-curl --user yourApiKey: http://citysdk.commerce.gov/citysdk/
+curl --user yourApiKey: http://citysdk.commerce.gov
 ```
 
 **Note:** leave the `password` field empty.
@@ -60,7 +60,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 apikey = "your_api_key"
-request_url = "http://citysdk.commerce.gov/citysdk/census/api"
+request_url = "http://citysdk.commerce.gov"
 
 request_obj = {
   'zip': '21401',
@@ -118,7 +118,7 @@ print response.json()
 curl --user yourApiKey: -X POST \
 -H "Content-Type: application/json" \
 -d '{"lat": 38.9047, "lng": -77.0164, "level": "state", "variables": ["income", "population"]}' \
-http://citysdk.commerce.gov/citysdk/census/api
+http://citysdk.commerce.gov/citysdk
 ```
 
 **Result data**

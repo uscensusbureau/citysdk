@@ -1,14 +1,16 @@
-var ts = require('gulp-typescript');
 var del = require('del');
 var gulp = require('gulp');
+var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
 var rollup = require('rollup');
 var replace = require('gulp-replace');
 var rollupJson = require('rollup-plugin-json');
+var rollupBabel = require('rollup-plugin-babel');
 
- /***********************************************************************
- *                            Shared tasks                              *
- /***********************************************************************/
+
+/************************************************************************
+ *                            Common tasks                              *
+/************************************************************************/
 
 // ----------------------------------------------------------------------
 // Task: Clean: All
@@ -30,16 +32,19 @@ gulp.task('copy:resources', function() {
       .pipe(gulp.dest('dist/resources'));
 });
 
+gulp.task('copy:citysdk', ['build:sdk'], function() {
+  return gulp.src('dist/sdk/core/citysdk.js')
+      .pipe(gulp.dest('.'));
+});
+
 // ----------------------------------------------------------------------
 // Task: Watch
 //
 // Watches the typescript and json files in src/api and excutes the build
 // task if a change is detected.
 // ----------------------------------------------------------------------
-gulp.task('watch', ['build:api', 'build:sdk'], function() {
-  gulp.watch('./src/api/**/*.ts', ['compile:typescript']);
+gulp.task('watch', ['build:services', 'build:sdk'], function() {
   gulp.watch('./src/sdk/core/*.js', ['compile:core']);
-  gulp.watch('./src/sdk/modules/census/*.js', ['compile:census']);
   gulp.watch('./src/resources/*.json', ['copy:resources']);
 });
 
@@ -48,114 +53,131 @@ gulp.task('watch', ['build:api', 'build:sdk'], function() {
 //
 // Cleans the dist directory and builds both the Node API and JS SDK
 // ----------------------------------------------------------------------
-gulp.task('default', ['clean', 'build:api', 'build:sdk']);
+gulp.task('default', ['clean', 'build:sdk', 'build:services', 'copy:citysdk']);
 
 
- /***********************************************************************
+/***********************************************************************
  *                           Node API tasks                            *
- /***********************************************************************/
+/***********************************************************************/
 
 // ----------------------------------------------------------------------
-// Task: Compile: Typescript
+// Task: Build: Services
 //
-// Compile typescript files (core and modules) and
-// copy them to the build directory.
+// Cleans the dist directory and builds both the Node API and JS SDK
 // ----------------------------------------------------------------------
-gulp.task('compile:typescript', function() {
-  return gulp.src('./src/api/**/*.ts')
-      .pipe(ts({'target': 'es5', 'module': 'commonjs', 'sourceMap': true}))
-      .pipe(gulp.dest('dist/api'));
+gulp.task('build:services', function() {
+  return gulp.src('src/api/services/*.js')
+      .pipe(babel({presets: ['es2015']}))
+      .pipe(gulp.dest('dist/api/services'));
 });
 
-// ----------------------------------------------------------------------
-// Task: Replace: Filepath
-//
-// Rename the filepath in the services modules to point to the census
-// modules in the dist directory.
-// ----------------------------------------------------------------------
-gulp.task('rename:filepaths', function() {
-  var oldCensusModule = '../../../dist/api/modules/census/census.citysdk';
-  var newCensusModule = '../modules/census/census.citysdk';
 
-  var oldCoreModule = '../../../dist/api/core/citysdk';
-  var newCoreModule = '../core/citysdk';
-
-  return gulp.src('./src/api/services/*.js')
-      .pipe(replace(oldCensusModule, newCensusModule))
-      .pipe(replace(oldCoreModule, newCoreModule))
-      .pipe(gulp.dest('./dist/api/services/'));
-});
-
-// ----------------------------------------------------------------------
-// Task: Build: API
-//
-// Executes all tasks required to buld the Node API.
-// ----------------------------------------------------------------------
-gulp.task('build:api', [
-  'compile:typescript',
-  'rename:filepaths',
-  'copy:resources'
-]);
-
-
- /***********************************************************************
- *                            JS SDK tasks                              *
- /***********************************************************************/
-
-var distCorePath = 'dist/sdk/core/';
-var distModulePath = 'dist/sdk/modules/';
+/***********************************************************************
+ *                            JS SDK tasks                             *
+/***********************************************************************/
 
 var corePath = 'src/sdk/core/';
-var modulePath = 'src/sdk/modules/';
+var distCorePath = 'dist/sdk/core/';
 
-var rollupOpts = {plugins: [rollupJson()]};
+var rollupOpts = {
+  plugins: [
+    rollupJson(),
+    rollupBabel({exclude: 'node_modules/**'})
+  ]
+};
 
 var rollupWriteOpts = {
   format: 'umd',
   globals: {
     'jquery': '$',
+    'promise': 'Promise',
     'terraformer': 'Terraformer',
     'terraformer-arcgis-parser': 'Terraformer.ArcGIS'
-  }
+  },
+  sourceMap: true
+};
+
+var rollItUp = function(filename, moduleName) {
+  rollupOpts.entry = corePath + filename;
+
+  return rollup.rollup(rollupOpts).then(function(bundle) {
+    rollupWriteOpts.moduleName = moduleName;
+    rollupWriteOpts.dest = distCorePath + filename;
+    bundle.write(rollupWriteOpts);
+  });
 };
 
 // ----------------------------------------------------------------------
-// Task: Compile: Core
-//
-// Uses the rollup to compile the ES6 core module into browser compatible
-// javascript
-// ----------------------------------------------------------------------
-gulp.task('compile:core', function() {
-  rollupOpts.entry = corePath + 'citysdk.new.js';
-
-  return rollup.rollup(rollupOpts).then(function(bundle) {
-    rollupWriteOpts.moduleName = 'CitySdk';
-    rollupWriteOpts.dest = distCorePath + 'citysdk.js';
-
-    bundle.write(rollupWriteOpts);
-  });
-});
-
-// ----------------------------------------------------------------------
-// Task: Compile: Census
+// Task: Compile: CitySdk
 //
 // Uses the rollup to compile the ES6 census module into browser
 // compatible javascript
 // ----------------------------------------------------------------------
-gulp.task('compile:census', function() {
-  rollupOpts.entry = modulePath + 'census/census.citysdk.js';
+gulp.task('compile:CitySdk', function() {
+  return rollItUp('citysdk.js', 'CitySdk');
+});
 
-  return rollup.rollup(rollupOpts).then(function(bundle) {
-    rollupWriteOpts.moduleName = 'CensusModule';
-    rollupWriteOpts.dest = distModulePath + 'census.citysdk.js';
+// ----------------------------------------------------------------------
+// Task: Compile: CensusGeoRequest
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CitySdkGeoRequest', function() {
+  return rollItUp('citysdk-geo-request.js', 'CitySdkGeoRequest');
+});
 
-    bundle.write(rollupWriteOpts);
-  });
+// ----------------------------------------------------------------------
+// Task: Compile: CensusTigerwebRequest
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CitySdkTigerwebRequest', function() {
+  return rollItUp('citysdk-tigerweb-request.js', 'CitySdkTigerwebRequest');
+});
+
+// ----------------------------------------------------------------------
+// Task: Compile: CensusRequestValidator
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CitySdkRequestValidator', function() {
+  return rollItUp('citysdk-request-validator.js', 'CitySdkRequestValidator');
+});
+
+// ----------------------------------------------------------------------
+// Task: Compile: CensusRequestUtils
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CitySdkRequestUtils', function() {
+  return rollItUp('citysdk-request-utils.js', 'CitySdkRequestUtils');
+});
+
+// ----------------------------------------------------------------------
+// Task: Compile: CensusSummaryRequest
+//
+// Uses the rollup to compile the ES6 census module into browser
+// compatible javascript
+// ----------------------------------------------------------------------
+gulp.task('compile:CitySdkSummaryRequest', function() {
+  return rollItUp('citysdk-summary-request.js', 'CitySdkSummaryRequest');
 });
 
 // ----------------------------------------------------------------------
 // Task: Build: SDK
 //
-// Compiles both core and census modules using rollup.
+// Compiles all core modules using rollup.
 // ----------------------------------------------------------------------
-gulp.task('build:sdk', ['compile:core', 'compile:census']);
+gulp.task('build:sdk', [
+  'compile:CitySdk',
+  'compile:CitySdkGeoRequest',
+  'compile:CitySdkTigerwebRequest',
+  'compile:CitySdkRequestValidator',
+  'compile:CitySdkRequestUtils',
+  'compile:CitySdkSummaryRequest',
+  'copy:resources'
+]);
