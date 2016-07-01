@@ -2162,12 +2162,7 @@
 	  censusUrl: 'https://api.census.gov/data/'
 	};
 
-	// TODO:
-	// Need to update this URL once the branch is merged into master.
-	// Instead of pointing to a branch it should probably point to a
-	// release tag.
-	var zctaJsonUrl = 'https://raw.githubusercontent.com/tshrestha/citysdk/tech-debt/277-modularize-request-functions/src/resources/zipcode-to-coordinates.json';
-
+	var zctaJsonUrl = 'https://s3.amazonaws.com/citysdk/zipcode-to-coordinates.json';
 	var fipsGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?';
 	var addressGeocoderUrl = 'https://geocoding.geo.census.gov/geocoder/locations/address?benchmark=4&format=jsonp';
 
