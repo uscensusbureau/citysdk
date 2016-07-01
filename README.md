@@ -36,9 +36,9 @@ To use the JavaScript SDK, you'll need to add four dependencies:
 3. Terraformer
 4. Terraformer ArcGIS Parser
 
-Make sure the `script` tag for CitySdk is the last one.
+Make sure the `<script>` tag for CitySdk is the last one.
 
-```
+```html
 <script src="https://www.promisejs.org/polyfills/promise-6.1.0.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="https://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js"></script>
@@ -48,7 +48,7 @@ Make sure the `script` tag for CitySdk is the last one.
 
 Once you have all that in place you can start using CitySdk:
 
-```
+```javascript
 <script>
     let request = {
         "zip": "21701",
