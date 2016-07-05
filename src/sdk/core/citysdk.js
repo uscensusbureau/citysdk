@@ -17,10 +17,22 @@ Terraformer.ArcGIS = ArcGIS;
 
 export default class CitySdk {
 
+  /**
+   * Returns a map of the most popular aliases.
+   */
   static getAliases() {
     return aliases;
   }
 
+  /**
+   * @description Converts a Census variable, or a list of variables, to
+   * its corresponding alias.
+   * For example: for the variable B0009_00130 this function
+   * would return "population" as the alias.
+   *
+   * @param variables
+   * @returns {{}}
+   */
   static variableToAlias(variables) {
     if(Object.prototype.toString.call(variables) !== '[object Array]') {
       variables = [variables];
@@ -40,6 +52,15 @@ export default class CitySdk {
     }
   }
 
+  /**
+   * @description Converts an alias, or a list of aliases, to its corresponding
+   * variable.
+   * For example: the alias population would be converted to the
+   * variable B0009_00130
+   *
+   * @param _aliases
+   * @returns {{}}
+   */
   static aliasToVariable(_aliases) {
     if(Object.prototype.toString.call(_aliases) !== '[object Array]') {
       _aliases = [_aliases];
@@ -138,6 +159,14 @@ export default class CitySdk {
     return Terraformer.ArcGIS.convert(geoJson);
   }
 
+  /**
+   * @description Runs the given request through the Census
+   * API pipeline and returns a response consisting of GeoJson
+   * and Census data.
+   *
+   * @param request
+   * @returns {*}
+   */
   static request(request) {
     request = CitySdkRequestValidator.validate(request);
 
