@@ -7,4 +7,3 @@ node_modules
 
 # Exclude source maps
 *.js.map
-

@@ -1952,9 +1952,25 @@
 
 	  createClass(CitySdk, null, [{
 	    key: 'getAliases',
+
+
+	    /**
+	     * Returns a map of the most popular aliases.
+	     */
 	    value: function getAliases() {
 	      return aliases;
 	    }
+
+	    /**
+	     * @description Converts a Census variable, or a list of variables, to
+	     * its corresponding alias.
+	     * For example: for the variable B0009_00130 this function
+	     * would return "population" as the alias.
+	     *
+	     * @param variables
+	     * @returns {{}}
+	     */
+
 	  }, {
 	    key: 'variableToAlias',
 	    value: function variableToAlias(variables) {
@@ -1995,6 +2011,17 @@
 	        throw new Error('Invalid list of variables. Make sure multiple variables are comma separated.');
 	      }
 	    }
+
+	    /**
+	     * @description Converts an alias, or a list of aliases, to its corresponding
+	     * variable.
+	     * For example: the alias population would be converted to the
+	     * variable B0009_00130
+	     *
+	     * @param _aliases
+	     * @returns {{}}
+	     */
+
 	  }, {
 	    key: 'aliasToVariable',
 	    value: function aliasToVariable(_aliases) {
@@ -2124,6 +2151,16 @@
 	    value: function geoToEsri(geoJson) {
 	      return Terraformer.ArcGIS.convert(geoJson);
 	    }
+
+	    /**
+	     * @description Runs the given request through the Census
+	     * API pipeline and returns a response consisting of GeoJson
+	     * and Census data.
+	     *
+	     * @param request
+	     * @returns {*}
+	     */
+
 	  }, {
 	    key: 'request',
 	    value: function request(_request) {
