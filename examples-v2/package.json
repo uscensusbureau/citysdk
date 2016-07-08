@@ -15,6 +15,7 @@
     "jquery": "^3.1.0",
     "jsonlint": "^1.6.2",
     "system": "^1.0.6",
+    "terraformer": "^1.0.5",
     "terraformer-arcgis-parser": "^1.0.4"
   },
   "devDependencies": {
