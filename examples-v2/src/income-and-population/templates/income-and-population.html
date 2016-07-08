@@ -4,9 +4,20 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <query-editor></query-editor>
-      <button type="button" class="btn btn-success">
+      <button type="button" class="btn btn-success" ng-click="incomePopCtrl.getData()"
+              ng-disabled="!incomePopCtrl.queryEditorContentValid">
         SUBMIT REQUEST
       </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <uib-tabset type="pills" active="$ctrl.activeTab">
+        <uib-tab>
+          <div id="income-and-population-map"></div>
+        </uib-tab>
+      </uib-tabset>
     </div>
   </div>
 </div>

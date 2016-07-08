@@ -9,7 +9,8 @@ incomeAndPopulation.config(($stateProvider) => {
     url: '/income-and-population',
     name: 'incomeAndPopulation',
     template: incomePopulationTpl,
-    controller: 'IncomeAndPopulationCtrl'
+    controller: 'IncomeAndPopulationCtrl',
+    controllerAs: 'incomePopCtrl'
   });
 });
 
