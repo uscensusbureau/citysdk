@@ -103,7 +103,7 @@ export default class CitySdkTigerwebRequest {
             request.level = 'blockGroup';
         }
 
-        this.getContainerGeometry(request)
+        CitySdkTigerwebRequest.getContainerGeometry(request)
             .then(CitySdkTigerwebRequest.getGeoData)
             .then((response) => resolve({response: CitySdk.esriToGeo(response), request: request}))
             .catch((reason) => reject(reason));
