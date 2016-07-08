@@ -2567,8 +2567,6 @@
 	  }, {
 	    key: 'request',
 	    value: function request(_request) {
-	      var _this = this;
-
 	      if (!_request.tigerwebApi) {
 	        _request.tigerwebApi = defaultTigerwebApi;
 	      }
@@ -2609,7 +2607,7 @@
 	              _request.level = 'blockGroup';
 	          }
 
-	          _this.getContainerGeometry(_request).then(CitySdkTigerwebRequest.getGeoData).then(function (response) {
+	          CitySdkTigerwebRequest.getContainerGeometry(_request).then(CitySdkTigerwebRequest.getGeoData).then(function (response) {
 	            return resolve({ response: CitySdk.esriToGeo(response), request: _request });
 	          }).catch(function (reason) {
 	            return reject(reason);
