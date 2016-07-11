@@ -95,21 +95,15 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
             return;
           }
 
-          //
-          // B01003_001E
-          //     :
-          //     "1005087"
-          // B19013_001E
-          //     :
-          //     "98704"
           let feature = features[0];
-          let popupContent = popupTpl.replace(/\$\{\w+\}/g, (match) => {
-            if (match === '${county}') return feature.properties.NAME;
-            if (match === '${income}') return $filter('currency')(feature.properties[incomeCode], '$', 0);
-            if (match === '${population}') return $filter('number')(feature.properties[populationCode]);
-          });
 
-          console.log(popupContent);
+          let popupContent = popupTpl.replace(/\$\{\w+\}/g, (match) => {
+            switch(match) {
+              case '${county}': return feature.properties.NAME;
+              case '${income}': return $filter('currency')(feature.properties[incomeCode], '$', 0);
+              case '${population}': return $filter('number')(feature.properties[populationCode]);
+            }
+          });
 
           new mapboxgl.Popup()
               .setLngLat(map.unproject(e.point))
