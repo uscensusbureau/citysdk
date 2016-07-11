@@ -1,16 +1,37 @@
 const CodeMirror = require('codemirror');
 
+require('../common');
 require('codemirror/mode/javascript/javascript');
 require('codemirror/addon/lint/lint');
 
 const fs = require('fs');
 const queryEditorTpl = fs.readFileSync(__dirname + '/query-editor.html');
 
-require('../common');
+const fields = {
+  lat: 'lat',
+  lng: 'lng',
+  level: 'level',
+  sublevel: 'sublevel',
+  state: 'state',
+  zip: 'zip',
+  container: 'container',
+  containerGeometry: 'containerGeometry',
+  api: 'api',
+  year: 'year',
+  apikey: 'apikey',
+  variables: 'variables'
+};
 
 function validateEditorContent(content) {
   try {
-    JSON.parse(content);
+    let validJson = JSON.parse(content);
+
+    for (let field in validJson) {
+      if (!fields.hasOwnProperty(field)) {
+        throw new Error(`Invalid field ${field}`);
+      }
+    }
+
   } catch (error) {
     return {valid: false, error: error};
   }
@@ -27,21 +48,19 @@ function QueryEditorCtrl($document, $timeout, queryEditorService) {
     tabSize: 4,
     indentUnit: 4,
     smartIndent: true,
-    lineNumbers: true,
-    gutters: ["CodeMirror-lint-markers"]
+    lineNumbers: true
   });
 
-  ctrl.editorContent = '{\n"level": "county"\n}';
   ctrl.contentValid = true;
   ctrl.editorErrorMessage = '';
 
-  editor.setValue(ctrl.editorContent);
+  editor.setValue(ctrl.query);
   editor.execCommand('selectAll');
   editor.execCommand('indentAuto');
   editor.setCursor({line: 3, ch: 1});
 
   queryEditorService.setContentValid(true);
-  queryEditorService.setEditorContent(ctrl.editorContent);
+  queryEditorService.setEditorContent(ctrl.query);
 
   editor.on('change', () => {
     let editorContent = editor.getValue();
@@ -53,7 +72,7 @@ function QueryEditorCtrl($document, $timeout, queryEditorService) {
       queryEditorService.setEditorContent(editorContent);
 
       if (contentState.valid) {
-        ctrl.editorContent = editorContent;
+        ctrl.query = editorContent;
       } else {
         ctrl.editorErrorMessage = contentState.error.message;
       }
@@ -62,6 +81,9 @@ function QueryEditorCtrl($document, $timeout, queryEditorService) {
 }
 
 angular.module('citysdk.common').component('queryEditor', {
+  bindings: {
+    query: '<'
+  },
   template: queryEditorTpl,
   controller: QueryEditorCtrl
 });

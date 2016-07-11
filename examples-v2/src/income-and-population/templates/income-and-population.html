@@ -1,23 +1,45 @@
+<style>
+  #map-content {
+    height: 600px;
+    padding: 0;
+  }
+
+  .mapboxgl-popup {
+    max-height: 400px;
+    max-width: 200px;
+    background: #FFFFFF;
+    box-shadow: 0 2px 4px #616161;
+    padding: 15px;
+    border-radius: 3px;
+  }
+
+  .mapboxgl-popup .panel.panel-default {
+    margin-bottom: 0;
+  }
+</style>
 <div class="container">
-  <h3>Income and Population</h3>
+  <h2>Maryland Income and Population</h2>
 
   <div class="panel panel-default">
-    <div class="panel-body">
-      <query-editor></query-editor>
-      <button type="button" class="btn btn-success" ng-click="incomePopCtrl.getData()"
-              ng-disabled="!incomePopCtrl.queryEditorContentValid">
-        SUBMIT REQUEST
-      </button>
-    </div>
+    <div class="panel-body" id="map-content"></div>
   </div>
 
-  <div class="row">
-    <div class="col-md-12">
-      <uib-tabset type="pills" active="$ctrl.activeTab">
-        <uib-tab>
-          <div id="income-and-population-map"></div>
-        </uib-tab>
-      </uib-tabset>
+  <p>
+    This examples uses City SDK and Mapbox GL to visualize the state of Maryland and its counties. The map is created
+    using the GeoJSON data requested using the query below. Mapbox renders the map and polygons from the GeoJSON data.
+  </p>
+  <p>
+    Click over a county to view its median income and population.
+  </p>
+</div>
+<hr>
+<div class="container">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <query-editor query="incomePopCtrl.query"></query-editor>
+      <button type="button" class="btn btn-success" ng-click="incomePopCtrl.getData()"
+              ng-disabled="!incomePopCtrl.queryEditorContentValid">SUBMIT REQUEST
+      </button>
     </div>
   </div>
 </div>
