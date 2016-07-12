@@ -13,7 +13,9 @@ angular.module('citysdk.incomeAndPopulation')
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiYmFodGVqIiwiYSI6ImNpam5ib2ExdzAwZzR0OWtvYnFxMzl0eG4ifQ.k42YGkuwwfKRnNkV7Ij8tQ';
 
-function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
+function IncomeAndPopulationCtrl($anchorScroll, $location, $timeout, $filter, queryEditorService) {
+  $anchorScroll.yOffset = 60;
+
   let ctrl = this;
 
   let map = new mapboxgl.Map({
@@ -27,8 +29,6 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
   let populationCode = CitySdk.aliasToVariable('population').population.variable;
 
   ctrl.exampleCode = exampleCode;
-  ctrl.loadingError = false;
-  ctrl.mapContentLoading = true;
 
   ctrl.query = JSON.stringify({
     level: 'state',
@@ -46,25 +46,32 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
   };
 
   ctrl.getData = () => {
+    ctrl.loadingError = false;
+
     if (ctrl.queryEditorContentValid) {
+      ctrl.mapContentLoading = true;
       let request = JSON.parse(queryEditorService.getEditorContent());
+      let layerPrefix = request.state.toLowerCase();
+
+      $location.hash('map-content');
+      $anchorScroll();
 
       CitySdk.request(request).then((response) => {
-        map.addSource('incomePop', {type: 'geojson', data: response});
+        map.addSource(layerPrefix + '-incomePop', {type: 'geojson', data: response});
 
         map.addLayer({
-          'id': 'counties-fill',
+          'id': layerPrefix + '-counties-fill',
           'type': 'fill',
-          'source': 'incomePop',
+          'source': layerPrefix + '-incomePop',
           'paint': {
             'fill-color': 'rgba(117,117,117,0.2)'
           }
         });
 
         map.addLayer({
-          'id': 'counties-outline',
+          'id': layerPrefix + '-counties-outline',
           'type': 'line',
-          'source': 'incomePop',
+          'source': layerPrefix + '-incomePop',
           'paint': {
             'line-color': 'rgba(117,117,117,0.6)',
             'line-width': 2
@@ -72,9 +79,9 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
         });
 
         map.addLayer({
-          'id': 'route-hover',
+          'id': layerPrefix + '-route-hover',
           'type': 'fill',
-          'source': 'incomePop',
+          'source': layerPrefix + '-incomePop',
           'layout': {},
           'paint': {
             'fill-color': 'rgba(117,117,117,0.6)'
@@ -85,7 +92,7 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
         map.on('mousemove', (e) => {
           map.getCanvas().style.cursor = 'pointer';
 
-          let features = map.queryRenderedFeatures(e.point, {layers: ['counties-fill']});
+          let features = map.queryRenderedFeatures(e.point, {layers: [layerPrefix + '-counties-fill']});
 
           if (features.length) {
             map.setFilter('route-hover', ['==', 'name', features[0].properties.name]);
@@ -95,7 +102,7 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
         });
         
         map.on('click', (e) => {
-          let features = map.queryRenderedFeatures(e.point, { layers: ['counties-fill'] });
+          let features = map.queryRenderedFeatures(e.point, { layers: [layerPrefix + '-counties-fill'] });
           if (!features.length) {
             return;
           }
