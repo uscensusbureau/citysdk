@@ -1,0 +1,10 @@
+<div class="btn-group navbar-right" uib-dropdown>
+  <button type="button" class="btn btn-default navbar-btn" uib-dropdown-toggle>
+    Examples <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu" uib-dropdown-menu>
+    <li role="menuitem" ng-repeat="example in $ctrl.examples">
+      <a ui-sref="{{example.name}}">{{example.label}}</a>
+    </li>
+  </ul>
+</div>

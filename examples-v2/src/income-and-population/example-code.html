@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Maryland Income and Population</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://cdn-geoweb.s3.amazonaws.com/terraformer/1.0.5/terraformer.min.js"></script>
+<script src="https://cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js"></script>
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.20.1/mapbox-gl.js"></script>
+<script src="https://s3.amazonaws.com/citysdk/releases/0.2.0/citysdk.js"></script>
+<link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.20.1/mapbox-gl.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<style>
+  .container {
+    padding: 0;
+  }
+
+  #map-content {
+    height: 600px;
+    width: 900px;
+  }
+</style>
+<div class="container" id="map-content"></div>
+<script>
+  mapboxgl.accessToken = '<your access token here>';
+
+  var incomeCode = CitySdk.aliasToVariable('income').income.variable;
+  var populationCode = CitySdk.aliasToVariable('population').population.variable;
+
+  var map = new mapboxgl.Map({
+    container: 'map-content',
+    style: 'mapbox://styles/mapbox/light-v9',
+    center: [-77.3, 38.9],
+    zoom: 7.3
+  });
+
+  var request = {
+    level: 'state',
+    state: 'MD',
+    sublevel: true,
+    variables: ['income', 'population'],
+    apikey: '<your api key here>'
+  };
+
+  CitySdk.request(request).then((function(response) {
+    map.addSource('incomePop', {type: 'geojson', data: response});
+
+    map.addLayer({
+      'id': 'counties-fill',
+      'type': 'fill',
+      'source': 'incomePop',
+      'paint': {
+        'fill-color': 'rgba(117,117,117,0.2)'
+      }
+    });
+
+    map.addLayer({
+      'id': 'counties-outline',
+      'type': 'line',
+      'source': 'incomePop',
+      'paint': {
+        'line-color': 'rgba(117,117,117,0.6)',
+        'line-width': 2
+      }
+    });
+
+    map.addLayer({
+      'id': 'route-hover',
+      'type': 'fill',
+      'source': 'incomePop',
+      'layout': {},
+      'paint': {
+        'fill-color': 'rgba(117,117,117,0.6)'
+      },
+      'filter': ['==', 'name', '']
+    });
+
+    var popupTpl = '<h4>${county}</h4>'
+        + '<div class="panel panel-default">'
+        + '<table class="table table-bordered">'
+        + '<tr><td>Median Income</td><td>${income}</td></tr>'
+        + '<tr><td>Population</td><td>${population}</td></tr>'
+        + '</table>'
+        + '</div>';
+
+    map.on('mousemove', function(e) {
+      map.getCanvas().style.cursor = 'pointer';
+
+      var features = map.queryRenderedFeatures(e.point, {layers: ['counties-fill']});
+
+      if (features.length) {
+        map.setFilter('route-hover', ['==', 'name', features[0].properties.name]);
+      } else {
+        map.setFilter('route-hover', ['==', 'name', '']);
+      }
+    });
+
+    map.on('click', function(e) {
+      var features = map.queryRenderedFeatures(e.point, {layers: ['counties-fill']});
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+
+      var popupContent = popupTpl.replace(/\$\{\w+\}/g, function(match) {
+        switch (match) {
+          case '${county}':
+            return feature.properties.NAME;
+          case '${income}':
+            return '$' + Number(feature.properties[incomeCode]).toLocaleString();
+          case '${population}':
+            return Number(feature.properties[populationCode]).toLocaleString();
+        }
+      });
+
+      new mapboxgl.Popup()
+          .setLngLat(map.unproject(e.point))
+          .setHTML(popupContent)
+          .addTo(map);
+    });
+
+  }).catch((error) => {
+    console.log(error.message);
+    throw new Error(error);
+  });
+</script>
