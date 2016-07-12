@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-8">
     <h4 class="text-muted">Request JSON</h4>
-    <div class="well" id="query-editor"></div>
+    <div class="well" id="query-editor" style="min-height: 400px;"></div>
     <div class="alert alert-danger" ng-if="!$ctrl.contentValid">
       {{$ctrl.editorErrorMessage}}
     </div>
@@ -9,8 +9,7 @@
   <div class="col-md-4">
     <h4 class="text-muted">Field Reference</h4>
     <div class="panel panel-default">
-      <table class="table table-bordered table-striped table-condensed"
-             style="font-family: 'Lucida Console', Monaco, monospace; font-size: 0.9em;">
+      <table class="table table-bordered table-striped table-condensed" style="font-family: Menlo, monospace; font-size: 1em;">
         <thead>
         <tr>
           <th>Field</th>

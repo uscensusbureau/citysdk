@@ -2,7 +2,6 @@ const CodeMirror = require('codemirror');
 
 require('../common');
 require('codemirror/mode/javascript/javascript');
-require('codemirror/addon/lint/lint');
 
 const fs = require('fs');
 const queryEditorTpl = fs.readFileSync(__dirname + '/query-editor.html');

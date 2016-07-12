@@ -9,6 +9,7 @@ require('./income-and-population/index');
 let citysdk = angular.module('citysdk', [
   'ui.router',
   'ui.bootstrap',
+  'ui.bootstrap.tabs',
 
   'citysdk.common',
   'citysdk.home',

@@ -6,7 +6,7 @@
 
   .mapboxgl-popup {
     max-height: 400px;
-    max-width: 200px;
+    max-width: 300px;
     background: #FFFFFF;
     box-shadow: 0 2px 4px #616161;
     padding: 15px;
@@ -21,6 +21,8 @@
   <h2>Maryland Income and Population</h2>
 
   <div class="panel panel-default">
+    <loading-gif visible="incomePopCtrl.mapContentLoading" message="'Loading map content'"></loading-gif>
+    <loading-error visible="incomePopCtrl.loadingError" message="'API error. Could not load map content.'"></loading-error>
     <div class="panel-body" id="map-content"></div>
   </div>
 
@@ -34,6 +36,7 @@
 </div>
 <hr>
 <div class="container">
+  <h3>Query Editor</h3>
   <div class="panel panel-default">
     <div class="panel-body">
       <query-editor query="incomePopCtrl.query"></query-editor>
@@ -42,4 +45,9 @@
       </button>
     </div>
   </div>
+</div>
+<hr>
+<div class="container">
+  <h3>Example Code</h3>
+  <code-viewer content="incomePopCtrl.exampleCode"></code-viewer>
 </div>

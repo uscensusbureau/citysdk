@@ -6,6 +6,7 @@ const fs = require('fs');
 const CitySdk = require('../../lib/citysdk');
 const mapboxgl = require('mapbox-gl');
 const popupTpl = fs.readFileSync(__dirname + '/templates/mapbox-popup.html', 'utf-8');
+const exampleCode = fs.readFileSync(__dirname + '/example-code.html', 'utf-8');
 
 angular.module('citysdk.incomeAndPopulation')
     .controller('IncomeAndPopulationCtrl', IncomeAndPopulationCtrl);
@@ -24,6 +25,10 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
 
   let incomeCode = CitySdk.aliasToVariable('income').income.variable;
   let populationCode = CitySdk.aliasToVariable('population').population.variable;
+
+  ctrl.exampleCode = exampleCode;
+  ctrl.loadingError = false;
+  ctrl.mapContentLoading = true;
 
   ctrl.query = JSON.stringify({
     level: 'state',
@@ -111,9 +116,15 @@ function IncomeAndPopulationCtrl($timeout, $filter, queryEditorService) {
               .addTo(map);
         });
 
+        $timeout(() => { ctrl.mapContentLoading = false; });
+
       }).catch((error) => {
         console.log(error.message);
-        throw new Error(error);
+
+        $timeout(() => {
+          ctrl.loadingError = true;
+          ctrl.mapContentLoading = false
+        });
       });
     }
   };
