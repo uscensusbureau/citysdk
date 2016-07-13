@@ -57,21 +57,26 @@ function IncomeAndPopulationCtrl($anchorScroll, $location, $timeout, $filter, qu
       $anchorScroll();
 
       CitySdk.request(request).then((response) => {
-        map.addSource(layerPrefix + '-incomePop', {type: 'geojson', data: response});
+        let source = layerPrefix + '-incomePop';
+        let fillLayerId = layerPrefix + '-counties-fill';
+        let outlineLayerId = layerPrefix + '-counties-outline';
+        let mouseoverLayerId = layerPrefix + '-hover';
+
+        map.addSource(source, {type: 'geojson', data: response});
 
         map.addLayer({
-          'id': layerPrefix + '-counties-fill',
+          'id': fillLayerId,
           'type': 'fill',
-          'source': layerPrefix + '-incomePop',
+          'source': source,
           'paint': {
             'fill-color': 'rgba(117,117,117,0.2)'
           }
         });
 
         map.addLayer({
-          'id': layerPrefix + '-counties-outline',
+          'id': outlineLayerId,
           'type': 'line',
-          'source': layerPrefix + '-incomePop',
+          'source': source,
           'paint': {
             'line-color': 'rgba(117,117,117,0.6)',
             'line-width': 2
@@ -79,9 +84,9 @@ function IncomeAndPopulationCtrl($anchorScroll, $location, $timeout, $filter, qu
         });
 
         map.addLayer({
-          'id': layerPrefix + '-route-hover',
+          'id': mouseoverLayerId,
           'type': 'fill',
-          'source': layerPrefix + '-incomePop',
+          'source': source,
           'layout': {},
           'paint': {
             'fill-color': 'rgba(117,117,117,0.6)'
@@ -92,17 +97,17 @@ function IncomeAndPopulationCtrl($anchorScroll, $location, $timeout, $filter, qu
         map.on('mousemove', (e) => {
           map.getCanvas().style.cursor = 'pointer';
 
-          let features = map.queryRenderedFeatures(e.point, {layers: [layerPrefix + '-counties-fill']});
+          let features = map.queryRenderedFeatures(e.point, {layers: [fillLayerId]});
 
           if (features.length) {
-            map.setFilter('route-hover', ['==', 'name', features[0].properties.name]);
+            map.setFilter(mouseoverLayerId, ['==', 'name', features[0].properties.name]);
           } else {
-            map.setFilter('route-hover', ['==', 'name', '']);
+            map.setFilter(mouseoverLayerId, ['==', 'name', '']);
           }
         });
         
         map.on('click', (e) => {
-          let features = map.queryRenderedFeatures(e.point, { layers: [layerPrefix + '-counties-fill'] });
+          let features = map.queryRenderedFeatures(e.point, { layers: [fillLayerId] });
           if (!features.length) {
             return;
           }
