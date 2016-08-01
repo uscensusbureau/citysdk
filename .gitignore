@@ -8,3 +8,4 @@ node_modules
 # Exclude source maps
 *.js.map
 
+examples-v2
