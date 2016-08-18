@@ -4,104 +4,317 @@ title: Getting Started
 ---
 
 <div class="row">
-    <div class="col-md-12 cenCoreStyles">
+    <div class="markdown-body">
+        <p>This doc explains the two approaches offered by the CitySDK: </p>
 
-        <div class="row">
-            <div class="col-md-6">
-                <p>CitySDK is fundamentally a javascript library that is expanded by modules which call on various APIs.
-                    Each module essentially adds a new data source for scripting to consume. The core library
-                    (citysdk.js) includes some basic utility functions that return coordinates for state capitals,
-                    etc.</p>
+        <p><strong>1. Node API.</strong> Supports any language of choice or cURL to retrieve data.</p>
 
+        <p><strong>2. Client-side Javascript library.</strong> Used for client-side apps (running in the browser). </p>
 
-                <p>Implementing the library can be requires these steps:</p>
+        <p>Both methods require a Census API key. If you do not have an API key, you may request one <a href="http://api.census.gov/data/key_signup.html">here</a>.</p>
 
-            </div>
-            <div class="col-md-6">
+        <h1>
+<a name="1-node-api" class="anchor" href="#1-node-api" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1. Node API</h1>
 
-                <ol>
-                    <li>Add the CitySDK javascript library and any desired module libraries</li>
-                    <li>Instantiate the CitySDK and desired modules</li>
-                    <li>Create a request JSON object
-                        <ol>
-                            <li>Define Location</li>
-                            <li>Choose Variables</li>
-                            <li>Choose Geographic Grouping / Level</li>
-                        </ol>
-                    </li>
-                    <li>Make the Request</li>
-                    <li>Use the returned object</li>
-                </ol>
+        <p>Once you have acquired an API key, it needs to be included in the <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">basic auth header</a> of every request.</p>
 
-            </div>
-        </div>
+        <pre><code>Authorization: Basic &lt;your_api_key&gt;
+</code></pre>
 
+        <h2>
+<a name="11--example-with-curl" class="anchor" href="#11--example-with-curl" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1.1  Example with cURL</h2>
 
-        <h2>1. Add the Library</h2>
+        <pre><code>curl --user yourApiKey: http://citysdk.commerce.gov
+</code></pre>
 
-        <p>Add the script libraries to the page. You will need the CitySDK core and then any <a
-                href="{{ site.baseurl }}/guides/modules.html">modules</a> you wish to use. This example will use the
-            Census Module.</p>
-        <pre>&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"&gt;&lt;/script&gt;
-&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"&gt;&lt;/script&gt;</pre>
-        <p><span class="label label-info">Note</span> jQuery is also required.</p>
+        <p><strong>Note:</strong> leave the <code>password</code> field empty.</p>
 
+        <h2>
+<a name="12--endpoints" class="anchor" href="#12--endpoints" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1.2  Endpoints</h2>
 
-        <h2>2. Enable the Library(s)</h2>
+        <p><strong>Base URL:</strong> <a href="http://citysdk.commerce.gov">http://citysdk.commerce.gov</a></p>
 
-        <p>Instantiate the CitySDK and modules you intend to use. Some modules may require an API key.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th align="left">Path</th>
+                    <th align="left">Method</th>
+                    <th align="left">Request Data</th>
+                    <th align="left">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td align="left"><code>/</code></td>
+                    <td align="left"><code>POST</code></td>
+                    <td align="left">
+                        <code>JSON</code> <a href="http://uscensusbureau.github.io/citysdk/guides/censusModule.html#theRequestObjectInDetail">Request object</a>
+                    </td>
+                    <td align="left">Evaluates request and returns either GeoJSON data or GeoJSON with Census data</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>/alias-to-variable</code></td>
+                    <td align="left"><code>GET</code></td>
+                    <td align="left">Comma separated aliases. Example: <code>?aliases=income,population</code>
+                    </td>
+                    <td align="left">Returns a map of alias -&gt; variable for the given parameter values</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>/variable-to-alias</code></td>
+                    <td align="left"><code>GET</code></td>
+                    <td align="left">Comma separated variables. Example: <code>?variables=P0010001,P0110022</code>
+                    </td>
+                    <td align="left">Returns a map of variable -&gt; alias for the given parameter values</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div class="row">
-            <div class="col-md-8">
-        <pre>&lt;script&gt;
-        var <var>sdk</var> = new CitySDK(); //Create the CitySDK Instance
-        <var>census</var> = <var>sdk.modules.census</var>; //Create an instance of the module
+        <h2>
+<a name="13--the-request-object" class="anchor" href="#13--the-request-object" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1.3  The Request Object</h2>
+
+        <p>The request object you send using the POST method is just JSON.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th align="left">Property</th>
+                    <th align="left">Type</th>
+                    <th align="left">Supported Values</th>
+                    <th align="left">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td align="left"><code>lat</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type"><code>Number</code></a></td>
+                    <td align="left">Example: <code>34.8994</code>
+                    </td>
+                    <td align="left">The latitude of the requested location (North). Also supported: <code>latitude</code>, <code>y</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left"><code>lng</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type"><code>Number</code></a></td>
+                    <td align="left">Example: <code>62.8995</code>
+                    </td>
+                    <td align="left">The longitude of the requested location (East). Also supported: <code>longitude</code>, <code>x</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left"><code>zip</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type"><code>String</code></a></td>
+                    <td align="left">Example: <code>"20902"</code>
+                    </td>
+                    <td align="left">The 5-digit zip code of the location. Note that USPS zip code areas do not align precisely with Census geographies, so when high accuracy is required it is recommended to use latitude and longitude. Specified as a string because certain
+                        zip codes begin with zeroes.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>state</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type"><code>String</code></a></td>
+                    <td align="left">Example: "MD"</td>
+                    <td align="left">The 2-letter USPS state code. It will be converted into the latitude and longitude of that state's capital.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>level</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type"><code>String</code></a></td>
+                    <td align="left">
+                        <code>"blockGroup"</code>, <code>"tract"</code>, <code>"county"</code>, <code>"state"</code>, <code>"us"</code>, <code>"place"</code>
+                    </td>
+                    <td align="left">At what level to request the data. These are based on census geographies.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>sublevel</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type"><code>Boolean</code></a></td>
+                    <td align="left">
+                        <code>true</code> or <code>false</code>
+                    </td>
+                    <td align="left">See <a href="http://uscensusbureau.github.io/citysdk/guides/censusModule.html#sublevelRequests">sublevel requests</a> for more information. Defaults to <code>false</code>.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>container</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type"><code>String</code></a></td>
+                    <td align="left">
+                        <code>"tract"</code>, <code>"county"</code>, <code>"state"</code>, <code>"place"</code>, <code>"geometry"</code>, <code>"geometry_within"</code>
+                    </td>
+                    <td align="left">Specifies a level which serves as a boundary for a GeoJSON request. For instance, if your level is "tract" and your container is set as "place" with sublevel enabled, it the SDK will return all tracts which fall within or touch that
+                        place's geographical boundaries. Note that for the "geometry" and "geometry" within tags you must specify the containerGeometry. "geometry" will return any entities that intersect the given geometry (including if they intersect
+                        but extend beyond the perimeter) whereas "geometry_within" will only return entities that are entirely contained within the containerGeometry specified.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>containerGeometry</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Objects"><code>Object</code></a></td>
+                    <td align="left"><code>{}</code></td>
+                    <td align="left">Specifies the bounding geometry for a GeoJSON request. The format of this data should be ArcGIS ESRI JSON. You can convert GeoJSON into ESRI using the Census module's GEOtoESRI() method. The boundary can be any arbitrary closed region
+                        or regions.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>api</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type"><code>String</code></a></td>
+                    <td align="left">Example: <code>"acs5"</code>
+                    </td>
+                    <td align="left">Specifies the API to use.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>year</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type"><code>Number</code></a></td>
+                    <td align="left">Example: <code>2010</code>
+                    </td>
+                    <td align="left">Specifies the year of the API to use. Defaults to the most recent year.</td>
+                </tr>
+                <tr>
+                    <td align="left"><code>variables</code></td>
+                    <td align="left"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"><code>Array</code></a></td>
+                    <td align="left"><code>[]</code></td>
+                    <td align="left">An array of strings specifying which variables to query. One can specify an aliased variable (see variable aliases) or a specific ACS variable code (e.g. "B01003_001E"). If this array is not specified, the SDK will simply geocode the
+                        location into Census FIPS codes. A list of all ACS variables is available on the Census's developer portal or via the SDK's getACSVariableDictionary method.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>
+<a name="14--examples" class="anchor" href="#14--examples" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1.4  Examples</h2>
+
+        <p><strong>Requesting GeoJSON and Census data using Python</strong></p>
+
+        <div class="highlight highlight-source-python"><pre><span class="pl-k">import</span> requests
+<span class="pl-k">from</span> requests.auth <span class="pl-k">import</span> HTTPBasicAuth
+
+apikey <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>your_api_key<span class="pl-pds">"</span></span>
+request_url <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>http://citysdk.commerce.gov<span class="pl-pds">"</span></span>
+
+request_obj <span class="pl-k">=</span> {
+  <span class="pl-s"><span class="pl-pds">'</span>zip<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>21401<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>state<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>MD<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>level<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>state<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>sublevel<span class="pl-pds">'</span></span>: <span class="pl-c1">False</span>,
+  <span class="pl-s"><span class="pl-pds">'</span>api<span class="pl-pds">'</span></span>: <span class="pl-s"><span class="pl-pds">'</span>acs5<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>year<span class="pl-pds">'</span></span>: <span class="pl-c1">2010</span>,
+  <span class="pl-s"><span class="pl-pds">'</span>variables<span class="pl-pds">'</span></span>: [<span class="pl-s"><span class="pl-pds">'</span>income<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>population<span class="pl-pds">'</span></span>]
+}
+
+response <span class="pl-k">=</span> requests.post(request_url, <span class="pl-v">auth</span><span class="pl-k">=</span>HTTPBasicAuth(apikey, <span class="pl-c1">None</span>), <span class="pl-v">json</span><span class="pl-k">=</span>request_obj)
+
+<span class="pl-c1">print</span> response.json()
+</pre></div>
+
+        <p><strong>Result data</strong></p>
+
+        <div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>blockGroup<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>zip<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>21401<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>level<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>state<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>sublevel<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>variables<span class="pl-pds">"</span></span>: [
+    <span class="pl-s"><span class="pl-pds">"</span>NAME<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>B19013_001E<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>B01003_001E<span class="pl-pds">"</span></span>
+  ],
+  <span class="pl-s"><span class="pl-pds">"</span>tract<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>706101<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>county<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>003<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>state<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>24<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>api<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>acs5<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>place<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>01600<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span>: <span class="pl-c1">2010</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>lat<span class="pl-pds">"</span></span>: <span class="pl-c1">38.9898034</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>lng<span class="pl-pds">"</span></span>: <span class="pl-c1">-76.5501227</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>B01003_001E<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>5696423<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>NAME<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Maryland<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>B19013_001E<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>70647<span class="pl-pds">"</span></span>
+    }
+  ],
+  <span class="pl-s"><span class="pl-pds">"</span>geographyValidForAPI<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>place_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Annapolis city<span class="pl-pds">"</span></span>
+}</pre></div>
+
+        <p><strong>Requesting GeoJSON and Census data using cURL</strong></p>
+
+        <pre><code>curl --user yourApiKey: -X POST \
+-H "Content-Type: application/json" \
+-d '{"lat": 38.9047, "lng": -77.0164, "level": "state", "variables": ["income", "population"]}' \
+http://citysdk.commerce.gov/
+</code></pre>
+
+        <p><strong>Result data</strong></p>
+
+        <div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>lat<span class="pl-pds">"</span></span>: <span class="pl-c1">38.9047</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>lng<span class="pl-pds">"</span></span>: <span class="pl-c1">-77.0164</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>level<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>state<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>variables<span class="pl-pds">"</span></span>: [
+    <span class="pl-s"><span class="pl-pds">"</span>NAME<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>B19013_001E<span class="pl-pds">"</span></span>,
+    <span class="pl-s"><span class="pl-pds">"</span>B01003_001E<span class="pl-pds">"</span></span>
+  ],
+  <span class="pl-s"><span class="pl-pds">"</span>api<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>acs5<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>year<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2014<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>sublevel<span class="pl-pds">"</span></span>: <span class="pl-c1">false</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>state<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>11<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>county<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>001<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>tract<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>004701<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>blockGroup<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>2<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>place<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>50000<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>place_name<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Washington city<span class="pl-pds">"</span></span>,
+  <span class="pl-s"><span class="pl-pds">"</span>geographyValidForAPI<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>data<span class="pl-pds">"</span></span>: [
+    {
+      <span class="pl-s"><span class="pl-pds">"</span>NAME<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>District of Columbia<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>B19013_001E<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>69235<span class="pl-pds">"</span></span>,
+      <span class="pl-s"><span class="pl-pds">"</span>B01003_001E<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>633736<span class="pl-pds">"</span></span>
+    }
+  ]
+}</pre></div>
+
+        <h1>
+<a name="2-client-side-javascript-library" class="anchor" href="#2-client-side-javascript-library" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2. Client-side Javascript library</h1>
+
+        <p>For client-side only apps, a Javascript library is provided that is expanded by modules which call on various APIs. Each module essentially adds a new data source for scripting to consume. The core library (citysdk.js) includes some basic utility
+            functions that return coordinates for state capitals, etc.</p>
+
+        <h2>
+<a name="21--add-the-library" class="anchor" href="#21--add-the-library" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2.1  Add the Library</h2>
+
+        <p>Add the script libraries to the page. You will need the CitySDK core and then any modules you wish to use. This example will use the Census Module.</p>
+
+        <pre><code>&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"&gt;&lt;/script&gt;
+</code></pre>
+
+        <p>Note: jQuery is also a required.</p>
+
+        <h2>
+<a name="22--enable-the-librarys" class="anchor" href="#22--enable-the-librarys" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2.2  Enable the Library(s)</h2>
+
+        <p>Make sure you have a Census API key, you may request one <a href="http://api.census.gov/data/key_signup.html">here</a>.</p>
+
+        <pre><code>&lt;script&gt;
+        var sdk = new CitySDK(); //Create the CitySDK Instance
+        census = sdk.modules.census; //Create an instance of the module
         census.enable("API-KEY"); //Enable the module with the api key
-&lt;/script&gt;</pre>
+&lt;/script&gt;
+</code></pre>
 
-            </div>
-            <div class="col-md-4">
+        <h2>
+<a name="23--create-the-request" class="anchor" href="#23--create-the-request" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2.3  Create the Request</h2>
 
-                <div class="alert alert-info">
-                    <h4>
-                        Census API Key Required
-                    </h4>
+        <p><strong>Define Location</strong></p>
 
-                    <p>If you don't already have one, be sure to grab a Census API key. <a
-                            href="http://api.census.gov/data/citysdk.html" class="alert-link">Get a Key</a></p>
-                </div>
+        <p>The location can be defined by coordinates (latitude/longiture), state, zipcode, or address. Generally coordinate points are optimal and fastest.</p>
 
-            </div>
-        </div>
+        <p><strong>Select Variables</strong></p>
 
+        <p>The variables determine what data points are returned by the request. For census modules many of the most common variables have been aliased for easier use. You can use either the aliases or the variable names.</p>
 
-        <h2>3. Create the Request</h2>
+        <p><strong>Choose Geographic Grouping / Level</strong></p>
 
-        <div class="row">
-            <div class="col-md-7"><h3>Define Location</h3>
+        <p>Choose what geographic level of data desired. For example, selecting “state” along with the coordinates of Richmond, VA will return data for the state of Virginia. Optionally you can include the sublevel which will include the next unit down (in
+            the previous example, selecting sublevel when requesting a state will also include county).</p>
 
-                <p>The location can be defined by coordinates (latitude/longiture), state, zipcode, or address.
-                    Generally coordinate points are optimal and fastest.</p>
+        <p><strong>The Completed Request</strong></p>
 
-                <h3>Select Variables</h3>
-
-                <p>The variables determine what data points are returned by the request. For census modules many of the
-                    most common variables have been aliased for easier use. You can use either the <a
-                            href="{{ site.baseurl }}/guides/censusModule/aliases.html">aliases</a> or the variable
-                    names.</p>
-
-                <h3>Choose Geographic <br/>Grouping / Level</h3>
-
-                <p>Choose what geographic level of data desired. For example, selecting “state” along with the
-                    coordinates of Richmond, VA will return data for the state of Virginia. Optionally you can include
-                    the sublevel which will include the next unit down (in the previous example, selecting sublevel when
-                    requesting a state will also include county).</p>
-            </div>
-            <div class="col-md-5">
-                <h3>The Completed Request</h3>
-
-        <pre>&lt;script&gt;
-    var <var>request</var> = {
+        <pre><code>&lt;script&gt;
+    var request = {
         "level": "state",
         "state": "AK",
         "sublevel": true,
@@ -113,18 +326,15 @@ title: Getting Started
             "commute_time_other"
         ]
     }
-&lt;/script&gt;</pre>
-            </div>
-        </div>
+&lt;/script&gt;
+</code></pre>
 
-
-        <h2>4. Submit the Request</h2>
+        <h2>
+<a id="24--submit-the-request" class="anchor" href="#24--submit-the-request" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2.4  Submit the Request</h2>
 
         <p>Make the request and use a callback to utilize the response.</p>
 
-
-
-        <pre>&lt;script&gt;
+        <pre><code>&lt;script&gt;
 
     //Create a callback function to use the data returned
      var callback = function(response) {
@@ -134,98 +344,13 @@ title: Getting Started
      // Make the request
      census.GEORequest(request, callback);
 
-&lt;/script&gt;</pre>
+&lt;/script&gt;
+</code></pre>
 
+        <h2>
+<a name="25--see-it-in-action" class="anchor" href="#25--see-it-in-action" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2.5  See It In Action</h2>
 
-        <h2>5. See It In Action</h2>
-
-        <p>See the CitySDK populate a Google map.</p>
-
-        <div class="row">
-            <div class="col-md-6">
-            <pre>
-
-        var sdk = new CitySDK();
-        var census = sdk.modules.census;
-
-        var request = {
-            "state": "MD",
-            "level": "state"
-        };
-
-        var callback = function(response) {
-            map.data.addGeoJson(response);
-            };
-
-        census.GEORequest(request, callback);
-
-        </pre>
-            </div>
-
-            <div class="col-md-6">
-                <div id="map-canvas" style="width: 100%; height: 400px; position: relative; border-radius:5px;"></div>
-            </div>
-
-        </div>
-
+        <p>Go to Guides &gt;&gt; Interactive Query Builder to explore different datasets, practice making requests, map the data, or download as a CSV. </p>
 
     </div>
 </div>
-
-
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
-
-
-<script>
-    var apiKey, map;
-
-    var sdk = new CitySDK();
-    var census = sdk.modules.census;
-    var farmersMarket = sdk.modules.farmersMarket;
-
-
-
-    function clearMap() {
-        map.data.forEach(function (feature) {
-            map.data.remove(feature);
-        });
-    }
-    ;
-
-    function runExample(id) {
-
-        clearMap();
-        var textarea = $('#' + id);
-
-        eval(textarea.val());
-    }
-    ;
-
-    $(document).ready(
-            function () {
-                var mapOptions = {
-                    center: {lat: 38.91732, lng: -77.2211},
-                    zoom: 6
-                };
-                map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-
-                map.data.setStyle({
-                    fillColor: 'blue'
-                });
-                census.enable(citySDKdemoConfiguration.apikey);
-
-                var request = {
-                    "state": "MD",
-                    "level": "state"
-                };
-
-                var callback = function (response) {
-                    map.data.addGeoJson(response);
-                };
-
-                census.GEORequest(request, callback);
-
-            }
-    );
-</script>
