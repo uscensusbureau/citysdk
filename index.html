@@ -2,84 +2,72 @@
 layout: default
 title: US CitySDK by the US Census Bureau
 ---
-
-<div class="row">
-  <div class="col-lg-12">
-    <div class="flex-video widescreen">
-      <iframe src="https://www.youtube.com/embed/o4ag2zIH2Q0" frameborder="0" allowfullscreen></iframe>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-lg-12">
-    <div class="intro-message">
-      <h3>Toolbox for civic innovators to connect local and national public data</h3>
-      <hr class="intro-divider">
-    </div>
-  </div>
-</div>
-
-<div class="row clearfix">
-  <div class="col-md-12 column">
-    <div class="row">
-
-      <div class="col-md-4">
-        <div class="thumbnail">
-          <img alt="240x160" src="static/img/guides.jpg"/>
-          <div class="Guides">
-            <h3>
-              <small>Guides</small>
-            </h3>
-            <p>
-              <small>
-                Check out the "Getting Started" tutorials, learn how to structure requests, and see what's possible with
-                the CitySDK.
-              </small>
-            </p>
-            <p>
-              <a class="btn btn-primary btn-sm" href="{{ site.baseurl }}/guides.html">Guides</a>
-            </p>
-          </div>
+<section class="usa-hero">
+    <img class="splash" src="{{site.baseurl}}/static/img/washington-dc-2.png" alt="Background Image of US Capitol" />
+    <div class="content-container">
+        <div class="usa-grid">
+            <header>
+                <h1>City SDK</h1>
+                <p>Explore Census Data</p>
+                <ul class="calls-to-action">
+                    <li class="action"><a href="{{site.baseurl}}/gettingstarted.html" class="usa-button usa-button-outline">Getting Started</a></li>
+                    <li class="preposition">or</li>
+                    <li class="action"><a href="{{site.baseurl}}/examplecode.html" class="usa-button usa-button-outline">Explore Examples</a></li>
+                </ul>
+            </header>
         </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="thumbnail">
-          <img alt="240x160" src="static/img/examples.jpg"/>
-          <div class="Examples">
-            <h3>
-              <small>Code Examples</small>
-            </h3>
-            <p>
-              <small>
-                Jump straight to code examples and begin integrating into open data and mapping capabilities into your
-                own applications.
-              </small>
-            </p>
-            <p>
-              <a class="btn btn-primary btn-sm"
-                 href="{{ site.baseurl }}/examplecode.html">Examples</a>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="thumbnail openOpportunityBadgeHP">
-          <div class="openOpportunityBadge">
-            <h3><a href="http://uscensusbureau.github.io/opportunity/" target="_blank">The Opportunity
-                                                                                       Project</a></h3>
-            <p>Let's build something amazing together.</p>
-
-            <a href="http://uscensusbureau.github.io/opportunity/" target="_blank"
-               class="btn btn-default">The Opportunity Project</a>
-            <a href="{{ site.baseurl }}/examples/arcGisHUD/" class="btn btn-default">View CitySDK
-                                                                                     Example</a>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </div>
-</div>
+</section>
+<section class="features">
+    <div class="usa-grid">
+        <header>
+            <p class="features-description">
+            The CitySDK is a collaboration between the US Census Bureau, the Department of Commerce, HUD, USDA, and other agencies in the federal government. The goal is to support civic innovation (through the efforts like Code for America) and streamline the development of applications that use open data. It was originally created in a 12-week sprint, to help the US Census Bureau launch it’s first ever open source project.
+            </p>
+        </header>
+        <div class="powered-by">
+            <ul class="data-sources">
+              <li class="commerce">
+                <a href="#"><img alt="Department of Commerce Logo" src="{{ site.baseurl }}/static/img/logos/commerce-logo.png"></a>
+              </li>
+                <li class="census">
+                    <a href="#"><img alt="Census Bureau Logo" src="{{ site.baseurl }}/static/img/logos/census-logo.png"></a>
+                </li>
+                <li class="hud">
+                    <a href="#"><img alt="Housing and Urban Development Logo" src="{{ site.baseurl }}/static/img/logos/hud-logo.png"></a>
+                </li>
+                <li class="usda">
+                    <a href="#"><img alt="USDA Logo" src="{{ site.baseurl }}/static/img/logos/usda-logo.png"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <ul class="feature-list">
+        <li>
+            <a href="#" style="text-decoration: none;">
+                <figure><img alt="API Icon" src="{{site.baseurl}}/static/img/feature-icons/api-icon.svg"></figure>
+                <h2>Getting Started</h2>
+                <p>Check out our documentation</p>
+            </a>
+        </li>
+        <li>
+            <a href="#" style="text-decoration: none;">
+                <figure><img alt="Learn More" src="{{site.baseurl}}/static/img/feature-icons/topics-icon.svg"></figure>
+                <h2>About CitySDK</h2>
+                <p>Success stories and awards</p>
+            </a>
+        </li>
+        <li>
+            <figure><img alt="Create Visualizations Icon" src="{{site.baseurl}}/static/img/feature-icons/create-your-own-icon.svg"></figure>
+            <h2>Use the Query Builder</h2>
+            <p>Lorem ipsum dolor sit amet</p>
+        </li>
+        <li>
+            <a href="/developers" style="text-decoration: none;">
+                <figure><img alt="Developer Tools Icon" src="{{site.baseurl}}/static/img/feature-icons/developer-tools-icon.svg"></figure>
+                <h2>Related Projects</h2>
+                <p>Opportunity Project, Midaas</p>
+            </a>
+        </li>
+    </ul>
+</section>
