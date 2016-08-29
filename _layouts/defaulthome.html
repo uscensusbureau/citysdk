@@ -7,18 +7,9 @@
   {% include headscriptsAndCSS.html %}
 
 </head>
-<body class="pages-developers">
+<body class="pages-home">
   {% include header.html %}
-  <section class="main-content">
-      <div class="usa-grid">
-          <div class="col-sm">
-          {% include sidenav.html %}
-          </div>
-          <div class="col-lg">
-            {{ content }}
-          </div>
-      </div>
-  </section>
+  {{ content }}
   {% include footer.html %}
 <script src="{{ site.baseurl }}/static/js/docs.min.js"></script>
 <script type="text/javascript" src="{{ site.baseurl }}/static/js/expandables.js"></script>
