@@ -1,0 +1,22 @@
+.gini-input {
+  margin-bottom: 1em;
+  position: relative;
+
+  input {
+    margin-bottom: 0.4em;
+  }
+
+  .label {
+    color: lighten($color-gray-dark, 10);
+    font-size: 0.8em;
+    position: absolute;
+  }
+
+  .label-left {
+    left: 0;
+  }
+
+  .label-right {
+    right: 0;
+  }
+}

@@ -1,0 +1,103 @@
+.app-footer {
+  background-color: $color-gray-dark;
+  padding: 2em 0;
+
+  h2 {
+    color: $color-white;
+    font-size: 1.1em;
+    margin: 1em 0 0.1em;
+  }
+
+  ul {
+    margin: 0;
+  }
+
+  .col {
+    @include span-columns(6);
+  }
+
+  .commerce-footer {
+    @include clearfix;
+  }
+
+  .commerce-links {
+    @include span-columns(6);
+    font-size: 0.9em;
+    margin-bottom: 2em;
+
+    a {
+      color: $color-white;
+
+      &:hover {
+        color: lighten($color-primary, 10);
+      }
+    }
+
+    li {
+      margin: 0 1em 0 0;
+    }
+  }
+
+  .label {
+    display: block;
+    overflow: hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+  }
+
+  .links {
+    font-size: 1.1em;
+
+    a {
+      color: $color-white;
+
+      &:hover {
+        color: lighten($color-primary, 30);
+      }
+    }
+
+    i {
+      color: lighten($color-primary, 30);
+      margin-right: 0.25em;
+    }
+  }
+}
+
+.footer-info {
+  text-align: right;
+
+  h1 {
+    color: $color-white;
+    font-size: 2em;
+    margin: 0;
+  }
+}
+
+.footer-logos {
+  @include clearfix;
+  display: block;
+  margin: 0;
+
+  li {
+    float: right;
+    margin-left: 5%;
+    margin-top: 0;
+    width: 20%;
+
+    &.census {
+      padding-top: 1em;
+    }
+
+    a {
+      display: block;
+    }
+  }
+}
+
+.footer-logos-container {
+  clear: both;
+  float: right;
+  margin-top: 1em;
+  max-width: 350px;
+  width: 100%;
+}

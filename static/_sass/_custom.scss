@@ -406,3 +406,21 @@ header.header {
   width: 100%;
   opacity: 0.25;
 }
+
+.panel-info>.panel-heading {
+    color: #f9f9f9;
+    background-color: #323a45;
+    border-color: #1d2127;
+}
+
+.panel-info {
+    border-color: #cccccc;
+}
+
+input[type=radio]:checked+label::before {
+    box-shadow: 0 0 0 2px #fff,0 0 0 4px #5b7da3;
+}
+input[type=checkbox]:checked+label::before, input[type=radio]:checked+label::before {
+    background-color: #5b7da3;
+    box-shadow: 0 0 0 1px #5b7da3;
+}
