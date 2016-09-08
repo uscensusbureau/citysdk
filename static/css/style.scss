@@ -3,7 +3,6 @@
 
 // CitySDK
 @import 'variables';
-@import 'custom';
 
 // Import Web Standards
 @import "../_sass/vendor/us-web-standards/all";
@@ -15,3 +14,5 @@
 @import "extends/slider";
 @import "modules/all";
 @import "pages/all";
+
+@import 'custom';
