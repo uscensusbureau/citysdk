@@ -438,3 +438,25 @@ input, input[type="text"], input[type="email"], input[type="password"], input[ty
 .btn-primary {
     background-color: #5b7da3;
 }
+
+.pages-home .usa-hero h1 {
+    font-family: Helvetica;
+    font-size: 4.4em;
+    letter-spacing: 0.5em;
+}
+
+.pages-home .usa-hero strong {
+    font-size: 1em;
+    line-height: 1em;
+}
+.logotype{
+  letter-spacing: 0.15em;
+}
+
+.powered-by li{
+  margin-right: 5em;
+}
+
+.powered-by li:last-child{
+  margin-right: 0;
+}

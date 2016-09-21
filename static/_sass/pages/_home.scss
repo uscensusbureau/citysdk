@@ -149,7 +149,6 @@
       box-shadow: inset 0 0 0 2px darken($color-yellow, 10);
       color: $color-white;
       font-weight: bold;
-      padding: 0.75em 1em;
 
       &:hover {
         box-shadow: inset 0 0 0 2px $color-white;
@@ -178,14 +177,6 @@
       display: inline-block;
       vertical-align: top;
       width: 100px;
-
-      &:first-child {
-        margin-right: 1em;
-      }
-
-      &.census {
-        padding-top: 1em;
-      }
     }
 
     ul {
