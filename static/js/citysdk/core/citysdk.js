@@ -48,7 +48,6 @@
   var OK = "oklahoma";
   var OR = "oregon";
   var PA = "pennsylvania";
-  var PR = "puerto rico"
   var RI = "rhode island";
   var SC = "south carolina";
   var SD = "south dakota";
@@ -101,7 +100,6 @@
     OK: OK,
     OR: OR,
     PA: PA,
-    PR: PR,
     RI: RI,
     SC: SC,
     SD: SD,
@@ -155,7 +153,6 @@
   var OK$1 = [35.4822, -97.535];
   var OR$1 = [44.9308, -123.0289];
   var PA$1 = [40.2697, -76.8756];
-  var PR$1 = [18.4655, -66.1057];
   var RI$1 = [41.8236, -71.4222];
   var SC$1 = [34.0298, -80.8966];
   var SD$1 = [44.368, -100.3364];
@@ -208,7 +205,6 @@
     OK: OK$1,
     OR: OR$1,
     PA: PA$1,
-    PR: PR$1,
     RI: RI$1,
     SC: SC$1,
     SD: SD$1,

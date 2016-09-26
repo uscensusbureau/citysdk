@@ -1,8 +1,9 @@
 ---
-layout: default
+layout: guideslayout
 published: true
 title: Census Module Query Builder
 ---
+
 
 <div class="row">
   <div class="col-md-12">
@@ -438,7 +439,7 @@ title: Census Module Query Builder
   //Following code borrowed from the Census Request Tester by github @mpaquette1
   var census;
   var variablehash;
-
+  
   function loadCoords(lat, lng) {
     jQuery("#lat").val(lat);
     jQuery("#lng").val(lng);
@@ -454,13 +455,13 @@ title: Census Module Query Builder
   function submit() {
     jQuery(".loading-icon-initialstate").show();
     jQuery(".outputSet").hide();
-
+    
     var request = buildCensusModuleRequest();
     var req = jQuery('[name="CitySDKcall"]:checked').val();
     var output = jQuery("#rawOutput");
-
+    
     output.empty();
-
+    
     if (req == 'APIRequest') {
       census.apiRequest(request, function(response) {
         output.empty();
@@ -471,7 +472,7 @@ title: Census Module Query Builder
         jQuery(".mapControlTab").removeClass("active");
         jQuery(".rawOutputControlTab").addClass("active");
       });
-
+      
     } else {
       census.geoRequest(request, function(response) {
         output.empty();
@@ -574,7 +575,7 @@ title: Census Module Query Builder
         city: addr_city,
         state: addr_state
       };
-
+      
       request.address = addr;
     }
     if (container.length > 0) request.container = container;
@@ -763,7 +764,7 @@ title: Census Module Query Builder
         }
       });
     });
-
+    
     jQuery('#variable_description').html(newdescription);
     bindVariableCloseAction();
   }// end changeAliasSelection
