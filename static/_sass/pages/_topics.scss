@@ -1,0 +1,94 @@
+.pages-topics {
+
+  header {
+
+    h1 {
+      margin: 0 0 0.25em;
+    }
+
+    p {
+      color: $color-gray;
+      margin: 0;
+    }
+  }
+
+  .col-lg {
+    @include span-columns(8);
+  }
+
+  .topic {
+    @extend %card;
+    display: block;
+    margin-bottom: 1.25em;
+    padding: 0;
+    position: relative;
+
+    &:hover {
+      box-shadow: 0 0 5px rgba($color-primary, 0.75);
+
+      .launch {
+        width: 8%;
+      }
+    }
+
+    &.coming-soon {
+
+      &:hover {
+        box-shadow: 0 -1px 0 lighten($color-gray-light, 25), 0 0 2px rgba($color-black, 0.05), 0 2px 4px rgba($color-black, 0.09);
+      }
+
+      h2 {
+        color: lighten($color-gray, 10);
+        font-size: 1.5em;
+      }
+
+      p {
+        color: lighten($color-gray-light, 10);
+      }
+    }
+
+    a {
+      display: block;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    h2 {
+      font-size: 1.5em;
+      font-weight: 500;
+      margin: 0 0 0.1em;
+    }
+
+    i {
+      color: $color-white;
+      font-size: 1.5em;
+      left: 50%;
+      margin: -0.5em 0 0 -0.4em;
+      position: absolute;
+      top: 50%;
+    }
+
+    p {
+      color: $color-gray;
+      font-size: 0.95em;
+      margin: 0;
+    }
+
+    .container {
+      padding: 1em;
+      width: 92%;
+    }
+
+    .launch {
+      @include transition(all 0.15s ease);
+      background-color: $color-primary;
+      bottom: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 6%;
+    }
+  }
+}

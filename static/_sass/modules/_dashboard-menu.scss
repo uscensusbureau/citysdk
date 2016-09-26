@@ -1,0 +1,79 @@
+.dashboard-menu {
+  background-color: $color-gray-dark;
+  bottom: 0;
+  position: fixed;
+  top: 0;
+  width: 200px;
+
+  h2 {
+    color: lighten($color-gray-light, 10);
+    font-size: 0.9em;
+    font-weight: 500;
+    margin: 0;
+    padding-left: 1em;
+  }
+
+  li {
+    background-color: $color-gray-dark;
+    color: $color-gray-light;
+    cursor: grab;
+    cursor: -webkit-grab;
+    font-size: 0.85em;
+    margin: 0;
+    padding: 0.4em 1em;
+    position: relative;
+    width: 100%;
+
+    &:hover {
+      background-color: darken($color-gray-dark, 5);
+    }
+  }
+
+  ul {
+    margin: 0;
+
+    &.drag-menu {
+      margin-bottom: 1em;
+    }
+  }
+
+  .disable-menu {
+
+    li {
+      cursor: default;
+
+      &:hover {
+        background-color: $color-gray-dark;
+      }
+    }
+  }
+
+  .logo-container {
+    @include clearfix;
+    background-color: $color-primary;
+    height: 69.5px;
+    margin-bottom: 2em;
+    padding: 1.45rem 0 3rem 3rem;
+  }
+}
+
+.drag-icon {
+  color: rgba($color-white, 0.5);
+  display: inline-block;
+  font-size: 0.85em;
+  margin-right: 0.5em;
+}
+
+.drag-item {
+  background-color: $color-gray-dark;
+  color: $color-gray-light;
+  font-size: 0.9em;
+  margin: 0;
+  padding: 0.5em 3rem;
+  position: relative;
+
+  &.gu-mirror {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+  }
+}

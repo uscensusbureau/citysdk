@@ -1,0 +1,33 @@
+.tools-tool {
+
+  header {
+    margin-bottom: 1em;
+
+    h1 {
+      font-size: 2em;
+      line-height: 1.25em;
+      margin: 0 0 0.1em;
+    }
+
+    p {
+      color: $color-gray;
+      margin: 0;
+    }
+  }
+
+  .col-lg {
+    @include span-columns(8);
+  }
+}
+
+.tool-description {
+  h2 {
+    font-size: 1.5em;
+    margin: 1em 0 0.2em;
+  }
+
+  p {
+    color: $color-gray-dark;
+    margin-top: 0;
+  }
+}
