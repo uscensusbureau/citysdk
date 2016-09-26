@@ -1,0 +1,10 @@
+@include keyframes(scaleUp) {
+
+  from {
+    @include transform(scale(0));
+  }
+
+  to {
+    @include transform(scale(1));
+  }
+}
