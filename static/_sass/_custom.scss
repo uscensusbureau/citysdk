@@ -461,3 +461,17 @@ input, input[type="text"], input[type="email"], input[type="password"], input[ty
 .powered-by li:last-child{
   margin-right: 0;
 }
+
+.dropdown-toggle{
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.dropdown-menu {
+  background-color: #323a45;
+  border: none;
+}
+
+.dropdown-item {
+  font-size: 1.3em;
+}
