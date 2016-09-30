@@ -13,9 +13,14 @@
     </div>
     <div class="app-links">
       <ul>
-        <li><a href="{{site.baseurl}}/about.html">About</a></li>
-        <li><a href="{{site.baseurl}}/developers">Developers</a></li>
-        <li><a href="/#">Showcase</a></li>
+        <li>
+          <a href="{{site.baseurl}}/about.html">About</a></li>
+        <li>
+          {% include devnavLinksDD.html %}
+        </li>
+        <li>
+          {% include examplesnavLinksDD.html %}
+        </li>
       </ul>
     </div>
   </div>
