@@ -277,8 +277,8 @@ http://citysdk.commerce.gov/
 
         <p>Add the script libraries to the page. You will need the CitySDK core and then any modules you wish to use. This example will use the Census Module.</p>
 
-        <pre><code>&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.js"&gt;&lt;/script&gt;
-&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/Release1.1/js/citysdk.census.js"&gt;&lt;/script&gt;
+        <pre><code>&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/gh-pages/static/js/citysdk/core/citysdk.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.rawgit.com/uscensusbureau/citysdk/gh-pages/static/js/citysdk/modules/census.citysdk.js"&gt;&lt;/script&gt;
 </code></pre>
 
         <p>Note: jQuery is also a required.</p>
@@ -289,9 +289,7 @@ http://citysdk.commerce.gov/
         <p>Make sure you have a Census API key, you may request one <a href="http://api.census.gov/data/key_signup.html">here</a>.</p>
 
         <pre><code>&lt;script&gt;
-        var sdk = new CitySDK(); //Create the CitySDK Instance
-        census = sdk.modules.census; //Create an instance of the module
-        census.enable("API-KEY"); //Enable the module with the api key
+        census = new CensusModule("API-KEY"); //Create and activate an instance of the module
 &lt;/script&gt;
 </code></pre>
 
@@ -342,8 +340,8 @@ http://citysdk.commerce.gov/
      };
 
      // Make the request
-     census.GEORequest(request, callback);
-
+     census.geoRequest(request, callback);
+     census.apiRequest(request, callback);
 &lt;/script&gt;
 </code></pre>
 
