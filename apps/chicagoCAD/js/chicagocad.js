@@ -7,12 +7,12 @@ var loadingCount = 0;
 $(document).ready(function() {
     //Initialize the SDK and create references to our Socrata and Census modules
     sdk = new CitySDK();
-    census = sdk.modules.census;
+    census = new CensusModule(citySDKdemoConfiguration.apikey);
     socrata = sdk.modules.socrata;
 
     //Enable the modules - Socrata doesn't require an API key
     socrata.enable();
-    census.enable(censusKey);
+    // census.enable(censusKey);
 
     //Enable tooltips - these pop up when a user hover's over a
     //variables "?" - it gets the descriptions from the Census moudule's aliases
@@ -126,7 +126,7 @@ function updateBoundaries() {
     variables = request.variables;
 
     //We now have a complete request, let's get the boundaries and data
-    census.GEORequest(request, function(geojson) {
+    census.geoRequest(request, function(geojson) {
         //Remove previous json
         clearBoundaries();
 
