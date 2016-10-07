@@ -62,8 +62,7 @@ title: Census Module Aliases
         var data = [];
         var table;
         var total_rows = 0;
-        var sdk = new CitySDK();
-        var census = sdk.modules.census;
+        var census = new CensusModule(citySDKdemoConfiguration.apikey);
         var variableToAliasIndex = {};
 
         function buildTable(type) {
@@ -371,5 +370,3 @@ title: Census Module Aliases
         });
 
     </script>
-
-
