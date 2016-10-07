@@ -135,9 +135,8 @@ title: Census Module Query Builder
             <label for="variable">Aliases</label>
 
             <p><em>These are aliases defined in CitySDK for ACS Variables for easier access. See <a
-                href="{{ site.baseurl }}/guides/censusModule/aliases.html" target="_blank">Alias/Variable
-                                                                                           List</a>.</em></p>
-            <select class="reqparam form-control" multiple size="15" id="variable"></select>
+                href="{{ site.baseurl }}/developers/aliases" target="_blank">Alias/Variable List</a>.</em></p>
+            <select class="reqparam form-control" size="15" id="variable"></select>
 
             <div id='variable_description' class="cenVariableDetails"></div>
           </div>
@@ -487,7 +486,6 @@ title: Census Module Query Builder
             map.data.remove(feature);
           });
           map.data.addGeoJson(response);
-
           map.setCenter({
             lat: Number(response.features[0].properties.INTPTLAT),
             lng: Number(response.features[0].properties.INTPTLON)
