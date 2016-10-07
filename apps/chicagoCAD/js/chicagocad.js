@@ -135,14 +135,15 @@ function updateBoundaries() {
 
         //If we don't want city boundaries, we need to set a container and sublevel tag
         if(choropleth_variable != 'none') {
+            var variableName = census.aliases[choropleth_variable].variable;
             var maxValue = Number.MIN_VALUE;
             var minValue = Number.MAX_VALUE;
 
             //Parse and find the maximum value and the lowest value
             geojson.features.forEach(function(feature) {
-                if(feature.properties[choropleth_variable] != null && feature.properties.AREALAND > 0 && (feature.properties.AREAWATER/feature.properties.AREALAND) < 0.98) {
-                    maxValue = Math.max(maxValue, Number(feature.properties[choropleth_variable]));
-                    minValue = Math.min(minValue, Number(feature.properties[choropleth_variable]));
+                if(feature.properties[variableName] != null && feature.properties.AREALAND > 0 && (feature.properties.AREAWATER/feature.properties.AREALAND) < 0.98) {
+                    maxValue = Math.max(maxValue, Number(feature.properties[variableName]));
+                    minValue = Math.min(minValue, Number(feature.properties[variableName]));
                 }
             });
 
@@ -158,7 +159,7 @@ function updateBoundaries() {
                 //                         range
                 //
                 geojson.features.forEach(function(feature) {
-                    feature.properties.choroplethOpacity = (Number(feature.properties[choropleth_variable]) - minValue)/range;
+                    feature.properties.choroplethOpacity = (Number(feature.properties[variableName]) - minValue)/range;
                 });
             } else {
                 //For some reason the max value and the min value are the same
