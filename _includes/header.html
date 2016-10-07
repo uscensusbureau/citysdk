@@ -3,19 +3,24 @@
 </div>
 <nav class="app-nav">
   <div class="usa-grid">
-    <div class="commerce-logo"><a href="https://www.commerce.gov/"><img src="{{ site.baseurl }}/static/img/citysdk-logo-notext.png"/></a></div>
+    <div class="sdk-logo"><a href="{{site.baseurl}}/"><img src="{{ site.baseurl }}/static/img/citysdk-logo-notext.png"/></a></div>
     <div class="logo">
       <div class="top"><a href="{{site.baseurl}}/">
           <h1 class="logotype">CITYSDK</h1></a>
         <div class="beta">Beta</div>
       </div>
-      <div class="bottom data-service"><a href="https://www.commerce.gov/dataservice" style="color: #fff;">Commerce Data Service</a></div>
+      <div class="bottom data-service"><span style="color: #fff;">Commerce Data Service</span></div>
     </div>
     <div class="app-links">
       <ul>
-        <li><a href="{{site.baseurl}}/about.html">About</a></li>
-        <li><a href="/#">Developers</a></li>
-        <li><a href="/#">Showcase</a></li>
+        <li>
+          <a href="{{site.baseurl}}/about">About</a></li>
+        <li>
+          {% include devnavLinksDD.html %}
+        </li>
+        <li>
+          {% include examplesnavLinksDD.html %}
+        </li>
       </ul>
     </div>
   </div>
