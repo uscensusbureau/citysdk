@@ -462,16 +462,28 @@ input, input[type="text"], input[type="email"], input[type="password"], input[ty
   margin-right: 0;
 }
 
-.dropdown-toggle{
-  font-size: 1em;
-  font-weight: 600;
-}
-
 .dropdown-menu {
   background-color: #323a45;
   border: none;
 }
 
-.dropdown-item {
-  font-size: 1.3em;
+.dropdown-menu li a{
+  color: #f9f9f9;
+}
+
+.dropdown button, .dropdown button:hover, .dropdown button:focus, .dropdown button:active{
+  background-color: transparent;
+  color: #f9f9f9;
+  outline: 0;
+  -webkit-box-shadow:none;
+  box-shadow: none;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.app-links .dropdown a:hover{
+  background-color: transparent;
+}
+.dropdown ul{
+  display: none;
 }

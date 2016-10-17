@@ -1,0 +1,354 @@
+---
+layout: default
+title: Using Multiple Modules
+---
+<div class="row">
+    <div class="col-md-12">
+
+        <h2>Overview</h2>
+
+        <p>This page will guide you through creating an application that unifies data from multiple modules.</p>
+
+        <p>This application will allow users to click on any county in California and view Farmer's Markets in and near
+            that county.</p>
+
+        <h2>Importing the Modules</h2>
+
+        <p>The first step to using multiple modules is importing them. We'll add import statements to our &lt;head&gt;
+            tag for the CitySDK core, and each module. We'll also
+            import code for our Google Map.</p>
+        <pre>
+        &lt;head&gt;
+            &lt;script type=&quot;text/javascript&quot;
+                    src=&quot;https://maps.googleapis.com/maps/api/js?v=3.exp&amp;libraries=visualization&amp;signed_in=true&quot;&gt;
+            &lt;/script&gt;
+
+            &lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+            &lt;script src=&quot;js/citysdk.js&quot;&gt;&lt;/script&gt;
+            &lt;script src=&quot;js/citysdk.census.js&quot;&gt;&lt;/script&gt;
+            &lt;script src=&quot;js/citysdk.farmersMarket.js&quot;&gt;&lt;/script&gt;
+        &lt;/head&gt;
+        </pre>
+        <p>Everything is now imported and we can get started on our actual code.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+
+        <h2>Instantiating the SDK, modules, and map</h2>
+
+        <p>Our first step is instantiating the SDK, modules and map. To do this, we'll first need to add the required
+            map-canvas div to the body of our file.</p>
+        <pre>
+            &lt;body&gt;
+                &lt;div id=&quot;map-canvas&quot; style=&quot;width: 200px; height: 200px&quot;&gt;&lt;/div&gt;
+            &lt;/body&gt;
+        </pre>
+        <p>This div is used by Google Maps to insert the map. That's all we'll need to do to the HTML of the page. The
+            rest of this application is done in JavaScript.
+            We'll be putting it in a &lt;script&gt; tag in our page's &lt;head&gt;, but you could also place it in a
+            JavaScript file.</p>
+
+        <p>First, let's create some global objects to hold our map and module references.</p>
+        <pre>
+            var apiKey, map;
+
+            var sdk = new CitySDK();
+            var census = sdk.modules.census;
+            var farmersMarket = sdk.modules.farmersMarket;
+
+            //We won't need API keys for just Geography.
+            census.enable("");
+        </pre>
+        <p>Notice we're not asking for the API key here. The Census module only needs an API key if you are accessing
+            ACS data; thus, since we're only getting geography, we can skip it.</p>
+
+        <p>Next, we'll initialize the map inside of a <em>$(document).ready()</em> function.</p>
+        <pre>
+             $(document).ready(
+                function() {
+                    var mapOptions = {
+                        center: { lat: 37, lng: -120},
+                        zoom: 6
+                    };
+                    map = new google.maps.Map(document.getElementById('map-canvas'),
+                            mapOptions);
+
+                    map.data.setStyle({
+                        fillColor: 'blue'
+                    });
+
+                }
+             );
+        </pre>
+        <p>Great! Now our application should be displaying a map of California.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+
+        <h2>Grabbing the County Geographies</h2>
+
+        <p>Next up, we need to draw the boundaries for all of California's counties. We'll use the Census module to do
+            this.</p>
+
+        <p>Just after the map's initialization inside of the <em>$(document).ready()</em> function, let's add a <em>GEORequest()</em>
+            for all of California's counties.</p>
+        <pre>
+                    var countyRequest = {
+                        state: "CA",
+                        level: "county",
+                        sublevel: true,
+                        container: "state"
+                    };
+
+                    census.GEORequest(countyRequest, function(response) {
+                        map.data.addGeoJson(response);
+                    });
+        </pre>
+        <p>In our SDK call we create a callback that will draw all of the GeoJSON on our map. If we refresh our
+            application, we should have a Google Map showing California and all of its
+            counties' boundaries.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+
+        <h2>Adding a pop-up</h2>
+
+        <p>To display our Farmer's Market data, we'll need to have a pop-up appear when user's click on a county. Let's
+            add some code to handle this. We can place it directly after our county boundary
+            loading code.</p>
+        <pre>
+                var popup = new google.maps.InfoWindow();
+
+                map.data.addListener('click', function(event) {
+                    popup.setContent("Clicked!");
+                    popup.setPosition(event.latLng);
+                    popup.open(map);
+                });
+        </pre>
+        <p>If we refresh our application, we should be able to click on counties and get a popup. Of course, it doesn't
+            show any information yet, but we'll handle that in the next section.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+
+        <h3>Adding Farmer's Market Data</h3>
+
+        <p>Let's use the USDA's Farmer's Market module to populate our popup with data about each county's markets.
+            We'll do this by grabbing the county's latitude and longitude from the GeoJSON
+            and making the request to the USDA with those coordinates. In our callback, we'll put the data into the
+            popup. Here's how we changed the onClick listener:</p>
+        <pre>
+            map.data.addListener('click', function(event) {
+                        var lat = event.feature.getProperty("CENTLAT");
+                        var lng = event.feature.getProperty("CENTLON");
+                        var name = event.feature.getProperty("NAME");
+
+                        var request = {
+                            "lat": lat,
+                            "lng": lng
+                        };
+
+                        farmersMarket.search(request, function(response) {
+                            var html = "&lt;h3&gt;" + name + "&lt;/h3&gt;&lt;br/&gt;";
+                            html+= "&lt;ul&gt;";
+                            response.results.forEach(function (market) {
+                                html+= "&lt;li&gt;" + market.marketname + "&lt;/li&gt;";
+                            });
+                            html+= "&lt;/ul&gt;";
+
+                            popup.setContent(html);
+                            popup.setPosition(event.latLng);
+                            popup.open(map);
+                        });
+                    });
+        </pre>
+        <p>When a user clicks, we grab the center latitude and longitude from that county, as well as the county's name,
+            and create a request object with that. We then issue a request to
+            the Farmer's market module. In the callback, we construct an HTML list of Farmer's markets in that county,
+            and place that HTML inside of the pop-up.</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+
+        <h3>The Completed Application</h3>
+
+        <p>Let's check out the finished product:</p>
+
+        <div id="map-canvas" style="width: 100%; height: 500px; position: relative; top: 1rem;"></div>
+        <br/>
+
+        <p>And here's the full JavaScript source:</p>
+        <pre>
+            &lt;script&gt;
+                var apiKey, map;
+
+                var sdk = new CitySDK();
+                var census = sdk.modules.census;
+                var farmersMarket = sdk.modules.farmersMarket;
+
+                //We won't need API keys for just Geography.
+                census.enable("");
+
+                function clearMap() {
+                    map.data.forEach(function(feature) {
+                        map.data.remove(feature);
+                    });
+                };
+
+                function runExample(id) {
+                    clearMap();
+                    var textarea = $('#' + id);
+
+                    eval(textarea.val());
+                };
+
+                $(document).ready(
+                        function() {
+                            var mapOptions = {
+                                center: { lat: 37, lng: -120},
+                                zoom: 6
+                            };
+                            map = new google.maps.Map(document.getElementById('map-canvas'),
+                                    mapOptions);
+
+                            map.data.setStyle({
+                                fillColor: 'blue'
+                            });
+
+                            //County boundary request
+                            var countyRequest = {
+                                state: "CA",
+                                level: "county",
+                                sublevel: true,
+                                container: "state"
+                            };
+
+                            //Request the boundaries and attach them to the map
+                            census.GEORequest(countyRequest, function(response) {
+                                map.data.addGeoJson(response);
+                            });
+
+                            //Create a popup
+                            var popup = new google.maps.InfoWindow();
+
+                            //Attach a listener for when a user clicks on a boundary
+                            map.data.addListener('click', function(event) {
+                                var lat = event.feature.getProperty("CENTLAT");
+                                var lng = event.feature.getProperty("CENTLON");
+                                var name = event.feature.getProperty("NAME");
+
+                                var request = {
+                                    "lat": lat,
+                                    "lng": lng
+                                };
+
+                                farmersMarket.search(request, function(response) {
+                                    var html = "&lt;h3&gt;" + name + "&lt;/h3&gt;&lt;br/&gt;";
+                                    html+= "&lt;ul&gt;";
+                                    response.results.forEach(function (market) {
+                                        html+= "&lt;li&gt;" + market.marketname + "&lt;/li&gt;";
+                                    });
+                                    html+= "&lt;/ul&gt;";
+
+                                    popup.setContent(html);
+                                    popup.setPosition(event.latLng);
+                                    popup.open(map);
+                                });
+                            });
+                        }
+                );
+            &lt;/script&gt;
+        </pre>
+    </div>
+</div>
+
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
+
+<script>
+    var apiKey, map;
+
+    var sdk = new CitySDK();
+    var census = sdk.modules.census;
+    var farmersMarket = sdk.modules.farmersMarket;
+
+    //We won't need API keys for just Geography.
+    census.enable("");
+
+    function clearMap() {
+        map.data.forEach(function (feature) {
+            map.data.remove(feature);
+        });
+    }
+    ;
+
+    function runExample(id) {
+        clearMap();
+        var textarea = $('#' + id);
+
+        eval(textarea.val());
+    }
+    ;
+
+    $(document).ready(
+            function () {
+                var mapOptions = {
+                    center: {lat: 37, lng: -120},
+                    zoom: 6
+                };
+                map = new google.maps.Map(document.getElementById('map-canvas'),
+                        mapOptions);
+
+                map.data.setStyle({
+                    fillColor: 'blue'
+                });
+
+                //County boundary request
+                var countyRequest = {
+                    state: "CA",
+                    level: "county",
+                    sublevel: true,
+                    container: "state"
+                };
+
+                //Request the boundaries and attach them to the map
+                census.GEORequest(countyRequest, function (response) {
+                    map.data.addGeoJson(response);
+                });
+
+                //Create a popup
+                var popup = new google.maps.InfoWindow();
+
+                //Attach a listener for when a user clicks on a boundary
+                map.data.addListener('click', function (event) {
+                    var lat = event.feature.getProperty("CENTLAT");
+                    var lng = event.feature.getProperty("CENTLON");
+                    var name = event.feature.getProperty("NAME");
+
+                    var request = {
+                        "lat": lat,
+                        "lng": lng
+                    };
+
+                    farmersMarket.search(request, function (response) {
+                        var html = "<h3>" + name + "</h3><br/>";
+                        html += "<ul>";
+                        response.results.forEach(function (market) {
+                            html += "<li>" + market.marketname + "</li>";
+                        });
+                        html += "</ul>";
+
+                        popup.setContent(html);
+                        popup.setPosition(event.latLng);
+                        popup.open(map);
+                    });
+                });
+            }
+    );
+</script>

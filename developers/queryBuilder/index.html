@@ -1,0 +1,942 @@
+---
+layout: default
+title: Census Module Query Builder
+---
+
+<div class="row">
+  <div class="col-md-12">
+    <h2>Overview</h2>
+
+    <p>This interactive tool will help you craft queries to test out the CitySDK, and make sure you are getting
+       the correct response.</p>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+
+
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">1. Select Dataset</h3>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="dataset">Dataset</label>
+            <select class="reqparam form-control" id="dataset"></select>
+          </div>
+          <div class="col-md-6">
+            <label for="apiyear">Year</label>
+            <select class="reqparam form-control" id="apiyear"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">2. Select Location</h3>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-4">
+            <label>Specify Location By</label><br/>
+            <input type="radio" name="location_radios" id="specify_location_coords" value="location_coords"
+                   onclick="visible('location_coords')" checked> <label
+              for="specify_location_coords">Coordinates</label><br/>
+            <input type="radio" name="location_radios" id="specify_location_zip" value="location_zip"
+                   onclick="visible('location_zip')"> <label for="specify_location_zip">Zip
+                                                                                        Code</label><br/>
+            <input type="radio" name="location_radios" id="specify_location_state" value="location_state"
+                   onclick="visible('location_state')"> <label for="specify_location_state">State
+                                                                                            Code</label><br/>
+            <input type="radio" name="location_radios" id="specify_location_address"
+                   value="location_address" onclick="visible('location_address')"> <label
+              for="specify_location_address">Address</label>
+          </div><!-- end col-md-4 -->
+
+          <div class="col-md-8">
+
+
+            <div class="location_coords">
+              <label for="lat">Latitude:</label>
+
+              <div class="input-group">
+                <input type="text" class="form-control reqparam" id="lat" placeholder=""
+                       aria-describedby="lat-helpblock">
+                <span class="input-group-addon" id="basic-addon2">&deg;N</span>
+              </div>
+              <span id="lat-helpblock" class="help-block">Number - The latitude of the requested location (North). Also supported: latitude, y</span>
+              <label for="lng">Longitude:</label>
+
+              <div class="input-group">
+                <input type="text" class="form-control reqparam" id="lng" placeholder=""
+                       aria-describedby="lng-helpblock">
+                <span class="input-group-addon" id="basic-addon3">&deg;E</span>
+              </div>
+              <span id="lng-helpblock" class="help-block">Number - The longitude of the requested location (East). Also supported: longitude, x</span>
+            </div><!-- end location_coords -->
+
+
+            <div class="location_zip">
+              <label>Zip Code:</label>
+              <input class="reqparam form-control" id="zip" type="text" size="5"
+                     aria-describedby="zip-helpblock"/>
+
+                            <span id="zip-helpblock" class="help-block">String - The 5-digit zip code of the location. Note that USPS zip code areas do not
+                                align precisely with Census geographies, so when high accuracy is required it is
+                                recommended to use latitude and longitude. Specified as a string because certain zip
+                                codes begin with zeroes.</span>
+
+            </div><!-- end location_zip -->
+
+
+            <div class="location_state">
+              <label for="state">State:</label>
+              <select class="reqparam form-control" id='state'>
+                <option value=""></option>
+              </select>
+
+              <p>String - The 2-letter USPS state code. It will be converted into the latitude and
+                 longitude of that state's capital.</p>
+
+            </div><!-- end location_state -->
+
+
+            <div class="location_address">
+              <label for="address_street">Street:</label>
+              <input class="reqparam form-control" id="address_street" type="text"/>
+              <label for="address_city">City:</label>
+              <input class="reqparam form-control" id="address_city" type="text"/>
+              <label for="address_state">State:</label>
+              <input class="reqparam form-control" id="address_state" type="text"/>
+
+              <p><em>Object - Represents the address of the requested location.</em></p>
+            </div><!-- end location_address -->
+
+
+          </div>
+        </div>
+      </div>
+      {% include coordsTable.html %}
+
+    </div>
+
+
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">3. Select Desired Variables</h3>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="variable">Aliases</label>
+
+            <p><em>These are aliases defined in CitySDK for ACS Variables for easier access. See <a
+                href="{{ site.baseurl }}/developers/aliases" target="_blank">Alias/Variable List</a>.</em></p>
+            <select class="reqparam form-control" multiple size="15" id="variable"></select>
+
+            <div id='variable_description' class="cenVariableDetails"></div>
+          </div>
+          <div class="col-md-6">
+            <label>Variables</label>
+
+            <p><em>Need a variable that isn't in the alias list? Input the Variable Code directly here.</em>
+            </p>
+
+            <div class="input-group">
+              <input type="text" class="form-control reqparam" id="cenvariable" placeholder="Add Variable"
+                     aria-describedby="cenvariable-helpblock">
+                              <span class="input-group-btn">
+                                <button class="btn btn-info" id="add-acs-variable-manually" type="button">Add Variable
+                                </button>
+                              </span>
+            </div><!-- /input-group -->
+
+            <div class="alert alert-warning validating-variable-code-alert">
+              <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+              Validating
+              Variable Code...
+            </div>
+
+            <div class="alert alert-danger error-variable-code-alert" role="alert"><strong>Error:</strong>
+              Could not find variable code.
+            </div>
+
+
+            <div id='cenvariable_description' class="cenVariableDetails"></div>
+
+            <input type="hidden" id="cenvariable_manual_set"/>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+
+                        <span id="cenvariable-helpblock" class="help-block">Array - Optional - An array of strings specifying which variables to query. One can
+                            specify an aliased variable (see variable aliases) or a specific ACS5 variable code (e.g.
+                            "B24124_407E"). If this array is not specified, the SDK will simply geocode the location
+                            into Census FIPS codes. A list of all ACS variables is available on the Census's developer
+                            portal or via the SDK's getACSVariableDictionary method.</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- end panel panel-info -->
+
+
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">4. How Will The Data Be Grouped?</h3>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="level">Level</label>
+
+              <select class="reqparam form-control" id="level" aria-describedby="level-helpblock">
+                <!--<option value="us">us</option>-->
+                <option value="state">state</option>
+                <option value="county" selected>county</option>
+                <option value="tract">tract</option>
+                <option value="blockGroup">blockGroup</option>
+                <option value="place">place</option>
+              </select>
+            </div>
+            <label for="sublevel">Include Sublevel</label>
+            <input class="reqparam" type="checkbox" value='1' id='sublevel' name='sublevel'
+                   aria-describedby="sublevel-helpblock">
+                        <span id="level-helpblock" class="help-block">At what level to request the data. These are based on census geographies. Supported options are:
+                            "blockGroup", "tract", "county", "state", "us", and "place". Note that the "place" tag currently only
+                            supports incorporated places.</span>
+
+            <span id="sublevel-helpblock" class="help-block">Sublevel - Optional Whether or not to return based upon sublevels. See <a
+                href="{{ site.baseurl }}/examples/commuteQuery/" target="_blank">sublevel requests</a> for more information. Defaults to false.</span>
+
+
+          </div><!-- end col-md-6 -->
+          <div class="col-md-6">
+
+            <label for="container">Container</label>
+            <select class="reqparam form-control" id="container" aria-describedby="container-helpblock">
+              <option value=""></option>
+              <option value="us">us</option>
+              <option value="state">state</option>
+              <option value="county">county</option>
+              <option value="tract">tract</option>
+              <option value="place">place</option>
+            </select>
+
+            <p>
+              <span class="label label-warning " id="container-input-warning-label">This option is only available for GeoJSON requests</span>
+              &nbsp;
+            </p>
+
+                        <span id="container-helpblock" class="help-block">String - Optional, GeoJSON request only - Specifies a level which serves as a boundary for a GeoJSON request.
+                        For instance, if your level is "tract" and your container is set as "place" with sublevel enabled, it the
+                        SDK will return all tracts which fall within or touch that place's geographical boundaries. The container
+                        tag says "get all level within container", a place is the census word for an incorporated city, and sublevel
+                        says "get all of that level"</span>
+
+          </div><!-- end col-md-6 -->
+        </div>
+
+
+      </div>
+    </div>
+
+
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">5. Select SDK Call and Submit</h3>
+      </div>
+      <div class="panel-body">
+
+        <div class="row">
+          <div class="col-md-6">
+            <h4>CitySDK Call Type</h4>
+
+            <input type="radio" id='APIRequest' name="CitySDKcall" value="APIRequest"> <label for="APIRequest">APIRequest</label>
+            <input type="radio" id='GEORequest' name="CitySDKcall" value="GEORequest" checked> <label for="GEORequest">GEORequest</label>
+          </div><!-- end col-md-6 -->
+
+          <div class="col-md-6">
+            <h4>Get the Data</h4>
+
+            <p><a class="btn btn-primary btn-lg" id="btnUpdateData" disabled style="width: 100%;"
+                  href="javascript:void(0)" onclick="submit()" role="button">Update Data</a></p>
+
+            <div class="loading-icon loading-icon-initialstate"></div>
+
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <h3 class="panel-title">The Request</h3>
+
+      </div>
+      <div class="panel-body">
+        <pre id="cenreq"></pre>
+
+
+      </div>
+    </div>
+
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        <div class="pull-right"><a id="saveLink" class="btn btn-primary btn-xs disabled" href="#" role="button">Save
+                                                                                                                Variables
+                                                                                                                to CSV
+                                                                                                                File</a>
+        </div>
+
+        <h3 class="panel-title">The Returned Data</h3>
+
+      </div>
+      <div class="panel-body">
+
+        <div class="loading-icon loading-icon-initialstate"></div>
+
+
+        <div class="outputSet">
+
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active mapControlTab"><a href="#formateedOutput"
+                                                                    aria-controls="formateedOutput"
+                                                                    role="tab" data-toggle="tab">Map</a>
+            </li>
+            <li role="presentation" class="rawOutputControlTab"><a href="#unformattedOutput"
+                                                                   aria-controls="unformattedOutput"
+                                                                   role="tab" data-toggle="tab">Raw JSON
+                                                                                                Response</a></li>
+            <li role="presentation"><a href="#shortCodeExample" aria-controls="shortCodeExample" role="tab"
+                                       data-toggle="tab">Sample Code</a></li>
+
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="mapControlTab tab-pane fade in active" id="formateedOutput">
+              <div id="output" style="width:100%;min-height:500px;">
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane rawOutputControlTab" id="unformattedOutput">
+              <p><pre id="rawOutput">
+                                    </pre>
+              </p>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="shortCodeExample">
+                            <pre id="shortCodeExampleAPIRequest"><code>&lt;script&gt;
+
+                            var <var>sdk</var> = new CitySDK();
+                            var <var>census</var> = <var>sdk.modules.census</var>;
+                            census.enable("Your API Key Here");
+
+                            var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
+
+                            census.APIRequest(<var>request</var>, function (<var>response</var>) {
+
+                            //Outputs the raw JSON text
+                            jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+
+                            });
+                            &lt;/script&gt;</code></pre>
+
+
+
+                            <pre id="shortCodeExampleGEORequest"><code>&lt;script&gt;
+
+                            var <var>sdk</var> = new CitySDK();
+                            var <var>census</var> = <var>sdk.modules.census</var>;
+                            census.enable("Your API Key Here");
+
+                            var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
+
+                            census.GEORequest(<var>request</var>, function (<var>response</var>) {
+
+                            //Outputs the raw JSON text
+                            jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
+
+                            map.data.forEach(function (feature) {
+                            map.data.remove(feature);
+                            });
+                            map.data.addGeoJson(response);
+                            map.setCenter({
+                            lat : Number(response.features[0].properties.INTPTLAT),
+                            lng : Number(response.features[0].properties.INTPTLON)
+                            });
+
+                            });
+                            &lt;/script&gt;</code></pre>
+
+
+            </div>
+          </div>
+
+        </div>
+
+
+      </div>
+    </div>
+
+
+  </div><!-- end col-md-12 -->
+</div><!-- end row -->
+
+
+<div class="row" id="save_row">
+  <div class="col-md-offset-6 col-md-6">
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h5>Credits</h5>
+    <cite>Modified from code by <a href="https://github.com/mpaquette1">@mpaquette1</a></cite>
+  </div>
+</div>
+
+
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
+<script>
+
+
+  var default_year = 2014;
+
+  function requestApiKey() {
+    window.open("http://api.census.gov/data/citysdk.html", "Census API Key Request", 'width=650,height=225,scrollbars=yes');
+  }
+
+  function loadCoords(lat, lng) {
+    $("#lat").val(lat);
+    $("#lng").val(lng);
+    buildCensusModuleRequest();
+  }
+
+  //Following code borrowed from the Census Request Tester by github @mpaquette1
+  var census;
+  var variablehash;
+
+  function loadCoords(lat, lng) {
+    jQuery("#lat").val(lat);
+    jQuery("#lng").val(lng);
+  }
+  function visible(x) {
+    var tabs = jQuery("*[class^='" + x.split("_")[0] + "']");
+    tabs.each(function(f) {
+      jQuery(this).hide();
+    });
+    jQuery('.' + x).show();
+  }
+
+  function submit() {
+    jQuery(".loading-icon-initialstate").show();
+    jQuery(".outputSet").hide();
+
+    var request = buildCensusModuleRequest();
+    var req = jQuery('[name="CitySDKcall"]:checked').val();
+    var output = jQuery("#rawOutput");
+
+    output.empty();
+
+    if (req == 'APIRequest') {
+      census.apiRequest(request, function(response) {
+        output.empty();
+        output.append(JSON.stringify(response, null, 4));
+        jQuery(".loading-icon").hide();
+        jQuery(".outputSet").show();
+        jQuery(".mapControlTab").hide();
+        jQuery(".mapControlTab").removeClass("active");
+        jQuery(".rawOutputControlTab").addClass("active");
+      });
+
+    } else {
+      census.geoRequest(request, function(response) {
+        output.empty();
+        output.append(JSON.stringify(response, null, 4));
+        jQuery(".loading-icon").hide();
+        jQuery(".outputSet").show();
+        jQuery(".mapControlTab").show();
+        jQuery(".rawOutputControlTab").removeClass("active");
+        jQuery(".mapControlTab").addClass("active");
+
+        if (typeof response.features != "undefined") {
+          map.data.forEach(function(feature) {
+            map.data.remove(feature);
+          });
+          map.data.addGeoJson(response);
+          map.setCenter({
+            lat: Number(response.features[0].properties.INTPTLAT),
+            lng: Number(response.features[0].properties.INTPTLON)
+          });
+        } else {
+          console.log("Cannot center map and add data due to empty response.");
+        }
+
+      });
+    }
+    jQuery('#saveLink').removeClass('disabled');
+  }
+
+  function buildCensusModuleRequest() {
+    var request = {};
+    var locationSelectionType = jQuery("input[name=location_radios]:checked").val();
+
+    var lat = "";
+    var lng = "";
+    var zip = "";
+    var state = "";
+    var addr_street = "";
+    var addr_city = "";
+    var addr_state = "";
+
+    if (locationSelectionType == "location_coords") {
+      lat = jQuery("#lat").val();
+      lng = jQuery("#lng").val();
+      if (lat != "" && lng != "") {
+        jQuery("#btnUpdateData").removeAttr("disabled");
+      } else {
+        jQuery("#btnUpdateData").attr("disabled", true);
+      }
+    } else if (locationSelectionType == "location_zip") {
+      zip = jQuery('#zip').val();
+      if (zip != "") {
+        jQuery("#btnUpdateData").removeAttr("disabled");
+      } else {
+        jQuery("#btnUpdateData").attr("disabled", true);
+      }
+    } else if (locationSelectionType == "location_state") {
+      state = jQuery('#state').val();
+      if (state != "") {
+        jQuery("#btnUpdateData").removeAttr("disabled");
+      } else {
+        jQuery("#btnUpdateData").attr("disabled", true);
+      }
+    } else {
+      addr_street = jQuery('#address_street').val();
+      addr_city = jQuery('#address_city').val();
+      addr_state = jQuery('#address_state').val();
+      if (addr_street != "" && addr_city != "" && addr_state != "") {
+        jQuery("#btnUpdateData").removeAttr("disabled");
+      } else {
+        jQuery("#btnUpdateData").attr("disabled", true);
+      }
+    }
+
+    var level = jQuery("#level").val();
+    var container = jQuery('#container').val();
+    var sublev = jQuery('#sublevel:checked').val();
+
+    var variables = jQuery("#cenvariable_manual_set").val().split("|");
+
+    jQuery("#variable option:selected").each(function(n, o) {
+      variables.push(o.value);
+    });
+    variables = variables.filter(function(n) {
+      return n != undefined
+    });
+    variables = variables.filter(function(n) {
+      return n != ""
+    });
+
+    request.level = level;
+    if (lat > 0) request.lat = lat;
+    if (lng < 0) request.lng = lng;
+    if (state.length > 0) request.state = state;
+    if (zip.length > 0) request.zip = zip;
+
+    if (addr_street.length > 0 && addr_city.length > 0 && addr_state.length > 0) {
+      var addr = {
+        street: addr_street,
+        city: addr_city,
+        state: addr_state
+      };
+
+      request.address = addr;
+    }
+    if (container.length > 0) request.container = container;
+    if (sublev == '1') {
+      request.sublevel = true;
+    }
+
+    request.variables = variables;
+    request.api = jQuery("#dataset").val();
+    request.year = jQuery("#apiyear").val();
+
+    return (request);
+  } // end buildCensusModuleRequest
+
+  function addManuallySpecifiedVariable(variablename) {
+    /*
+     console.log(variablehash);
+     console.log(variablename);
+     console.log(censusVariableDefinitionList[variablename]);
+     */
+    var api = jQuery("#dataset").val();
+    var year = parseInt(jQuery("#apiyear").val());
+
+    jQuery(".error-variable-code-alert").fadeOut();
+
+    // Check for currently selected manual variables
+    var manualVariablesSelected = [];
+    if (jQuery("#cenvariable_manual_set").val() != "") {
+      manualVariablesSelected = jQuery("#cenvariable_manual_set").val().split("|");
+    }
+
+    // Variable is already set
+    if (manualVariablesSelected.indexOf(variablename) >= 0) {
+      return true;
+    }
+
+    // Check against list of known aliases
+    var knownAlias = false;
+    for (var key in variablehash) {
+      if (variablehash[key].variable == variablename) {
+        if (api in variablehash[key]['api']) {
+          if (variablehash[key]['api'][api].indexOf(year)) {
+            knownAlias = key;
+          }
+        }
+      }
+    }
+    if (knownAlias !== false) {
+      // Input is an alias already set in CitySDK
+
+      // Add to selection
+      jQuery("#variable [value=" + knownAlias + "]").attr("selected", "selected");
+      changeAliasSelection();
+
+    }else {
+
+      // Check to see if variable is valid
+      if (variablename in censusVariableDefinitionList[api][year].variables) {
+        // Input is a custom variable
+        // Add HTML
+        newdescription = '<div class="alert alert-info alias-selected-entry" role="alert"  data-variablename="' + variablename + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close" data-variablename="' + variablename + '"><span aria-hidden="true">&times;</span></button>' + variablename + ': &nbsp;&nbsp;<strong>' + censusVariableDefinitionList[api][year].variables[variablename].label + '</strong><br />';
+        newdescription += censusVariableDefinitionList[api][year].variables[variablename].concept + '.</div>';
+        jQuery('#cenvariable_description').append(newdescription);
+        bindVariableCloseAction();
+
+        // Add to hidden input
+        manualVariablesSelected.push(variablename);
+        jQuery("#cenvariable_manual_set").val(manualVariablesSelected.join("|"));
+      } else {
+        // Variable is NOT valid
+        jQuery(".error-variable-code-alert").fadeIn();
+
+        return false;
+      }
+
+    }
+
+    // Update query json text
+    jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+    jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+
+    return true;
+  }// end addManuallySpecifiedVariable
+
+  function removeManuallySpecifiedVariable(variablename) {
+
+    // Clear Selected Manual Variables
+    var manualVariablesSelected = [];
+    if (jQuery("#cenvariable_manual_set").val() != "") {
+      manualVariablesSelected = jQuery("#cenvariable_manual_set").val().split("|");
+    }
+
+    // Variable is already set
+    var variableToKillIndex = manualVariablesSelected.indexOf(variablename);
+    if (variableToKillIndex >= 0) {
+      manualVariablesSelected.splice(variableToKillIndex, 1);
+      jQuery("#cenvariable_manual_set").val(manualVariablesSelected.join("|"));
+    }
+
+    // Remove any selected aliases
+    jQuery("#variable [value=" + variablename + "]").prop("selected", false);
+    jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+    jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+
+    changeAliasSelection();
+
+  }// end removeManuallySpecifiedVariable
+
+  function convertOutput() {
+    var textarea = jQuery('#rawOutput').text();
+    var JSONObject = JSON.parse(textarea);
+    var csvString = "";
+    var keys = [];
+    for (var index in JSONObject.data) {
+      // Loop to get the field keys.  It tries to build a complete set based on the actual data
+      var theseKeys = Object.keys(JSONObject.data[index]);
+      for (var thisKey in theseKeys) {
+        if (keys.indexOf(theseKeys[thisKey]) == -1) {
+          keys.push(theseKeys[thisKey]);
+        }
+      }
+    }
+
+    for (var index in JSONObject.data) {
+      if (index == 0) {
+        //keys = Object.keys(JSONObject.data[index]);
+        for (var key in keys) {
+          csvString = csvString + keys[key];
+          if (key != (keys.length - 1)) {
+            csvString = csvString + ',';
+          } else {
+            csvString = csvString + '\n';
+          }
+        }
+      }
+      var dataJSONObject = JSONObject.data[index];
+
+      for (var key in keys) {
+        if (keys[key] in JSONObject.data[index]) {
+          var newval = JSONObject.data[index][keys[key]];
+          if (typeof newval == 'string') {
+            // if this is a string, check for characters that must be escaped
+            if (newval.indexOf(",") != -1 || newval.indexOf("\"") != -1) {
+              newval = newval.replace("\"", "\"\"");
+              newval = "\"" + newval + "\"";
+            }
+          }
+
+          csvString = csvString + newval;
+        }
+        if (key != (keys.length - 1)) {
+          csvString = csvString + ',';
+        } else {
+          csvString = csvString + '\n';
+        }
+      }
+    }
+    return csvString;
+  }
+
+  var removeManuallySpecifiedVariableActionHandler = function removeManuallySpecifiedVariableAction(object) {
+    removeManuallySpecifiedVariable(jQuery(this).data("variablename"));
+  };
+
+  function bindVariableCloseAction() {
+    jQuery(".alias-selected-entry .close").unbind("click.variableHandler");
+    jQuery(".alias-selected-entry .close").bind("click.variableHandler", removeManuallySpecifiedVariableActionHandler);
+  }
+
+  function changeAliasSelection() {
+    jQuery('#variable_description').html('');
+    var newdescription = '';
+    jQuery("#variable option:selected").each(function(n, opt) {
+      var newcensusvariable = opt.value;
+      $.each(variablehash, function(aliasname, oAlias) {
+        if (aliasname == newcensusvariable) {
+
+          newdescription += '<div class="alert alert-info alias-selected-entry"  role="alert" data-variablename="' + aliasname + '"><button type="button" class="close" data-dismiss="alert" aria-label="Close" data-variablename="' + aliasname + '"><span aria-hidden="true">&times;</span></button>' + oAlias.variable + ': &nbsp;&nbsp;<strong>' + aliasname + '</strong><br />';
+          if (oAlias.normalizable) {
+            newdescription += ' <em>(Normalizable)</em> ';
+          }
+          newdescription += oAlias.description + '.</div>';
+          return (false);
+        }
+      });
+    });
+
+    jQuery('#variable_description').html(newdescription);
+    bindVariableCloseAction();
+  }// end changeAliasSelection
+
+  function updateApiYearList(api) {
+    if (!(api in census.availableDatasets)) {
+      return false;
+    }
+
+    var selectedYear = jQuery("#apiyear").val();
+    jQuery("#apiyear").empty();
+    census.availableDatasets[api].sort();
+
+    for (var yearIdx in census.availableDatasets[api]) {
+      jQuery('<option value="' + census.availableDatasets[api][yearIdx] + '">' + census.availableDatasets[api][yearIdx] + '</option>').appendTo('#apiyear');
+    }
+
+    if (census.availableDatasets[api].indexOf(selectedYear) > -1) {
+      // attempt to keep the currently selected year
+      jQuery("#apiyear").val(selectedYear);
+    } else if (census.availableDatasets[api].indexOf(default_year) > -1) {
+      // attempt to use the 'default' year defined by the census module
+      jQuery("#apiyear").val(default_year);
+    }
+
+  }//updateApiYearList
+
+  // Location to store the census variable list
+  var censusVariableDefinitionList = {};
+
+  function updateAliasAndVariableList(api, year) {
+    // Fill in variables.
+    var sortedvariables = [];
+    variablehash = census.aliases;
+    year = parseInt(year);
+
+    // Clear the already selected variables
+    jQuery("#cenvariable_manual_set").val("");
+    jQuery('#cenvariable_description').html('');
+
+    if (variablehash != undefined) {
+      jQuery.each(variablehash, function(aliasname, oAlias) {
+        if (api in oAlias.api) {
+          if (oAlias.api[api].indexOf(year) > -1) {
+            sortedvariables.push(aliasname);
+          }
+        }
+      });
+      sortedvariables.sort();
+      jQuery('#variable').empty();
+
+      changeAliasSelection();
+
+      jQuery.each(sortedvariables, function(n, alias) {
+        jQuery('<option value="' + alias + '">' + alias + '</option>').appendTo('#variable');
+      });
+    }
+  }//updateAliasAndVariableList
+
+  jQuery(document).ready(function() {
+
+    visible("location_coords");
+    // Instantiate census object.
+    var sdk = new CitySdk();
+    census = new CensusModule(citySDKdemoConfiguration.apikey);
+
+    // Fill in states.
+    jQuery.each(census.stateCapitals, function(stateabbrev, capitalcoords) {
+      jQuery('<option>' + stateabbrev + '</option>').appendTo('#state');
+    });
+
+    // Fill in the API options
+    var datasetsArray = [];
+    jQuery.each(census.availableDatasets, function(index, api) {
+      datasetsArray.push(index);
+    });
+    datasetsArray.sort();
+    for (var index in datasetsArray) {
+      jQuery('<option value="' + datasetsArray[index] + '">' + datasetsArray[index] + '</option>').appendTo('#dataset');
+    }
+
+    // Set default API selection
+    jQuery("#dataset").val(CensusModule.defaultApi);
+
+    census.availableDatasets[CensusModule.defaultApi].sort();
+    for (var yearIdx in census.availableDatasets[CensusModule.defaultApi]) {
+      jQuery('<option value="' + census.availableDatasets[CensusModule.defaultApi][yearIdx] + '">' + census.availableDatasets[CensusModule.defaultApi][yearIdx] + '</option>').appendTo('#apiyear');
+    }
+
+    jQuery("#dataset").on("change", function() {
+      updateApiYearList(jQuery(this).val());
+      updateAliasAndVariableList(jQuery('#dataset').val(), jQuery('#apiyear').val());
+    });
+
+    jQuery("#apiyear").val(default_year);
+
+    jQuery("#apiyear").on("change", function() {
+      updateAliasAndVariableList(jQuery('#dataset').val(), jQuery('#apiyear').val());
+    });
+
+    // Fil In Variables
+    updateAliasAndVariableList(CensusModule.defaultApi, default_year);
+
+    // Make parameter changes immediately be reflected in the displayed request.
+    jQuery('.reqparam').change(function() {
+      jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+      jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+
+    });
+
+    jQuery('#add-acs-variable-manually').click(function() {
+      var manuallyDefinedVariable = jQuery("#cenvariable").val();
+      var api = jQuery("#dataset").val();
+      var year = jQuery("#apiyear").val();
+
+      // The census variable definition list is empty, load it
+      var variablesListIsLoaded = false;
+      if (api in censusVariableDefinitionList) {
+        if (year in censusVariableDefinitionList[api]) {
+          variablesListIsLoaded = true;
+        }
+      }
+
+      if (variablesListIsLoaded == false) {
+        jQuery(".validating-variable-code-alert").fadeIn();
+        if (!(api in censusVariableDefinitionList)) {
+          censusVariableDefinitionList[api] = {};
+        }
+
+        // Get the variable list
+        jQuery.when(
+          census.getVariableDictionary(jQuery("#dataset").val(), jQuery("#apiyear").val())
+        ).done(function(response){
+          censusVariableDefinitionList[api][year] = response
+          addManuallySpecifiedVariable(manuallyDefinedVariable);
+          jQuery(".validating-variable-code-alert").fadeOut();
+        })
+
+      } else {
+        addManuallySpecifiedVariable(manuallyDefinedVariable);
+      }
+    });
+
+    // Set the variable drop-down to show a description.
+    jQuery('#variable').change(changeAliasSelection);
+    jQuery('#variable_description, td').css({'font-family': 'sans-serif', 'font-size': '0.9em'});
+    jQuery('#APIRequest').click(function() {
+      jQuery('#save_row').slideDown('slow');
+      jQuery('#container-input-warning-label').show();
+      jQuery("select#container [value=\"\"]").attr("selected", "selected");
+      jQuery('select#container').prop('disabled', true);
+      jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+      jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+      jQuery("#shortCodeExampleGEORequest").hide();
+      jQuery("#shortCodeExampleAPIRequest").show();
+
+    });
+    jQuery('#GEORequest').click(function() {
+      jQuery('#save_row').slideUp('slow');
+      jQuery('#container-input-warning-label').hide();
+      jQuery('select#container').prop('disabled', false);
+      jQuery('#cenreq').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+      jQuery('.machineRequestPlaceholder').text(JSON.stringify(buildCensusModuleRequest(), null, 4));
+      jQuery("#shortCodeExampleGEORequest").show();
+      jQuery("#shortCodeExampleAPIRequest").hide();
+    });
+
+    var mapOptions = {
+      center: {lat: 38.91732, lng: -77.2211},
+      zoom: 10
+    };
+    map = new google.maps.Map(document.getElementById('output'), mapOptions);
+
+    map.data.setStyle({
+      fillColor: 'blue'
+    });
+
+    jQuery("#shortCodeExampleAPIRequest").hide();
+
+    jQuery("#saveLink").click(function(e) {
+      e.preventDefault();
+
+      var csvString;
+      csvString = convertOutput();
+      saveToCSVfile(csvString);
+
+    });
+
+  });
+</script>

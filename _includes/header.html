@@ -3,25 +3,48 @@
 </div>
 <nav class="app-nav">
   <div class="usa-grid">
-    <div class="commerce-logo"><a href="https://www.commerce.gov/"><img src="{{ site.baseurl }}/static/img/citysdk-logo-notext.png"/></a></div>
+    <div class="sdk-logo"><a href="{{site.baseurl}}/"><img src="{{ site.baseurl }}/static/img/citysdk-logo-notext.png"/></a></div>
     <div class="logo">
       <div class="top"><a href="{{site.baseurl}}/">
           <h1 class="logotype">CITYSDK</h1></a>
         <div class="beta">Beta</div>
       </div>
-      <div class="bottom data-service"><a href="https://www.commerce.gov/dataservice" style="color: #fff;">Commerce Data Service</a></div>
+      <div class="bottom data-service"><span style="color: #fff;">Commerce Data Service</span></div>
     </div>
     <div class="app-links">
       <ul>
         <li>
-          <a href="{{site.baseurl}}/about.html">About</a></li>
-        <li>
-          {% include devnavLinksDD.html %}
+          <div class="dropdown">
+            <button class="btn" type="button"><a href="{{ site.baseurl }}/about">About</a></button>
+          </div>
         </li>
         <li>
-          {% include examplesnavLinksDD.html %}
+          <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              Developers
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+              {% include devnavLinks.html%}
+            </ul>
+          </div>
+        </li>
+        <li>
+          <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              Showcase
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+              {% include examplesnavLinks.html%}
+            </ul>
+          </div>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+<script>
+$('.dropdown-toggle').dropdown()
+</script>

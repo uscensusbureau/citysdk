@@ -1,0 +1,324 @@
+---
+layout: default
+title: Census Module Common Requests
+---
+
+
+<div class="row">
+    <div class="col-md-12">
+    <p>The following are some common request objects.</p>
+
+        <h2>Geocode via Lat/Lng</h2>
+        <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
+        <pre>
+            var request = {
+                lat: 39.0997,
+                lng: -94.5783
+            }
+
+            census.APIRequest(request, callback);
+        </pre>
+        <p>The response to this looks like the following:</p>
+        <pre>
+            {
+            	"lat" : 39.0997,
+            	"lng" : -94.5783,
+            	"year" : 2013,
+            	"api" : "acs5",
+            	"level" : "blockGroup",
+            	"sublevel" : false,
+            	"state" : "29",
+            	"county" : "095",
+            	"tract" : "015900",
+            	"blockGroup" : "1",
+            	"place" : "38000",
+            	"place_name" : "Kansas City city",
+            	"geocoded" : true
+            }
+        </pre>
+        <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
+            codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
+
+        <h2>Geocode via Zipcode</h2>
+        <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
+        <pre>
+            var request = {
+                zip: "64101"
+            }
+
+            census.APIRequest(request, callback);
+        </pre>
+        <p>The response to this looks like the following:</p>
+        <pre>
+            {
+            	"zip" : "64101",
+            	"year" : 2013,
+            	"api" : "acs5",
+            	"level" : "blockGroup",
+            	"sublevel" : false,
+            	"lat" : "+39.1034634",
+            	"lng" : "-094.6006137",
+            	"state" : "29",
+            	"county" : "095",
+            	"tract" : "015200",
+            	"blockGroup" : "1",
+            	"place" : "38000",
+            	"place_name" : "Kansas City city",
+            	"geocoded" : true
+            }
+        </pre>
+        <p>Our response object include the Latitude and Longitude that the SDK used to geocode the zip code you specified. This is the central latitude and longitude of the zip code tabulation area geography for that code.</p>
+        <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
+            codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
+
+        <h2>Geocode via State Code</h2>
+        <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
+        <pre>
+            var request = {
+                state: "MO"
+            }
+
+            census.APIRequest(request, callback);
+        </pre>
+        <p>The response to this looks like the following:</p>
+        <pre>
+            {
+            	"year" : 2013,
+            	"api" : "acs5",
+            	"level" : "blockGroup",
+            	"sublevel" : false,
+            	"lat" : 38.5791,
+            	"lng" : -92.173,
+            	"state" : "29",
+            	"county" : "051",
+            	"tract" : "020700",
+            	"blockGroup" : "1",
+            	"place" : "37000",
+            	"place_name" : "Jefferson City city",
+            	"geocoded" : true
+            }
+        </pre>
+        <p>Our response object include the Latitude and Longitude that the SDK used to geocode the state code you specified. This is the latitude and longitude of the capital city of that state.</p>
+        <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
+            codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
+
+        <h2>Geocode via Address</h2>
+        <p>This is a simple Geocoding request - it will convert the location specified into Census FIPS codes. It uses the <em>APIRequest()</em> function.</p>
+        <pre>
+            var request = {
+                address: {
+                    street: "400 Grand Blvd",
+                    city: "Kansas City",
+                    state: "MO"
+                }
+            }
+
+            census.APIRequest(request, callback);
+        </pre>
+        <p>The response to this looks like the following:</p>
+        <pre>
+            {
+            	"address" : {
+            		"street" : "400 Grand Blvd",
+            		"city" : "Kansas City",
+            		"state" : "MO",
+            		"addressMatch" : {
+            			"matchedAddress" : "400 GRAND BLVD, KANSAS CITY, MO, 64106",
+            			"coordinates" : {
+            				"x" : -94.58074,
+            				"y" : 39.10965
+            			},
+            			"addressComponents" : {
+            				"fromAddress" : "400",
+            				"toAddress" : "498",
+            				"preQualifier" : "",
+            				"preDirection" : "",
+            				"preType" : "",
+            				"streetName" : "GRAND",
+            				"suffixType" : "BLVD",
+            				"suffixDirection" : "",
+            				"suffixQualifier" : "",
+            				"city" : "KANSAS CITY",
+            				"state" : "MO",
+            				"zip" : "64106"
+            			},
+            		}
+            	},
+            	"year" : 2013,
+            	"api" : "acs5",
+            	"level" : "blockGroup",
+            	"sublevel" : false,
+            	"lat" : 39.10965,
+            	"lng" : -94.58074,
+            	"state" : "29",
+            	"county" : "095",
+            	"tract" : "015200",
+            	"blockGroup" : "1",
+            	"place" : "38000",
+            	"place_name" : "Kansas City city",
+            	"geocoded" : true
+            }
+        </pre>
+        <p>Our response object include the Latitude and Longitude that the SDK used to geocode the address you specified. You can also see the precise address that was matched to the one you specified.</p>
+        <p>You'll notice some extra tags - api, year, and level - these are set to the default as we didn't specify a different setting in the request. We can check out the FIPS
+            codes by looking at the state, county, tract, and blockGroup tags. Our location was in an Incorporated place, so we get an extra FIPS code for "place"</p>
+
+        <h2>GeoJSON request - Single</h2>
+        <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
+        <pre>
+            var request = {
+                state: "MO",
+                level: "state"
+            }
+
+            census.GEORequest(request, callback);
+        </pre>
+        <p>The response to this request is a standard GeoJSON featureCollection. You could also change the level to "blockGroup" to get the geography for the block group at your specified location.
+        A level of "tract" would get the geography for the tract, and likewise for "county". If you specify a level of "place", and your location is in an incorporated city, you will get the boundaries for that city.</p>
+
+        <h2>GeoJSON request - Multiple</h2>
+        <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
+        <pre>
+            var request = {
+                state: "MO",
+                level: "state",
+                sublevel: true
+            }
+
+            census.GEORequest(request, callback);
+        </pre>
+        <p>The response to this request is a standard GeoJSON featureCollection. The sublevel tag is set to true, which indicates that the request should acquire all the components of the specified level.</p>
+
+        <h2>GeoJSON request - Multiple - Using Container</h2>
+        <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
+        <pre>
+            var request = {
+                "zip" : "64101",
+                level: "tract",
+                container: "place",
+                sublevel: true
+            }
+
+            census.GEORequest(request, callback);
+        </pre>
+        <p>The response to this request is a standard GeoJSON featureCollection. When the container tag is specified along with the sublevel tag being set to true, the request will return
+        all LEVEL within CONTAINER. In this example, we'd get all tracts within Kansas City, MO.</p>
+
+        <h2>GeoJSON request - With Data</h2>
+        <p>You can specify the location for this request using any of the previous geocoding examples. GeoJSON requests use the <em>GEORequest()</em> function.</p>
+        <pre>
+            var request = {
+                zip: "64101",
+                level: "tract",
+                container: "place",
+                sublevel: true,
+
+                variables: [
+                    "income",
+                    "C24010_008E"
+                ]
+            }
+
+            census.GEORequest(request, callback);
+        </pre>
+        <p>The response to this request is a standard GeoJSON featureCollection. Because the variable array is specified, the SDK will get the requested variables for each feature in the collection
+         and attach the data to that feature's property tag.</p>
+
+        <h2>Basic Request - With Data</h2>
+        <p>You can specify the location for this request using any of the previous geocoding examples. Non-geography requests use the <em>APIRequest()</em> function.</p>
+        <pre>
+            var request = {
+                state : "CA",
+                level: "state",
+
+                variables: [
+                    "income",
+                    "C24010_008E"
+                ]
+            }
+
+            census.APIRequest(request, callback);
+        </pre>
+        <p>This request produces the following response:</p>
+        <pre>
+            {
+            	"level" : "state",
+            	"variables" : ["income", "C24010_008E"],
+            	"year" : 2013,
+            	"api" : "acs5",
+            	"sublevel" : false,
+            	"lat" : 38.5766,
+            	"lng" : -121.4934,
+            	"state" : "06",
+            	"county" : "067",
+            	"tract" : "001101",
+            	"blockGroup" : "1",
+            	"place" : "64000",
+            	"place_name" : "Sacramento city",
+            	"data" : [{
+            			"income" : "61094",
+            			"C24010_008E" : "363692"
+            		}
+            	]
+            }
+        </pre>
+        <p>Notice the new "data" tag - this is an array of object(s) which contain the data we requested. It will have multiple objects if we make a sublevel request.</p>
+
+        <h2>Sublevel Request - With Data</h2>
+        <p>You can specify the location for this request using any of the previous geocoding examples. Non-geography requests use the <em>APIRequest()</em> function.</p>
+        <pre>
+            var request = {
+                state : "DE",
+                level: "state",
+                sublevel: true,
+
+                variables: [
+                    "income",
+                    "C24010_008E"
+                ]
+            }
+
+            census.APIRequest(request, callback);
+        </pre>
+        <p>This request produces the following response:</p>
+        <pre>
+            {
+            	"level" : "state",
+            	"sublevel" : true,
+            	"variables" : ["income", "C24010_008E"],
+            	"year" : 2013,
+            	"api" : "acs5",
+            	"lat" : 39.1619,
+            	"lng" : -75.5267,
+            	"state" : "10",
+            	"county" : "001",
+            	"tract" : "040900",
+            	"blockGroup" : "1",
+            	"place" : "21200",
+            	"place_name" : "Dover city",
+            	"data" : [{
+            			"name" : "Kent County, Delaware",
+            			"state" : "10",
+            			"county" : "001",
+            			"income" : "55149",
+            			"C24010_008E" : "833"
+            		}, {
+            			"name" : "New Castle County, Delaware",
+            			"state" : "10",
+            			"county" : "003",
+            			"income" : "64537",
+            			"C24010_008E" : "6702"
+            		}, {
+            			"name" : "Sussex County, Delaware",
+            			"state" : "10",
+            			"county" : "005",
+            			"income" : "52710",
+            			"C24010_008E" : "610"
+            		}
+            	]
+            }
+        </pre>
+        <p>Notice the new "data" tag - this is an array of object(s) which contain the data we requested. It will have multiple objects if we make a sublevel request. Each of these sublevel
+        objects contains individual geocoding information.</p>
+    </div>
+</div>
