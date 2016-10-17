@@ -338,12 +338,11 @@ title: Census Module Query Builder
                             <pre id="shortCodeExampleAPIRequest"><code>&lt;script&gt;
 
                             var <var>sdk</var> = new CitySDK();
-                            var <var>census</var> = <var>sdk.modules.census</var>;
-                            census.enable("Your API Key Here");
+                            var <var>census</var> = <var>new CensueModule("Your API Key Here")</var>;
 
                             var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
 
-                            census.APIRequest(<var>request</var>, function (<var>response</var>) {
+                            census.apiRequest(<var>request</var>, function (<var>response</var>) {
 
                             //Outputs the raw JSON text
                             jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));
@@ -356,12 +355,11 @@ title: Census Module Query Builder
                             <pre id="shortCodeExampleGEORequest"><code>&lt;script&gt;
 
                             var <var>sdk</var> = new CitySDK();
-                            var <var>census</var> = <var>sdk.modules.census</var>;
-                            census.enable("Your API Key Here");
+                            var <var>census</var> = <var>new CensueModule("Your API Key Here")</var>;
 
                             var <var>request</var> = <span class="machineRequestPlaceholder"></span>;
 
-                            census.GEORequest(<var>request</var>, function (<var>response</var>) {
+                            census.geoRequest(<var>request</var>, function (<var>response</var>) {
 
                             //Outputs the raw JSON text
                             jQuery("#rawOutput").append(JSON.stringify(<var>response</var>));

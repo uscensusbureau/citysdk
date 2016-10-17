@@ -9,16 +9,18 @@
 </head>
 <body class="pages-developers">
   {% include header.html %}
-  <section class="main-content">
-      <div class="usa-grid">
-          <div class="col-sm">
-          {% include sidenav.html %}
-          </div>
-          <div class="col-lg">
-            {{ content }}
-          </div>
-      </div>
-  </section>
+  <div class="container">
+    <section class="main-content">
+        <div class="row">
+            <div class="col-md-3 hidden-sm hidden-xs">
+            {% include sidenav.html %}
+            </div>
+            <div class="col-md-9 col-sm-12">
+              {{ content }}
+            </div>
+        </div>
+    </section>
+  </div>
   {% include footer.html %}
 <script type="text/javascript" src="{{ site.baseurl }}/static/js/expandables.js"></script>
 {% include analytics.html %}
