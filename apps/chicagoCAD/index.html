@@ -1,40 +1,15 @@
 ---
-layout: exampleslayout
+layout: default
 published: true
 title: Chicago Crime and Demographics
 ---
-
-
-
-    <style>
-        .row-spacer {
-            margin-top: 0.5em;
-        }
-
-        .chicagoCADMasthead {
-            padding: 10px 30px;
-        }
-    </style>
-</head>
-
-    <div style="background: url(skyline.jpg) no-repeat center center; margin-bottom: 2em; color: white; height: 300px; background-size: cover; background-position: -100px, -100px;
-                background-color:black; position:relative;">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="chicagoCADMasthead">
-            <h3>Chicago Crime and Demographics</h3>
-            <p>Visualize Chicago Crime data versus various demographics. Change the date range, crime types, and arrest options for Crime.</p>
-            <p>Select your boundary types and variables to compare.
-            Click a crime marker to view more data about that crime, or click inside a boundary to view the requested variables for that boundary.</p>
-                </div>
-            </div>
-        </div>
-        <div style="color:white; font-size: 75%; position:absolute; bottom:0; right:0; padding: 0.5em; text-align:right;">
-            Powered by<br/>
-            <a href="{{ site.baseurl }}/index.html" target="_blank"><img height="50px"
-                                                                         src="./citysdk_horizontal_logo.png"/></a>
-        </div>
-    </div>
+<section>
+  <h3>Chicago Crime and Demographics</h3>
+  <p>Visualize Chicago Crime data versus various demographics. Change the date range, crime types, and arrest options for Crime. Crime data provided by the <a href="https://data.cityofchicago.org/">City of Chicago</a></p>
+  <p>Select your boundary types and variables to compare.
+  Click a crime marker to view more data about that crime, or click inside a boundary to view the requested variables for that boundary.</p>
+</section>
+<section>
 <div class="row">
         <div class="col-md-6" style="position:relative;">
             <div id="map-canvas" style="width:100%; height:800px;"></div>
@@ -248,18 +223,7 @@ title: Chicago Crime and Demographics
             </div>
         </div>
     </div>
-    <div style="background-color: black; padding: 0.5em; color:white; margin-top: 1.5em;">
-        <div class="row">
-            <div class="col-md-12">
-            <p style="font-size: smaller;">Skyline image CC-BY-3.0 <a href="https://www.flickr.com/photos/earlwilkersonphotography/5599454581">Earl Wilkerson</a></p>
-            <p style="font-size: smaller;">Population, income, and demographics provided by the <a href="https://www.census.gov">U.S. Census Bureau</a></p>
-            <p style="font-size: smaller;">Crime data provided by the <a href="https://data.cityofchicago.org/">City of Chicago</a></p>
-
-                <p style="font-size: smaller;">Data access powered by <a
-                        href="{{ site.baseurl }}/index.html">CitySDK</a></p>
-            </div>
-        </div>
-    </div>
+  </section>
 
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.min.css"
