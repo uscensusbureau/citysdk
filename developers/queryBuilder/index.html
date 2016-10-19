@@ -921,8 +921,8 @@ title: Census Module Query Builder
     };
     map = new google.maps.Map(document.getElementById('output'), mapOptions);
 
-    map.data.setStyle({
-      fillColor: 'blue'
+    google.maps.event.addListenerOnce(map, 'idle', function() {
+    google.maps.event.trigger(map, 'resize');
     });
 
     jQuery("#shortCodeExampleAPIRequest").hide();

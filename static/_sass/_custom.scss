@@ -403,6 +403,7 @@ header.header {
 // End Youtube iFrame
 
 .splash{
+  object-fit: cover;
   height:550px;
   width: 100%;
   opacity: 0.25;
@@ -442,14 +443,14 @@ input, input[type="text"], input[type="email"], input[type="password"], input[ty
 
 .pages-home .usa-hero h1 {
     font-family: Helvetica;
-    font-size: 4.4em;
-    letter-spacing: 0.5em;
+    font-size: 8vw;
+    letter-spacing: 3vw;
 }
 
 .pages-home .usa-hero strong {
-    font-size: 1em;
-    line-height: 1em;
+    font-size: 8vw;
 }
+
 .logotype{
   letter-spacing: 0.15em;
 }
