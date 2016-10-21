@@ -301,10 +301,7 @@ title: Census Module Query Builder
 
       </div>
       <div class="panel-body">
-
         <div class="loading-icon loading-icon-initialstate"></div>
-
-
         <div class="outputSet">
 
           <!-- Nav tabs -->
@@ -325,7 +322,7 @@ title: Census Module Query Builder
           <!-- Tab panes -->
           <div class="tab-content">
             <div role="tabpanel" class="mapControlTab tab-pane fade in active" id="formateedOutput">
-              <div id="output" style="width:100%;min-height:500px;">
+              <div id="output" style="width:100%; min-height:500px; overflow:visible;">
               </div>
             </div>
             <div role="tabpanel" class="tab-pane rawOutputControlTab" id="unformattedOutput">
@@ -405,10 +402,10 @@ title: Census Module Query Builder
 </div>
 
 
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization&signed_in=true"></script>
-<script>
 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiLLnFsyLn0e-MQvNGEuI36fS62gJnhTI"></script>
+
+<script>
 
   var default_year = 2014;
 
@@ -915,15 +912,6 @@ title: Census Module Query Builder
       jQuery("#shortCodeExampleAPIRequest").hide();
     });
 
-    var mapOptions = {
-      center: {lat: 38.91732, lng: -77.2211},
-      zoom: 10
-    };
-    map = new google.maps.Map(document.getElementById('output'), mapOptions);
-
-    google.maps.event.addListenerOnce(map, 'idle', function() {
-    google.maps.event.trigger(map, 'resize');
-    });
 
     jQuery("#shortCodeExampleAPIRequest").hide();
 
@@ -937,4 +925,12 @@ title: Census Module Query Builder
     });
 
   });
+  var map;
+
+    var mapOptions = {
+      center: {lat: 38.91732, lng: -77.2211},
+      zoom: 8
+    };
+    map = new google.maps.Map(document.getElementById('output'), mapOptions);
+
 </script>
