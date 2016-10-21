@@ -3,8 +3,8 @@ $usa-btn-medium-width:  8.5rem;
 $usa-btn-big-width:     11.6rem;
 
 @mixin search-icon {
-  background-image: url('../img/search.png');
-  background-image: url('../img/search.svg');
+  background-image: url('#{$image-path}/search.png');
+  background-image: url('#{$image-path}/search.svg');
   background-position: 50%;
   background-repeat: no-repeat;
 }
@@ -16,19 +16,16 @@ $usa-btn-big-width:     11.6rem;
 
   [type="search"],
   .usa-search-input {
+    @include padding(0 null);
     -webkit-appearance: none;
-    border: {
-      bottom-right-radius: 0;
-      right: none;
-      top-right-radius: 0;
-    }
+    border-bottom-right-radius: 0;
+    border-right: none;
+    border-top-right-radius: 0;
+    box-sizing: border-box;
     float: left;
+    font-size: $small-font-size;
     height: 3.3rem;
     margin: 0;
-    padding: {
-      bottom: 0;
-      top: 0;
-    }
     width: calc(100% - #{$usa-btn-small-width});
 
     @include media($small-screen) {
@@ -39,10 +36,8 @@ $usa-btn-big-width:     11.6rem;
   [type="submit"],
   .usa-search-submit {
     @include search-icon;
-    border: {
-      bottom-left-radius: 0;
-      top-left-radius: 0;
-    }
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
     height: 3.3rem;
     margin: 0;
     padding: 0;
@@ -69,14 +64,15 @@ $usa-btn-big-width:     11.6rem;
 
       [type="search"],
       .usa-search-input {
+        font-size: $base-font-size;
         height: $height;
         width: calc(100% - #{$width});
       }
 
       [type="submit"],
       .usa-search-submit {
-        height: $height;
         font-size: $h3-font-size;
+        height: $height;
         width: $width;
       }
     }

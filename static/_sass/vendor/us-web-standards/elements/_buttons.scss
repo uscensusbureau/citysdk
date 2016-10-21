@@ -4,6 +4,7 @@ $button-stroke: inset 0 0 0 2px;
 
 // Buttons
 
+// scss-lint:disable PropertyCount
 .usa-button,
 .usa-button-primary,
 .usa-button:visited,
@@ -13,6 +14,8 @@ button,
 [type="submit"],
 [type="reset"],
 [type="image"] {
+  @include font-smoothing;
+  @include margin(0.5em 0.5em 0.5em null);
   appearance: none;
   background-color: $color-primary;
   border: 0;
@@ -24,17 +27,15 @@ button,
   font-size: $base-font-size;
   font-weight: $font-bold;
   line-height: 1;
-  margin: {
-    top: .5em;
-    bottom: .5em;
-    right: .5em;
-  }
   outline: none;
   padding: 1rem 2rem;
   text-align: center;
   text-decoration: none;
   width: 100%;
-  -webkit-font-smoothing: antialiased;
+
+  @include media($small-screen) {
+    width: auto;
+  }
 
   &:hover,
   &.usa-button-hover {
@@ -52,10 +53,6 @@ button,
   &:active,
   &.usa-button-active {
     background-color: $color-primary-darkest;
-  }
-
-  @media (min-width: $small-screen) {
-    width: auto;
   }
 
   &.usa-button-primary-alt {
@@ -153,18 +150,19 @@ button,
     padding: 1.5rem 3rem;
   }
 }
+// scss-lint:enable PropertyCount
 
 [type="submit"]:disabled,
 .usa-button-disabled {
   background-color: $color-gray-lighter;
   color: $color-gray-dark;
-  cursor: default;
+  pointer-events: none;
 
   &:hover,
   &.usa-button-hover,
   &:active,
   &.usa-button-active,
-  &:focus  {
+  &:focus {
     background-color: $color-gray-lighter;
     border: 0;
     box-shadow: none;
@@ -172,16 +170,22 @@ button,
   }
 }
 
-.usa-button-unstyled {
-  background: none;
+@mixin button-unstyled {
+  background-color: transparent;
   border: 0;
   border-radius: 0;
+  font-weight: $font-normal;
+  margin: 0;
   outline: 0;
   padding: 0;
   text-align: left;
+  -webkit-font-smoothing: auto;
 
-  &:focus,
   &:hover {
-    box-shadow: initial;
+    background-color: transparent;
   }
+}
+
+.usa-button-unstyled {
+  @include button-unstyled;
 }

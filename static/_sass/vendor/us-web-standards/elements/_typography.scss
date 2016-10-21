@@ -9,20 +9,17 @@ body {
 
 p {
   line-height: $base-line-height;
-  margin: {
-    top: 1em;
-    bottom: 1em;
-  }
+  margin-bottom: 1em;
+  margin-top: 1em;
 }
 
 a {
   color: $color-primary;
-  text-decoration: none;
+  text-decoration: underline;
 
-  &:hover, 
+  &:hover,
   &:active {
     color: $color-primary-darker;
-    text-decoration: underline;
   }
 
   &:visited {
@@ -35,17 +32,51 @@ a {
   }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  clear: both;
-  font-family: $font-serif;
-  line-height: $heading-line-height;
-  margin: {
-    top: 1.5em;
-    bottom: .5em;
+@mixin external-link($external-link, $external-link-hover) {
+  &::after {
+    background: url('#{$image-path}/#{$external-link}.png') no-repeat 0 0;
+    background: url('#{$image-path}/#{$external-link}.svg') no-repeat 0 0;
+    background-size: 100%;
+    content: '';
+    display: inline-block;
+    height: 0.65em;
+    margin-bottom: -1px;
+    margin-left: 4px;
+    width: 0.65em;
+  }
+
+  &:hover::after {
+    background-image: url('#{$image-path}/#{$external-link-hover}.png');
+    background-image: url('#{$image-path}/#{$external-link-hover}.svg');
   }
 }
 
-// Create heading mixins 
+// External link consider "effortless style approach":
+// [href^="http:"]:not([href*="my-domain.com"])
+// [href^="https:"]:not([href*="my-domain.com"])
+
+.usa-external_link {
+  @include external-link(external-link, external-link-hover);
+}
+
+.usa-external_link-alt {
+  @include external-link(external-link-alt, external-link-alt-hover);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  clear: both;
+  font-family: $font-serif;
+  line-height: $heading-line-height;
+  margin-bottom: .5em;
+  margin-top: 1.5em;
+}
+
+// Create heading mixins
 
 @mixin title {
   font-size: $title-font-size;
@@ -105,58 +136,51 @@ h5 {
 }
 
 h6 {
-  @include h6(); 
+  @include h6();
 }
 
 // Remove user agent styles
 
-cite, 
-var, 
-address, 
+cite,
+var,
+address,
 dfn {
- font-style: normal;
+  font-style: normal;
 }
 
 // Custom typography
 
 .usa-content {
-  p {
+  p:not(.usa-font-lead) {
     max-width: $text-max-width;
-  }  
+  }
 }
 
 .usa-content-list {
   max-width: $text-max-width;
 }
 
-p, 
-.usa-content-list {
-  a {
-    text-decoration: underline;
-  }
-}
-
 .usa-sans {
-  p, 
-  a, 
-  li, 
+  p,
+  a,
+  li,
   span {
     font-family: $font-sans;
+  }
+
+  a {
+    border-bottom: none;
+    font-weight: $font-bold;
   }
 }
 
 .usa-serif {
-  p, 
-  a, 
-  li, 
+  p,
+  a,
+  li,
   span {
     font-family: $font-serif;
   }
-}
-
-.usa-sans a {
-  border-bottom: none;
-  font-weight: $font-bold;
 }
 
 .usa-display {
@@ -173,9 +197,10 @@ p,
 }
 
 .usa-font-lead {
-  font-size: $lead-font-size;
   font-family: $font-serif;
+  font-size: $lead-font-size;
   line-height: $lead-line-height;
+  max-width: $lead-max-width;
 }
 
 .usa-image-block {
@@ -201,13 +226,14 @@ p,
 .usa-background-dark {
   background-color: $color-gray-dark;
 
-  p, span {
+  p,
+  span {
     color: $color-white;
   }
 
   a {
     color: $color-gray-lighter;
-    
+
     &:hover {
       color: $color-white;
     }

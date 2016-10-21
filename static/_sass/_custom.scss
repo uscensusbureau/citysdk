@@ -299,6 +299,7 @@ header.header {
   }
 }
 
+
 .openOpportunityBadgeHP {
   overflow: hidden;
 }
@@ -478,8 +479,7 @@ input, input[type="text"], input[type="email"], input[type="password"], input[ty
   outline: 0;
   -webkit-box-shadow:none;
   box-shadow: none;
-  font-size: 1em;
-  font-weight: 600;
+  font-size: 1.2em;
 }
 
 .app-links .dropdown a:hover{
@@ -487,4 +487,7 @@ input, input[type="text"], input[type="email"], input[type="password"], input[ty
 }
 .dropdown ul{
   display: none;
+}
+a {
+  text-decoration: none;
 }

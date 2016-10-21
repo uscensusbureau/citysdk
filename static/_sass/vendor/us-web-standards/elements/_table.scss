@@ -4,16 +4,25 @@ table {
   min-width: 100%;
 
   thead {
-    tr {
+    th,
+    td {
       background-color: $color-gray-lightest;
-    }
-
-    th {
-      text-align: left;
     }
   }
 
-  th, td {
+  th {
+    text-align: left;
+  }
+
+  tbody {
+    th {
+      font-weight: $font-normal;
+    }
+  }
+
+  th,
+  td {
+    background-color: $color-white;
     border: 1px solid $color-gray;
     padding: 1.5rem;
   }
@@ -23,17 +32,16 @@ table {
   thead {
     tr {
       background-color: transparent;
+    }
 
-      th {
-        border-top: 0;
-      }
+    th {
+      border-top: 0;
     }
   }
 
-  th, td {
-    border: {
-      left: 0;
-      right: 0;
-    }
+  th,
+  td {
+    border-left: 0;
+    border-right: 0;
   }
 }
