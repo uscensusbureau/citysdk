@@ -14,8 +14,7 @@ Source code can be found in the js directory.
 Through our City SDK, we are aiming to provide a user-friendly "toolbox" for civic hackers to connect local and national
 public data. The creation of the SDK came out of the desire to make it easier to use the Census API for common tasks
 that our developer community asked for. We have been engaging developers around the country for the past two years and
-have observed how they use the API and have built the most commonly needed functionalities built on top of our API right
-into the SDK, saving the developer from having to do it herself. 
+have observed how they use the API. Here we have packaged the most commonly needed functionalities typically built on top of our API, saving the developer from having to do it herself. 
 
 ## Features
 - Never have to figure out what your FIPS code is again! Just pass in lat/longs, we handle the translation. Only have ZIP codes? No problem, we translate those too. 
@@ -28,7 +27,11 @@ into the SDK, saving the developer from having to do it herself.
 
 ## Getting Started
 
-CitySdk is available as an API _and_ SDK. If you want to use the API, then read the [API documentation](src/api/README.md).
+CitySdk is available as an API _and_ SDK. If you want to use the API, then read the API documentation:
+
+### [API documentation](src/api/README.md).
+
+### JavaScript SDK
 
 To use the JavaScript SDK, you'll need to add four dependencies:
 
