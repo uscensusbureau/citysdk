@@ -29,7 +29,7 @@ have observed how they use the API. Here we have packaged the most commonly need
 
 CitySdk is available as an API _and_ SDK. If you want to use the API, then read the API documentation:
 
-### [API documentation](src/api/README.md).
+### [API Documentation](src/api/README.md)
 
 ### JavaScript SDK
 
