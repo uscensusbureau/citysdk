@@ -1,3 +1,6 @@
+## PROJECT STATUS 
+Currently, this project is not in active development, but we hope to shore up some resources soon to remedy this. Please voice your support on cnmp.developers.list@census.gov or on twitter @uscensusbureau to help us make the case!
+
 [![Stories in Ready](https://badge.waffle.io/uscensusbureau/citysdk.png?label=ready&title=Ready)](https://waffle.io/uscensusbureau/citysdk)
 # CitySDK #
 
