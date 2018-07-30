@@ -1,0 +1,35 @@
+{
+  "name": "census-geojson",
+  "version": "0.0.1",
+  "description": "Functions and assets for Census TigerLine Boundary files conversion from shapefile to GeoJSON format",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loganpowell/census-geojson.git"
+  },
+  "keywords": [
+    "geojson",
+    "census",
+    "shapefiles",
+    "boundaries",
+    "government",
+    "usa",
+    "cartography"
+  ],
+  "author": "Logan Powell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/loganpowell/census-geojson/issues"
+  },
+  "homepage": "https://github.com/loganpowell/census-geojson#readme",
+  "dependencies": {
+    "dotenv": "^5.0.1",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.4.24"
+  }
+}
