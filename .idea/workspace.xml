@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="82ac4cda-63ef-47ec-b2ea-e93ad332046f" name="Default" comment="" />
+    <ignored path="$PROJECT_DIR$/../target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -10,32 +11,92 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="package.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/package.json">
+        <entry file="file://$PROJECT_DIR$/../package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="18" column="10" selection-start-line="18" selection-start-column="10" selection-end-line="18" selection-end-column="10" />
+            <state relative-caret-position="220">
+              <caret line="11" column="4" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="core.cljs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../src/merger/core.cljs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="343">
+              <caret line="669" column="30" selection-start-line="669" selection-start-column="30" selection-end-line="669" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+        <entry file="file://$PROJECT_DIR$/../.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="3" column="18" lean-forward="true" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="counties.json" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../test/counties.json">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="756" selection-start-column="756" selection-end-column="756" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".env" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../.env">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="20">
-              <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+              <caret line="1" column="55" selection-start-line="1" selection-start-column="55" selection-end-line="1" selection-end-column="55" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shadow-idea-notes.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../shadow-idea-notes.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="160">
+                <caret line="8" column="50" selection-start-line="8" selection-start-column="50" selection-end-line="8" selection-end-column="50" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="shadow-cljs.edn" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="280">
+              <caret line="14" selection-start-line="14" selection-end-line="14" />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>obj</find>
+    </findStrings>
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/main/core.cljs" />
+        <option value="$PROJECT_DIR$/shadow-cljs.edn" />
+        <option value="$PROJECT_DIR$/../shadow-idea-notes.md" />
+        <option value="$PROJECT_DIR$/../shadow-cljs.edn" />
+        <option value="$PROJECT_DIR$/../.env" />
+        <option value="$PROJECT_DIR$/../src/merger/core.cljs" />
+        <option value="$PROJECT_DIR$/../.gitignore" />
       </list>
     </option>
   </component>
@@ -46,17 +107,17 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="NodeModulesDirectoryManager">
-    <handled-path value="$PROJECT_DIR$/node_modules" />
+    <handled-path value="$PROJECT_DIR$/../node_modules" />
   </component>
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths>
-      <path value="$PROJECT_DIR$/package.json" />
+      <path value="$PROJECT_DIR$/../package.json" />
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="2729" />
     <option name="y" value="221" />
-    <option name="width" value="1144" />
+    <option name="width" value="1294" />
     <option name="height" value="1567" />
   </component>
   <component name="ProjectView">
@@ -64,25 +125,51 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="census-geojson" type="b2602c69:ProjectViewProjectNode" />
+              <item name="." type="b2602c69:ProjectViewProjectNode" />
               <item name="census-geojson" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="." type="b2602c69:ProjectViewProjectNode" />
+              <item name="census-geojson" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="." type="b2602c69:ProjectViewProjectNode" />
+              <item name="census-geojson" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="node" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="." type="b2602c69:ProjectViewProjectNode" />
+              <item name="census-geojson" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
+              <item name="node" type="462c0819:PsiDirectoryNode" />
+              <item name="cljs-runtime" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="." type="b2602c69:ProjectViewProjectNode" />
+              <item name="census-geojson" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/pom.xml" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
+  <component name="ReplState" timestamp="1532990208566">{:repl-history {:ide [], :local [], :remote [{:command &quot;(shadow/watch :lib)&quot;, :offset 19, :ns &quot;shadow.user&quot;} {:command &quot;(shadow.cljs.devtools.api/node-repl)&quot;, :offset 36, :ns &quot;shadow.user&quot;} {:command &quot;(+ 1 1 )&quot;, :offset 8, :ns &quot;cljs.user&quot;} {:command &quot;(GET\n  \&quot;http://no-sushi-here\&quot;\n  {:handler       #(prn %)\n   :error-handler #(prn (str \&quot;bad sushi: \&quot; %))})&quot;, :offset 105, :ns &quot;merger.core&quot;} {:command &quot;(defn get-sushi [format handler keywords?]\n  (GET\n    \&quot;http://api.sushicount.com/add-piece-of-sushi/0\&quot;\n    {:handler         handler\n     :error-handler   #(prn (str \&quot;bad sushi: \&quot; %))\n     :response-format format\n     :keywords?       keywords?}))&quot;, :offset 247, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :json prn false)&quot;, :offset 27, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :json prn true)&quot;, :offset 26, :ns &quot;merger.core&quot;} {:command &quot;(defn json-transit [t]\n  (let [r (t/reader :transit)]\n    (t/read r t)))&quot;, :offset 72, :ns &quot;merger.core&quot;} {:command &quot;(-&gt;&gt; (get-sushi :json prn true)\n     (clj-&gt;js))&quot;, :offset 47, :ns &quot;merger.core&quot;} {:command &quot;(defn t-&gt;json [t]\n  (let [w (t/writer :json)]\n    (t/write w t)))&quot;, :offset 65, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json %) (prn)))&quot;, :offset 45, :ns &quot;merger.core&quot;} {:command &quot;(defn t-&gt;json-verbose [t]\n  (let [w (t/writer :json-verbose)]\n    (t/write w t)))&quot;, :offset 81, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (prn)))&quot;, :offset 53, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (js/console.log)))&quot;, :offset 64, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (js/JSON.parse) (js/console.log)))&quot;, :offset 80, :ns &quot;merger.core&quot;} {:command &quot;(defn get-markets [format zipcode keywords?]\n  (GET\n    \&quot;https://search.ams.usda.gov/farmersmarkets/v1/data.svc/zipSearch\&quot;\n    {:response-format format\n     :handler         #(pprint %)\n     :keywords?       keywords?\n     :error-handler   #(prn (str \&quot;Error!: \&quot; %))\n     :params          {:zip zipcode}}))&quot;, :offset 305, :ns &quot;merger.core&quot;} {:command &quot;(get-markets :json 32514 true)&quot;, :offset 30, :ns &quot;merger.core&quot;} {:command &quot;(defn kv-pair-&gt;str [pair]\n  (subs (str (s/join \&quot;:\&quot; pair)) 1))&quot;, :offset 61, :ns &quot;merger.core&quot;} {:command &quot;(defn stats-url-builder\n  \&quot;Composes a URL to call Census' statistics API\&quot;\n  [{:keys [vintage sourcePath geoHierarchy variables statsKey]}]\n  (str\n    \&quot;https://api.census.gov/data/\&quot;\n    vintage\n    \&quot;/\&quot; (s/join \&quot;/\&quot; sourcePath)\n    \&quot;?get=\&quot; (s/join \&quot;,\&quot; variables)\n    (if (= 1 (count geoHierarchy))\n      (str \&quot;&amp;for=\&quot; (kv-pair-&gt;str (first geoHierarchy)))\n      (str \&quot;&amp;in=\&quot; (s/join \&quot;%20\&quot; (map #(kv-pair-&gt;str %) (butlast geoHierarchy)))\n           \&quot;&amp;for=\&quot; (kv-pair-&gt;str (last geoHierarchy))))\n    \&quot;&amp;key=\&quot; statsKey))&quot;, :offset 509, :ns &quot;merger.core&quot;} {:command &quot;(def stats-key (obj/oget (env/load) [\&quot;parsed\&quot; \&quot;Census_Key_Pro\&quot;]))&quot;, :offset 65, :ns &quot;merger.core&quot;} {:command &quot;(ns merger.core\n  (:require [cljs.core.async\n             :as async\n             :refer [chan put! take! &gt;! &lt;! pipe timeout close! alts! pipeline-async]]\n            [cljs.core.async :refer-macros [go go-loop alt!]]\n            [ajax.core :as http :refer [GET POST]]\n            [cognitect.transit :as t]\n            [oops.core :as obj]\n            [clojure.string :as s]\n            [cljs.pprint :refer [pprint]]\n            [\&quot;dotenv\&quot; :as env]\n            [\&quot;fs\&quot; :as fs])\n  (:use [clojure.repl :only (source)]))&quot;, :offset 511, :ns &quot;merger.core&quot;} {:command &quot;(GET\n  \&quot;http://api.sushicount.com/add-piece-of-sushi/0\&quot;\n  {:handler #(prn %)})&quot;, :offset 78, :ns &quot;merger.core&quot;} {:command &quot;(go\n  (-&gt;\n    (get-json-&gt;put! \&quot;https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&amp;in=state:01&amp;for=county:*\&quot;)\n    (&lt;!)\n    (pprint)))&quot;, :offset 151, :ns &quot;merger.core&quot;} {:command &quot;(defn get-json-&gt;put!\n  [base-url keywords?]\n  (let [=resp= (chan)\n        args (merge\n               {:response-format :json\n                :handler         #(put! =resp= %)\n                :error-handler   #(prn (str \&quot;ERROR: \&quot; %))}\n               (when-let [keywords? {:keywords? keywords?}]\n                 keywords?))]\n    (do\n      (GET base-url args)\n      =resp=)))&quot;, :offset 373, :ns &quot;merger.core&quot;} {:command &quot;(go\n  (-&gt;\n    (get-json-&gt;put! \&quot;https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&amp;in=state:01&amp;for=county:*\&quot; false)\n    (&lt;!)\n    (pprint)))&quot;, :offset 157, :ns &quot;merger.core&quot;}]}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -98,6 +185,12 @@
   <component name="RunManager">
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration name="Shadow REPL" type="ClojureREPL" factoryName="Remote">
+      <module name="census-geojson" />
+      <setting name="host" value="localhost" />
+      <setting name="port" value="3333" />
+      <setting name="replType" value="0" />
     </configuration>
     <configuration name="&lt;template&gt;" type="JUnit" default="true" selected="false">
       <option name="VM_PARAMETERS" value="-ea" />
@@ -115,57 +208,247 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1532985568925</updated>
-      <workItem from="1532985572100" duration="142000" />
+      <workItem from="1532985572100" duration="1880000" />
+      <workItem from="1532987541062" duration="95000" />
+      <workItem from="1532987719844" duration="2400000" />
+      <workItem from="1532990391831" duration="692000" />
+      <workItem from="1532991145601" duration="52000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="142000" />
+    <option name="totallyTimeSpent" value="5119000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="2729" y="221" width="1144" height="1567" extended-state="0" />
+    <frame x="2729" y="221" width="1294" height="1567" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
-      <window_info anchor="right" id="REPL" side_tool="true" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="right" id="Maven Projects" order="6" />
+      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="REPL" order="12" sideWeight="0.5015649" side_tool="true" weight="0.329904" />
+      <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Quokka" />
-      <window_info anchor="right" id="Leiningen" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info id="Designer" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
-      <window_info anchor="right" id="Database" />
+      <window_info anchor="bottom" id="Quokka" order="10" />
+      <window_info anchor="right" id="Leiningen" order="4" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49843505" weight="0.329904" />
+      <window_info id="Designer" order="2" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22065727" />
+      <window_info anchor="right" id="Database" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".gitignore" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/package.json">
+    <entry file="file://$PROJECT_DIR$/../package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="18" column="10" selection-start-line="18" selection-start-column="10" selection-end-line="18" selection-end-column="10" />
+        <state relative-caret-position="220">
+          <caret line="11" column="4" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/../test/counties.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="756" selection-start-column="756" selection-end-column="756" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.env">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="20">
-          <caret line="1" lean-forward="true" selection-start-line="1" selection-end-line="1" />
+          <caret line="1" column="55" selection-start-line="1" selection-start-column="55" selection-end-line="1" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-idea-notes.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="160">
+            <caret line="8" column="50" selection-start-line="8" selection-start-column="50" selection-end-line="8" selection-end-column="50" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/merger/core.cljs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13380">
+          <caret line="669" column="30" lean-forward="true" selection-start-line="669" selection-start-column="30" selection-end-line="669" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="4" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/merger/core.cljs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="14160">
+          <caret line="708" column="4" selection-start-line="708" selection-start-column="4" selection-end-line="708" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20">
+          <caret line="1" column="55" selection-start-line="1" selection-start-column="55" selection-end-line="1" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-idea-notes.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="160">
+            <caret line="8" column="50" selection-start-line="8" selection-start-column="50" selection-end-line="8" selection-end-column="50" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../test/counties.json">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="700">
+          <caret line="35" selection-start-line="35" selection-end-line="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="700">
+          <caret line="35" selection-start-line="35" selection-end-line="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../node_modules/shadow-cljs/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="15" column="26" lean-forward="true" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../node_modules/shadow-cljs/cli/default-config.edn">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/main/core.cljs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="5" column="19" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-idea-notes.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="160">
+            <caret line="8" column="50" selection-start-line="8" selection-start-column="50" selection-end-line="8" selection-end-column="50" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/clojure/core.async/0.4.474/core.async-0.4.474.jar!/cljs/core/async.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="3" column="10" selection-start-line="3" selection-start-column="10" selection-end-line="3" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.env">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20">
+          <caret line="1" column="55" selection-start-line="1" selection-start-column="55" selection-end-line="1" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="4" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../test/counties.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="756" selection-start-column="756" selection-end-column="756" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/merger/core.cljs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="343">
+          <caret line="669" column="30" selection-start-line="669" selection-start-column="30" selection-end-line="669" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="3" column="18" lean-forward="true" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
         </state>
       </provider>
     </entry>
