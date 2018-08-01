@@ -45,8 +45,8 @@
       <file leaf-file-name="core.cljs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../src/merger/core.cljs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="224" column="50" lean-forward="true" selection-start-line="224" selection-start-column="50" selection-end-line="224" selection-end-column="50" />
+            <state relative-caret-position="776">
+              <caret line="246" column="2" selection-start-line="246" selection-start-column="2" selection-end-line="246" selection-end-column="2" />
             </state>
           </provider>
         </entry>
@@ -99,9 +99,9 @@
         <option value="$PROJECT_DIR$/../.env" />
         <option value="$PROJECT_DIR$/../.gitignore" />
         <option value="$PROJECT_DIR$/../shadow-idea-notes.md" />
-        <option value="$PROJECT_DIR$/../src/merger/core.cljs" />
         <option value="$PROJECT_DIR$/../src/geojson/core.cljs" />
         <option value="$PROJECT_DIR$/../src/geojson/cartoFileStructure.md" />
+        <option value="$PROJECT_DIR$/../src/merger/core.cljs" />
       </list>
     </option>
   </component>
@@ -200,7 +200,7 @@
       <recent name="C:\Users\Surface\Projects\clojure\cljs\census-geojson\geoRaw\test-#testing#" />
     </key>
   </component>
-  <component name="ReplState" timestamp="1533149445172">{:repl-history {:ide [], :local [], :remote [{:command &quot;(+ 1 1 )&quot;, :offset 8, :ns &quot;cljs.user&quot;} {:command &quot;(GET\n  \&quot;http://no-sushi-here\&quot;\n  {:handler       #(prn %)\n   :error-handler #(prn (str \&quot;bad sushi: \&quot; %))})&quot;, :offset 105, :ns &quot;merger.core&quot;} {:command &quot;(defn get-sushi [format handler keywords?]\n  (GET\n    \&quot;http://api.sushicount.com/add-piece-of-sushi/0\&quot;\n    {:handler         handler\n     :error-handler   #(prn (str \&quot;bad sushi: \&quot; %))\n     :response-format format\n     :keywords?       keywords?}))&quot;, :offset 247, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :json prn false)&quot;, :offset 27, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :json prn true)&quot;, :offset 26, :ns &quot;merger.core&quot;} {:command &quot;(defn json-transit [t]\n  (let [r (t/reader :transit)]\n    (t/read r t)))&quot;, :offset 72, :ns &quot;merger.core&quot;} {:command &quot;(-&gt;&gt; (get-sushi :json prn true)\n     (clj-&gt;js))&quot;, :offset 47, :ns &quot;merger.core&quot;} {:command &quot;(defn t-&gt;json [t]\n  (let [w (t/writer :json)]\n    (t/write w t)))&quot;, :offset 65, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json %) (prn)))&quot;, :offset 45, :ns &quot;merger.core&quot;} {:command &quot;(defn t-&gt;json-verbose [t]\n  (let [w (t/writer :json-verbose)]\n    (t/write w t)))&quot;, :offset 81, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (prn)))&quot;, :offset 53, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (js/console.log)))&quot;, :offset 64, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (js/JSON.parse) (js/console.log)))&quot;, :offset 80, :ns &quot;merger.core&quot;} {:command &quot;(defn get-markets [format zipcode keywords?]\n  (GET\n    \&quot;https://search.ams.usda.gov/farmersmarkets/v1/data.svc/zipSearch\&quot;\n    {:response-format format\n     :handler         #(pprint %)\n     :keywords?       keywords?\n     :error-handler   #(prn (str \&quot;Error!: \&quot; %))\n     :params          {:zip zipcode}}))&quot;, :offset 305, :ns &quot;merger.core&quot;} {:command &quot;(get-markets :json 32514 true)&quot;, :offset 30, :ns &quot;merger.core&quot;} {:command &quot;(defn kv-pair-&gt;str [pair]\n  (subs (str (s/join \&quot;:\&quot; pair)) 1))&quot;, :offset 61, :ns &quot;merger.core&quot;} {:command &quot;(defn stats-url-builder\n  \&quot;Composes a URL to call Census' statistics API\&quot;\n  [{:keys [vintage sourcePath geoHierarchy variables statsKey]}]\n  (str\n    \&quot;https://api.census.gov/data/\&quot;\n    vintage\n    \&quot;/\&quot; (s/join \&quot;/\&quot; sourcePath)\n    \&quot;?get=\&quot; (s/join \&quot;,\&quot; variables)\n    (if (= 1 (count geoHierarchy))\n      (str \&quot;&amp;for=\&quot; (kv-pair-&gt;str (first geoHierarchy)))\n      (str \&quot;&amp;in=\&quot; (s/join \&quot;%20\&quot; (map #(kv-pair-&gt;str %) (butlast geoHierarchy)))\n           \&quot;&amp;for=\&quot; (kv-pair-&gt;str (last geoHierarchy))))\n    \&quot;&amp;key=\&quot; statsKey))&quot;, :offset 509, :ns &quot;merger.core&quot;} {:command &quot;(def stats-key (obj/oget (env/load) [\&quot;parsed\&quot; \&quot;Census_Key_Pro\&quot;]))&quot;, :offset 65, :ns &quot;merger.core&quot;} {:command &quot;(GET\n  \&quot;http://api.sushicount.com/add-piece-of-sushi/0\&quot;\n  {:handler #(prn %)})&quot;, :offset 78, :ns &quot;merger.core&quot;} {:command &quot;(go\n  (-&gt;\n    (get-json-&gt;put! \&quot;https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&amp;in=state:01&amp;for=county:*\&quot;)\n    (&lt;!)\n    (pprint)))&quot;, :offset 151, :ns &quot;merger.core&quot;} {:command &quot;(defn get-json-&gt;put!\n  [base-url keywords?]\n  (let [=resp= (chan)\n        args (merge\n               {:response-format :json\n                :handler         #(put! =resp= %)\n                :error-handler   #(prn (str \&quot;ERROR: \&quot; %))}\n               (when-let [keywords? {:keywords? keywords?}]\n                 keywords?))]\n    (do\n      (GET base-url args)\n      =resp=)))&quot;, :offset 373, :ns &quot;merger.core&quot;} {:command &quot;(go\n  (-&gt;\n    (get-json-&gt;put! \&quot;https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&amp;in=state:01&amp;for=county:*\&quot; false)\n    (&lt;!)\n    (pprint)))&quot;, :offset 157, :ns &quot;merger.core&quot;} {:command &quot;(shadow.cljs.devtools.api/node-repl)&quot;, :offset 36, :ns &quot;shadow.user&quot;} {:command &quot;(ns merger.core\n  (:require [cljs.core.async\n             :as async\n             :refer [chan put! take! &gt;! &lt;! pipe timeout close! alts! pipeline-async]]\n            [cljs.core.async :refer-macros [go go-loop alt!]]\n            [ajax.core :as http :refer [GET POST]]\n            [cognitect.transit :as t]\n            [oops.core :as obj]\n            [clojure.string :as s]\n            [cljs.pprint :refer [pprint]]\n            [\&quot;dotenv\&quot; :as env]\n            [\&quot;fs\&quot; :as fs])\n  (:use [clojure.repl :only (source)]))&quot;, :offset 511, :ns &quot;cljs.user&quot;} {:command &quot;(shadow/watch :lib)&quot;, :offset 18, :ns &quot;cljs.user&quot;}]}}</component>
+  <component name="ReplState" timestamp="1533149821127">{:repl-history {:ide [], :local [], :remote [{:command &quot;(+ 1 1 )&quot;, :offset 8, :ns &quot;cljs.user&quot;} {:command &quot;(GET\n  \&quot;http://no-sushi-here\&quot;\n  {:handler       #(prn %)\n   :error-handler #(prn (str \&quot;bad sushi: \&quot; %))})&quot;, :offset 105, :ns &quot;merger.core&quot;} {:command &quot;(defn get-sushi [format handler keywords?]\n  (GET\n    \&quot;http://api.sushicount.com/add-piece-of-sushi/0\&quot;\n    {:handler         handler\n     :error-handler   #(prn (str \&quot;bad sushi: \&quot; %))\n     :response-format format\n     :keywords?       keywords?}))&quot;, :offset 247, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :json prn false)&quot;, :offset 27, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :json prn true)&quot;, :offset 26, :ns &quot;merger.core&quot;} {:command &quot;(defn json-transit [t]\n  (let [r (t/reader :transit)]\n    (t/read r t)))&quot;, :offset 72, :ns &quot;merger.core&quot;} {:command &quot;(-&gt;&gt; (get-sushi :json prn true)\n     (clj-&gt;js))&quot;, :offset 47, :ns &quot;merger.core&quot;} {:command &quot;(defn t-&gt;json [t]\n  (let [w (t/writer :json)]\n    (t/write w t)))&quot;, :offset 65, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json %) (prn)))&quot;, :offset 45, :ns &quot;merger.core&quot;} {:command &quot;(defn t-&gt;json-verbose [t]\n  (let [w (t/writer :json-verbose)]\n    (t/write w t)))&quot;, :offset 81, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (prn)))&quot;, :offset 53, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (js/console.log)))&quot;, :offset 64, :ns &quot;merger.core&quot;} {:command &quot;(get-sushi :transit #(-&gt;&gt; (t-&gt;json-verbose %) (js/JSON.parse) (js/console.log)))&quot;, :offset 80, :ns &quot;merger.core&quot;} {:command &quot;(defn get-markets [format zipcode keywords?]\n  (GET\n    \&quot;https://search.ams.usda.gov/farmersmarkets/v1/data.svc/zipSearch\&quot;\n    {:response-format format\n     :handler         #(pprint %)\n     :keywords?       keywords?\n     :error-handler   #(prn (str \&quot;Error!: \&quot; %))\n     :params          {:zip zipcode}}))&quot;, :offset 305, :ns &quot;merger.core&quot;} {:command &quot;(get-markets :json 32514 true)&quot;, :offset 30, :ns &quot;merger.core&quot;} {:command &quot;(defn kv-pair-&gt;str [pair]\n  (subs (str (s/join \&quot;:\&quot; pair)) 1))&quot;, :offset 61, :ns &quot;merger.core&quot;} {:command &quot;(defn stats-url-builder\n  \&quot;Composes a URL to call Census' statistics API\&quot;\n  [{:keys [vintage sourcePath geoHierarchy variables statsKey]}]\n  (str\n    \&quot;https://api.census.gov/data/\&quot;\n    vintage\n    \&quot;/\&quot; (s/join \&quot;/\&quot; sourcePath)\n    \&quot;?get=\&quot; (s/join \&quot;,\&quot; variables)\n    (if (= 1 (count geoHierarchy))\n      (str \&quot;&amp;for=\&quot; (kv-pair-&gt;str (first geoHierarchy)))\n      (str \&quot;&amp;in=\&quot; (s/join \&quot;%20\&quot; (map #(kv-pair-&gt;str %) (butlast geoHierarchy)))\n           \&quot;&amp;for=\&quot; (kv-pair-&gt;str (last geoHierarchy))))\n    \&quot;&amp;key=\&quot; statsKey))&quot;, :offset 509, :ns &quot;merger.core&quot;} {:command &quot;(def stats-key (obj/oget (env/load) [\&quot;parsed\&quot; \&quot;Census_Key_Pro\&quot;]))&quot;, :offset 65, :ns &quot;merger.core&quot;} {:command &quot;(GET\n  \&quot;http://api.sushicount.com/add-piece-of-sushi/0\&quot;\n  {:handler #(prn %)})&quot;, :offset 78, :ns &quot;merger.core&quot;} {:command &quot;(go\n  (-&gt;\n    (get-json-&gt;put! \&quot;https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&amp;in=state:01&amp;for=county:*\&quot;)\n    (&lt;!)\n    (pprint)))&quot;, :offset 151, :ns &quot;merger.core&quot;} {:command &quot;(defn get-json-&gt;put!\n  [base-url keywords?]\n  (let [=resp= (chan)\n        args (merge\n               {:response-format :json\n                :handler         #(put! =resp= %)\n                :error-handler   #(prn (str \&quot;ERROR: \&quot; %))}\n               (when-let [keywords? {:keywords? keywords?}]\n                 keywords?))]\n    (do\n      (GET base-url args)\n      =resp=)))&quot;, :offset 373, :ns &quot;merger.core&quot;} {:command &quot;(go\n  (-&gt;\n    (get-json-&gt;put! \&quot;https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&amp;in=state:01&amp;for=county:*\&quot; false)\n    (&lt;!)\n    (pprint)))&quot;, :offset 157, :ns &quot;merger.core&quot;} {:command &quot;(shadow.cljs.devtools.api/node-repl)&quot;, :offset 36, :ns &quot;shadow.user&quot;} {:command &quot;(ns merger.core\n  (:require [cljs.core.async\n             :as async\n             :refer [chan put! take! &gt;! &lt;! pipe timeout close! alts! pipeline-async]]\n            [cljs.core.async :refer-macros [go go-loop alt!]]\n            [ajax.core :as http :refer [GET POST]]\n            [cognitect.transit :as t]\n            [oops.core :as obj]\n            [clojure.string :as s]\n            [cljs.pprint :refer [pprint]]\n            [\&quot;dotenv\&quot; :as env]\n            [\&quot;fs\&quot; :as fs])\n  (:use [clojure.repl :only (source)]))&quot;, :offset 511, :ns &quot;cljs.user&quot;} {:command &quot;(shadow/watch :lib)&quot;, :offset 18, :ns &quot;cljs.user&quot;}]}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -243,30 +243,29 @@
       <workItem from="1532987541062" duration="95000" />
       <workItem from="1532987719844" duration="2400000" />
       <workItem from="1532990391831" duration="692000" />
-      <workItem from="1532991145601" duration="20422000" />
+      <workItem from="1532991145601" duration="20797000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25489000" />
+    <option name="totallyTimeSpent" value="25864000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2729" y="221" width="1267" height="1607" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="REPL" order="12" sideWeight="0.6266986" side_tool="true" visible="true" weight="0.32977304" />
+      <window_info active="true" anchor="bottom" id="REPL" order="12" sideWeight="0.6722622" side_tool="true" visible="true" weight="0.32977304" />
       <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Quokka" order="10" />
       <window_info anchor="right" id="Leiningen" order="4" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.37330136" visible="true" weight="0.32977304" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.3277378" visible="true" weight="0.32977304" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19264588" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19264588" />
       <window_info anchor="right" id="Database" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -503,8 +502,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../src/merger/core.cljs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="224" column="50" lean-forward="true" selection-start-line="224" selection-start-column="50" selection-end-line="224" selection-end-column="50" />
+        <state relative-caret-position="776">
+          <caret line="246" column="2" selection-start-line="246" selection-start-column="2" selection-end-line="246" selection-end-column="2" />
         </state>
       </provider>
     </entry>
