@@ -208,22 +208,29 @@
 ; This section is not important to your understanding of either `core.async` or `cljs-ajax` and can be comfortably skipped. However, if you're target API does not conform to the `:vec-strategy` schemes, it might be handy for you to see some string manipulation techniques for putting together a URL.
 
 
-(defn kv-pair->str [pair]
-  (subs (str (s/join ":" pair)) 1))
+(defn kv-pair->str [pair separator]
+  (subs (str (s/join separator pair)) 1))
 
 (defn stats-url-builder
   "Composes a URL to call Census' statistics API"
-  [{:keys [vintage sourcePath geoHierarchy variables statsKey]}]
-  (str
-    "https://api.census.gov/data/"
-    vintage
-    "/" (s/join "/" sourcePath)
-    "?get=" (s/join "," variables)
-    (if (= 1 (count geoHierarchy))
-      (str "&for=" (kv-pair->str (first geoHierarchy)))
-      (str "&in=" (s/join "%20" (map #(kv-pair->str %) (butlast geoHierarchy)))
-           "&for=" (kv-pair->str (last geoHierarchy))))
-    "&key=" statsKey))
+  [{:keys [vintage sourcePath geoHierarchy variables predicates statsKey]}]
+  (s/replace-first
+    (s/replace
+      (str
+        "https://api.census.gov/data/"
+        vintage
+        (s/join (map #(str "/" %) sourcePath))
+        "?get=" (s/join "," variables)
+        (if (some? predicates)
+          (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
+          "")
+        (if (= 1 (count geoHierarchy))
+          (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
+          (str "&in=" (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
+               "&for=" (kv-pair->str (last geoHierarchy) ":")))
+        "&key=" statsKey)
+      #"-|#" {"-" "%20" "#" ")"})
+    #"[)]" "("))
 
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
@@ -235,6 +242,21 @@
                     :statsKey     stats-key})               ;; input your key
 
 ;; Produces => "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3"
+
+
+(stats-url-builder {:vintage      "2016"
+                    :sourcePath   ["acs" "acs5"]
+                    :geoHierarchy {:state "12" :state-legislative-district-#upper-chamber# "001"}
+                    :variables    ["B01001_001E"]
+                    :statsKey     stats-key})
+
+; https://api.census.gov/data/2016/acs/acs5?get=NAME,B01001_001E&for=state%20legislative%20district%20(upper%20chamber):001&in=state:12
+(stats-url-builder {:vintage      "2010"
+                    :sourcePath   ["cbp"]
+                    :geoHierarchy {:state "01" :county "*"}
+                    :variables    ["ESTAB"]
+                    :predicates   {:EMPSZES "212"}
+                    :statsKey     stats-key})
 
 ;; Census's statistics API doesn't return standard JSON and thus the`keywords?` argument doesn't make a difference
 
