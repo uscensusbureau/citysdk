@@ -229,7 +229,7 @@
           (str "&in=" (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
                "&for=" (kv-pair->str (last geoHierarchy) ":")))
         "&key=" statsKey)
-      #"-|\+" {"-" "%20" "\+" ")"})
+      #"-|'|!" {"-" "%20" "'" ")" "!" "/"})
     #"[)]" "("))
 
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
@@ -246,7 +246,7 @@
 
 (stats-url-builder {:vintage      "2016"
                     :sourcePath   ["acs" "acs5"]
-                    :geoHierarchy {:state "12" :state-legislative-district-+upper-chamber+ "001"}
+                    :geoHierarchy {:state "12" :state-legislative!district-'upper-chamber' "001"}
                     :variables    ["B01001_001E"]
                     :statsKey     stats-key})
 
