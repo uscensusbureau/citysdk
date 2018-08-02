@@ -208,19 +208,19 @@
 ; This section is not important to your understanding of either `core.async` or `cljs-ajax` and can be comfortably skipped. However, if you're target API does not conform to the `:vec-strategy` schemes, it might be handy for you to see some string manipulation techniques for putting together a URL.
 
 
-(defn kv-pair->str [pair separator]
-  (subs (str (s/join separator pair)) 1))
+(defn kv-pair->str [[k v] separator]
+  (s/join separator [(name k) (str v)]))
 
 (defn stats-url-builder
   "Composes a URL to call Census' statistics API"
-  [{:keys [vintage sourcePath geoHierarchy variables predicates statsKey]}]
+  [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
   (s/replace-first
     (s/replace
       (str
         "https://api.census.gov/data/"
-        vintage
+        (str vintage)
         (s/join (map #(str "/" %) sourcePath))
-        "?get=" (s/join "," variables)
+        "?get=" (s/join "," values)
         (if (some? predicates)
           (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
           "")
@@ -235,26 +235,35 @@
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
 ;; EXAMPLE:
-(stats-url-builder {:vintage      "2016"
+(stats-url-builder {:vintage      2016
                     :sourcePath   ["acs" "acs5"]
                     :geoHierarchy {:state "01" :county "073" :tract "000100"}
-                    :variables    ["B01001_001E" "B01001_001M"]
+                    :values       ["B01001_001E" "B01001_001M"]
                     :statsKey     stats-key})               ;; input your key
 
 ;; Produces => "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3"
 
+; in order to operate simultaneously as a keyword, a valid (non-encoded) URL *and* a folder/filename,
+; the following encodings are used:
 
+; encoding for " " = `-` and "(" = `'` (with first "(" changed into ")"):
 (stats-url-builder {:vintage      "2016"
                     :sourcePath   ["acs" "acs5"]
-                    :geoHierarchy {:state "12" :state-legislative!district-'upper-chamber' "001"}
-                    :variables    ["B01001_001E"]
+                    :geoHierarchy {:state "12" :state-legislative-district-'upper-chamber' "001"}
+                    :values       ["B01001_001E"]
+                    :statsKey     stats-key})
+; encoding for "/" = `!`
+(stats-url-builder {:vintage      "2016"
+                    :sourcePath   ["acs" "acs5"]
+                    :geoHierarchy {:state "12" :metropolitan-statistical-area!micropolitan-statistical-area "*"}
+                    :values       ["B01001_001E"]
                     :statsKey     stats-key})
 
 ; https://api.census.gov/data/2016/acs/acs5?get=NAME,B01001_001E&for=state%20legislative%20district%20(upper%20chamber):001&in=state:12
 (stats-url-builder {:vintage      "2010"
                     :sourcePath   ["cbp"]
                     :geoHierarchy {:state "01" :county "*"}
-                    :variables    ["ESTAB"]
+                    :values       ["ESTAB"]
                     :predicates   {:EMPSZES "212"}
                     :statsKey     stats-key})
 
@@ -291,7 +300,7 @@
 (get-stats {:vintage      "2016"
             :sourcePath   ["acs" "acs5"]
             :geoHierarchy {:state "01" :county "073" :tract "000100"}
-            :variables    ["B01001_001E" "B01001_001M"]
+            :values       ["B01001_001E" "B01001_001M"]
             :statsKey     stats-key})
 ;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ; [{:B01001_001E "3111",
@@ -303,7 +312,7 @@
 (get-stats {:vintage      "2016"
             :sourcePath   ["acs" "acs5"]
             :geoHierarchy {:state "01" :county "*"}
-            :variables    ["B01001_001E"]
+            :values       ["B01001_001E"]
             :statsKey     stats-key})
 ;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ; [{:B01001_001E "55049", :state "01", :county "001"
@@ -314,14 +323,14 @@
 (get-stats {:vintage      "2016"
             :sourcePath   ["acs" "acs5"]
             :geoHierarchy {:state "01"}
-            :variables    ["B01001_001E"]
+            :values       ["B01001_001E"]
             :statsKey     stats-key})
 ;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;[{:B01001_001E "4841164", :state "01"}]
 
 (defn stats+geoids
   "
-  Takes a single result map from the Census stats API and an integer denoting the number of variables the user requested.
+  Takes a single result map from the Census stats API and an integer denoting the number of values the user requested.
   The integer is used to target the non-variable geographic IDs in the result, which are combined into a UID key.
   The function constructs a new map with a hierarchy containing two new parent keys.
   The top-level parent key is the composed key, which will serve in the `deep-merge` to `group-by`.
@@ -411,7 +420,7 @@
   "Composes a call and calls Census' Statistics API"
   [args cb]
   (let [call (stats-url-builder args)
-        vars# (count (get args :variables))]
+        vars# (count (get args :values))]
     (go
       (let [time (js/Date.)]
         (->
@@ -462,7 +471,7 @@
 
 ;; If you want to pass an argument into your transducer, wrap it in another function, which takes the arg and returns a transducer containing it.
 (defn xf-geo+stat
-  "A function, which returns a transducer after being passed an integer argument denoting the number of variables the user requested. The transducer is used to transform each item from the Census API response collection into a new map with a hierarchy that will enable deep-merging of the stats with a GeoJSON `feature`s `:properties` map."
+  "A function, which returns a transducer after being passed an integer argument denoting the number of values the user requested. The transducer is used to transform each item from the Census API response collection into a new map with a hierarchy that will enable deep-merging of the stats with a GeoJSON `feature`s `:properties` map."
   [vars#]
   (fn [rf]
     (fn
@@ -494,9 +503,9 @@
 
 (defn get->chan->xfstats
   "Composes a call and calls Census' Statistics API"
-  [{:keys [variables] :as args} cb]
+  [{:keys [values] :as args} cb]
   (let [url (stats-url-builder args)
-        vars (count variables)
+        vars (count values)
         port (chan)]
     (go
       (let [time (js/Date.)]
@@ -507,7 +516,7 @@
 (get->chan->xfstats {:vintage      "2016"
                      :sourcePath   ["acs" "acs5"]
                      :geoHierarchy {:county "*"}
-                     :variables    ["B01001_001E"]
+                     :values       ["B01001_001E"]
                      :statsKey     stats-key}
                     pprint)
 
@@ -515,7 +524,7 @@
 
 (defn xf-stats->map
   "
-  A higher order transducer function, which returns a transducer after being passed an integer argument denoting the number of variables the user requested. The transducer is used to transform *the entire* Census API response collection into a new map, which will enable deep-merging of the stats with a GeoJSON `feature`s `:properties` map. Designed as a `core.async` channel transducer.
+  A higher order transducer function, which returns a transducer after being passed an integer argument denoting the number of values the user requested. The transducer is used to transform *the entire* Census API response collection into a new map, which will enable deep-merging of the stats with a GeoJSON `feature`s `:properties` map. Designed as a `core.async` channel transducer.
   "
   [vars#]
   (fn [rf]
@@ -527,9 +536,9 @@
 
 (defn get->chanxf->stats
   "Composes a call and calls Census' Statistics API"
-  [{:keys [variables] :as args} cb]
+  [{:keys [values] :as args} cb]
   (let [url (stats-url-builder args)
-        vars# (count variables)
+        vars# (count values)
         =resp= (chan 1 (xf-stats->map vars#) #(pprint "fail! " %))]
     (go
       (let [time (js/Date.)]
@@ -545,7 +554,7 @@
 (get->chanxf->stats {:vintage      "2016"
                      :sourcePath   ["acs" "acs5"]
                      :geoHierarchy {:state "01" :county "*"}
-                     :variables    ["B01001_001E"]
+                     :values       ["B01001_001E"]
                      :statsKey     stats-key}
                     pprint)
 ;;=> returns reversed list of response
@@ -559,7 +568,7 @@
 (get->chan->xfstats {:vintage      "2016"
                      :sourcePath   ["acs" "acs5"]
                      :geoHierarchy {:state "01" :county "*"}
-                     :variables    ["B01001_001E"]
+                     :values       ["B01001_001E"]
                      :statsKey     stats-key}
                     pprint)
 ;;=> returns a list preserving response order
@@ -573,7 +582,7 @@
 (get-stats->put! {:vintage      "2016"
                   :sourcePath   ["acs" "acs5"]
                   :geoHierarchy {:state "01" :county "*"}
-                  :variables    ["B01001_001E"]
+                  :values       ["B01001_001E"]
                   :statsKey     stats-key}
                  pprint)
 ;;=> returns a vector preserving response order
@@ -590,7 +599,7 @@
 
 
 (defn xf-geo+feature
-  "A function, which returns a transducer after being passed an integer argument denoting the number of variables the user requested. The transducer is used to transform each item withing a GeoJSON FeatureCollection into a new map with a hierarchy that will enable deep-merging of the stats with a stat map."
+  "A function, which returns a transducer after being passed an integer argument denoting the number of values the user requested. The transducer is used to transform each item withing a GeoJSON FeatureCollection into a new map with a hierarchy that will enable deep-merging of the stats with a stat map."
   [rf]
   (fn
     ([] (rf))
@@ -716,10 +725,10 @@
   "
   [args]
   (let [stats-call (stats-url-builder args)
-        vars# (count (get args :variables))
+        vars# (count (get args :values))
         =features= (chan 1 xf-features->map #(pprint "features fail! " %))
         =stats= (chan 1 (xf-stats->map vars#) #(pprint "stats fail! " %))
-        =merged= (async/map (merge-geo+stats2 (keyword (first (get args :variables))) :GEOID) [=stats= =features=])]
+        =merged= (async/map (merge-geo+stats2 (keyword (first (get args :values))) :GEOID) [=stats= =features=])]
     (go (get-features->put!->port "https://raw.githubusercontent.com/loganpowell/geojson/master/src/archive/test.geojson" =features=)
         (pipeline-async 1 =merged= identity =features=))
     (go (get->put!->port stats-call =stats=)
@@ -731,5 +740,5 @@
 (merge-geo-stats->map {:vintage      "2016"
                        :sourcePath   ["acs" "acs5"]
                        :geoHierarchy {:county "*"}
-                       :variables    ["B01001_001E"]
+                       :values       ["B01001_001E"]
                        :statsKey     stats-key})
