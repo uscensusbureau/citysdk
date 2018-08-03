@@ -125,53 +125,57 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 
 # Scoping and Storage
 
-No. | Key                                                           | pre2010       | 2010+                 | by state  | by county | extra 
---- | ------------------------------------------------------------- | ------------- | --------------------- | :-------: | :-------: | ----- 
-1   | nation                                                        | x             | us_nation             |           |           | 8
-2   | region                                                        | rg            | region                |           |           |       
-3   | division                                                      | dv            | division              |           |           |       
-4   | state                                                         | st            | state                 |           |           |        
-5   | county                                                        | co            | county                | api?      |           |       
-6   | county                                                        | x             | county_within_ua      | geo & api |           | 1     
-7   | county                                                        | x             | county_within_cd115   | api       |           | 2     
-8   | county-subdivision                                            | cs            | cousub                | geo/api   | api?      |       
-9   | tract                                                         | tr            | tract                 | geo/api   | api?      |       
-10  | place                                                         | pl            | place                 | geo/api?  |           |       
-11  | alaska-native-regional-corporation                            | an            | anrc                  | geo/api?  |           |       
-12  | american-indian-area!alaska-native-area!hawaiian-home-land    | na:00 ir:90   | aiannh                |           |           |       
-13  | metropolitan-statistical-area!micropolitan-statistical-area   | ma            | ?                     | api?      |           | 3     
-14  | combined-statistical-area                                     | ?             | csa                   |           |           | 3     
-15  | new-england-city-and-town-area                                | ?             | necta                 |           |           | 3     
-16  | urban-area                                                    | ua            | ua10                  |           |           | 4     
-17  | congressional-district                                        | cd...         | cd99...               | api?      |           | 5     
-18  | school-district-'elementary'                                  | se..          | elsd                  | geo/api   |           |       
-19  | school-district-'secondary'                                   | ss..          | scsd                  | geo/api   |           |       
-20  | school-district-'unified'                                     | sn..          | unsd                  | geo/api   |           |       
-    | place-remainder                                               | x             | x                     |           |           |       
-21  | block-group                                                   | bg..          | .._bg                 | geo/api   | api       |       
-22  | public-use-microdata-area                                     | p1..          | .._puma10             | geo/api?  |           | 6     
-23  | zip-code-tabulation-area *or* zipcode                         | zt..          | us_zcta510            |           |           | 7     
-24  | state-legislative-district-'upper-chamber'                    | su..          | .._sldu               |  geo/api  |           |       
-25  | state-legislative-district-'lower-chamber'                    | sl..          | .._sldl               |  geo/api  |           |       
-    | principal-city                                                | x             | x                     |           |           |       
-    | metropolitan-division                                         | x             | x                     |           |           |       
-    | principal-city-'or-part'                                      | x             | x                     |           |           |       
-    | combined-new-england-city-and-town-area                       | x             | x                     |           |           |       
-    | combined-statistical-area                                     | x             | x                     |           |           |       
-    | new-england-city-and-town-area                                | x             | x                     |           |           |       
-    | county-subdivision-'or-part'                                  | x             | x                     |           |           |       
-    | consolidated-city                                             | cc            | x                     |           | geo/api?  |       
+| No. | Key                                                           | pre2010       | 2010+                 | by state  | by county | extra |
+| --- | ------------------------------------------------------------- | ------------- | --------------------- | :-------: | :-------: | ----- |
+| 1   | nation                                                        | x             | us_nation             |           |           | 8     |
+| 2   | region                                                        | rg            | region                |           |           |       |
+| 3   | division                                                      | dv            | division              |           |           |       |
+| 4   | state                                                         | st            | state                 |           |           |       | 
+| 5   | county                                                        | co            | county                | api?      |           |       |
+| 6   | county                                                        | x             | county_within_ua      | geo & api |           | 1     |
+| 7   | county                                                        | x             | county_within_cd115   | api       |           | 2     |
+| 8   | county-subdivision                                            | cs            | cousub                | geo/api   | api?      |       |
+| 9   | tract                                                         | tr            | tract                 | geo/api   | api?      |       |
+| 10  | place                                                         | pl            | place                 | geo/api?  |           |       |
+| 11  | alaska-native-regional-corporation                            | an            | anrc                  | geo/api?  |           |       |
+| 12  | american-indian-area!alaska-native-area!hawaiian-home-land    | na:00 ir:90   | aiannh                |           |           |       |
+| 13  | metropolitan-statistical-area!micropolitan-statistical-area   | ma            | ?                     | api?      |           | 3     |
+| 14  | combined-statistical-area                                     | ?             | csa                   |           |           | 3     |
+| 15  | new-england-city-and-town-area                                | ?             | necta                 |           |           | 3     |
+| 16  | urban-area                                                    | ua            | ua10                  |           |           | 4     |
+| 17  | congressional-district                                        | cd...         | cd99...               | api?      |           | 5     |
+| 18  | school-district-'elementary'                                  | se..          | elsd                  | geo/api   |           |       |
+| 19  | school-district-'secondary'                                   | ss..          | scsd                  | geo/api   |           |       |
+| 20  | school-district-'unified'                                     | sn..          | unsd                  | geo/api   |           |       |
+|     | place-remainder                                               | x             | x                     |           |           |       |
+| 21  | block-group                                                   | bg..          | .._bg                 | geo/api   | api       |       |
+| 22  | public-use-microdata-area                                     | p1..          | .._puma10             | geo/api?  |           | 6     |
+| 23  | zip-code-tabulation-area *or* zipcode(zbp)                    | zt..          | us_zcta510            |           |           | 7     |
+| 24  | state-legislative-district-'upper-chamber'                    | su..          | .._sldu               |  geo/api  |           |       |
+| 25  | state-legislative-district-'lower-chamber'                    | sl..          | .._sldl               |  geo/api  |           |       |
+|     | principal-city                                                | x             | x                     |           |           |       |
+|     | metropolitan-division                                         | x             | x                     |           |           |       |
+|     | principal-city-'or-part'                                      | x             | x                     |           |           |       |
+|     | combined-new-england-city-and-town-area                       | x             | x                     |           |           |       |
+|     | combined-statistical-area                                     | x             | x                     |           |           |       |
+|     | new-england-city-and-town-area                                | x             | x                     |           |           |       |
+|     | county-subdivision-'or-part'                                  | x             | x                     |           |           |       |
+|     | consolidated-city                                             | cc            | x                     |           | geo/api?  |       |
 
 ## Notes
 1) (612) required geoHierarchy `{:urban-growth-area :state :county}`
 2) (510) required geoHierarchy `{:state :congressional-distric :county}`
 3) Confirm these mappings (2010+ vs pre2010 respectively)
-  - cbsa = Core Based Statistical Areas                 :   ma = Metropolitan Statistical Areas
-  - csa = Combined Statistical Areas                    :   cm:99 cmsa:96/98 = Consolidated Metropolitan Statistical Areas *or* cm_sa = Consolidated Metropolitan Statistical Areas and Metropolitan Statistical Areas
-  - necta = New England City and Town Areas             :   ne = New England County Metropolitan Areas 
-  - cnecta = Combined New England City and Town Areas   :   ?
-4) Confirm these mappings (2010+ vs pre2010 respectively)
-  - ua10= Urban Area                                    :   ua = Urbanized Areas
+
+| 2010+                                             | Pre 2010                                                                               | Correct? |
+| ---------------------------------------           | ---------------------------------------------------------------------------------------| -------- |
+| cbsa = Core Based Statistical Areas               | ma = Metropolitan Statistical Areas                                                    |          |
+| csa = Combined Statistical Areas                  | cm:99 cmsa:96/98 = Consolidated Metropolitan Statistical Areas                         |          |
+| csa = Combined Statistical Areas                  | cm_sa = Consolidated Metropolitan Statistical Areas and Metropolitan Statistical Areas |          |
+| necta = New England City and Town Areas           | ne = New England County Metropolitan Areas                                             |          |
+| cnecta = Combined New England City and Town Areas | ?                                                                                      |          |
+| ua10= Urban Area                                  | ua = Urbanized Areas                                                                   |          |
+
 5) `...` = 3-digit congressional session number (e.g., `103`)
 6) Confirm these mappings (2010+ vs pre2010 respectively)
   - puma10 = public use microdata areas                 :   p1 or p5 = public use microdata areas (1 or 5 percent?)
