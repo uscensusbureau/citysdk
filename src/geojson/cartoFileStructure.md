@@ -139,10 +139,10 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 | 10  | place                                                         | pl            | place                 | geo/api?  |           |       |
 | 11  | alaska-native-regional-corporation                            | an            | anrc                  | geo/api?  |           |       |
 | 12  | american-indian-area!alaska-native-area!hawaiian-home-land    | na:00 ir:90   | aiannh                |           |           |       |
-| 13  | metropolitan-statistical-area!micropolitan-statistical-area   | ma            | ?                     | api?      |           | 3     |
-| 14  | combined-statistical-area                                     | ?             | csa                   |           |           | 3     |
-| 15  | new-england-city-and-town-area                                | ?             | necta                 |           |           | 3     |
-| 16  | urban-area                                                    | ua            | ua10                  |           |           | 4     |
+| 13  | metropolitan-statistical-area!micropolitan-statistical-area   | ma            | cbsa                  | api?      |           |      |
+| 14  | combined-statistical-area                                     | cmsa:96 cm:99 | csa                   |           |           | 3     |
+| 15  | new-england-city-and-town-area                                | ne            | necta                 |           |           | 3     |
+| 16  | urban-area                                                    | ua            | ua10                  |           |           | 3     |
 | 17  | congressional-district                                        | cd...         | cd99...               | api?      |           | 5     |
 | 18  | school-district-'elementary'                                  | se..          | elsd                  | geo/api   |           |       |
 | 19  | school-district-'secondary'                                   | ss..          | scsd                  | geo/api   |           |       |
@@ -169,8 +169,8 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 
 | 2010+                                             | Pre 2010                                                                               | Correct? |
 | ---------------------------------------           | ---------------------------------------------------------------------------------------| -------- |
-| cbsa = Core Based Statistical Areas               | ma = Metropolitan Statistical Areas                                                    |          |
-| csa = Combined Statistical Areas                  | cm:99 cmsa:96/98 = Consolidated Metropolitan Statistical Areas                         |          |
+| cbsa = Core Based Statistical Areas               | ma = Metropolitan Statistical Areas                                                    | Y        |
+| csa = Combined Statistical Areas                  | cm:99 cmsa:96/98 = Consolidated Metropolitan Statistical Areas                         | Y        |
 | csa = Combined Statistical Areas                  | cm_sa = Consolidated Metropolitan Statistical Areas and Metropolitan Statistical Areas |          |
 | necta = New England City and Town Areas           | ne = New England County Metropolitan Areas                                             |          |
 | cnecta = Combined New England City and Town Areas | ?                                                                                      |          |
@@ -184,229 +184,356 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 
 ## Rosetta Stones (all files end in .zip)
 
-Key                                                           | 1990                              | 
-------------------------------------------------------------- | :--------------------------------:| 
+Key                                                           | 1990                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
 nation                                                        | x                                 | 
 region                                                        | x                                 | 
 division                                                      | x                                 | 
 state                                                         | st01_d90_shp                      | 
 county                                                        | co01_d90_shp                      | 
-county                                                        | x                                 | 
-county                                                        | x                                 | 
-county-subdivision                                            | cs01_d00_shp                      | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+county-subdivision                                            | cs01_d90_shp                      | 
+tract                                                         | tr01_d90_shp                      | 
+place                                                         | pl01_d90_shp                      | 
+alaska-native-regional-corporation                            | an02_d90_shp                      | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | ir99_d90_shp                      | 
+metropolitan-statistical-area!micropolitan-statistical-area   | ma99_90_shp                       | 
+combined-statistical-area                                     | x                                 |
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | ua99_d90_shp                      | 
+congressional-district                                        | cd01_103_shp                      |  ? TBD
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | bg01_d90_shp                      | 
+public-use-microdata-area                                     | x                                 |
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | x                                 |
+state-legislative-district-'lower-chamber'                    | x                                 |
 
-Key                                                           | 2000                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
+Key                                                           | 1996                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
+region                                                        | x                                 | 
+division                                                      | x                                 | 
+state                                                         | x                                 | 
+county                                                        | x                                 | 
+county-subdivision                                            | x                                 | 
+tract                                                         | x                                 | 
+place                                                         | x                                 | 
+alaska-native-regional-corporation                            | x                                 | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 |
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | x                                 | 
+congressional-district                                        |                                   | ? TBD
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | x                                 | 
+public-use-microdata-area                                     | x                                 | 
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | x                                 |
+state-legislative-district-'lower-chamber'                    | x                                 |
+
+Key                                                           | 1998                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
+region                                                        | x                                 | 
+division                                                      | x                                 | 
+state                                                         | x                                 | 
+county                                                        | x                                 | 
+county-subdivision                                            | x                                 | 
+tract                                                         | x                                 | 
+place                                                         | pl01_d98_shp                      | 
+alaska-native-regional-corporation                            | x                                 | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 |
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | x                                 | 
+congressional-district                                        |                                   | ? TBD
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | x                                 | 
+public-use-microdata-area                                     | x                                 | ? TBD
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | x                                 |
+state-legislative-district-'lower-chamber'                    | x                                 |
+
+Key                                                           | 1999                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
+region                                                        | x                                 | 
+division                                                      | x                                 | 
+state                                                         | x                                 | 
+county                                                        | x                                 | 
+county-subdivision                                            | x                                 | 
+tract                                                         | x                                 | 
+place                                                         | x                                 | 
+alaska-native-regional-corporation                            | x                                 | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 | 
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | x                                 | 
+congressional-district                                        |                                   | ? TBD
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | x                                 | 
+public-use-microdata-area                                     | x                                 | 
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | x                                 |
+state-legislative-district-'lower-chamber'                    | x                                 |
+
+Key                                                           | 2000                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
 region                                                        | rg99_d00_shp                      | 
 division                                                      | dv99_d00_shp                      | 
 state                                                         | st01_d00_shp                      | 
 county                                                        | co01_d00_shp                      | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+county-subdivision                                            | cs01_d00_shp                      | 
+tract                                                         | tr01_d00_shp                      | 
+place                                                         | pl01_d00_shp                      | 
+alaska-native-regional-corporation                            | an02_d00_shp                      | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | na99_d00_shp                      | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 | 
+new-england-city-and-town-area                                | ne99_d00_shp                      | 
+urban-area                                                    | ua99_d00_shp                      | 
+congressional-district                                        |                                   | ? TBD
+school-district-'elementary'                                  | se01_d00_shp                      | 
+school-district-'secondary'                                   | ss01_d00_shp                      | 
+school-district-'unified'                                     | sn01_d00_shp                      | 
+place-remainder                                               | x                                 | 
+block-group                                                   | bg01_d00_shp                      | 
+public-use-microdata-area                                     | x                                 | only p1/5 available
+zip-code-tabulation-area *or* zipcode                         | zt01_d00_shp                      | 
+state-legislative-district-'upper-chamber'                    | su01_d00_shp                      |
+state-legislative-district-'lower-chamber'                    | sl01_d00_shp                      |
 
-Key                                                           | 2010                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
-region                                                        |                                   | 
-division                                                      |                                   | 
-state                                                         | st01_d90_shp.zip                  | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+Key                                                           | 2010                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | gz_2010_us_outline_500k           | 
+region                                                        | gz_2010_us_020_00_500k            | 
+division                                                      | gz_2010_us_030_00_500k            | 
+state                                                         | gz_2010_us_040_00_500k            | 
+county                                                        | gz_2010_us_050_00_500k            | 
+county-subdivision                                            | gz_2010_01_060_00_500k            | 
+tract                                                         | gz_2010_01_140_00_500k            | 
+place                                                         | gz_2010_01_160_00_500k            | 
+alaska-native-regional-corporation                            | gz_2010_02_230_00_500k            | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 | 
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | cb_2012_us_uac10_500k             | mislabeled? https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html
+congressional-district                                        | x                                 | 
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | gz_2010_01_150_00_500k            | 
+public-use-microdata-area                                     | x                                 | 
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | gz_2010_01_610_u2_500k            |
+state-legislative-district-'lower-chamber'                    | gz_2010_01_620_l2_500k            |
 
-Key                                                           | 2013                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
-region                                                        |                                   | 
-division                                                      |                                   | 
-state                                                         | st01_d90_shp.zip                  | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+Key                                                           | 2011                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
+region                                                        | x                                 | 
+division                                                      | x                                 | 
+state                                                         | x                                 | 
+county                                                        | x                                 | 
+county-subdivision                                            | x                                 | 
+tract                                                         | x                                 | 
+place                                                         | x                                 | 
+alaska-native-regional-corporation                            | x                                 | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 | 
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | x                                 | 
+congressional-district                                        | x                                 | 
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | x                                 | 
+public-use-microdata-area                                     | x                                 | 
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | su01_d11_shp                      | ? folder is su06shp
+state-legislative-district-'lower-chamber'                    | sl01_d11_shp                      | ?
 
-Key                                                           | 2012                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
-region                                                        |                                   | 
-division                                                      |                                   | 
-state                                                         | st01_d90_shp.zip                  | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+Key                                                           | 2012                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
+region                                                        | x                                 | 
+division                                                      | x                                 | 
+state                                                         | x                                 | 
+county                                                        | x                                 | 
+county-subdivision                                            | x                                 | 
+tract                                                         | x                                 | 
+place                                                         | x                                 | 
+alaska-native-regional-corporation                            | x                                 | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 | 
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | cb_2012_us_uac10_500k             | 
+congressional-district                                        | cb_rd13_us_cd113_500k             | 
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | x                                 | 
+public-use-microdata-area                                     | x                                 | 
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | cb_rd13_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_rd13_01_sldl_500k              |
 
-Key                                                           | 1990                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
-region                                                        |                                   | 
-division                                                      |                                   | 
-state                                                         | st01_d90_shp.zip                  | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+Key                                                           | 2013                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | cb_2013_us_nation_500k            | 
+region                                                        | cb_2013_us_region_500k            | 
+division                                                      | cb_2013_us_division_500k          | 
+state                                                         | cb_2013_us_state_500k             | 
+county                                                        | cb_2013_us_county_500k            | 
+county-subdivision                                            | cb_2013_01_cousub_500k            | 
+tract                                                         | cb_2013_01_tract_500k             | 
+place                                                         | cb_2013_01_place_500k             | 
+alaska-native-regional-corporation                            | cb_2013_02_anrc_500k              | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | cb_2013_us_aiannh_500k            | 
+metropolitan-statistical-area!micropolitan-statistical-area   | cb_2013_us_cbsa_500k              | 
+combined-statistical-area                                     | cb_2013_us_csa_500k               | 
+new-england-city-and-town-area                                | cb_2013_us_necta_500k             | 
+urban-area                                                    | cb_2013_us_ua10_500k              | 
+congressional-district                                        | cb_2013_us_cd113_500k             | 
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | cb_2013_01_bg_500k                | 
+public-use-microdata-area                                     | cb_2013_01_puma10_500k            | 
+zip-code-tabulation-area *or* zipcode                         | cb_2013_us_zcta510_500k           | 
+state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k              |
 
-Key                                                           | 1990                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
-region                                                        |                                   | 
-division                                                      |                                   | 
-state                                                         | st01_d90_shp.zip                  | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+Key                                                           | 2014                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | cb_2014_us_nation_5m              | no 500k available
+region                                                        | cb_2014_us_region_500k            | 
+division                                                      | cb_2014_us_division_500k          | 
+state                                                         | cb_2014_us_state_500k             | 
+county                                                        | cb_2014_us_county_500k            | 
+county-subdivision                                            | cb_2014_01_cousub_500k            | 
+tract                                                         | cb_2017_01_tract_500k             | 
+place                                                         | cb_2013_01_place_500k             | 
+alaska-native-regional-corporation                            | cb_2017_02_anrc_500k              | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | cb_2013_us_aiannh_500k            | 
+metropolitan-statistical-area!micropolitan-statistical-area   | cb_2017_us_cbsa_500k              | 
+combined-statistical-area                                     | cb_2013_us_csa_500k               | 
+new-england-city-and-town-area                                | cb_2013_us_necta_500k             | 
+urban-area                                                    | cb_2014_us_ua10_500k              | 
+congressional-district                                        | cb_2014_us_cd114_500k             | 
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | cb_2013_01_bg_500k                | 
+public-use-microdata-area                                     | cb_2013_01_puma10_500k            | 
+zip-code-tabulation-area *or* zipcode                         | cb_2013_us_zcta510_500k           | 
+state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k              |
 
-Key                                                           | 1990                              | 
-------------------------------------------------------------- | :--------------------------------:| 
-nation                                                        |                                   | 
-region                                                        |                                   | 
-division                                                      |                                   | 
-state                                                         | st01_d90_shp.zip                  | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county                                                        |                                   | 
-county-subdivision                                            |                                   | 
-tract                                                         |                                   | 
-place                                                         |                                   | 
-alaska-native-regional-corporation                            |                                   | 
-american-indian-area!alaska-native-area!hawaiian-home-land    |                                   | 
-metropolitan-statistical-area!micropolitan-statistical-area   |                                   | 
-combined-statistical-area                                     |                                   | 
-new-england-city-and-town-area                                |                                   | 
-urban-area                                                    |                                   | 
-congressional-district                                        |                                   | 
-school-district-'elementary'                                  |                                   | 
-school-district-'secondary'                                   |                                   | 
-school-district-'unified'                                     |                                   | 
-place-remainder                                               |                                   | 
-block-group                                                   |                                   | 
-public-use-microdata-area                                     |                                   | 
-zip-code-tabulation-area *or* zipcode                         |                                   | 
-state-legislative-district-'upper-chamber'                    |                                   |
+Key                                                           | 2015                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | cb_2015_us_nation_5m              | no 500k available
+region                                                        | cb_2015_us_region_500k            | 
+division                                                      | cb_2015_us_division_500k          | 
+state                                                         | cb_2015_us_state_500k             | 
+county                                                        | cb_2015_us_county_500k            | 
+county-subdivision                                            | cb_2015_01_cousub_500k            | 
+tract                                                         | cb_2017_01_tract_500k             | 
+place                                                         | cb_2013_01_place_500k             | 
+alaska-native-regional-corporation                            | cb_2017_02_anrc_500k              | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | cb_2013_us_aiannh_500k            | 
+metropolitan-statistical-area!micropolitan-statistical-area   | cb_2017_us_cbsa_500k              | 
+combined-statistical-area                                     | cb_2013_us_csa_500k               | 
+new-england-city-and-town-area                                | cb_2013_us_necta_500k             | 
+urban-area                                                    | cb_2015_us_ua10_500k              | 
+congressional-district                                        | cb_2015_us_cd114_500k             | 
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+place-remainder                                               | x                                 | 
+block-group                                                   | cb_2013_01_bg_500k                | 
+public-use-microdata-area                                     | cb_2013_01_puma10_500k            | 
+zip-code-tabulation-area *or* zipcode                         | cb_2013_us_zcta510_500k           | 
+state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k              |
+
+Key                                                           | 2016                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | cb_2016_us_nation_5m              | no 500k available
+region                                                        | cb_2016_us_region_500k            | 
+division                                                      | cb_2016_us_division_500k          | 
+state                                                         | cb_2016_us_state_500k             | 
+county                                                        | cb_2016_us_county_500k            | 
+county-subdivision                                            | cb_2016_01_cousub_500k            | 
+tract                                                         | cb_2017_01_tract_500k             | 
+place                                                         | cb_2013_01_place_500k             | 
+alaska-native-regional-corporation                            | cb_2017_02_anrc_500k              | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | cb_2013_us_aiannh_500k            | 
+metropolitan-statistical-area!micropolitan-statistical-area   | cb_2017_us_cbsa_500k              | 
+combined-statistical-area                                     | cb_2013_us_csa_500k               | 
+new-england-city-and-town-area                                | cb_2013_us_necta_500k             | 
+urban-area                                                    | cb_2015_us_ua10_500k              | 
+congressional-district                                        | cb_2016_us_cd115_500k             | 
+school-district-'elementary'                                  | cb_2016_01_elsd_500k              | 
+school-district-'secondary'                                   | cb_2016_01_scsd_500k              | 
+school-district-'unified'                                     | cb_2016_01_unsd_500k              | 
+place-remainder                                               | x                                 | 
+block-group                                                   | cb_2013_01_bg_500k                | 
+public-use-microdata-area                                     | cb_2013_01_puma10_500k            | 
+zip-code-tabulation-area *or* zipcode                         | cb_2013_us_zcta510_500k           | 
+state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k              |
+
+Key                                                           | 2017                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | cb_2017_us_nation_5m              | no 500k available
+region                                                        | cb_2017_us_region_500k            | 
+division                                                      | cb_2017_us_division_500k          | 
+state                                                         | cb_2017_us_state_500k             | 
+county                                                        | cb_2017_us_county_500k            | 
+county-subdivision                                            | cb_2017_01_cousub_500k            | 
+tract                                                         | cb_2017_01_tract_500k             | 
+place                                                         | cb_2013_01_place_500k             | 
+alaska-native-regional-corporation                            | cb_2017_02_anrc_500k              | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | cb_2013_us_aiannh_500k            | 
+metropolitan-statistical-area!micropolitan-statistical-area   | cb_2017_us_cbsa_500k              | 
+combined-statistical-area                                     | cb_2013_us_csa_500k               | 
+new-england-city-and-town-area                                | cb_2013_us_necta_500k             | 
+urban-area                                                    | cb_2015_us_ua10_500k              | 
+congressional-district                                        | cb_2017_us_cd115_500k             | 
+school-district-'elementary'                                  | cb_2016_01_elsd_500k              | 
+school-district-'secondary'                                   | cb_2016_01_scsd_500k              | 
+school-district-'unified'                                     | cb_2016_01_unsd_500k              | 
+place-remainder                                               | x                                 | 
+block-group                                                   | cb_2013_01_bg_500k                | 
+public-use-microdata-area                                     | cb_2013_01_puma10_500k            | 
+zip-code-tabulation-area *or* zipcode                         | cb_2013_us_zcta510_500k           | 
+state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k              |
 
 
   

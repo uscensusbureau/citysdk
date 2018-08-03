@@ -75,8 +75,8 @@
           <provider editor-type-id="Gfm" />
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="FIRST">
-              <first_editor relative-caret-position="779">
-                <caret line="175" column="38" lean-forward="true" selection-start-line="175" selection-start-column="38" selection-end-line="175" selection-end-column="38" />
+              <first_editor relative-caret-position="829">
+                <caret line="528" column="100" lean-forward="true" selection-start-line="528" selection-start-column="100" selection-end-line="528" selection-end-column="100" />
               </first_editor>
               <second_editor />
             </state>
@@ -89,6 +89,8 @@
     <findStrings>
       <find>obj</find>
       <find>gfm</find>
+      <find>growth</find>
+      <find>x</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -255,12 +257,12 @@
       <workItem from="1532990391831" duration="692000" />
       <workItem from="1532991145601" duration="37320000" />
       <workItem from="1533223286311" duration="471000" />
-      <workItem from="1533223860548" duration="23855000" />
+      <workItem from="1533223860548" duration="39220000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="66713000" />
+    <option name="totallyTimeSpent" value="82078000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2725" y="221" width="1361" height="1571" extended-state="0" />
@@ -627,8 +629,8 @@
       <provider editor-type-id="Gfm" />
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="FIRST">
-          <first_editor relative-caret-position="779">
-            <caret line="175" column="38" lean-forward="true" selection-start-line="175" selection-start-column="38" selection-end-line="175" selection-end-column="38" />
+          <first_editor relative-caret-position="829">
+            <caret line="528" column="100" lean-forward="true" selection-start-line="528" selection-start-column="100" selection-end-line="528" selection-end-column="100" />
           </first_editor>
           <second_editor />
         </state>
