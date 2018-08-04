@@ -75,8 +75,8 @@
           <provider editor-type-id="Gfm" />
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="FIRST">
-              <first_editor relative-caret-position="829">
-                <caret line="528" column="100" lean-forward="true" selection-start-line="528" selection-start-column="100" selection-end-line="528" selection-end-column="100" />
+              <first_editor relative-caret-position="480">
+                <caret line="186" column="41" selection-start-line="186" selection-start-column="41" selection-end-line="186" selection-end-column="41" />
               </first_editor>
               <second_editor />
             </state>
@@ -125,10 +125,10 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="2725" />
+    <option name="x" value="2729" />
     <option name="y" value="221" />
-    <option name="width" value="1361" />
-    <option name="height" value="1571" />
+    <option name="width" value="1513" />
+    <option name="height" value="1567" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -257,15 +257,15 @@
       <workItem from="1532990391831" duration="692000" />
       <workItem from="1532991145601" duration="37320000" />
       <workItem from="1533223286311" duration="471000" />
-      <workItem from="1533223860548" duration="39220000" />
+      <workItem from="1533223860548" duration="48428000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="82078000" />
+    <option name="totallyTimeSpent" value="91286000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="2725" y="221" width="1361" height="1571" extended-state="0" />
+    <frame x="2729" y="221" width="1513" height="1567" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="GfmBrowser" order="3" weight="0.32980227" />
@@ -629,8 +629,8 @@
       <provider editor-type-id="Gfm" />
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="FIRST">
-          <first_editor relative-caret-position="829">
-            <caret line="528" column="100" lean-forward="true" selection-start-line="528" selection-start-column="100" selection-end-line="528" selection-end-column="100" />
+          <first_editor relative-caret-position="480">
+            <caret line="186" column="41" selection-start-line="186" selection-start-column="41" selection-end-line="186" selection-end-column="41" />
           </first_editor>
           <second_editor />
         </state>
