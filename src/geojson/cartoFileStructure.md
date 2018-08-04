@@ -1,4 +1,4 @@
-
+(ns geojson.core)
 
 # Cartography Files from the US Census Bureau
 
@@ -209,6 +209,7 @@ public-use-microdata-area                                     | x               
 zip-code-tabulation-area *or* zipcode                         | x                                 | 
 state-legislative-district-'upper-chamber'                    | x                                 |
 state-legislative-district-'lower-chamber'                    | x                                 |
+
 
 Key                                                           | 2000                              | Notes
 ------------------------------------------------------------- | :--------------------------------:| -----
