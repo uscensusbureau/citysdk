@@ -9,21 +9,7 @@
             [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
-            ["fs" :as fs]
-            [merger.core :as merger]
-            [clojure.repl :refer [source]]))
-
-(def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
-
-;; EXAMPLE:
-(merger/stats-url-builder {:vintage      "2016"
-                           :sourcePath   ["acs" "acs5"]
-                           :geoHierarchy {:state "01" :county "073" :tract "000100"}
-                           :variables    ["B01001_001E" "B01001_001M"]
-                           :statsKey     stats-key})
-
-;http://www2.census.gov/geo/tiger/GENZ2010/gz_2010_us_outline_500k.zip
-
+            ["fs" :as fs]))
 
 ; 1990 pattern:
 
@@ -68,28 +54,24 @@
 
 ;; 2010
 (geoIDPartitioner "gz_2010_us_outline_500k.zip")
-;; form 1 =>  (["gz"] ["2010"] [state-fips/"us"] ["outline"] ["500" "k"] ["zip"])
+;; form 1 =>  (["gz"] ["2010"] ["us"] ["outline"] ["500" "k"] ["zip"])
 
 ;; Pattern
-;; [_ [vintage] ["us"] _ _ _]
+;; [_ [vintage] ["us"] ["outline"] _ _]
 
 (geoIDPartitioner "cb_2012_us_uac10_500k.zip")
-;; form 2 =>  (["cb"] ["2012"] [state-fips/"us"] ["uac" "10"] ["500" "k"] ["zip"])
+;; form 2 =>  (["cb"] ["2012"] ["us"] ["uac" "10"] ["500" "k"] ["zip"])
 
 ;; Pattern
 ;; [_ ["2012"] ["us"] [level _] _ _]
 
 (geoIDPartitioner "gz_2010_us_330_m1_500k.zip")
-;; form 3 =>  (["gz"] ["2010"] [state-fips/"us"] ["330"] ["m" "1"] ["500" "k"] ["zip"])
-
-;; Pattern
-;; [_ [vintage] ["us"] [summary-level] _ _ _]
-
+;; form 3 =>  (["gz"] ["2010"] ["us"] ["330"] ["m" "1"] ["500" "k"] ["zip"])
 (geoIDPartitioner "gz_2010_01_970_00_500k.zip")
-;; form 4 =>  (["gz"] ["2010"] [state-fips/"us"] ["970"] ["00"] ["500" "k"] ["zip"])
+;; form 4 =>  (["gz"] ["2010"] ["us"] ["970"] ["00"] ["500" "k"] ["zip"])
 
 ;; Pattern
-;; [_ [vintage] [fips] [summary-level] _ _ _]
+;; [_ [vintage] [state-fips/"us"] [summary-level] _ _ _]
 
 
 ;; 2013 - 2017
@@ -102,4 +84,34 @@
 
 ;; Pattern
 ;; [_ [vintage] [state-fips/"us"] [level] _ _]
+
+
+;; Let's try to convert those strings, which contain integers, into integers
+
+(map
+  (fn [x]
+    (if (not= (map #(js/parseInt % 10)) ##NaN)
+        (map #(js/parseInt % 10))
+        (map #(identity %)))
+    x)
+  [["gz"] ["2010"] ["us"] ["970"] ["00"] ["500" "k"] ["zip"]])
+
+
+
+;; `if-let`: if the value of condition is truthy, then that value is assigned to the definition, and "then" is evaluated.
+;; Otherwise the value is NOT assigned to the definition, and "else" is evaluated.
+
+(defn translateInts
+  [vec]
+  (map
+    (fn [v]
+      (if (false? (js/Number.isNaN (js/parseInt v 10)))
+        (js/parseInt v 10)
+        v))
+    vec))
+(map #(translateInts %) [["gz"] ["2010"] ["us"] ["970"] ["00"] ["500" "k"] ["zip"]])
+
+(translateInts "500")
+(map #(translateInts %) ["500" "k"])
+(map #(js/parseInt % 10) ["500" "k" "01" "nope"])
 

@@ -393,6 +393,17 @@ zip-code-tabulation-area *or* zipcode                         | cb_2017_us_zcta5
 state-legislative-district-'upper-chamber'                    | cb_2017_01_sldu_500k              |
 state-legislative-district-'lower-chamber'                    | cb_2017_01_sldl_500k              |
 
+
+# Patterns
+Vintage       | Pattern
+------------- | ------------------------------------
+ 1990 - 2000  |  `[ [level state-fips/"99"]   [vintage]   _                   _]`
+ 2010         |  `[ _                         [vintage]   ["us"]              ["outline"]     _ _]`
+ 2010         |  `[ _                         ["2012"]    ["us"]              [level _]       _ _]`
+ 2010         |  `[ _                         [vintage]   [state-fips/"us"]   [summary-level] _ _ _]`
+ 2013 - 2017  |  `[ _                         [vintage]   [state-fips/"us"]   [level]         _ _]`
+ 
+
 ## Notations
 1) Source for Summary Level codes: [AFF](https://factfinder.census.gov/help/en/summary_level_code_list.htm)
 2) Listed as 2010 [here](https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html)
@@ -588,6 +599,7 @@ state-legislative-district-'lower-chamber'                    | cb_2017_01_sldl_
  950 | State-School District (Elementary)/Remainder
  960 | State-School District (Secondary)/Remainder
  970 | State-School District (Unified)/Remainder
+ 
 ### Cartography Cross-walk Checklist:
 
 #### National Files
