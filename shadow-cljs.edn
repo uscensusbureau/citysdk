@@ -4,7 +4,8 @@
                 [cljs-http "0.1.45"]
                 [cljs-ajax "0.7.3"]
                 [com.cognitect/transit-cljs "0.8.256"]
-                [binaryage/oops "0.6.2"]]
+                [binaryage/oops "0.6.2"]
+                [defun "0.3.0-RC1"]]
  :nrepl {:port 3333}
  :builds
  {:lib {:target     :node-library

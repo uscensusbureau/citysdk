@@ -9,84 +9,14 @@
             [clojure.string :as s]
             [clojure.set :refer [map-invert]]
             [cljs.pprint :refer [pprint]]
+            [defun.core :refer [defun]]
             ["dotenv" :as env]
             ["fs" :as fs]))
 
 
-(def)
-; 1990 pattern:
-
-(s/split "st01_d90_shp.zip" #"_|\.")
-;; => ["st01" "d90" "shp" "zip"]
-(s/split "st01_d90_shp" #"_")
-;; => ["st01" "d90" "shp"]
-;; Better way:
-(map #(vec %) (map #(re-seq #"[a-z]+|[0-9]+" %) ["st01" "d90" "shp" "zip"]))
-;; => (["st" "01"] ["d" "90"] ["shp"] ["zip"])
-
-(comment
-  ; Clojure
-  (Integer/parseInt "123")
-  ; ClojureScript
-  (js/parseInt "123"))
-
-;; All together now
-
-(defn translateInts
-  [vec]
-  (map
-    (fn [v]
-      (if (false? (js/Number.isNaN (js/parseInt v 10)))
-        (js/parseInt v 10)
-        v))
-    vec))
-(map #(translateInts %) [["gz"] ["2010"] ["us"] ["970"] ["00"] ["500" "k"] ["zip"]])
-
-(defn verboseVintner
-  [vec]
-  (map
-    (fn [v]
-      (cond
-        (= "90" v) "1990"
-        (= "00" v) "2000"
-        :else v))
-    vec))
-
-(defn geoIDPartitioner
-  [string]
-  (->>
-    (s/split string #"_|\.")                                ;; => ["st01" "d90" "shp" "zip"]
-    (map #(re-seq #"[a-z]+|[0-9]+" %))                      ;; => (("st" "01") ("d" "90") ("shp") ("zip"))
-    (map (fn [y] (remove #(= "d" %) y)))                    ;; => (("st" "01") ("90") ("shp") ("zip"))
-    ;(map #(translateInts %)) ;; => not worth it (("st" 1) (90) ("shp") ("zip"))
-    (map #(verboseVintner %))
-    (map #(vec %))))                                        ;; => (["st" "01"] ["90"] ["shp"] ["zip"])
-
-(str (name :01))
-
-(geoIDPartitioner "st01_d90_shp.zip")
-;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
-(geoIDPartitioner "rg99_d00_shp.zip")
-;; => (["rg" "99"] ["2000"] ["shp"] ["zip"])
-(geoIDPartitioner "gz_2010_us_outline_500k.zip")
-;; => (["gz"] ["2010"] ["us"] ["outline"] ["500" "k"] ["zip"])
-(geoIDPartitioner "cb_2012_us_uac10_500k.zip")
-;; => (["cb"] ["2012"] ["us"] ["uac" "10"] ["500" "k"] ["zip"])
-(geoIDPartitioner "gz_2010_us_330_m1_500k.zip")
-;; => (["gz"] ["2010"] ["us"] ["330"] ["m" "1"] ["500" "k"] ["zip"])
-(geoIDPartitioner "gz_2010_01_970_00_500k.zip")
-;; => (["gz"] ["2010"] ["01"] ["970"] ["2000"] ["500" "k"] ["zip"])
-(geoIDPartitioner "cb_2014_us_nation_5m.zip")
-;; => (["cb"] ["2014"] ["us"] ["nation"] ["5" "m"] ["zip"])
-(geoIDPartitioner "cb_2014_us_region_500k.zip")
-;; => (["cb"] ["2014"] ["us"] ["region"] ["500" "k"] ["zip"])
-(geoIDPartitioner "cb_2014_01_tract_500k.zip")
-;; => (["cb"] ["2014"] ["01"] ["tract"] ["500" "k"] ["zip"])
-(geoIDPartitioner "cb_rd13_us_cd113_500k.zip")
-
-
 (def geoKeyMap
-  {:nation                                                      {:2013 "nation"
+  {:nation                                                      {:2010 "outline"
+                                                                 :2013 "nation"
                                                                  :2014 "nation"
                                                                  :2015 "nation"
                                                                  :2016 "nation"
@@ -188,7 +118,8 @@
                                                                  :2012 "uac"
                                                                  :1990 "ua"
                                                                  :2000 "ua"}
-   :congressional-district                                      {:2013 "cd"
+   :congressional-district                                      {:2012 "cd"
+                                                                 :2013 "cd"
                                                                  :2014 "cd"
                                                                  :2015 "cd"
                                                                  :2016 "cd"
@@ -242,46 +173,77 @@
                                                                  :2010 "620"
                                                                  :2000 "sl"}})
 
-(def testMap
-  {{:2013 "sldl"
-    :2014 "sldl"
-    :2015 "sldl"
-    :2016 "sldl"
-    :2017 "sldl"
-    :2012 "sldl"
-    :2010 "620"
-    :2000 "sl"} :state-legislative-district-'lower-chamber'})
 
-(first testMap)
-;; => [{:2013 "sldl", :2014 "sldl", :2015 "sldl", :2016 "sldl", :2017 "sldl", :2012 "sldl", :2010 "620", :2000 "sl"}
-; :state-legislative-district-'lower-chamber']
+(s/split "st01_d90_shp.zip" #"_|\.")
+;; => ["st01" "d90" "shp" "zip"]
+(s/split "st01_d90_shp" #"_")
+;; => ["st01" "d90" "shp"]
+;; Better way:
+(map #(vec %) (map #(re-seq #"[a-z]+|[0-9]+" %) ["st01" "d90" "shp" "zip"]))
+;; => (["st" "01"] ["d" "90"] ["shp"] ["zip"])
 
+(comment
+  ; Clojure
+  (Integer/parseInt "123")
+  ; ClojureScript
+  (js/parseInt "123"))
 
+;; All together now
 
-;; => {:2013 "sldl", :2014 "sldl", :2015 "sldl", :2016 "sldl", :2017 "sldl", :2012 "sldl", :2010 "620", :2000 "sl"}
+(defn translateInts
+  [vec]
+  (map
+    (fn [v]
+      (if (false? (js/Number.isNaN (js/parseInt v 10)))
+        (js/parseInt v 10)
+        v))
+    vec))
+(map #(translateInts %) [["gz"] ["2010"] ["us"] ["970"] ["00"] ["500" "k"] ["zip"]])
 
-(defn tester
-  [vintage level map-]
-  (let [[k v] (first map-)]
-    (if-let [[k2 v2] (find k (keyword vintage))]
-      (if (= v2 level)
-        (name v)
-        "boop"))))
+(defn verboseVintner
+  [vec]
+  (map
+    (fn [v]
+      (cond
+        (= "90" v) "1990"
+        (= "00" v) "2000"
+        :else v))
+    vec))
 
+(defn geoIDPartitioner
+  [string]
+  (->>
+    (s/split string #"_|\.")                                ;; => ["st01" "d90" "shp" "zip"]
+    (map #(re-seq #"[a-z]+|[0-9]+" %))                      ;; => (("st" "01") ("d" "90") ("shp") ("zip"))
+    (map (fn [y] (remove #(= "d" %) y)))                    ;; => (("st" "01") ("90") ("shp") ("zip"))
+    ;(map #(translateInts %)) ;; => not worth it (("st" 1) (90) ("shp") ("zip"))
+    (map #(verboseVintner %))
+    (map #(vec %))))                                        ;; => (["st" "01"] ["90"] ["shp"] ["zip"])
 
-(tester "2010" "620" testMap)
+(str (name :01))
 
-(def testMap2
-  [{:2013 "sldl"
-    :2014 "sldl"
-    :2015 "sldl"
-    :2016 "sldl"
-    :2017 "sldl"
-    :2012 "sldl"
-    :2010 "620"
-    :2000 "sl"} :state-legislative-district-'lower-chamber'])
+(geoIDPartitioner "st01_d90_shp.zip")
+;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
+(geoIDPartitioner "rg99_d00_shp.zip")
+;; => (["rg" "99"] ["2000"] ["shp"] ["zip"])
+(geoIDPartitioner "gz_2010_us_outline_500k.zip")
+;; => (["gz"] ["2010"] ["us"] ["outline"] ["500" "k"] ["zip"])
+(geoIDPartitioner "cb_2012_us_uac10_500k.zip")
+;; => (["cb"] ["2012"] ["us"] ["uac" "10"] ["500" "k"] ["zip"])
+(geoIDPartitioner "gz_2010_us_330_m1_500k.zip")
+;; => (["gz"] ["2010"] ["us"] ["330"] ["m" "1"] ["500" "k"] ["zip"])
+(geoIDPartitioner "gz_2010_01_970_00_500k.zip")
+;; => (["gz"] ["2010"] ["01"] ["970"] ["2000"] ["500" "k"] ["zip"])
+(geoIDPartitioner "cb_2014_us_nation_5m.zip")
+;; => (["cb"] ["2014"] ["us"] ["nation"] ["5" "m"] ["zip"])
+(geoIDPartitioner "cb_2014_us_region_500k.zip")
+;; => (["cb"] ["2014"] ["us"] ["region"] ["500" "k"] ["zip"])
+(geoIDPartitioner "cb_2014_01_tract_500k.zip")
+;; => (["cb"] ["2014"] ["01"] ["tract"] ["500" "k"] ["zip"])
+(geoIDPartitioner "cb_rd13_us_cd113_500k.zip")
+;; => (["cb"] ["rd" "13"] ["us"] ["cd" "113"] ["500" "k"] ["zip"])
 
-(defn tester2
+(defn find1Key
   [vintage level [k v]]
   (if-let [[k2 v2] (find k (keyword vintage))]
     (if (= v2 level)
@@ -289,31 +251,64 @@
       nil)
     nil))
 
-(tester2 "2010" "620" testMap2)
-
-(remove nil? (map #(tester2 "2010" "620" %) (seq (map-invert geoKeyMap))))
-
-(find {:2013 "sldl", :2014 "sldl", :2015 "sldl", :2016 "sldl", :2017 "sldl", :2012 "sldl", :2010 "620", :2000 "sl"} :2010)
-
-
-
 (defn keyFinder
-  [vintage level map-]
-  (let [inv (map-invert map-)]
-    (->>
-      (map ()))))
+  [vintage level]
+  (apply str (remove nil? (map #(find1Key vintage level %) (seq (map-invert geoKeyMap))))))
+
+(keyFinder "2010" "970")
+;; => ("state-legislative-district-'lower-chamber'")
 
 
-(->>
-  (map-invert geoKeyMap)
-  (map (fn [m] #(first %))))
+(defn scopeHandler
+  [vintage scope level res resMes]
+  (if (or (= scope "99") (= scope "us"))
+    (apply str (interpose "/" [(apply str res resMes), vintage, (keyFinder vintage level)]))
+    (apply str (interpose "/" [(apply str res resMes), vintage, scope, (keyFinder vintage level)]))))
+
+(defun fileDirector
+  ([[level scope] [vintage] _        _]                                        (scopeHandler vintage scope level "500" "k"))
+  ([_             [vintage] [scope] ["outline"]   [res resMes] _]              (scopeHandler vintage scope "outline" res resMes))
+  ([_             [vintage] [scope] ["uac" "10"]  [res resMes] _]              (scopeHandler vintage scope "uac" res resMes))
+  ([_             [vintage] [scope] [level]       _            [res resMes] _] (scopeHandler vintage scope level res resMes))
+  ([_             [vintage] [scope] [level]       [res resMes] _]              (scopeHandler vintage scope level res resMes))
+  ([_             [vintage] [scope] [level]       [res resMes] _]              (scopeHandler vintage scope level res resMes))
+  ([_             _         [scope] [level "113"] [res resMes] _]              (scopeHandler "2012" scope level res resMes)))
+
+
+(apply fileDirector [["cb"] ["rd" "13"] ["us"] ["cd" "113"] ["500" "k"] ["zip"]])
+
+(defn geoFileTrans
+  [s]
+  (->>
+    (geoIDPartitioner s)
+    (apply fileDirector)))
+
+(geoFileTrans "cb_rd13_us_cd113_500k.zip")
+;; => "500k/2012/congressional-district"
+(geoFileTrans "st01_d90_shp.zip")
+;; => "500k/1990/01/state"
+(geoFileTrans "rg99_d00_shp.zip")
+;; => "500k/2000/region"
+(geoFileTrans "gz_2010_us_outline_500k.zip")
+;; => "500k/2010/nation"
+(geoFileTrans "cb_2012_us_uac10_500k.zip")
+;; => "500k/2012/urban-area"
+(geoFileTrans "gz_2010_us_330_m1_500k.zip")
+;; => "500k/2010/combined-statistical-area"
+(geoFileTrans "gz_2010_01_970_00_500k.zip")
+;; => "500k/2010/01/school-district-'unified'"
+(geoFileTrans "cb_2014_us_nation_5m.zip")
+;; => "5m/2014/nation"
+(geoFileTrans "cb_2014_us_region_500k.zip")
+;; => "500k/2014/region"
+(geoFileTrans "cb_2014_01_tract_500k.zip")
+;; => "500k/2014/01/tract"
+(geoFileTrans "cb_rd13_us_cd113_500k.zip")
+;; => "500k/2012/congressional-district"
+
 
 ;; `if-let`: if the value of condition is truthy, then that value is assigned to the definition, and "then" is evaluated.
 ;; Otherwise the value is NOT assigned to the definition, and "else" is evaluated.
+;; In Clojure, anything that isn't either `false` or `nil` is "truthy".
 
-
-
-(translateInts "500")
-(map #(translateInts %) ["500" "k"])
-(map #(js/parseInt % 10) ["500" "k" "01" "nope"])
 
