@@ -139,7 +139,7 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 | 10  | place                                                         | pl            | place                 | geo/api?  |           |       |
 | 11  | alaska-native-regional-corporation                            | an            | anrc                  | geo/api?  |           |       |
 | 12  | american-indian-area!alaska-native-area!hawaiian-home-land    | na:00 ir:90   | aiannh                |           |           |       |
-| 13  | metropolitan-statistical-area!micropolitan-statistical-area   | ma            | cbsa                  | api?      |           |      |
+| 13  | metropolitan-statistical-area!micropolitan-statistical-area   | ma            | cbsa                  | api?      |           |       |
 | 14  | combined-statistical-area                                     | cmsa:96 cm:99 | csa                   |           |           | 3     |
 | 15  | new-england-city-and-town-area                                | ne            | necta                 |           |           | 3     |
 | 16  | urban-area                                                    | ua            | ua10                  |           |           | 3     |
@@ -239,7 +239,7 @@ state-legislative-district-'lower-chamber'                    | sl01_d00_shp    
 
 Key                                                           | 2010                              | Notes
 ------------------------------------------------------------- | :--------------------------------:| -----
-nation                                                        | gz_2010_us_outline_500k           | 010 
+nation                                                        | x                                 | 010 
 region                                                        | gz_2010_us_020_00_500k            | 
 division                                                      | gz_2010_us_030_00_500k            | 
 state                                                         | gz_2010_us_040_00_500k            | 
@@ -252,7 +252,7 @@ american-indian-area!alaska-native-area!hawaiian-home-land    | gz_2010_us_250_0
 metropolitan-statistical-area!micropolitan-statistical-area   | gz_2010_us_310_m1_500k            | 310 
 combined-statistical-area                                     | gz_2010_us_330_m1_500k            | 330
 new-england-city-and-town-area                                | gz_2010_us_350_m1_500k            | 350
-urban-area                                                    | cb_2012_us_uac10_500k             | (1) 
+urban-area                                                    | x                                 | (1) 
 congressional-district                                        | gz_2010_us_500_11_5m              | 500
 school-district-'elementary'                                  | x                                 | 950
 school-district-'secondary'                                   | x                                 | 960
@@ -262,6 +262,34 @@ public-use-microdata-area                                     | x               
 zip-code-tabulation-area *or* zipcode                         | gz_2010_us_860_00_500k            | 860
 state-legislative-district-'upper-chamber'                    | gz_2010_01_610_u2_500k            | 610
 state-legislative-district-'lower-chamber'                    | gz_2010_01_620_l2_500k            | 620
+
+
+Key                                                           | 2012                              | Notes
+------------------------------------------------------------- | :--------------------------------:| -----
+nation                                                        | x                                 | 
+region                                                        | x                                 | 
+division                                                      | x                                 | 
+state                                                         | x                                 | 
+county                                                        | x                                 | 
+county-subdivision                                            | x                                 | 
+tract                                                         | x                                 | 
+place                                                         | x                                 | 
+alaska-native-regional-corporation                            | x                                 | 
+american-indian-area!alaska-native-area!hawaiian-home-land    | x                                 | 
+metropolitan-statistical-area!micropolitan-statistical-area   | x                                 | 
+combined-statistical-area                                     | x                                 | 
+new-england-city-and-town-area                                | x                                 | 
+urban-area                                                    | cb_2012_us_uac10_500k             | 
+congressional-district                                        | cb_rd13_us_cd113_500k             |
+school-district-'elementary'                                  | x                                 | 
+school-district-'secondary'                                   | x                                 | 
+school-district-'unified'                                     | x                                 | 
+block-group                                                   | x                                 | 
+public-use-microdata-area                                     | x                                 |
+zip-code-tabulation-area *or* zipcode                         | x                                 | 
+state-legislative-district-'upper-chamber'                    | cb_rd13_01_sldu_500k              |
+state-legislative-district-'lower-chamber'                    | cb_rd13_01_sldl_500k              |
+
 
 Key                                                           | 2013                              | Notes
 ------------------------------------------------------------- | :--------------------------------:| -----
@@ -393,21 +421,33 @@ zip-code-tabulation-area *or* zipcode                         | cb_2017_us_zcta5
 state-legislative-district-'upper-chamber'                    | cb_2017_01_sldu_500k              |
 state-legislative-district-'lower-chamber'                    | cb_2017_01_sldl_500k              |
 
-
 # Patterns
-Vintage       | Pattern
-------------- | ------------------------------------
- 1990 - 2000  |  `[ [level state-fips/"99"]   [vintage]   _                   _]`
- 2010         |  `[ _                         [vintage]   ["us"]              ["outline"]     _ _]`
- 2010         |  `[ _                         ["2012"]    ["us"]              [level _]       _ _]`
- 2010         |  `[ _                         [vintage]   [state-fips/"us"]   [summary-level] _ _ _]`
- 2013 - 2017  |  `[ _                         [vintage]   [state-fips/"us"]   [level]         _ _]`
- 
+Vintage       | i0           | i1          | i2                | i3              | i4          | i5          | i6
+------------- | ------------ | ----------- | ----------------- | --------------- | ----------- | ----------- | ---
+ 1990 - 2000  |  ["st" "01"] |  ["90"]     | ["shp"]           | ["zip"]         |             |             |   
+ 2010         |  ["gz"]      |  ["2010"]   | ["us"]            | ["outline"]     | ["500" "k"] | ["zip"]     |   
+ 2010         |  ["cb"]      |  ["2012"]   | ["us"]            | ["uac" "10"]    | ["500" "k"] | ["zip"]     |   
+ 2010         |  ["gz"]      |  ["2010"]   | ["us"]            | ["970"]         | ["00"]      | ["500" "k"] | ["zip"]
+ 2013 - 2017  |  ["cb"]      |  ["2013"]   | ["us"]            | ["tract"]       | ["500" "k"] | ["zip"]     |   
+
 
 ## Notations
 1) Source for Summary Level codes: [AFF](https://factfinder.census.gov/help/en/summary_level_code_list.htm)
 2) Listed as 2010 [here](https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html)
 3) Listing of Sessions of Congress [by year](https://en.wikipedia.org/wiki/List_of_United_States_Congresses)
+
+## File Structure for Geo Files
+
+- 500K
+  - Vintage
+    - 1990
+      - National level files
+      - 01 (state code)
+        - State level files
+        - 001 (county code)
+          - County level files (block-groups and blocks (TBD))
+
+## Summary Level Codes
 
  Summary Level (2010) | Name
 :---:| ---
