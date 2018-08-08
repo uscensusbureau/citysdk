@@ -11,7 +11,9 @@
             [cljs.pprint :refer [pprint]]
             [defun.core :refer-macros [defun]]
             ["dotenv" :as env]
-            ["fs" :as fs]))
+            ["node-dir" :as dir]
+            ["fs" :as fs]
+            ["path" :as path]))
 
 
 (def geoKeyMap
@@ -189,7 +191,7 @@
                                                                  :2010 "620"
                                                                  :2000 "sl"}})
 
-(defn verboseVintner
+(defn vinter
   [vec]
   (map
     (fn [v]
@@ -202,11 +204,11 @@
 (defn geoIDPartitioner
   [string]
   (->>
-    (s/split string #"_|\.")                                             ;; => ["st01" "d90" "shp" "zip"]
-    (map #(re-seq #"[a-z]+|[0-9]+" %))                                   ;; => (("st" "01") ("d" "90") ("shp") ("zip"))
-    (map (fn [y] (remove #(= "d" %) y)))                                 ;; => (("st" "01") ("90") ("shp") ("zip"))
-    (map-indexed #(if (zero? (mod (inc %1) 2 )) (verboseVintner %2) %2)) ;; only apply function to the 2nd item (vintage)
-    (map #(vec %))))                                                     ;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
+    (s/split string #"_|\.")                                     ;; => ["st01" "d90" "shp" "zip"]
+    (map #(re-seq #"[a-z]+|[0-9]+" %))                           ;; => (("st" "01") ("d" "90") ("shp") ("zip"))
+    (map (fn [y] (remove #(= "d" %) y)))                         ;; => (("st" "01") ("90") ("shp") ("zip"))
+    (map-indexed #(if (zero? (mod (inc %1) 2 )) (vinter %2) %2)) ;; only apply function to the 2nd item (vintage)
+    (map #(vec %))))                                             ;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
 
 (defn find1Key
   [vintage level [k v]]
@@ -221,36 +223,51 @@
   (apply str (remove nil? (map #(find1Key vintage level %) (seq (map-invert geoKeyMap))))))
 
 (defn scopeHandler
-  [[vintage scope level res resMes :as all]]
-  (if-not (= "" (keyFinder vintage level))
-    (if (or (= scope "99") (= scope "us"))
-      (apply str (interpose "/" [(apply str res resMes) vintage (apply str (keyFinder vintage level) ".json")]))
-      (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str (keyFinder vintage level) ".json")]))) ;; works
+  [[vin sco lev res mes :as all]]
+  (if-not (= "" (keyFinder vin lev))
+    (if (or (= sco "99") (= sco "us"))
+      (apply str (interpose "/" [(apply str res mes) vin (apply str (keyFinder vin lev) ".json")]))
+      (apply str (interpose "/" [(apply str res mes) vin sco (apply str (keyFinder vin lev) ".json")])))
     nil))
 
 ;; TODO: use this to resolve inconsistencies in file location (e.g., `zipcodes`) across vintages?
 
 (defun fileDirector
-  ([[level scope] [vintage] _         _]                                         (scopeHandler [vintage scope level "500" "k"]))
-  ([_             [vintage] [scope]   ["outline"]   [res resMes] _]              (scopeHandler [vintage scope "outline" res resMes]))
-  ([_             [vintage] [scope]   ["uac" "10"]  [res resMes] _]              (scopeHandler [vintage scope "uac" res resMes]))
-  ([_             [vintage] [scope]   [level]       _            [res resMes] _] (scopeHandler [vintage scope level res resMes]))
-  ([_             [vintage] [scope]   [level]       [res resMes] _]              (scopeHandler [vintage scope level res resMes]))
-  ([_             [vintage] [scope]   [level]       [res resMes] _]              (scopeHandler [vintage scope level res resMes]))
-  ([_             _         [scope]   [level "113"] [res resMes] _]              (scopeHandler ["2012" scope level res resMes]))
-  ([& anything-else]  nil))
+  ([[lev sco] [vin] _     _]                                  (scopeHandler [vin sco lev "500" "k"]))
+  ([_         [vin] [sco] ["outline"]  [res mes] _]           (scopeHandler [vin sco "outline" res mes]))
+  ([_         [vin] [sco] ["uac" "10"] [res mes] _]           (scopeHandler [vin sco "uac" res mes]))
+  ([_         [vin] [sco] [lev]        _         [res mes] _] (scopeHandler [vin sco lev res mes]))
+  ([_         [vin] [sco] [lev]        [res mes] _]           (scopeHandler [vin sco lev res mes]))
+  ([_         [vin] [sco] [lev]        [res mes] _]           (scopeHandler [vin sco lev res mes]))
+  ([_         _     [sco] [lev "113"]  [res mes] _]           (scopeHandler ["2012" sco lev res mes]))
+  ([& anything-else]                                          nil))
 
 (defn geoFileTrans
   [string]
   (if-let [answer (->> (geoIDPartitioner string) (apply fileDirector))]
     answer
     nil)) ;; use the `nil` here to trigger the fs to skip this file
-
     ;(str (first (s/split string #"\.")) ".json"))) ;; just naively convert the filename to .json in flat folder
 
-;; `if-let`: if the value of condition is truthy, then that value is assigned to the definition, and "then" is evaluated.
-;; Otherwise the value is NOT assigned to the definition, and "else" is evaluated.
-;; In Clojure, anything that isn't either `false` or `nil` is "truthy".
+
+;(.isDirectory (fs/statSync "public"))
+
+;(defn walkFilesSync
+;  [drive]
+;  (if (= true (.isDirectory (fs/statSync drive)))
+;    (.map (fs/readdirSync drive) #(recur (path/join drive %)))
+;    drive))
+
+(dir/paths
+  "C:\\Users\\Surface\\Downloads"
+  true
+  ;#(js/console.log %2)
+  (fn [raw]
+    (->>
+      (js/JSON.stringify raw)
+      ;(js/console.log))))
+      (fs/writeFile ".\\test\\test5.json" % "utf8" (fn [] (js/console.log "file saved"))))))
+
 
 
 (geoFileTrans "tb99_d00_shp.zip")

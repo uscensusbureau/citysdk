@@ -27,6 +27,7 @@
   "homepage": "https://github.com/loganpowell/census-geojson#readme",
   "dependencies": {
     "dotenv": "^5.0.1",
+    "node-dir": "^0.1.17",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {

@@ -9,8 +9,8 @@
             [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
-            ["fs" :as fs])
-  (:use [clojure.repl :only (source)]))
+            ["fs" :as fs]
+            [clojure.repl :refer [source]]))
 
 ; For Intellij IDE:
 ; start up remote repl: yarn shadow-cljs clj-repl
@@ -733,12 +733,13 @@
         (pipeline-async 1 =merged= identity =features=))
     (go (get->put!->port stats-call =stats=)
         (pipeline-async 1 =merged= identity =stats=)
-        (fs/writeFileSync "./test/counties.json" (<! =merged=) (js/console.log "file saved"))
+        (fs/writeFileSync ".\\test\\testingslashes.json" (<! =merged=) (js/console.log "file saved"))
         (close! =features=)
         (close! =stats=))))
 
 (merge-geo-stats->map {:vintage      "2016"
                        :sourcePath   ["acs" "acs5"]
-                       :geoHierarchy {:county "*"}
+                       :geoHierarchy {:state "01"
+                                      :county "*"}
                        :values       ["B01001_001E"]
                        :statsKey     stats-key})
