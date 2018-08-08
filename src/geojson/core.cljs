@@ -249,32 +249,67 @@
     nil)) ;; use the `nil` here to trigger the fs to skip this file
     ;(str (first (s/split string #"\.")) ".json"))) ;; just naively convert the filename to .json in flat folder
 
+;; inspired by: https://github.com/georgewsinger/cljs-callback-heaven
+(defn getShpFilePaths
+  [source-path destination-path]
+  (go
+    (let [c (chan)]
+      (dir/paths
+        source-path
+        true
+        (fn [err, raw] (if err (go (>! c err))
+                               (go (>! c (js/JSON.stringify raw))))))
+      (go (fs/writeFile destination-path (<! c) "utf8" #(js/console.log "file saved"))))))
 
-;(.isDirectory (fs/statSync "public"))
 
-;(defn walkFilesSync
-;  [drive]
-;  (if (= true (.isDirectory (fs/statSync drive)))
-;    (.map (fs/readdirSync drive) #(recur (path/join drive %)))
-;    drive))
+(getShpFilePaths "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2012\\ua" ".\\test\\test11.json")
 
-(dir/paths
-  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger"
-  true
-  ;#(js/console.log %2)
-  (fn [err, raw]
-    (->>
-      (js/JSON.stringify raw)
-      (js/console.log))))
-      ;#(fs/writeFile ".\\test\\test.json" % "utf8" (js/console.log "file saved")))))
+(defn getFileNames<-paths
+  [paths]
+  (->> (js/JSON.parse (fs/readFileSync paths "utf8"))
+       (map #(->> (s/split % #"\\") (last)))))
 
-(go
-  (let [c (chan)]
-    (dir/paths "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger"
-               true
-               (fn [err, raw]
-                 (go (>! c (js/JSON.stringify raw)))))
-    (go (fs/writeFileSync ".\\test\\test9.json" (<! c) "utf8" (js/console.log "file saved")))))
+(getFileNames<-paths ".\\test\\test10-abv.json")
+
+;; time for transducers
+(defn xf-features->map
+  "
+  This is a transducer, which uses a transducer to operate over a list of paths
+  returned from a node `fs` call
+  This transducer is meant to be used in concert with a `core.async`
+  channel.
+  "
+  [rf]
+  (fn
+    ([] (rf))
+    ([result] (rf result))
+    ([result item]
+     (rf result (transduce xf-geo+feature conj item)))))
+
+
+(defn getShapeFilePaths->restructure
+  [source-path destination-path]
+  (let [=paths= (chan)]))
+
+
+(comment
+  (go
+    (let [=paths= (chan)]
+      (go (fs/readFile source-path "utf8"
+            (fn [err data]
+              (if err
+                (go (>! =paths= err))
+                (go (>! =paths= (js/JSON.parse data)))))))
+      (go (map (fn [path] (go (let [filename (->> (s/split path "\\") (last))
+                                    fileExtn (->> (s/split filename ".") (last))]
+                                (if (= fileExtn "zip")
+                                    (js/console.log "zipper!")
+                                    (js/console.log (str "fileExtn: " fileExtn))))))
+               (<! =paths=))))))
+
+;; test on this C:\Users\Surface\Downloads\www2.census.gov\geo\tiger\GENZ2012\ua
+
+(getShapeFilePaths->restructure "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2012\\ua")
 
 (geoFileTrans "tb99_d00_shp.zip")
 ;; => nil
