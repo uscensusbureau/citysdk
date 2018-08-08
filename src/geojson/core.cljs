@@ -189,34 +189,6 @@
                                                                  :2010 "620"
                                                                  :2000 "sl"}})
 
-
-(s/split "st01_d90_shp.zip" #"_|\.")
-;; => ["st01" "d90" "shp" "zip"]
-(s/split "st01_d90_shp" #"_")
-;; => ["st01" "d90" "shp"]
-;; Better way:
-(map #(vec %) (map #(re-seq #"[a-z]+|[0-9]+" %) ["st01" "d90" "shp" "zip"]))
-;; => (["st" "01"] ["d" "90"] ["shp"] ["zip"])
-
-(comment
-  ; Clojure
-  (Integer/parseInt "123")
-  ; ClojureScript
-  (js/parseInt "123"))
-
-;; All together now
-
-
-(comment
-  (defn translateInts
-    [vec]
-    (map
-      (fn [v]
-        (if (false? (js/Number.isNaN (js/parseInt v 10)))
-          (js/parseInt v 10)
-          v))
-      vec)))
-
 (defn verboseVintner
   [vec]
   (map
@@ -236,51 +208,6 @@
     (map-indexed #(if (zero? (mod (inc %1) 2 )) (verboseVintner %2) %2)) ;; only apply function to the 2nd item (vintage)
     (map #(vec %))))                                                     ;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
 
-(str (name :01))
-
-(geoIDPartitioner "tb99_d00_shp.zip")
-
-(geoIDPartitioner "zt01_d00_shp.zip")
-
-(geoIDPartitioner "st01_d90_shp.zip")
-;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
-
-(geoIDPartitioner "rg99_d00_shp.zip")
-;; => (["rg" "99"] ["2000"] ["shp"] ["zip"])
-
-(geoIDPartitioner "gz_2010_us_outline_500k.zip")
-;; => (["gz"] ["2010"] ["us"] ["outline"] ["500" "k"] ["zip"])
-
-(geoIDPartitioner "cb_2012_us_uac10_500k.zip")
-;; => (["cb"] ["2012"] ["us"] ["uac" "10"] ["500" "k"] ["zip"])
-
-(geoIDPartitioner "gz_2010_us_330_m1_500k.zip")
-;; => (["gz"] ["2010"] ["us"] ["330"] ["m" "1"] ["500" "k"] ["zip"])
-
-(geoIDPartitioner "gz_2010_01_970_00_500k.zip")
-;; => (["gz"] ["2010"] ["01"] ["970"] ["2000"] ["500" "k"] ["zip"])
-
-(geoIDPartitioner "cb_2014_us_nation_5m.zip")
-;; => (["cb"] ["2014"] ["us"] ["nation"] ["5" "m"] ["zip"])
-
-(geoIDPartitioner "cb_2014_us_region_500k.zip")
-;; => (["cb"] ["2014"] ["us"] ["region"] ["500" "k"] ["zip"])
-
-(geoIDPartitioner "cb_2014_01_tract_500k.zip")
-;; => (["cb"] ["2014"] ["01"] ["tract"] ["500" "k"] ["zip"])
-
-(fileDirector ["cb"] ["2014"] ["01"] ["tract"] ["500" "k"] ["zip"])
-;; => "500k/2014/01/tract.json"
-
-(geoIDPartitioner "cd36_103_shp.zip")
-;; => (["cd" "36"] ["103"] ["shp"] ["zip"])
-
-(geoIDPartitioner "cb_rd13_us_cd113_500k.zip")
-;; => (["cb"] ["rd" "13"] ["us"] ["cd" "113"] ["500" "k"] ["zip"])
-
-
-(geoIDPartitioner "cm_sa_96_shp.zip")
-
 (defn find1Key
   [vintage level [k v]]
   (if-let [[k2 v2] (find k (keyword vintage))]
@@ -293,25 +220,6 @@
   [vintage level]
   (apply str (remove nil? (map #(find1Key vintage level %) (seq (map-invert geoKeyMap))))))
 
-(keyFinder "2013" "cd")
-;; => ("state-legislative-district-'lower-chamber'")
-
-
-(comment (defn scopeHandler
-           [[vintage scope level res resMes & rest :as all] match?]
-           (cond
-             (not= "" (keyFinder vintage level))
-             (if (or (= scope "99") (= scope "us"))
-               (apply str (interpose "/" [(apply str res resMes) vintage (apply str (keyFinder vintage level) ".json")]))
-               (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str (keyFinder vintage level) ".json")]))) ;; works
-             (and (= "" (keyFinder vintage level)) (= match? true))
-             (if (or (= scope "99") (= scope "us"))
-               (apply str (interpose "/" [(apply str res resMes) vintage (apply str level ".json")]))
-               (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str level ".json")])))
-             (and (= "" (keyFinder vintage level)) (= match? false))
-             ;(apply str (interpose "/" [(butlast (flatten all))]) ".json")
-             nil)))
-
 (defn scopeHandler
   [[vintage scope level res resMes :as all]]
   (if-not (= "" (keyFinder vintage level))
@@ -320,7 +228,7 @@
       (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str (keyFinder vintage level) ".json")]))) ;; works
     nil))
 
-;; TODO: use this to resolve inconsistencies in file location (e.g., ZIPCODES) across vintages?
+;; TODO: use this to resolve inconsistencies in file location (e.g., `zipcodes`) across vintages?
 
 (defun fileDirector
   ([[level scope] [vintage] _         _]                                         (scopeHandler [vintage scope level "500" "k"]))
@@ -334,18 +242,11 @@
 
 (defn geoFileTrans
   [string]
-  (if-let [answer (->>
-                    (geoIDPartitioner string)
-                    (apply fileDirector))]
+  (if-let [answer (->> (geoIDPartitioner string) (apply fileDirector))]
     answer
-    false)) ;; use the `false` here to trigger the fs to skip this file
-    ;(str (first (s/split string #"\.")) ".json"))) ;; just naively convert the filename to .json in flat folder
+    nil)) ;; use the `nil` here to trigger the fs to skip this file
 
-;(defn geoFileTrans
-;  [s]
-;  (->>
-;    (geoIDPartitioner s)
-;    (apply fileDirector)))
+    ;(str (first (s/split string #"\.")) ".json"))) ;; just naively convert the filename to .json in flat folder
 
 ;; `if-let`: if the value of condition is truthy, then that value is assigned to the definition, and "then" is evaluated.
 ;; Otherwise the value is NOT assigned to the definition, and "else" is evaluated.
@@ -353,16 +254,31 @@
 
 
 (geoFileTrans "tb99_d00_shp.zip")
+;; => nil
 
 (geoFileTrans "zt01_d00_shp.zip")
+;; => "500k/2000/01/zip-code-tabulation-area.json"
 
 (geoFileTrans "cm_sa_96_shp.zip")
+;; => nil
+
+(geoFileTrans "tb99_d00_shp.zip")
+;; => nil
+
+(geoFileTrans "zt01_d00_shp.zip")
+;; => "500k/2000/01/zip-code-tabulation-area.json"
+
+(geoFileTrans "cm_sa_96_shp.zip")
+;; => nil
 
 (geoFileTrans "cmsa_96_shp.zip")
+;; => nil
 
 (geoFileTrans "cb99_03a_shp.zip")
+;; => nil
 
 (geoFileTrans "cb_2014_us_county_within_cd114_500k.zip")
+;; => nil
 
 (geoFileTrans "cb_rd13_us_cd113_500k.zip")
 ;; => "500k/2012/congressional-district.json"
