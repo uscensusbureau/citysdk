@@ -259,16 +259,22 @@
 ;    drive))
 
 (dir/paths
-  "C:\\Users\\Surface\\Downloads"
+  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger"
   true
   ;#(js/console.log %2)
-  (fn [raw]
+  (fn [err, raw]
     (->>
       (js/JSON.stringify raw)
-      ;(js/console.log))))
-      (fs/writeFile ".\\test\\test5.json" % "utf8" (fn [] (js/console.log "file saved"))))))
+      (js/console.log))))
+      ;#(fs/writeFile ".\\test\\test.json" % "utf8" (js/console.log "file saved")))))
 
-
+(go
+  (let [c (chan)]
+    (dir/paths "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger"
+               true
+               (fn [err, raw]
+                 (go (>! c (js/JSON.stringify raw)))))
+    (go (fs/writeFileSync ".\\test\\test9.json" (<! c) "utf8" (js/console.log "file saved")))))
 
 (geoFileTrans "tb99_d00_shp.zip")
 ;; => nil
