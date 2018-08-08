@@ -191,6 +191,7 @@ region                                                        | x               
 division                                                      | x                                 | 
 state                                                         | st01_d90_shp                      | 
 county                                                        | co01_d90_shp                      | 
+consolidated-cities                                           | x                                 | 
 county-subdivision                                            | cs01_d90_shp                      | 
 tract                                                         | tr01_d90_shp                      | 
 place                                                         | pl01_d90_shp                      | 
@@ -218,6 +219,7 @@ region                                                        | rg99_d00_shp    
 division                                                      | dv99_d00_shp                      | 
 state                                                         | st01_d00_shp                      | 
 county                                                        | co01_d00_shp                      | 
+consolidated-cities                                           | cc99_d00_shp                      | 
 county-subdivision                                            | cs01_d00_shp                      | 
 tract                                                         | tr01_d00_shp                      | 
 place                                                         | pl01_d00_shp                      | 
@@ -243,6 +245,7 @@ nation                                                        | x               
 region                                                        | gz_2010_us_020_00_500k            | 
 division                                                      | gz_2010_us_030_00_500k            | 
 state                                                         | gz_2010_us_040_00_500k            | 
+consolidated-cities                                           | gz_2010_09_170_00_500k            | 
 county                                                        | gz_2010_us_050_00_500k            | 
 county-subdivision                                            | gz_2010_01_060_00_500k            | 
 tract                                                         | gz_2010_01_140_00_500k            | 
@@ -270,6 +273,7 @@ nation                                                        | x               
 region                                                        | x                                 | 
 division                                                      | x                                 | 
 state                                                         | x                                 | 
+consolidated-cities                                           | x                                 | 
 county                                                        | x                                 | 
 county-subdivision                                            | x                                 | 
 tract                                                         | x                                 | 
@@ -297,6 +301,7 @@ nation                                                        | cb_2013_us_natio
 region                                                        | cb_2013_us_region_500k            | 
 division                                                      | cb_2013_us_division_500k          | 
 state                                                         | cb_2013_us_state_500k             | 
+consolidated-cities                                           | cb_2013_01_concity_500k           | 
 county                                                        | cb_2013_us_county_500k            | 
 county-subdivision                                            | cb_2013_01_cousub_500k            | 
 tract                                                         | cb_2013_01_tract_500k             | 
@@ -323,6 +328,7 @@ nation                                                        | cb_2014_us_natio
 region                                                        | cb_2014_us_region_500k            | 
 division                                                      | cb_2014_us_division_500k          | 
 state                                                         | cb_2014_us_state_500k             | 
+consolidated-cities                                           | cb_2014_01_concity_500k           | 
 county                                                        | cb_2014_us_county_500k            | 
 county-subdivision                                            | cb_2014_01_cousub_500k            | 
 tract                                                         | cb_2014_01_tract_500k             | 
@@ -349,6 +355,7 @@ nation                                                        | cb_2015_us_natio
 region                                                        | cb_2015_us_region_500k            | 
 division                                                      | cb_2015_us_division_500k          | 
 state                                                         | cb_2015_us_state_500k             | 
+consolidated-cities                                           | cb_2015_01_concity_500k           | 
 county                                                        | cb_2015_us_county_500k            | 
 county-subdivision                                            | cb_2015_01_cousub_500k            | 
 tract                                                         | cb_2015_01_tract_500k             | 
@@ -375,6 +382,7 @@ nation                                                        | cb_2016_us_natio
 region                                                        | cb_2016_us_region_500k            | 
 division                                                      | cb_2016_us_division_500k          | 
 state                                                         | cb_2016_us_state_500k             | 
+consolidated-cities                                           | cb_2016_01_concity_500k           | 
 county                                                        | cb_2016_us_county_500k            | 
 county-subdivision                                            | cb_2016_01_cousub_500k            | 
 tract                                                         | cb_2016_01_tract_500k             | 
@@ -401,6 +409,7 @@ nation                                                        | cb_2017_us_natio
 region                                                        | cb_2017_us_region_500k            | 
 division                                                      | cb_2017_us_division_500k          | 
 state                                                         | cb_2017_us_state_500k             | 
+consolidated-cities                                           | cb_2017_01_concity_500k           | 
 county                                                        | cb_2017_us_county_500k            | 
 county-subdivision                                            | cb_2017_01_cousub_500k            | 
 tract                                                         | cb_2017_01_tract_500k             | 
@@ -410,6 +419,7 @@ american-indian-area!alaska-native-area!hawaiian-home-land    | cb_2017_us_aiann
 metropolitan-statistical-area!micropolitan-statistical-area   | cb_2017_us_cbsa_500k              | 
 combined-statistical-area                                     | cb_2017_us_csa_500k               | 
 new-england-city-and-town-area                                | cb_2017_us_necta_500k             | 
+combined-new-england-city-and-town-area                       | cb_2017_us_cnecta_500k            | 
 urban-area                                                    | cb_2017_us_ua10_500k              | 
 congressional-district                                        | cb_2017_us_cd115_500k             | 
 school-district-'elementary'                                  | cb_2017_01_elsd_500k              | 

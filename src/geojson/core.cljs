@@ -9,7 +9,7 @@
             [clojure.string :as s]
             [clojure.set :refer [map-invert]]
             [cljs.pprint :refer [pprint]]
-            [defun.core :refer [defun]]
+            [defun.core :refer-macros [defun]]
             ["dotenv" :as env]
             ["fs" :as fs]))
 
@@ -43,6 +43,13 @@
                                                                  :2010 "040"
                                                                  :1990 "st"
                                                                  :2000 "st"}
+   :consolidated-cities                                         {:2000 "cc"
+                                                                 :2010 "170"
+                                                                 :2013 "concity"
+                                                                 :2014 "concity"
+                                                                 :2015 "concity"
+                                                                 :2016 "concity"
+                                                                 :2017 "concity"}
    :county                                                      {:2013 "county"
                                                                  :2014 "county"
                                                                  :2015 "county"
@@ -110,6 +117,8 @@
                                                                  :2016 "necta"
                                                                  :2017 "necta"
                                                                  :2010 "350"}
+   :combined-new-england-city-and-town-area                     {:2016 "cnecta"
+                                                                 :2017 "cnecta"}
    :urban-area                                                  {:2013 "ua"
                                                                  :2014 "ua"
                                                                  :2015 "ua"
@@ -118,7 +127,14 @@
                                                                  :2012 "uac"
                                                                  :1990 "ua"
                                                                  :2000 "ua"}
-   :congressional-district                                      {:2012 "cd"
+   :congressional-district                                      {:103  "cd"
+                                                                 :104  "cd"
+                                                                 :105  "cd"
+                                                                 :106  "cd"
+                                                                 :107  "cd"
+                                                                 :108  "cd"
+                                                                 :109  "cd"
+                                                                 :110  "cd"
                                                                  :2013 "cd"
                                                                  :2014 "cd"
                                                                  :2015 "cd"
@@ -190,15 +206,16 @@
 
 ;; All together now
 
-(defn translateInts
-  [vec]
-  (map
-    (fn [v]
-      (if (false? (js/Number.isNaN (js/parseInt v 10)))
-        (js/parseInt v 10)
-        v))
-    vec))
-(map #(translateInts %) [["gz"] ["2010"] ["us"] ["970"] ["00"] ["500" "k"] ["zip"]])
+
+(comment
+  (defn translateInts
+    [vec]
+    (map
+      (fn [v]
+        (if (false? (js/Number.isNaN (js/parseInt v 10)))
+          (js/parseInt v 10)
+          v))
+      vec)))
 
 (defn verboseVintner
   [vec]
@@ -213,35 +230,56 @@
 (defn geoIDPartitioner
   [string]
   (->>
-    (s/split string #"_|\.")                                ;; => ["st01" "d90" "shp" "zip"]
-    (map #(re-seq #"[a-z]+|[0-9]+" %))                      ;; => (("st" "01") ("d" "90") ("shp") ("zip"))
-    (map (fn [y] (remove #(= "d" %) y)))                    ;; => (("st" "01") ("90") ("shp") ("zip"))
-    ;(map #(translateInts %)) ;; => not worth it (("st" 1) (90) ("shp") ("zip"))
-    (map #(verboseVintner %))
-    (map #(vec %))))                                        ;; => (["st" "01"] ["90"] ["shp"] ["zip"])
+    (s/split string #"_|\.")                                             ;; => ["st01" "d90" "shp" "zip"]
+    (map #(re-seq #"[a-z]+|[0-9]+" %))                                   ;; => (("st" "01") ("d" "90") ("shp") ("zip"))
+    (map (fn [y] (remove #(= "d" %) y)))                                 ;; => (("st" "01") ("90") ("shp") ("zip"))
+    (map-indexed #(if (zero? (mod (inc %1) 2 )) (verboseVintner %2) %2)) ;; only apply function to the 2nd item (vintage)
+    (map #(vec %))))                                                     ;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
 
 (str (name :01))
 
+(geoIDPartitioner "tb99_d00_shp.zip")
+
+(geoIDPartitioner "zt01_d00_shp.zip")
+
 (geoIDPartitioner "st01_d90_shp.zip")
 ;; => (["st" "01"] ["1990"] ["shp"] ["zip"])
+
 (geoIDPartitioner "rg99_d00_shp.zip")
 ;; => (["rg" "99"] ["2000"] ["shp"] ["zip"])
+
 (geoIDPartitioner "gz_2010_us_outline_500k.zip")
 ;; => (["gz"] ["2010"] ["us"] ["outline"] ["500" "k"] ["zip"])
+
 (geoIDPartitioner "cb_2012_us_uac10_500k.zip")
 ;; => (["cb"] ["2012"] ["us"] ["uac" "10"] ["500" "k"] ["zip"])
+
 (geoIDPartitioner "gz_2010_us_330_m1_500k.zip")
 ;; => (["gz"] ["2010"] ["us"] ["330"] ["m" "1"] ["500" "k"] ["zip"])
+
 (geoIDPartitioner "gz_2010_01_970_00_500k.zip")
 ;; => (["gz"] ["2010"] ["01"] ["970"] ["2000"] ["500" "k"] ["zip"])
+
 (geoIDPartitioner "cb_2014_us_nation_5m.zip")
 ;; => (["cb"] ["2014"] ["us"] ["nation"] ["5" "m"] ["zip"])
+
 (geoIDPartitioner "cb_2014_us_region_500k.zip")
 ;; => (["cb"] ["2014"] ["us"] ["region"] ["500" "k"] ["zip"])
+
 (geoIDPartitioner "cb_2014_01_tract_500k.zip")
 ;; => (["cb"] ["2014"] ["01"] ["tract"] ["500" "k"] ["zip"])
+
+(fileDirector ["cb"] ["2014"] ["01"] ["tract"] ["500" "k"] ["zip"])
+;; => "500k/2014/01/tract.json"
+
+(geoIDPartitioner "cd36_103_shp.zip")
+;; => (["cd" "36"] ["103"] ["shp"] ["zip"])
+
 (geoIDPartitioner "cb_rd13_us_cd113_500k.zip")
 ;; => (["cb"] ["rd" "13"] ["us"] ["cd" "113"] ["500" "k"] ["zip"])
+
+
+(geoIDPartitioner "cm_sa_96_shp.zip")
 
 (defn find1Key
   [vintage level [k v]]
@@ -255,60 +293,114 @@
   [vintage level]
   (apply str (remove nil? (map #(find1Key vintage level %) (seq (map-invert geoKeyMap))))))
 
-(keyFinder "2010" "970")
+(keyFinder "2013" "cd")
 ;; => ("state-legislative-district-'lower-chamber'")
 
 
+(comment (defn scopeHandler
+           [[vintage scope level res resMes & rest :as all] match?]
+           (cond
+             (not= "" (keyFinder vintage level))
+             (if (or (= scope "99") (= scope "us"))
+               (apply str (interpose "/" [(apply str res resMes) vintage (apply str (keyFinder vintage level) ".json")]))
+               (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str (keyFinder vintage level) ".json")]))) ;; works
+             (and (= "" (keyFinder vintage level)) (= match? true))
+             (if (or (= scope "99") (= scope "us"))
+               (apply str (interpose "/" [(apply str res resMes) vintage (apply str level ".json")]))
+               (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str level ".json")])))
+             (and (= "" (keyFinder vintage level)) (= match? false))
+             ;(apply str (interpose "/" [(butlast (flatten all))]) ".json")
+             nil)))
+
 (defn scopeHandler
-  [vintage scope level res resMes]
-  (if (or (= scope "99") (= scope "us"))
-    (apply str (interpose "/" [(apply str res resMes), vintage, (keyFinder vintage level)]))
-    (apply str (interpose "/" [(apply str res resMes), vintage, scope, (keyFinder vintage level)]))))
+  [[vintage scope level res resMes :as all]]
+  (if-not (= "" (keyFinder vintage level))
+    (if (or (= scope "99") (= scope "us"))
+      (apply str (interpose "/" [(apply str res resMes) vintage (apply str (keyFinder vintage level) ".json")]))
+      (apply str (interpose "/" [(apply str res resMes) vintage scope (apply str (keyFinder vintage level) ".json")]))) ;; works
+    nil))
+
+;; TODO: use this to resolve inconsistencies in file location (e.g., ZIPCODES) across vintages?
 
 (defun fileDirector
-  ([[level scope] [vintage] _        _]                                        (scopeHandler vintage scope level "500" "k"))
-  ([_             [vintage] [scope] ["outline"]   [res resMes] _]              (scopeHandler vintage scope "outline" res resMes))
-  ([_             [vintage] [scope] ["uac" "10"]  [res resMes] _]              (scopeHandler vintage scope "uac" res resMes))
-  ([_             [vintage] [scope] [level]       _            [res resMes] _] (scopeHandler vintage scope level res resMes))
-  ([_             [vintage] [scope] [level]       [res resMes] _]              (scopeHandler vintage scope level res resMes))
-  ([_             [vintage] [scope] [level]       [res resMes] _]              (scopeHandler vintage scope level res resMes))
-  ([_             _         [scope] [level "113"] [res resMes] _]              (scopeHandler "2012" scope level res resMes)))
-
-
-(apply fileDirector [["cb"] ["rd" "13"] ["us"] ["cd" "113"] ["500" "k"] ["zip"]])
+  ([[level scope] [vintage] _         _]                                         (scopeHandler [vintage scope level "500" "k"]))
+  ([_             [vintage] [scope]   ["outline"]   [res resMes] _]              (scopeHandler [vintage scope "outline" res resMes]))
+  ([_             [vintage] [scope]   ["uac" "10"]  [res resMes] _]              (scopeHandler [vintage scope "uac" res resMes]))
+  ([_             [vintage] [scope]   [level]       _            [res resMes] _] (scopeHandler [vintage scope level res resMes]))
+  ([_             [vintage] [scope]   [level]       [res resMes] _]              (scopeHandler [vintage scope level res resMes]))
+  ([_             [vintage] [scope]   [level]       [res resMes] _]              (scopeHandler [vintage scope level res resMes]))
+  ([_             _         [scope]   [level "113"] [res resMes] _]              (scopeHandler ["2012" scope level res resMes]))
+  ([& anything-else]  nil))
 
 (defn geoFileTrans
-  [s]
-  (->>
-    (geoIDPartitioner s)
-    (apply fileDirector)))
+  [string]
+  (if-let [answer (->>
+                    (geoIDPartitioner string)
+                    (apply fileDirector))]
+    answer
+    false)) ;; use the `false` here to trigger the fs to skip this file
+    ;(str (first (s/split string #"\.")) ".json"))) ;; just naively convert the filename to .json in flat folder
 
-(geoFileTrans "cb_rd13_us_cd113_500k.zip")
-;; => "500k/2012/congressional-district"
-(geoFileTrans "st01_d90_shp.zip")
-;; => "500k/1990/01/state"
-(geoFileTrans "rg99_d00_shp.zip")
-;; => "500k/2000/region"
-(geoFileTrans "gz_2010_us_outline_500k.zip")
-;; => "500k/2010/nation"
-(geoFileTrans "cb_2012_us_uac10_500k.zip")
-;; => "500k/2012/urban-area"
-(geoFileTrans "gz_2010_us_330_m1_500k.zip")
-;; => "500k/2010/combined-statistical-area"
-(geoFileTrans "gz_2010_01_970_00_500k.zip")
-;; => "500k/2010/01/school-district-'unified'"
-(geoFileTrans "cb_2014_us_nation_5m.zip")
-;; => "5m/2014/nation"
-(geoFileTrans "cb_2014_us_region_500k.zip")
-;; => "500k/2014/region"
-(geoFileTrans "cb_2014_01_tract_500k.zip")
-;; => "500k/2014/01/tract"
-(geoFileTrans "cb_rd13_us_cd113_500k.zip")
-;; => "500k/2012/congressional-district"
-
+;(defn geoFileTrans
+;  [s]
+;  (->>
+;    (geoIDPartitioner s)
+;    (apply fileDirector)))
 
 ;; `if-let`: if the value of condition is truthy, then that value is assigned to the definition, and "then" is evaluated.
 ;; Otherwise the value is NOT assigned to the definition, and "else" is evaluated.
 ;; In Clojure, anything that isn't either `false` or `nil` is "truthy".
+
+
+(geoFileTrans "tb99_d00_shp.zip")
+
+(geoFileTrans "zt01_d00_shp.zip")
+
+(geoFileTrans "cm_sa_96_shp.zip")
+
+(geoFileTrans "cmsa_96_shp.zip")
+
+(geoFileTrans "cb99_03a_shp.zip")
+
+(geoFileTrans "cb_2014_us_county_within_cd114_500k.zip")
+
+(geoFileTrans "cb_rd13_us_cd113_500k.zip")
+;; => "500k/2012/congressional-district.json"
+
+(geoFileTrans "st01_d90_shp.zip")
+;; => "500k/1990/01/state.json"
+
+(geoFileTrans "rg99_d00_shp.zip")
+;; => "500k/2000/region.json"
+
+(geoFileTrans "gz_2010_us_outline_500k.zip")
+;; => "500k/2010/nation.json"
+
+(geoFileTrans "cb_2012_us_uac10_500k.zip")
+;; => "500k/2012/urban-area.json"
+
+(geoFileTrans "gz_2010_us_330_m1_500k.zip")
+;; => "500k/2010/combined-statistical-area.json"
+
+(geoFileTrans "gz_2010_01_970_00_500k.zip")
+;; => "500k/2010/01/school-district-'unified'.json"
+
+(geoFileTrans "cb_2014_us_nation_5m.zip")
+;; => "5m/2014/nation.json"
+
+(geoFileTrans "cb_2014_us_region_500k.zip")
+;; => "500k/2014/region.json"
+
+(geoFileTrans "cb_2014_01_tract_500k.zip")
+;; => "500k/2014/01/tract.json"
+
+(geoFileTrans "cd36_103_shp.zip")
+;; => "500k/103/36/congressional-district.json"
+
+(geoFileTrans "cb_rd13_us_cd113_500k.zip")
+;; => "500k/2012/congressional-district.json"
+
+
+
 
 
