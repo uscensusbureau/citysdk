@@ -28,6 +28,7 @@
   "dependencies": {
     "dotenv": "^5.0.1",
     "node-dir": "^0.1.17",
+    "shpjs": "^3.4.2",
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {

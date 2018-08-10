@@ -123,9 +123,7 @@
                                  (put! port r))
               :error-handler   #(prn (str "ERROR: " %))
               :keywords?       true}]
-    (do
-      (GET url args)
-      port)))
+    (do (GET url args) port)))
 
 ;; When working with `core.async` it's important to understand what you expect the shape of your data flowing into your channels will look like. In the case below, a single request using `cljs-ajax` will return a list of results, so we deal with this list after it is retrieved rather than as part of the `chan` establishment. When we plan on using transducers as a way to treat a stream or flow of individual items as a collection **over time** via a channel, we can do so by adding such a transducer to the `chan` directly (e.g.: `let [port (chan 1 (xform-each-item))]`
 
@@ -235,13 +233,10 @@
 (defn get-features->put!->port
   [url port]
   (let [args {:response-format :json
-              :handler         (fn [r]
-                                 (put! port (get r :features)))
+              :handler         (fn [r] (put! port (get r :features)))
               :error-handler   #(prn (str "ERROR: " %))
               :keywords?       true}]
-    (do
-      (GET url args)
-      port)))
+    (do (GET url args) port)))
 
 
 (defn merge-geo-stats->map
@@ -273,10 +268,11 @@
         (js/console.log "done!")
         (close! =features=)
         (close! =stats=))))
-;
-;(merge-geo-stats->map {:vintage      "2016"
-;                       :sourcePath   ["acs" "acs5"]
-;                       :geoHierarchy {:state "01"
-;                                      :county "*"}
-;                       :values       ["B01001_001E"]
-;                       :statsKey     stats-key})
+
+(merge-geo-stats->map {:vintage      "2016"
+                       :sourcePath   ["acs" "acs5"]
+                       :geoHierarchy {:state "01"
+                                      :county "*"}
+                       :values       ["B01001_001E"]
+                       :statsKey     stats-key})
+                       ;; add `:predicates` and count them for `vars#`})
