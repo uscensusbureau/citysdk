@@ -1,7 +1,7 @@
 (ns geojson.core
   (:require [cljs.core.async
              :as async
-             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async]]
+             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async split]]
             [cljs.core.async :refer-macros [go go-loop alt!]]
             [ajax.core :as http :refer [GET POST]]
             [cognitect.transit :as t]
@@ -10,10 +10,11 @@
             [clojure.set :refer [map-invert]]
             [cljs.pprint :refer [pprint]]
             [defun.core :refer-macros [defun]]
-            ["dotenv" :as env]
             ["node-dir" :as dir]
             ["fs" :as fs]
             ["path" :as path]
+            ["shpjs" :as shpjs]
+            ["mkdirp" :as mkdirp]
             [clojure.repl :refer [source doc]]))
 
 
@@ -255,7 +256,8 @@
   "Consumes parts of the Tiger filename to compose a structured path for storage as a `.json` file."
   [[lev res m vin & etc]]
   (let [geopath (s/join "/" (list* vin etc))]
-    (s/join "/" [(apply str res m) geopath (apply str (keySearch vin lev) ".json")])))
+    {:filepath (str "./GeoJSON/" (s/join "/" [(apply str res m) geopath (apply str (keySearch vin lev) ".json")]))
+     :dirpath (str "./GeoJSON/" (s/join "/" [(apply str res m) geopath]))}))
 
 (parts->geopath ["county" "500" "k" "2000" "01"]) ;;  "500k/2000/01/.json"
 
@@ -285,7 +287,7 @@
   [string]
   (if-let [answer (->> (filename->>geoIDvecs string) (apply file=<<Director))] answer nil))  ;; use the `nil` here to trigger the fs to skip this file
 
-(comment ;; filename->>geopath  Examples
+(comment ; filename->>geopath
   (filename->>geopath "tb99_d00_shp.zip")
   ;; => nil
 
@@ -346,7 +348,10 @@
   (filename->>geopath "cd36_103_shp.zip")
   ;; => "500k/103/36/congressional-district.json"
 
-  (filename->>geopath "cb_rd13_us_cd113_500k.zip"))
+  (filename->>geopath "cb_rd13_us_cd113_500k.zip")
+  ;; => "500k/2012/congressional-district.json"
+
+  (filename->>geopath "cb_2013_01_cousub_500k.zip"))
   ;; => "500k/2012/congressional-district.json"
 
 
@@ -359,7 +364,7 @@
 
 
 (defn x-pathStr->>filename
-  "Transducer, which takes a vector of fully qualified path strings (returned from node `fs`) and pulls out the filename from the end."
+  "Transducer, which takes a fully qualified path string (returned from node `fs`) and pulls out the filename from the end."
   [rf]
   (fn
     ([] (rf))
@@ -380,40 +385,62 @@
 ;; - https://github.com/calvinmetcalf/shapefile-js
 ;; - if-let
 
-; transducify this:
-(defn getFileNames<-paths
-  [paths]
-  (->> (js/JSON.parse (fs/readFileSync paths "utf8")) ;; put this step into a chan
-       (map #(->> (s/split % #"\\") (last))))) ;; this becomes two transducers (->> signifies a transducible operation)
-
-(getFileNames<-paths ".\\test\\test10-abv.json")
-
-(last ["folder"])
-(apply #(s/split % ".") ["folder"])
+(into []
+      x-pathStr->>filename
+      (js/JSON.parse (fs/readFileSync ".\\test\\test10-abv.json" "utf8")))
 
 
-;; time for transducers
-(defn strPath->vecPath
-  "
-  A transducer, which converts a single path provided by node fs from a string to a vector of the path's components
-  "
-  ([string]
-   (fn [rf]
-     (fn
-       ([] (rf))
-       ([result] (rf result))
-       ([result item]
-        (rf result (s/split string #"\\") item))))))
+(defn x-path->geojson->fs
+  "Transducer, which takes a fully qualified path string (returned from node `fs`) tries to convert its last component (split by `\\`) into a geojson filepath (if the filename successfully passes through conversion). If conversion results in `nil` does nothing. If it returns a filepath, it uses the path string as input to `shpjs` library and outputs to the supplied geojson filepath."
+  [rf]
+  (fn
+    ([] (rf))
+    ([result] (rf result))
+    ([result input]
+     (rf result (let [=c= (chan)]
+                  (if-let
+                    [{:keys [filepath dirpath]} (->> (s/split input #"\\") (last) (filename->>geopath))]
+                    (do
+                      (go (mkdirp dirpath (js/console.log (str "Saved " filepath " to: " dirpath))))
+                      (go (.then (shpjs (fs/readFileSync input)) #(put! =c= %)))
+                      (go (fs/writeFileSync filepath (<! =c=))))
+                    (js/console.log (str "No bueno.")))
+                  (close! =c=))))))
 
-(transduce (strPath->vecPath "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\Directory_Contents_ReadMe.pdf") conj [])
+(into []
+      x-path->geojson->fs
+      (js/JSON.parse (fs/readFileSync ".\\test\\test10-abv.json" "utf8")))
+
+(.then
+  (shpjs (fs/readFile
+           "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+           "utf8"
+           (fn [err data]
+             (if err
+               (js/console.log (str "Error: " err))
+               data))))
+  (fn [geojson] (fs/writeFile
+                  "./GeoJSON/500k/2013/01/county-subdivision.json"
+                  geojson
+                  "utf8"
+                  #(js/console.log "wrote"))))
 
 
-(defn getShapeFilePaths->restructure
-  [source-path destination-path]
-  (let [=paths= (chan)]))
+(.then
+  (shpjs (fs/readFileSync "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))
+  #(js/console.log %))
 
 
-;
+
+(go (get->put!->port stats-call =stats=)
+    (pipeline-async 1 =merged= identity =stats=)
+    (fs/writeFileSync "./test/counties.json" (<! =merged=) (js/console.log "file saved")))
+
+;; (.then some-promise #(async/put! chan %))
+;; ^ something like that, and take the value out of the channel in a go block
+;; See reference: https://clojurians-log.clojureverse.org/clojurescript/2017-03-07/1488907938.022922
+
+
 ;(into [] x-vinter ["90" "blah"])
 
 ;([string]
