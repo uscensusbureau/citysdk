@@ -93,5 +93,7 @@
     <orderEntry type="library" name="Maven: defun:defun:0.3.0-RC1" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:core.match:0.3.0-alpha4" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:tools.macro:0.1.2" level="project" />
+    <orderEntry type="library" name="Maven: funcool:promesa:1.9.0" level="project" />
+    <orderEntry type="library" name="Maven: jamesmacaulay:cljs-promises:0.1.0" level="project" />
   </component>
 </module>
