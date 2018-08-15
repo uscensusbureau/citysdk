@@ -400,31 +400,75 @@
 ;; `(js/JSON.stringify <<output>>)`
 ;; ===============================================================
 
+(comment
+  (defn fsRead-zip->fsWrite-json
+    "A `core.async` asynchronous operation coordination function, which takes two string paths: `inpath` is a path to a zipfile containing a shapefile and related assets; The shapefile is converted to geojson and sent to the `outpath` as the destination folder."
+    [inpath outpath]
+    (let [=file= (chan 1)
+          =json= (chan 1)]
+      (do
+        (fs/readFile
+          inpath
+          (fn [err zip]
+            (if (= (type err) (type js/Error))
+              (throw err)
+              (put! =file= zip #(pprint "put! =file=")))))
+        (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=))))))
+        (take! =json=
+               (fn [json]
+                 (fs/writeFile
+                     outpath
+                     (js/JSON.stringify json)
+                     #(js/console.log "wrote")))))))
 
-(defn fsRead-zip->fsWrite-json
-  "A `core.async` asynchronous operation coordination function, which takes two string paths: `inpath` is a path to a zipfile containing a shapefile and related assets; The shapefile is converted to geojson and sent to the `outpath` as the destination folder."
-  [inpath outpath]
+  (fsRead-zip->fsWrite-json
+    "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+    "./GeoJSON/500k/2013/01/county-subdivision.json"))
+
+
+(defn fsRead-zip->fsWriteWDIR-json
+  "A `core.async` asynchronous operation coordination function, which takes a full string path to a zipfile containing a shapefile and related assets. The shapefile is converted to geojson and sent to a destination folder if the path contains a valid geopath (based on `filename->>geopath` function)."
+  [fullpath]
   (let [=file= (chan 1)
-        =json= (chan 1)]
-    (do
-      (fs/readFile
-        inpath
-        (fn [err zip]
-          (if (= (type err) (type js/Error))
-            (throw err)
-            (put! =file= zip #(pprint "put! =file=")))))
-      (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=))))))
-      (take! =json=
-             (fn [json]
-               (fs/writeFile
-                   outpath
-                   (js/JSON.stringify json)
-                   #(js/console.log "wrote")))))))
-
-(fsRead-zip->fsWrite-json
-  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-  "./GeoJSON/500k/2013/01/county-subdivision.json")
-
+        =json= (chan 1)
+        =dirpath= (chan 1)
+        =fullpath= (chan 1)]
+    (if-let
+      [{:keys [filepath dirpath]} (->> (s/split fullpath #"\\") (last) (filename->>geopath))]
+      (do
+        ;; async create directories if needed, then put dirpath into =dirpath= chan. Make sure to close!
+        (go (do (>! =dirpath= dirpath) (close! =dirpath=)))
+        ;; use pipeline-async to ensure order of chan functions, passing fullpath as a baton
+        (pipeline-async 1
+                        =fullpath= ;; out-bound chan
+                        (fn [path =fullpath=]
+                          (do
+                            (mkdirp path (put! =fullpath= fullpath)) ;; the most important part
+                            (close! =fullpath=)))
+                        =dirpath=) ;; in-bound chan (initiates function sequence above)
+        ;; take the fullpath from the out-bound pipeline-async =fullpath= chan
+        ;; then read in zip file, then put! onto =file= chan
+        (go (fs/readFile
+              (<! =fullpath=)
+              (fn [err zip]
+                (if (= (type err) (type js/Error))
+                  (throw err)
+                  (put! =file= zip #(pprint "put! =file="))))))
+        ;; <! from =file=, translate to geojson, convert from promise via <?, then >! to =json=
+        (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
+            (close! =file=))
+        (take! =json=
+               (fn [json]
+                 (do (fs/writeFile
+                       filepath
+                       (js/JSON.stringify json)
+                       #(js/console.log "wrote"))
+                     (close! =json=)))))
+      (go (close! =json=)
+          (close! =file=)))))
+;
+;(fsRead-zip->fsWriteWDIR-json
+;  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
 
 ;; ============================================================================
 
@@ -438,27 +482,9 @@
 ;;
 
 
-
-(defn x-path->geojson->fs
-  "Transducer, which takes a fully qualified path string (returned from node `fs`) tries to convert its last component (split by `\\`) into a geojson filepath (if the filename successfully passes through conversion). If conversion results in `nil` does nothing. If it returns a filepath, it uses the path string as input to `shpjs` library and outputs to the supplied geojson filepath."
-  [rf]
-  (fn
-    ([] (rf))
-    ([result] (rf result))
-    ([result input]
-     (rf result (let [=c= (chan)]
-                  (if-let
-                    [{:keys [filepath dirpath]} (->> (s/split input #"\\") (last) (filename->>geopath))]
-                    (do
-                      (go (mkdirp dirpath (js/console.log (str "Saved " filepath " to: " dirpath))))
-                      (go (.then (shpjs (fs/readFileSync input)) #(put! =c= %)))
-                      (go (fs/writeFileSync filepath (<! =c=))))
-                    (js/console.log (str "No bueno.")))
-                  (close! =c=))))))
-
-
 ;; -----------------------------------------------------------------------------------------
 
+;; TODO: Map over all the files in the test.json abr for a test of functionality
 
 ;;                         Y8b           ,e, 888 Y8b        ,e,                Y8b          888                         Y8b
 ;; 888-~88e  e88~-_         Y8b 888-~88e  "  888  Y8b        "  888-~88e        Y8b  e88~~\ 888-~88e   /~~~8e  888-~88e  Y8b
@@ -513,22 +539,6 @@
 
 
 
-
-(comment
-  (go
-    (let [=paths= (chan)]
-      (go (fs/readFile source-path "utf8"
-                       (fn [err data]
-                         (if err
-                           (go (>! =paths= err))
-                           (go (>! =paths= (js/JSON.parse data)))))))
-      (go (map (fn [path] (go (let [filename (->> (s/split path "\\") (last))
-                                    fileExtn (->> (s/split filename ".") (last))]
-                                (if (= fileExtn "zip")
-                                  (js/console.log "zipper!")
-                                  (js/console.log (str "fileExtn: " fileExtn))))))
-               (<! =paths=))))))
-
 ;; test on this C:\Users\Surface\Downloads\www2.census.gov\geo\tiger\GENZ2012\ua
 
 ;;                   ,e,                       d8
@@ -540,6 +550,7 @@
 ;;  888
 
 ;; inspired by: https://github.com/georgewsinger/cljs-callback-heaven
+
 (defn getShpFilePaths
   "
   Get full path and filenames for a given source-path
