@@ -3,15 +3,10 @@
              :as async
              :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async split]
              :refer-macros [go go-loop alt!]]
-            [ajax.core :as http :refer [GET POST]]
-            [cognitect.transit :as t]
-            [oops.core :as obj]
             [clojure.string :as s]
             [clojure.set :refer [map-invert]]
             [cljs.pprint :refer [pprint]]
             [defun.core :refer-macros [defun]]
-            [promesa.core :as p]
-            [promesa.async-cljs :refer-macros [async]]
             [cljs-promises.core :as cp]
             [cljs-promises.async
              :as cpa
@@ -392,12 +387,57 @@
 ;; - https://github.com/calvinmetcalf/shapefile-js
 ;; - if-let
 
-(into []
-      x-pathStr->>filename
-      (js/JSON.parse (fs/readFileSync ".\\test\\test10-abv.json" "utf8")))
+;(into []
+;      x-pathStr->>filename
+;      (js/JSON.parse (fs/readFileSync ".\\test\\test10-abv.json" "utf8")))
 
 
-;; TODO: Use Promesa for this
+;; =================== IMPORTANT NOTE ==========================
+;; If the written file is showing up as `[object Object]` it might
+;; be due to it being stored as the representation of a js object
+;; instead of the actual content therein. This got me stuck for a
+;; long time!!! Solved by wrapping the desired output like so:
+;; `(js/JSON.stringify <<output>>)`
+;; ===============================================================
+
+
+(defn fsRead-zip->fsWrite-json
+  "A `core.async` asynchronous operation coordination function, which takes two string paths: `inpath` is a path to a zipfile containing a shapefile and related assets; The shapefile is converted to geojson and sent to the `outpath` as the destination folder."
+  [inpath outpath]
+  (let [=file= (chan 1)
+        =json= (chan 1)]
+    (do
+      (fs/readFile
+        inpath
+        (fn [err zip]
+          (if (= (type err) (type js/Error))
+            (throw err)
+            (put! =file= zip #(pprint "put! =file=")))))
+      (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=))))))
+      (take! =json=
+             (fn [json]
+               (fs/writeFile
+                   outpath
+                   (js/JSON.stringify json)
+                   #(js/console.log "wrote")))))))
+
+(fsRead-zip->fsWrite-json
+  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+  "./GeoJSON/500k/2013/01/county-subdivision.json")
+
+
+;; ============================================================================
+
+
+;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;;       888     d888   \  888   \   d888   \
+;;       888    88888    | 888    | 88888    |
+;;       888    88888    | 888    | 88888    |
+;;       888     Y888   /  888   /   Y888   /
+;;       888      `88_-~   888_-~     `88_-~
+;;
+
+
 
 (defn x-path->geojson->fs
   "Transducer, which takes a fully qualified path string (returned from node `fs`) tries to convert its last component (split by `\\`) into a geojson filepath (if the filename successfully passes through conversion). If conversion results in `nil` does nothing. If it returns a filepath, it uses the path string as input to `shpjs` library and outputs to the supplied geojson filepath."
@@ -416,175 +456,6 @@
                     (js/console.log (str "No bueno.")))
                   (close! =c=))))))
 
-(into []
-      x-path->geojson->fs
-      (js/JSON.parse (fs/readFileSync ".\\test\\test10-abv.json" "utf8")))
-
-(.then
-  (shpjs (fs/readFile
-           "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-           "utf8"
-           (fn [err data]
-             (if err
-               (js/console.log (str "Error: " err))
-               data))))
-  (fn [geojson] (fs/writeFile
-                  "./GeoJSON/500k/2013/01/county-subdivision.json"
-                  geojson
-                  "utf8"
-                  #(js/console.log "wrote"))))
-
-;; Works
-(.then
-  (shpjs (fs/readFileSync "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))
-  #(js/console.log %))
-
-;; test 1
-
-
-;; see examples: https://blog.jeaye.com/2017/09/30/clojurescript-promesa/
-;; https://stackoverflow.com/questions/17645478/node-js-how-to-read-a-file-and-then-write-the-same-file-with-two-separate-functi
-;; https://stackoverflow.com/questions/39732076/how-to-bind-the-resolved-value-of-javascript-promise-in-clojurescript#comment66818230_39742698
-;; https://github.com/jamesmacaulay/cljs-promises
-;; https://clojureverse.org/t/any-pointer-to-make-clojurescript-javascript-interop-work-with-promise-library/1744
-
-;; works with `fs/readFileSync, but...
-
-(defn x-shp->json
-  [rf]
-  (fn
-    ([] (rf))
-    ([result] (rf result))
-    ([result input] (rf result (-> (shpjs input)
-                                   (.then (fn [_ data] data)))))))
-
-(defn x-json->save
-  [rf]
-  (fn
-    ([] (rf))
-    ([result] (rf result))
-    ([result input] (rf result (fs/writeFile
-                                 "./GeoJSON/500k/2013/01/county-subdivision5.json"
-                                 input
-                                 #(js/console.log "wrote"))))))
-
-
-;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;;       888     d888   \  888   \   d888   \
-;;       888    88888    | 888    | 88888    |
-;;       888    88888    | 888    | 88888    |
-;;       888     Y888   /  888   /   Y888   /
-;;       888      `88_-~   888_-~     `88_-~
-;;                                             
-
-
-;; TODO: SOOOOOOOOO CLOOOOOOOOOOOOOSE!
-(let [=file= (chan 1)
-      =json= (chan 1)]
-  (fs/readFile "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-                  (fn [err zip]
-                    (if (= (type err) (type js/Error))
-                      (throw err)
-                      (go (>! =file= zip)))))
-  (go (pprint (<? (cpa/pair-port (shpjs (<! =file=)))))))
-
-
-
-
-
-
-;; https://blog.jeaye.com/2017/09/30/clojurescript-promesa/ ---------------
-;(defmacro await-> [thenable & thens]
-;  `(-> ~thenable
-;       ~@thens
-;       ~'js/Promise.resolve
-;       p/await))
-;; ------------------------------------------------------------------------
-
-;; ==== This works, but returns the actual zip file instead of geojson ====
-(defn shp->fs->json
-  [srcPath cbk]
-  (shpjs (fs/readFile
-           srcPath
-           "utf8"
-           (fn [err json]
-             (if (= (type err) (type js/Error))
-               (throw err)
-               (cbk json))))))
-
-(defn json->fs->save
-  [srcPath savPath]
-  (shp->fs->json srcPath
-                 (fn [json]
-                   (fs/writeFile
-                     savPath
-                     json
-                     #(js/console.log "wrote")))))
-
-(json->fs->save
-  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-  "./GeoJSON/500k/2013/01/county-subdivision3.json")
-
-;; ============================================================================
-
-(go
-  (let [[value _] (pair-port
-                    (shpjs (fs/readFile
-                             "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-                             "utf8"
-                             (fn [err json]
-                               (if (= (type err) (type js/Error))
-                                 (throw err)
-                                 json)))))]
-    (try
-      ;(fs/writeFile
-      ;  "./GeoJSON/500k/2013/01/county-subdivision4.json"
-      ;  (<? value)
-      ;  #(js/console.log "wrote"))
-      (js/console.log (<? value))
-      (catch js/Error e
-        (js/console.log (str "bogus: " (ex-message e)))))))
-
-
-
-(-> (shpjs (fs/readFile
-             "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-             (fn [_ data]
-               data)))
-    (.then (fn [_ geojson] (fs/writeFile
-                             "./GeoJSON/500k/2013/01/county-subdivision4.json"
-                             geojson
-                             #(js/console.log "wrote")))))
-
-
-;; Works
-(async
-  (p/alet [geojson
-           (->
-             (shpjs (fs/readFileSync "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))
-             js/Promise.resolve
-             p/await)]
-          (js/console.log geojson)))
-
-
-(go
-  (let [geojson (cpa/value-port (shpjs (fs/readFileSync "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")))]
-    (try
-      (js/console.log (<? geojson))
-      (catch js/Error e
-        (js/console.log (str "Bloop: " (ex-message e)))))))
-
-(async
-  (p/alet [geojson
-           (->
-             (shpjs (fs/readFileSync
-                      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))
-             js/Promise.resolve
-             p/await)]
-    (fs/writeFile "./GeoJSON/500k/2013/01/county-sub.json"
-       geojson
-       "utf8"
-       #(js/console.log "wrote"))))
 
 ;; -----------------------------------------------------------------------------------------
 
@@ -598,58 +469,6 @@
 ;;
 ;;
 
-(-> (shpjs (fs/readFileSync "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))
-    (.then (fn [promisedata] (js/Promise.resolve promisedata)))
-    (.then #(js/console.log %)))
-    ;(.then  (fn [geojson]
-    ;          (fs/writeFile "./GeoJSON/500k/2013/01/county-subdivision.json"
-    ;            geojson
-    ;            "utf8"
-    ;            #(js/console.log "wrote")))))
-
-
-
-(.then
-  (.then
-    (shpjs
-      (fs/readFile "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-                   (fn [err data]
-                     (if err
-                       (js/console.log (str "Error: " err))
-                       data))))
-    (fn [promisedata]
-      promisedata))
-  (fn [geojson]
-    (fs/writeFile "./GeoJSON/500k/2013/01/county-subdivision.json"
-                   geojson
-                   "utf8"
-                   #(js/console.log "wrote"))))
-
-
-
-
-(go
-  (let [[err data] (<! (.then (shpjs (io/aslurp "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))))]
-    (if-not err
-      (js/console.log data)
-      (js/console.log "bloop"))))
-
-;; Doesn't work... yet
-(go
-  (.then
-    (shpjs (slurp "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"))
-    #(fs/writeFile
-       "./GeoJSON/500k/2013/01/county-subdivision.json"
-       %
-       "utf8"
-       (fn [err]
-         (js/console.log "wrote")))))
-
-
-
-(go (get->put!->port stats-call =stats=)
-    (pipeline-async 1 =merged= identity =stats=)
-    (fs/writeFileSync "./test/counties.json" (<! =merged=) (js/console.log "file saved")))
 
 ;; (.then some-promise #(async/put! chan %))
 ;; ^ something like that, and take the value out of the channel in a go block
