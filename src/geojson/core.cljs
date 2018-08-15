@@ -400,8 +400,8 @@
 ;; `(js/JSON.stringify <<output>>)`
 ;; ===============================================================
 
-(comment
-  (defn fsRead-zip->fsWrite-json
+(comment ;; this version can handle a single source-path -> destination-path transformation
+  (defn fsRead1-zip->fsWrite-json
     "A `core.async` asynchronous operation coordination function, which takes two string paths: `inpath` is a path to a zipfile containing a shapefile and related assets; The shapefile is converted to geojson and sent to the `outpath` as the destination folder."
     [inpath outpath]
     (let [=file= (chan 1)
@@ -421,10 +421,18 @@
                      (js/JSON.stringify json)
                      #(js/console.log "wrote")))))))
 
-  (fsRead-zip->fsWrite-json
+  (fsRead1-zip->fsWrite-json
     "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
     "./GeoJSON/500k/2013/01/county-subdivision.json"))
 
+;; =================== IMPORTANT NOTE ==========================
+;; The pipeline-async function is used below in an unconventional
+;; manner. Instead of it being used primarily to subject some input
+;; from a channel to an asynchronous function and then passing the
+;; resulting transformation to an out-bound channel, it's primarily
+;; used as a coordination device to ensure the file directories are
+;; created before the filesystem tries to create files within.
+;; ===============================================================
 
 (defn fsRead-zip->fsWriteWDIR-json
   "A `core.async` asynchronous operation coordination function, which takes a full string path to a zipfile containing a shapefile and related assets. The shapefile is converted to geojson and sent to a destination folder if the path contains a valid geopath (based on `filename->>geopath` function)."
@@ -432,20 +440,23 @@
   (let [=file= (chan 1)
         =json= (chan 1)
         =dirpath= (chan 1)
-        =fullpath= (chan 1)]
+        =fullpath= (chan 1)
+        =as-pipe= (fn [dirpath* =fullpath=]
+                    (do
+                      (mkdirp dirpath* (put! =fullpath= fullpath)) ;; the most important part
+                      (close! =fullpath=)))]
     (if-let
       [{:keys [filepath dirpath]} (->> (s/split fullpath #"\\") (last) (filename->>geopath))]
       (do
-        ;; async create directories if needed, then put dirpath into =dirpath= chan. Make sure to close!
+        ;; To kick things off, async create directories if needed,
+        ;; then put dirpath into =dirpath= chan. Make sure to close!
         (go (do (>! =dirpath= dirpath) (close! =dirpath=)))
-        ;; use pipeline-async to ensure order of chan functions, passing fullpath as a baton
+        ;; use pipeline-async to ensure order of chan functions,
+        ;; passing fullpath as the coordination baton,
         (pipeline-async 1
-                        =fullpath= ;; out-bound chan
-                        (fn [path =fullpath=]
-                          (do
-                            (mkdirp path (put! =fullpath= fullpath)) ;; the most important part
-                            (close! =fullpath=)))
-                        =dirpath=) ;; in-bound chan (initiates function sequence above)
+                        =fullpath= ; to
+                        =as-pipe=  ; make directory and pass fullpath to next step
+                        =dirpath=) ; from
         ;; take the fullpath from the out-bound pipeline-async =fullpath= chan
         ;; then read in zip file, then put! onto =file= chan
         (go (fs/readFile
@@ -454,9 +465,12 @@
                 (if (= (type err) (type js/Error))
                   (throw err)
                   (put! =file= zip #(pprint "put! =file="))))))
-        ;; <! from =file=, translate to geojson, convert from promise via <?, then >! to =json=
+        ;; <! zipfile from =file= chan, translate to geojson, convert
+        ;; the promise returned from shpjs via the cljs-promise <? macro,
+        ;; then >! resulting geojson to =json= chan
         (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
             (close! =file=))
+        ;; take! the geojson and write to the filepath, then close! =json=
         (take! =json=
                (fn [json]
                  (do (fs/writeFile
@@ -464,12 +478,55 @@
                        (js/JSON.stringify json)
                        #(js/console.log "wrote"))
                      (close! =json=)))))
-      (go (close! =json=)
-          (close! =file=)))))
+      (go (close! =file=)
+          (close! =json=)
+          (close! =dirpath=)
+          (close! =fullpath=)))))
 ;
-;(fsRead-zip->fsWriteWDIR-json
-;  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
+(fsRead-zip->fsWriteWDIR-json
+  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
 
+(defn megaShpGeoJSONConverter
+  "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
+  [path-to-list-of-files]
+  (let [=filepaths= (chan 1)
+        =to= (chan 1)
+        =from= (chan 1)]
+    (go (fs/readFile
+         path-to-list-of-files
+         (fn [err list]
+           (if (= (type err) (type js/Error))
+             (throw err)
+             (put! =filepaths= (js->clj (js/JSON.parse list)))))))
+    (pipeline-async
+      1
+      =to=
+      (take! =filepaths= (fn [filepaths])
+                   (map #(js/console.log (str "filepath: " %)) filepaths)))))
+;      =from=
+;
+;
+;
+;
+;
+;    (do (fs/readFile
+;          path-to-list-of-files
+;          (fn [err list]
+;            (if (= (type err) (type js/Error))
+;              (throw err)
+;              (put! =filepaths= (js->clj (js/JSON.parse list))))))
+;        (take! =filepaths= (fn [filepaths]
+;                             (map #(js/console.log (str "filepath: " %)) filepaths)))
+;        (close! =filepaths=)))
+;
+;(megaShpGeoJSONConverter "./test/test10-abv.json")
+;
+;(fs/readFile
+;  "./test/test10-abv.json"
+;  (fn [err list]
+;    (if (= (type err) (type js/Error))
+;      (throw err)
+;      (js/console.log (js/JSON.parse list)))))
 ;; ============================================================================
 
 
@@ -486,14 +543,7 @@
 
 ;; TODO: Map over all the files in the test.json abr for a test of functionality
 
-;;                         Y8b           ,e, 888 Y8b        ,e,                Y8b          888                         Y8b
-;; 888-~88e  e88~-_         Y8b 888-~88e  "  888  Y8b        "  888-~88e        Y8b  e88~~\ 888-~88e   /~~~8e  888-~88e  Y8b
-;; 888  888 d888   i            888  888 888 888            888 888  888            d888    888  888       88b 888  888
-;; 888  888 8888   |            888  888 888 888            888 888  888            8888    888  888  e88~-888 888  888
-;; 888  888 Y888   '            888  888 888 888            888 888  888            Y888    888  888 C888  888 888  888
-;; 888  888  "88_-~             888  888 888 888            888 888  888             "88__/ 888  888  '88_-888 888  888
-;;
-;;
+
 
 
 ;; (.then some-promise #(async/put! chan %))
