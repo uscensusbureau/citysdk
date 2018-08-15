@@ -434,6 +434,9 @@
 ;; created before the filesystem tries to create files within.
 ;; ===============================================================
 
+
+;; Works, but has issues with a race condition, seemingly between the creation of the folders and the files.
+
 (defn fsRead-zip->fsWriteWDIR-json
   "A `core.async` asynchronous operation coordination function, which takes a full string path to a zipfile containing a shapefile and related assets. The shapefile is converted to geojson and sent to a destination folder if the path contains a valid geopath (based on `filename->>geopath` function)."
   [fullpath]
@@ -483,8 +486,84 @@
           (close! =dirpath=)
           (close! =fullpath=)))))
 ;
-(fsRead-zip->fsWriteWDIR-json
-  "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
+(fsRead-zip->fsWriteWDIR-json "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
+
+
+
+
+
+
+;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;;       888     d888   \  888   \   d888   \
+;;       888    88888    | 888    | 88888    |
+;;       888    88888    | 888    | 88888    |
+;;       888     Y888   /  888   /   Y888   /
+;;       888      `88_-~   888_-~     `88_-~
+;;
+
+;; TODO: Consider making two passes: 1) to create the folder structures and 2) to create the files... solve race consdition.
+
+
+
+
+(defn fsRead-zip->fsWriteWDIR-json2
+  "A `core.async` asynchronous operation coordination function, which takes a full string path to a zipfile containing a shapefile and related assets. The shapefile is converted to geojson and sent to a destination folder if the path contains a valid geopath (based on `filename->>geopath` function)."
+  [fullpath]
+  (if-let
+    [{:keys [filepath dirpath]} (->> (s/split fullpath #"\\") (last) (filename->>geopath))]
+    (go
+      (let [=file= (chan 1)
+            =json= (chan 1)
+            =dirpath= (chan 1)
+            =fullpath= (chan 1)
+            =as-pipe= (fn [dirpath* =fullpath=]
+                        (go
+                          (mkdirp dirpath* (>! =fullpath= fullpath)) ;; the most important part
+                          (close! =fullpath=)))]
+
+        (do (>! =dirpath= dirpath) (close! =dirpath=))
+        (pipeline-async 1
+                        =fullpath=
+                        =as-pipe=
+                        =dirpath=)
+        (fs/readFile
+          (<! =fullpath=)
+          (fn [err zip]
+            (if (= (type err) (type js/Error))
+              (throw err)
+              (go (>! =file= zip)))))
+        (do (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
+            (close! =file=))
+        (do (fs/writeFile
+                filepath
+                (js/JSON.stringify (<! =json=))
+                #(js/console.log "wrote"))
+            (close! =json=))))
+    (js/console.log "bloop")))
+
+
+(map #(fsRead-zip->fsWriteWDIR-json2 %) ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip",
+                                         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_county_within_ua_500k.zip",
+                                         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip",
+                                         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
+                                         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 (defn megaShpGeoJSONConverter
   "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
@@ -528,16 +607,6 @@
 ;      (throw err)
 ;      (js/console.log (js/JSON.parse list)))))
 ;; ============================================================================
-
-
-;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;;       888     d888   \  888   \   d888   \
-;;       888    88888    | 888    | 88888    |
-;;       888    88888    | 888    | 88888    |
-;;       888     Y888   /  888   /   Y888   /
-;;       888      `88_-~   888_-~     `88_-~
-;;
-
 
 ;; -----------------------------------------------------------------------------------------
 
