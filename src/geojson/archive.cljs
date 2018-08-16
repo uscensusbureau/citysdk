@@ -1,4 +1,4 @@
-(ns geojson.core
+(ns geojson.archive
   (:require [cljs.core.async
              :as async
              :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async split]
@@ -12,7 +12,7 @@
              :refer [pair-port]
              :refer-macros [<?]]
             ["node-dir" :as dir]
-            ["fs-extra" :as fs]
+            ["fs" :as fs]
             ["child_process" :as child]
             ["path" :as path]
             ["shpjs" :as shpjs]
@@ -596,25 +596,25 @@
       "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
       "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
 
-; MADE MOOT BY FS-EXTRA NPM LIBRARY
-;(defn mkdirp!
-;  "
-;  Like the NPM mkdirp, but takes a file path string (the file to be created), a
-;  directory path string (the file path minus the file name) and an input `chan`
-;  and puts the file path to that channel when done making the directory. This is
-;  used as an async coordinator to halts later file-writing processes via
-;  internal `(go...)` block.
-;  "
-;  [=file-path= file-path dir-path]
-;  (go (mkdirp dir-path (>! =file-path= file-path))))
-;
-;#_(let [=file-path= (chan 1)]
-;    (go (mkdirp! =file-path= "./test/mkdirp!/file.name" "./test/mkdirp2!/")
-;        (pprint (<! =file-path=))
-;        (close! =file-path=)))
-;
-;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
-;;"Done mkdirp: ./test/mkdirp!/"
+
+(defn mkdirp!
+  "
+  Like the NPM mkdirp, but takes a file path string (the file to be created), a
+  directory path string (the file path minus the file name) and an input `chan`
+  and puts the file path to that channel when done making the directory. This is
+  used as an async coordinator to halts later file-writing processes via
+  internal `(go...)` block.
+  "
+  [=file-path= file-path dir-path]
+  (go (mkdirp dir-path (>! =file-path= file-path))))
+
+#_(let [=file-path= (chan 1)]
+    (go (mkdirp! =file-path= "./test/mkdirp!/file.name" "./test/mkdirp2!/")
+        (pprint (<! =file-path=))
+        (close! =file-path=)))
+
+;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
+;"Done mkdirp: ./test/mkdirp!/"
 
 (defn fsR!
   "
@@ -655,20 +655,20 @@
   2. .zip file to be converted to GeoJSON
   "
   [=json= zip]
-  (go (>! =json= (<? (cpa/value-port (shpjs zip))))))
+  (go (>! =json= (<? (cpa/pair-port (shpjs zip))))))
 
-#_(let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
-    (go
-      (mkdirp!
-        =file-path=
-        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
-        "./test/mkdirp!/")
-      (fsR! =zip= (<! =file-path=))
-      (close! =file-path=)
-      (zip->>json! =json= (<! =zip=))
-      (close! =zip=)
-      (js/console.log (js/JSON.stringify (<! =json=)))
-      (close! =json=)))
+(let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+  (go
+    (mkdirp!
+      =file-path=
+      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
+      "./test/mkdirp!/")
+    (fsR! =zip= (<! =file-path=))
+    (close! =file-path=)
+    (zip->>json! =json= (<! =zip=))
+    (close! =zip=)
+    (js/console.log (js/JSON.stringify (<! =json=)))
+    (close! =json=)))
 
 ;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;{"type":"FeatureCollection","features":[{"type":"Feature", ... GeoJSON!
@@ -680,9 +680,9 @@
   2) file path to store GeoJSON to
   1) GeoJSON
   "
-  [outpath =json=]
-  (go (fs/outputJson
-        outpath
+  [filepath =json=]
+  (go (fs/writeFile
+        filepath
         (js/JSON.stringify (<! =json=))
         #(js/console.log "Wrote GeoJSON to: " filepath))
       (close! =json=)))

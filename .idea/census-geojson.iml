@@ -59,10 +59,6 @@
     <orderEntry type="library" name="Maven: net.incongru.watchservice:barbary-watchservice:1.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:3.2.2" level="project" />
     <orderEntry type="library" name="Maven: thheller:shadow-cljsjs:0.0.15" level="project" />
-    <orderEntry type="library" name="Maven: proto-repl:proto-repl:0.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.clojure:tools.namespace:0.2.11" level="project" />
-    <orderEntry type="library" name="Maven: compliment:compliment:0.2.7" level="project" />
-    <orderEntry type="library" name="Maven: defprecated:defprecated:0.1.3" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:core.async:0.4.474" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:tools.analyzer.jvm:0.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:tools.analyzer:0.6.9" level="project" />
@@ -73,6 +69,7 @@
     <orderEntry type="library" name="Maven: cljs-http:cljs-http:0.1.45" level="project" />
     <orderEntry type="library" name="Maven: noencore:noencore:0.3.3" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.10" level="project" />
+    <orderEntry type="library" name="Maven: org.clojure:tools.namespace:0.2.11" level="project" />
     <orderEntry type="library" name="Maven: cljs-ajax:cljs-ajax:0.7.3" level="project" />
     <orderEntry type="library" name="Maven: cheshire:cheshire:5.7.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.6" level="project" />
@@ -93,7 +90,6 @@
     <orderEntry type="library" name="Maven: defun:defun:0.3.0-RC1" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:core.match:0.3.0-alpha4" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:tools.macro:0.1.2" level="project" />
-    <orderEntry type="library" name="Maven: funcool:promesa:1.9.0" level="project" />
     <orderEntry type="library" name="Maven: jamesmacaulay:cljs-promises:0.1.0" level="project" />
   </component>
 </module>
