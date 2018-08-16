@@ -12,11 +12,10 @@
              :refer [pair-port]
              :refer-macros [<?]]
             ["node-dir" :as dir]
-            ["fs-extra" :as fs]
-            ["child_process" :as child]
+            ["fs-extra" :as fs] ;; If all else fails, use this and...
             ["path" :as path]
             ["shpjs" :as shpjs]
-            ["mkdirp" :as mkdirp]
+            ["mkdirp" :as mkdirp] ;; remove this (redundant).
             [clojure.repl :refer [source doc]]))
 
 ;;       /                    888  /                          e    e

@@ -12,8 +12,7 @@
              :refer [pair-port]
              :refer-macros [<?]]
             ["node-dir" :as dir]
-            ["fs" :as fs]
-            ["child_process" :as child]
+            ["fs" :as fs] ;; if basic `fs` works, `npm uninstall fs-extra`
             ["path" :as path]
             ["shpjs" :as shpjs]
             ["mkdirp" :as mkdirp]
