@@ -1,6 +1,5 @@
 (ns geojson.archive
   (:require [cljs.core.async
-             :as async
              :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async split]
              :refer-macros [go go-loop alt!]]
             [clojure.string :as s]
@@ -11,7 +10,6 @@
              :as cpa
              :refer [pair-port]
              :refer-macros [<?]]
-            ["node-dir" :as dir]
             ["fs" :as fs] ;; if basic `fs` works, `npm uninstall fs-extra`
             ["path" :as path]
             ["shpjs" :as shpjs]
@@ -235,12 +233,11 @@
   Takes a single string and returns a vector of vectors.
   "
   [string]
-  (->>
-    (s/split string #"_|\.")
-    (map #(re-seq #"[a-z]+|[0-9]+" %))
-    (map (fn [y] (remove #(= "d" %) y)))
-    (map-target-idx ii->vin 2)
-    (map #(vec %))))
+  (->> (s/split string #"_|\.")
+       (map #(re-seq #"[a-z]+|[0-9]+" %))
+       (map (fn [y] (remove #(= "d" %) y)))
+       (map-target-idx ii->vin 2)
+       (map #(vec %))))
 
 ;; (filename->>geoIDvecs "cb_d00_01_county_within_ua_500k.zip")
 ;; => (["cb"] ["2000"] ["01"] ["county"] ["within"] ["ua"] ["500" "k"] ["zip"])
@@ -254,9 +251,7 @@
   "
   [vintage level [k v]]
   (if-let [[_ v2] (find k (keyword vintage))]
-    (if (= v2 level)
-      (name v)
-      nil)
+    (if (= v2 level) (name v) nil)
     nil))
 
 (defn keySearch
@@ -473,130 +468,115 @@
 
 ;; Works, but has issues with a race condition, seemingly between the creation of the folders and the files.
 
-(defn fsRead-zip->fsWriteWDIR-json
-  "
+#_(defn fsRead-zip->fsWriteWDIR-json
+    "
   A `core.async` asynchronous operation coordination function, which takes a
   full string path to a zipfile containing a shapefile and related assets. The
   shapefile is converted to geojson and sent to a destination folder if the path
   contains a valid geopath (based on `filename->>geopath` function).
   "
-  [fullpath]
-  (let [=file= (chan 1)
-        =json= (chan 1)
-        =dirpath= (chan 1)
-        =fullpath= (chan 1)
-        =as-pipe= (fn [dirpath* =fullpath=]
-                    (do
-                      (mkdirp dirpath* (put! =fullpath= fullpath)) ;; the most important part
-                      (close! =fullpath=)))]
+    [fullpath]
+    (let [=file= (chan 1)
+          =json= (chan 1)
+          =dirpath= (chan 1)
+          =fullpath= (chan 1)
+          =as-pipe= (fn [dirpath* =fullpath=]
+                      (do
+                        (mkdirp dirpath* (put! =fullpath= fullpath)) ;; the most important part
+                        (close! =fullpath=)))]
+      (if-let
+        [{:keys [filepath dirpath]} (->> (s/split fullpath #"\\") (last) (filename->>geopath))]
+        (do
+          ;; To kick things off, async create directories if needed,
+          ;; then put dirpath into =dirpath= chan. Make sure to close!
+          (go (do (>! =dirpath= dirpath) (close! =dirpath=)))
+          ;; use pipeline-async to ensure order of chan functions,
+          ;; passing fullpath as the coordination baton,
+          (pipeline-async 1
+                          =fullpath= ; to
+                          =as-pipe=  ; make directory and pass fullpath to next step
+                          =dirpath=) ; from
+          ;; take the fullpath from the out-bound pipeline-async =fullpath= chan
+          ;; then read in zip file, then put! onto =file= chan
+          (go (fs/readFile
+                (<! =fullpath=)
+                (fn [err zip]
+                  (if (= (type err) (type js/Error))
+                    (throw err)
+                    (put! =file= zip #(pprint "put! =file="))))))
+          ;; <! zipfile from =file= chan, translate to geojson, convert
+          ;; the promise returned from shpjs via the cljs-promise <? macro,
+          ;; then >! resulting geojson to =json= chan
+          (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
+              (close! =file=))
+          ;; take! the geojson and write to the filepath, then close! =json=
+          (take! =json=
+                 (fn [json]
+                   (do (fs/writeFile
+                         filepath
+                         (js/JSON.stringify json)
+                         #(js/console.log "wrote"))
+                       (close! =json=)))))
+        (go (close! =file=)
+            (close! =json=)
+            (close! =dirpath=)
+            (close! =fullpath=)))))
+;
+#_(fsRead-zip->fsWriteWDIR-json "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
+
+
+
+
+#_(defn fsRead-zip->fsWriteWDIR-json2
+    "
+  A `core.async` asynchronous operation coordination function, which takes a
+  full string path to a zipfile containing a shapefile and related assets. The
+  shapefile is converted to geojson and sent to a destination folder if the path
+  contains a valid geopath (based on `filename->>geopath` function).
+  "
+    [fullpath]
     (if-let
       [{:keys [filepath dirpath]} (->> (s/split fullpath #"\\") (last) (filename->>geopath))]
-      (do
-        ;; To kick things off, async create directories if needed,
-        ;; then put dirpath into =dirpath= chan. Make sure to close!
-        (go (do (>! =dirpath= dirpath) (close! =dirpath=)))
-        ;; use pipeline-async to ensure order of chan functions,
-        ;; passing fullpath as the coordination baton,
-        (pipeline-async 1
-                        =fullpath= ; to
-                        =as-pipe=  ; make directory and pass fullpath to next step
-                        =dirpath=) ; from
-        ;; take the fullpath from the out-bound pipeline-async =fullpath= chan
-        ;; then read in zip file, then put! onto =file= chan
-        (go (fs/readFile
-              (<! =fullpath=)
-              (fn [err zip]
-                (if (= (type err) (type js/Error))
-                  (throw err)
-                  (put! =file= zip #(pprint "put! =file="))))))
-        ;; <! zipfile from =file= chan, translate to geojson, convert
-        ;; the promise returned from shpjs via the cljs-promise <? macro,
-        ;; then >! resulting geojson to =json= chan
-        (go (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
-            (close! =file=))
-        ;; take! the geojson and write to the filepath, then close! =json=
-        (take! =json=
-               (fn [json]
-                 (do (fs/writeFile
-                       filepath
-                       (js/JSON.stringify json)
-                       #(js/console.log "wrote"))
-                     (close! =json=)))))
-      (go (close! =file=)
-          (close! =json=)
-          (close! =dirpath=)
-          (close! =fullpath=)))))
-;
-(fsRead-zip->fsWriteWDIR-json "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip")
+      (go
+        (let [=file= (chan 1)
+              =json= (chan 1)
+              =dirpath= (chan 1)
+              =fullpath= (chan 1)
+              =as-pipe= (fn [dirpath* =fullpath=]
+                          (go
+                            (mkdirp dirpath* (>! =fullpath= fullpath)) ;; the most important part
+                            (close! =fullpath=)))]
+
+          (do (>! =dirpath= dirpath) (close! =dirpath=))
+          (pipeline-async 2
+                          =fullpath=
+                          =as-pipe=
+                          =dirpath=)
+          (fs/readFile
+            (<! =fullpath=)
+            (fn [err zip]
+              (if (= (type err) (type js/Error))
+                (throw err)
+                (go (>! =file= zip)))))
+          (do (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
+              (close! =file=))
+          (do (fs/writeFile
+                  filepath
+                  (js/JSON.stringify (<! =json=))
+                  #(js/console.log "wrote"))
+              (close! =json=))))
+      (js/console.log "bloop")))
 
 
+#_(map #(fsRead-zip->fsWriteWDIR-json2 %)
+       ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip",
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_county_within_ua_500k.zip",
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip",
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
 
 
-
-
-;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;;       888     d888   \  888   \   d888   \
-;;       888    88888    | 888    | 88888    |
-;;       888    88888    | 888    | 88888    |
-;;       888     Y888   /  888   /   Y888   /
-;;       888      `88_-~   888_-~     `88_-~
-;;
-
-;; TODO: Consider making two passes: 1) to create the folder structures and 2) to create the files... solve race consdition.
-
-
-
-
-(defn fsRead-zip->fsWriteWDIR-json2
-  "
-  A `core.async` asynchronous operation coordination function, which takes a
-  full string path to a zipfile containing a shapefile and related assets. The
-  shapefile is converted to geojson and sent to a destination folder if the path
-  contains a valid geopath (based on `filename->>geopath` function).
-  "
-  [fullpath]
-  (if-let
-    [{:keys [filepath dirpath]} (->> (s/split fullpath #"\\") (last) (filename->>geopath))]
-    (go
-      (let [=file= (chan 1)
-            =json= (chan 1)
-            =dirpath= (chan 1)
-            =fullpath= (chan 1)
-            =as-pipe= (fn [dirpath* =fullpath=]
-                        (go
-                          (mkdirp dirpath* (>! =fullpath= fullpath)) ;; the most important part
-                          (close! =fullpath=)))]
-
-        (do (>! =dirpath= dirpath) (close! =dirpath=))
-        (pipeline-async 2
-                        =fullpath=
-                        =as-pipe=
-                        =dirpath=)
-        (fs/readFile
-          (<! =fullpath=)
-          (fn [err zip]
-            (if (= (type err) (type js/Error))
-              (throw err)
-              (go (>! =file= zip)))))
-        (do (>! =json= (<? (cpa/pair-port (shpjs (<! =file=)))))
-            (close! =file=))
-        (do (fs/writeFile
-                filepath
-                (js/JSON.stringify (<! =json=))
-                #(js/console.log "wrote"))
-            (close! =json=))))
-    (js/console.log "bloop")))
-
-
-(map #(fsRead-zip->fsWriteWDIR-json2 %)
-     ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_county_within_ua_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
-
-
-(defn mkdirp!
+(defn go-mkdirp!
   "
   Like the NPM mkdirp, but takes a file path string (the file to be created), a
   directory path string (the file path minus the file name) and an input `chan`
@@ -608,14 +588,14 @@
   (go (mkdirp dir-path (>! =file-path= file-path))))
 
 #_(let [=file-path= (chan 1)]
-    (go (mkdirp! =file-path= "./test/mkdirp!/file.name" "./test/mkdirp2!/")
+    (go (go-mkdirp! =file-path= "./test/go-mkdirp!/file.name" "./test/mkdirp2!/")
         (pprint (<! =file-path=))
         (close! =file-path=)))
 
 ;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
-;"Done mkdirp: ./test/mkdirp!/"
+;"Done mkdirp: ./test/go-mkdirp!/"
 
-(defn fsR!
+(defn go-fsR!
   "
   Takes a file-path and a channel and uses `fs/readFile` to read the file and
   put the result into the chan. Inputs:
@@ -634,11 +614,11 @@
 
 #_(let [=file-path= (chan 1) =zip= (chan 1)]
     (go
-      (mkdirp!
+      (go-mkdirp!
         =file-path=
         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
-        "./test/mkdirp!/")
-      (fsR! =zip= (<! =file-path=))
+        "./test/go-mkdirp!/")
+      (go-fsR! =zip= (<! =file-path=))
       (close! =file-path=)
       (pprint (<! =zip=))
       (close! =zip=)))
@@ -646,7 +626,7 @@
 ;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;"PK"   \b (Iï¿½Dï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½  ` cb_2013_01_pum... zipfile wackies
 
-(defn zip->>json!
+(defn go-zip->>json!
   "
   Takes a .zip file and converts it to GeoJSON via 3rd party `shpjs` library.
   Inputs:
@@ -656,30 +636,30 @@
   [=json= zip]
   (go (>! =json= (<? (cpa/pair-port (shpjs zip))))))
 
-(let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
-  (go
-    (mkdirp!
-      =file-path=
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
-      "./test/mkdirp!/")
-    (fsR! =zip= (<! =file-path=))
-    (close! =file-path=)
-    (zip->>json! =json= (<! =zip=))
-    (close! =zip=)
-    (js/console.log (js/JSON.stringify (<! =json=)))
-    (close! =json=)))
+#_(let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+    (go
+      (go-mkdirp!
+        =file-path=
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
+        "./test/go-mkdirp!/")
+      (go-fsR! =zip= (<! =file-path=))
+      (close! =file-path=)
+      (go-zip->>json! =json= (<! =zip=))
+      (close! =zip=)
+      (js/console.log (js/JSON.stringify (<! =json=)))
+      (close! =json=)))
 
 ;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;{"type":"FeatureCollection","features":[{"type":"Feature", ... GeoJSON!
 
-(defn json->fsW!
+(defn go-json->fsW!X
   "
   Takes a file path and some GeoJSON and uses `fs/writeFile` to save the file.
   Inputs:
   2) file path to store GeoJSON to
   1) GeoJSON
   "
-  [filepath =json=]
+  [=json= filepath]
   (go (fs/writeFile
         filepath
         (js/JSON.stringify (<! =json=))
@@ -687,25 +667,28 @@
       (close! =json=)))
 
 
-(let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
-  (go
-    (mkdirp!
-      =file-path=
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
-      "./test/mkdirp!/")
-    (fsR! =zip= (<! =file-path=))
-    (close! =file-path=)
-    (zip->>json! =json= (<! =zip=))
-    (close! =zip=)
-    (json->fsW! "./test/mkdirp!/test.json" =json=)))
+#_ (let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+     (go
+       (go-mkdirp!
+         =file-path=
+         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
+         "./test/go-mkdirp!/")
+       (go-fsR! =zip= (<! =file-path=))
+       (close! =file-path=)
+       (go-zip->>json! =json= (<! =zip=))
+       (close! =zip=)
+       (go-json->fsW!X =json= "./test/go-mkdirp!/test3.json")))
+
+; => #object[cljs.core.async.impl.channels.ManyToManyChannel]
+; Wrote GeoJSON to:  ./test/go-mkdirp!/test3.json
 
 
-;;    88~\ ,e,
-;;  _888__  ^  888-~88e
-;;   888   888 888  888
-;;   888   888 888  888
-;;   888   888 888  888
-;;   888   888 888  888
+;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;;       888     d888   \  888   \   d888   \
+;;       888    88888    | 888    | 88888    |
+;;       888    88888    | 888    | 88888    |
+;;       888     Y888   /  888   /   Y888   /
+;;       888      `88_-~   888_-~     `88_-~
 ;;
 
 
@@ -720,13 +703,33 @@
   "
   [path-string]
   (if-let [{:keys [filepath dirpath]} (->> (s/split path-string #"\\") (last) (filename->>geopath))]
-    (let [=mkdirp= (chan 1)
-          =zip=    (chan 1)
-          =json=   (chan 1)]
-      (go ()))))
+    (let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+      (go
+        (go-mkdirp! =file-path= path-string dirpath)
+        (go-fsR! =zip= (<! =file-path=))
+        (close! =file-path=)
+        (go-zip->>json! =json= (<! =zip=))
+        (close! =zip=)
+        (go-json->fsW!X =json= filepath)))
+    (pprint (str "No match found for: " path-string))))
+
+(map #(mkdirp>!fsR-zip>!json>!fsW %)
+     ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip",
+      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_county_within_ua_500k.zip",
+      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip",
+      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
+      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
 
 
 
+
+    ;;    88~\ ,e,
+;;  _888__  ^  888-~88e
+;;   888   888 888  888
+;;   888   888 888  888
+;;   888   888 888  888
+;;   888   888 888  888
+;;
 
 
 
