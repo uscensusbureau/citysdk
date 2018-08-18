@@ -16,6 +16,11 @@
             ["mkdirp" :as mkdirp]
             [clojure.repl :refer [source doc]]))
 
+
+;; NOTE: To increase the Heap memory needed for this:
+;; Eval in REPL:
+#_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+
 ;;       /                    888  /                          e    e
 ;; e88~88e  e88~~8e   e88~-_  888 /     e88~~8e  Y88b  /     d8b  d8b       /~~~8e  888-~88e
 ;; 888 888 d888  88b d888   i 888/\    d888  88b  Y888/     d888bdY88b          88b 888  888b
@@ -536,6 +541,8 @@
 ;;
 
 
+;; TODO: Potentially Come up with something better than timeouts here (threads.js?)
+
 (defn mkdirp>!fsR-zip>!json>!fsW
   "
   Coordinates the conveyance of a zipped shapefile through three asynchronous
@@ -550,12 +557,15 @@
     (let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
       (go
         (go-mkdirp! =file-path= path-string dirpath)
+        (<! (timeout 100))
         (go-fsR! =zip= (<! =file-path=))
+        (<! (timeout 100))
         (close! =file-path=)
         (go-zip->>json! =json= (<! =zip=))
+        (<! (timeout 100))
         (close! =zip=)
         (go-json->fsW!X =json= filepath)))
-    (pprint (str "No match found for: " path-string))))
+    (str "No :geoKeyMap match found for: " path-string)))
 
 (map #(mkdirp>!fsR-zip>!json>!fsW %)
      ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip",
@@ -564,25 +574,80 @@
       "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
       "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
 
+(defn x-mkdirp>!fsR-zip>!json>!fsW
+  "transducified version of the same name (minus the `x-`)"
+  [xf]
+  (fn
+    ([] (xf))
+    ([result] (xf result))
+    ([result input]
+     (xf result (mkdirp>!fsR-zip>!json>!fsW input)))))
 
+(defn x-pprint
+  "pprint trasnducer"
+  [xf]
+  (fn
+    ([] (xf))
+    ([result] (xf result))
+    ([result input] (xf result (pprint input)))))
 
+;;            ,e,                     888 ,e,
+;;  888-~88e   "  888-~88e   e88~~8e  888  "  888-~88e  e88~~8e         /~~~8e   d88~\ Y88b  / 888-~88e  e88~~\
+;;  888  888b 888 888  888b d888  88b 888 888 888  888 d888  88b ____       88b C888    Y888/  888  888 d888
+;;  888  8888 888 888  8888 8888__888 888 888 888  888 8888__888       e88~-888  Y88b    Y8/   888  888 8888
+;;  888  888P 888 888  888P Y888    , 888 888 888  888 Y888    ,      C888  888   888D    Y    888  888 Y888
+;;  888-_88"  888 888-_88"   "88___/  888 888 888  888  "88___/        "88_-888 \_88P    /     888  888  "88__/
+;;  888           888                                                                  _/
+
+;; While this works, it actually performs worse on `fs` functions. \
+;; Hitting the limit of Node's single event model here (I think)
+
+(defn af-mkdirp>!fsR-zip>!json>!fsW
+  [filepaths =paths=] (go (>! =paths= (into [] x-mkdirp>!fsR-zip>!json>!fsW filepaths)) (close! =paths=)))
+
+(defn megaShpGeoJSON
+  "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
+  [path-to-list-of-files]
+  (let [=filepaths= (chan 1)
+        =paths= (chan 1)
+        =result= (chan 1000 x-mkdirp>!fsR-zip>!json>!fsW)]
+    (go (go-fsR! =filepaths= path-to-list-of-files)
+        (>! =paths= (js->clj (js/JSON.parse (<! =filepaths=))))
+        ;(pipeline-async 1 =results= af-mkdirp>!fsR-zip>!json>!fsW =paths=) works, but overflows VM
+        ;(into [] x-mkdirp>!fsR-zip>!json>!fsW (<! =paths=)) ; works, but overflows VM
+        (close! =filepaths=)
+        ;(pprint (<! =paths=))
+        (loop [paths (<! =paths=)
+               done []]
+          (let [path (first paths)]
+            (if (empty? path)
+              (pprint (str "Done: " done))
+              (do
+                (>! =result= path)
+                (<! =result=)
+                (pprint (str "Working on path: " path))
+                (recur (rest paths)
+                       (conj done path))))))
+        (pprint "Drumroll .............. We're done!")
+        (close! =paths=)
+        (close! =result=))))
+
+(empty? nil)
+
+(conj [] "hello")
 #_(defn megaShpGeoJSONConverter
     "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
     [path-to-list-of-files]
     (let [=filepaths= (chan 1)
-          =to= (chan 1)
-          =from= (chan 1)]
-      (go (fs/readFile
-           path-to-list-of-files
-           (fn [err list]
-             (if (= (type err) (type js/Error))
-               (throw err)
-               (put! =filepaths= (js->clj (js/JSON.parse list)))))))))
+          =paths= (chan 100)]
+      (go (go-fsR! =filepaths= path-to-list-of-files)
+          (>! =paths= (js->clj (js/JSON.parse (<! =filepaths=))))
+          (pprint (<! =paths=))
+          (close! =paths=)
+          (close! =filepaths=))))
 
-
-
-;; TODO: Map over all the files in the test.json abr for a test of functionality
-
+(megaShpGeoJSON "./test/test10.json")
+;; Works..... with copious amounts of `(<! (timeout ...))`s
 
 
 ;;    88~\ ,e,
