@@ -19,7 +19,7 @@
 
 ;; NOTE: To increase the Heap memory needed for this:
 ;; Eval in REPL:
-#_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+#_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192 --expose-gc"]})
 
 ;;       /                    888  /                          e    e
 ;; e88~88e  e88~~8e   e88~-_  888 /     e88~~8e  Y88b  /     d8b  d8b       /~~~8e  888-~88e
@@ -515,17 +515,17 @@
       (close! =json=)))
 
 
-#_ (let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
-     (go
-       (go-mkdirp!
-         =file-path=
-         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
-         "./test/go-mkdirp!/")
-       (go-fsR! =zip= (<! =file-path=))
-       (close! =file-path=)
-       (go-zip->>json! =json= (<! =zip=))
-       (close! =zip=)
-       (go-json->fsW!X =json= "./test/go-mkdirp!/test3.json")))
+#_(let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+    (go
+      (go-mkdirp!
+        =file-path=
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip"
+        "./test/go-mkdirp!/")
+      (go-fsR! =zip= (<! =file-path=))
+      (close! =file-path=)
+      (go-zip->>json! =json= (<! =zip=))
+      (close! =zip=)
+      (go-json->fsW!X =json= "./test/go-mkdirp!/test3.json")))
 
 ; => #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ; Wrote GeoJSON to:  ./test/go-mkdirp!/test3.json
@@ -541,7 +541,41 @@
 ;;
 
 
-;; TODO: Potentially Come up with something better than timeouts here (threads.js?)
+;; TODO: Pass the channels in as arguments instead of creating them internally:
+;;C:\Users\Surface\Projects\clojure\cljs\census-geojson\.shadow-cljs\builds\node-repl\dev\out\cljs-runtime\cljs\core\async\impl\channels.cljs:141
+;                  (assert (< (.-length takes) impl/MAX-QUEUE-SIZE)
+;                  ^
+;Error: Assert failed: No more than 1024 pending takes are allowed on a single channel.
+;(< (.-length takes) impl/MAX-QUEUE-SIZE)
+;    at cljs.core.async.impl.channels.ManyToManyChannel.cljs$core$async$impl$protocols$ReadPort$take_BANG_$arity$2 (C:\Users\Surface\Projects\clojure\cljs\census-geojson\.shadow-cljs\builds\node-repl\dev\out\cljs-runtime\cljs\core\async\impl\channels.cljs:141:19)
+;    at cljs$core$async$impl$ioc_helpers$take_BANG_ (C:\Users\Surface\Projects\clojure\cljs\census-geojson\.shadow-cljs\builds\node-repl\dev\out\cljs-runtime\cljs\core\async\impl\ioc_helpers.cljs:45:15)
+;    at <eval>:79:52
+;    at <eval>:120:51
+;    at Function.geojson$core$mkdirp_GT__BANG_fsR_zip_GT__BANG_json_GT__BANG_fsW_$_state_machine__25620__auto____1 [as cljs$core$IFn$_invoke$arity$1] (<eval>:1
+
+#_(defn mkdirp>!fsR-zip>!json>!fsW
+    "
+  Coordinates the conveyance of a zipped shapefile through three asynchronous
+  process using `core.async` channels. Takes a path as a string and determines
+  if the file in the path matches one of the known geoHierarchies (in
+  `geoKeyMap`). If matched, creates the necessary directory structure, converts
+  the file from .zip to .json (GeoJSON), then saves the file to the directory
+  created.
+  "
+    [path-string]
+    (if-let [{:keys [filepath dirpath]} (->> (s/split path-string #"\\") (last) (filename->>geopath))]
+      (let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+        (go
+          (go-mkdirp! =file-path= path-string dirpath)
+          (<! (timeout 100))
+          (go-fsR! =zip= (<! =file-path=))
+          (close! =file-path=)
+          (<! (timeout 100))
+          (go-zip->>json! =json= (<! =zip=))
+          (close! =zip=)
+          (<! (timeout 100))
+          (go-json->fsW!X =json= filepath)))
+      (str "No :geoKeyMap match found for: " path-string)))
 
 (defn mkdirp>!fsR-zip>!json>!fsW
   "
@@ -554,25 +588,18 @@
   "
   [path-string]
   (if-let [{:keys [filepath dirpath]} (->> (s/split path-string #"\\") (last) (filename->>geopath))]
-    (let [=file-path= (chan 1) =zip= (chan 1) =json= (chan 1)]
+    (let [=baton= (chan 3)]
       (go
-        (go-mkdirp! =file-path= path-string dirpath)
+        (go-mkdirp! =baton= path-string dirpath)
         (<! (timeout 100))
-        (go-fsR! =zip= (<! =file-path=))
+        (go-fsR! =baton= (<! =baton=))
         (<! (timeout 100))
-        (close! =file-path=)
-        (go-zip->>json! =json= (<! =zip=))
+        (go-zip->>json! =baton= (<! =baton=))
         (<! (timeout 100))
-        (close! =zip=)
-        (go-json->fsW!X =json= filepath)))
+        (go-json->fsW!X =baton= filepath)))
     (str "No :geoKeyMap match found for: " path-string)))
 
-(map #(mkdirp>!fsR-zip>!json>!fsW %)
-     ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_county_within_ua_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_puma10_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip",
-      "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_sldl_500k.zip"])
+
 
 (defn x-mkdirp>!fsR-zip>!json>!fsW
   "transducified version of the same name (minus the `x-`)"
@@ -607,30 +634,34 @@
 
 (defn megaShpGeoJSON
   "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
-  [path-to-list-of-files]
-  (let [=filepaths= (chan 1)
-        =paths= (chan 1)
-        =result= (chan 1000 x-mkdirp>!fsR-zip>!json>!fsW)]
-    (go (go-fsR! =filepaths= path-to-list-of-files)
-        (>! =paths= (js->clj (js/JSON.parse (<! =filepaths=))))
+  [source-path]
+  (let [=fileslist= (chan 1)
+        =paths= (chan 1)]
+    (go (go-fsR! =fileslist= source-path)
+        (>! =paths= (js->clj (js/JSON.parse (<! =fileslist=))))
         ;(pipeline-async 1 =results= af-mkdirp>!fsR-zip>!json>!fsW =paths=) works, but overflows VM
         ;(into [] x-mkdirp>!fsR-zip>!json>!fsW (<! =paths=)) ; works, but overflows VM
-        (close! =filepaths=)
+        (close! =fileslist=)
         ;(pprint (<! =paths=))
+        #_(doseq [path (<! =paths=)]
+            (mkdirp>!fsR-zip>!json>!fsW path)) ;; doseq and loop do the same thing
+          ;(pprint path))
         (loop [paths (<! =paths=)
                done []]
-          (let [path (first paths)]
+          (let [path (first paths)
+                =result= (chan 1 x-mkdirp>!fsR-zip>!json>!fsW)]
             (if (empty? path)
               (pprint (str "Done: " done))
               (do
                 (>! =result= path)
+                (<! (timeout 500))
                 (<! =result=)
+                (close! =result=)
                 (pprint (str "Working on path: " path))
                 (recur (rest paths)
                        (conj done path))))))
         (pprint "Drumroll .............. We're done!")
-        (close! =paths=)
-        (close! =result=))))
+        (close! =paths=))))
 
 (empty? nil)
 
