@@ -34,6 +34,6 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
-    "shadow-cljs": "^2.4.24"
+    "shadow-cljs": "^2.6.1"
   }
 }
