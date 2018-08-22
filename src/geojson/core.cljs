@@ -22,12 +22,7 @@
 ;; Eval in REPL:
 #_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192 --expose-gc"]})
 
-;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;;       888     d888   \  888   \   d888   \
-;;       888    88888    | 888    | 88888    |
-;;       888    88888    | 888    | 88888    |
-;;       888     Y888   /  888   /   Y888   /
-;;       888      `88_-~   888_-~     `88_-~
+
 
 ; TODO: Update geoKeyMap with latest variables and re-run batch process
 ;;       /                    888  /                          e    e
@@ -536,16 +531,24 @@
         (pprint (str "No :geoKeyMap match found for: " path))))
     (recur)))
 
+;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;;       888     d888   \  888   \   d888   \
+;;       888    88888    | 888    | 88888    |
+;;       888    88888    | 888    | 88888    |
+;;       888     Y888   /  888   /   Y888   /
+;;       888      `88_-~   888_-~     `88_-~
+
+;; FIXME: Implement backpressure here...
 
 (defn megaShpGeoJSON
   "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
   [paths-vec]
   (let [=path= (chan 1)]
     (go=>zip=>json=> =path=)
-    (doseq [path paths-vec]
-      (put! =path= path))))
+    (go (doseq [path paths-vec]
+          (>! =path= path)))))
 
-#_(megaShpGeoJSON geos_abv/paths) ; OMFG.... it works
+(megaShpGeoJSON geos/paths) ; OMFG.... it works
 
 
 
