@@ -1,5 +1,6 @@
 (ns geojson.core
-  (:require [cljs.core.async
+  (:require [goog.object :as jsOb]
+            [cljs.core.async
              :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async onto-chan]
              :refer-macros [go go-loop alt!]]
             [clojure.string :as s]
@@ -14,15 +15,15 @@
             ["path" :as path]
             ["shpjs" :as shpjs]
             ["mkdirp" :as mkdirp]
+            ["big-json" :as big-json]
             [clojure.repl :refer [source doc]]
             [geojson.filepaths :as geos]
             [geojson.filepaths_abv :as geos_abv]))
 
 ;; NOTE: To increase the Heap memory needed for this:
 ;; Eval in REPL:
-#_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192 --expose-gc"]})
-
-
+#_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+#_(shadow.cljs.devtools.api/node-repl {:node-args ["--expose-gc"]})
 
 ; TODO: Update geoKeyMap with latest variables and re-run batch process
 ;;       /                    888  /                          e    e
@@ -389,13 +390,6 @@
   ;; => "500k/2012/congressional-district.json"
 
 
-;; =================== IMPORTANT NOTE ==========================
-;; If the written file is showing up as `[object Object]` it might
-;; be due to it being stored as the representation of a js object
-;; instead of the actual content therein. This got me stuck for a
-;; long time!!! Solved by wrapping the desired output like so:
-;; `(js/JSON.stringify <<output>>)`
-;; ===============================================================
 
 (defn fsRead->put!
   [val, =port=]
@@ -419,21 +413,87 @@
 ;#object[Buffer PK    'Iï¿½Dcï¿½L  ï¿½   ` cb_2013_01_c ...works
 
 
+;; =================== IMPORTANT NOTE ==========================
+;; If the written file is showing up as `[object Object]` it might
+;; be due to it being stored as the representation of a js object
+;; instead of the actual content therein. This got me stuck for a
+;; long time!!! Solved by wrapping the desired output like so:
+;; `(js/JSON.stringify <<output>>)`
+;; ===============================================================
+;
+;(js/console.log #js {:key "value"})
+;
+;(js/console.log (big-json/stringify
+;                  #js {:body #js {:key "value"}}
+;                  (fn [err data]
+;                    data)))
+
+#_(defn zip->json->put!
+    [val =port=]
+    (let [ob #js {}]
+      (pprint (str "zip->json'ing..."))
+      (take! (cpa/value-port (shpjs val))
+             (fn [res]
+               (let [json (jsOb/set ob "body" res)]
+                 (put! =port=
+                       (big-json/stringify
+                         json
+                         (fn [err data]
+                           (if (= (type err) (type js/Error))
+                             (throw (js/Error. err))
+                             data)))
+                       #(close! =port=)))))))
+
+;(big-json/stringify (js-obj "body" (js-obj "key" "value"))
+;                    #(js/console.log %2))
+;
+;(js/console.log (js-obj "body" (js-obj "key1" "value1")))
+
+#_(defn zip->json->put! ; very slow and not sure it even works for the large payload.
+    [val =port=]
+    (pprint (str "zip->json'ing..."))
+    (take! (cpa/value-port (shpjs val))
+           (fn [res]
+               (big-json/stringify
+                 (js-obj "body" res)
+                 (fn [err json]
+                   (if (= (type err) (type js/Error))
+                     (throw (js/Error. err))
+                     (put! =port= json #(close! =port=))))))))
+
 (defn zip->json->put!
   [val =port=]
   (pprint (str "zip->json'ing..."))
   (take! (cpa/value-port (shpjs val))
          (fn [res] (put! =port=
-                         (js/JSON.stringify res)
+                         res
                          #(close! =port=)))))
+#_(defn zip->json->put!
+    [val =port=]
+    (pprint (str "zip->json'ing..."))
+    (take! (cpa/value-port (shpjs val))
+           (fn [res] (put! =port=
+                           (js/JSON.stringify res)
+                           #(close! =port=)))))
 
-#_(let [=zip= (chan 1)
-        =json= (chan 1)]
-    (go (fsRead->put!
-          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-          =zip=)
-        (pipeline-async 1 =json= zip->json->put! =zip=)
-        (js/console.log (<! =json=))))
+
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
+
+
+;; TODO: THIS!!!!
+
+(let [=zip= (chan 1)
+      =json= (chan 1)]
+  (go (fsRead->put!
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+        =zip=)
+      (pipeline-async 1 =json= zip->json->put! =zip=)
+      (js/console.log (<! =json=)))) ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
 ;
@@ -450,7 +510,7 @@
   "
   [val]
   (let [{:keys [directory filepath json]} val]
-    (pprint (str "Making Directory: " directory))
+    (pprint (str "Ensuring Directory: " directory))
     (mkdirp
       directory
       (fn [err]
@@ -507,14 +567,16 @@
 ; {:directory "geotest directory", :json "test directory 3"}
 ; {:directory "geotest directory", :json "test json 3"}]
 
-;;            ,e,                     888 ,e,
-;;  888-~88e   "  888-~88e   e88~~8e  888  "  888-~88e  e88~~8e         /~~~8e   d88~\ Y88b  / 888-~88e  e88~~\
-;;  888  888b 888 888  888b d888  88b 888 888 888  888 d888  88b ____       88b C888    Y888/  888  888 d888
-;;  888  8888 888 888  8888 8888__888 888 888 888  888 8888__888       e88~-888  Y88b    Y8/   888  888 8888
-;;  888  888P 888 888  888P Y888    , 888 888 888  888 Y888    ,      C888  888   888D    Y    888  888 Y888
-;;  888-_88"  888 888-_88"   "88___/  888 888 888  888  "88___/        "88_-888 \_88P    /     888  888  "88__/
-;;  888           888                                                                  _/
+;            ,e,                     888 ,e,
+;  888-~88e   "  888-~88e   e88~~8e  888  "  888-~88e  e88~~8e         /~~~8e   d88~\ Y88b  / 888-~88e  e88~~\
+;  888  888b 888 888  888b d888  88b 888 888 888  888 d888  88b ____       88b C888    Y888/  888  888 d888
+;  888  8888 888 888  8888 8888__888 888 888 888  888 8888__888       e88~-888  Y88b    Y8/   888  888 8888
+;  888  888P 888 888  888P Y888    , 888 888 888  888 Y888    ,      C888  888   888D    Y    888  888 Y888
+;  888-_88"  888 888-_88"   "88___/  888 888 888  888  "88___/        "88_-888 \_88P    /     888  888  "88__/
+;  888           888                                                                  _/
 
+
+;; TODO: Test on "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
 
 (defn go=>zip=>json=>
   [=path=]
@@ -526,17 +588,15 @@
           (do
             (fsRead->put! path =zip=)
             (pipeline-async 1 =json= zip->json->put! =zip=)
-            (mkdir->fsW! (<! =json=))
-            (recur)))
+            (mkdir->fsW! (<! =json=))))
         (pprint (str "No :geoKeyMap match found for: " path))))
     (recur)))
 
-;;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;;       888     d888   \  888   \   d888   \
-;;       888    88888    | 888    | 88888    |
-;;       888    88888    | 888    | 88888    |
-;;       888     Y888   /  888   /   Y888   /
-;;       888      `88_-~   888_-~     `88_-~
+(let [=c= (chan 1)]
+  (go (>! =c= "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip")
+      (go=>zip=>json=> =c=)
+      (close! =c=)))
+
 
 ;; FIXME: Implement backpressure here...
 
@@ -548,7 +608,7 @@
     (go (doseq [path paths-vec]
           (>! =path= path)))))
 
-(megaShpGeoJSON geos/paths) ; OMFG.... it works
+(megaShpGeoJSON geos_abv/paths) ; OMFG.... it works
 
 
 
