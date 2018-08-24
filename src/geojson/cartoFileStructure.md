@@ -241,7 +241,7 @@ state-legislative-district-'lower-chamber'                    | sl01_d00_shp    
 
 Key                                                           | 2010                              | Notes
 ------------------------------------------------------------- | :--------------------------------:| -----
-nation                                                        | x                                 | 010 
+nation                                                        | gz_2010_us_outline_20m            | 010 
 region                                                        | gz_2010_us_020_00_500k            | 
 division                                                      | gz_2010_us_030_00_500k            | 
 state                                                         | gz_2010_us_040_00_500k            | 

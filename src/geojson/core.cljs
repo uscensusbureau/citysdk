@@ -1,7 +1,6 @@
 (ns geojson.core
-  (:require [goog.object :as jsOb]
-            [cljs.core.async
-             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async onto-chan]
+  (:require [cljs.core.async
+             :refer [chan put! take! >! <! timeout close! alts! pipeline-async]
              :refer-macros [go go-loop alt!]]
             [clojure.string :as s]
             [clojure.set :refer [map-invert]]
@@ -15,15 +14,14 @@
             ["path" :as path]
             ["shpjs" :as shpjs]
             ["mkdirp" :as mkdirp]
-            ["big-json" :as big-json]
             [clojure.repl :refer [source doc]]
             [geojson.filepaths :as geos]
             [geojson.filepaths_abv :as geos_abv]))
 
-;; NOTE: To increase the Heap memory needed for this:
+;; NOTE: If you need to increase memory of Node in Shadow...
 ;; Eval in REPL:
 #_(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
-#_(shadow.cljs.devtools.api/node-repl {:node-args ["--expose-gc"]})
+
 
 ; TODO: Update geoKeyMap with latest variables and re-run batch process
 ;;       /                    888  /                          e    e
@@ -190,7 +188,7 @@
                                                                  :2015 "zcta"
                                                                  :2016 "zcta"
                                                                  :2017 "zcta"
-                                                                 :2010 "860"
+                                                                 :2010 "860" ;; this is a bfjo, punted
                                                                  :2000 "zt"} ;; zipcodes are *not* the same
    :state-legislative-district-'upper-chamber'                  {:2013 "sldu"
                                                                  :2014 "sldu"
@@ -299,19 +297,33 @@
       (parts->geopath [lev res mes vin sco]))
     nil))
 
+
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
+
+
+;; TODO: Rename functions, move geoKeyMap to its own namespace and include in this namespace
+;; TODO: Checkout pattern (below) match for 2012 sldl and sldu (e.g. "C:\Users\Surface\Downloads\www2.census.gov\geo\tiger\GENZ2012\sldl\cb_rd13_48_sldl_500k.zip")
+
 (defun file=<<Director
   "
   Pattern matches against incoming file structures to create a harmonized
   directory ontology in which to store the file.
   "
-  ([[lev sco] [vin] _     _]                                    (geoScopeFiler [lev       "500" "k" vin    sco]))
-  ([_         [vin] [sco] ["outline"]  ["500" "k"] _]           (geoScopeFiler ["outline" "500" "k" vin    sco]))
-  ([_         [vin] [sco] ["uac" "10"] ["500" "k"] _]           (geoScopeFiler ["uac"     "500" "k" vin    sco]))
-  ([_         [vin] [sco] [lev]        _         ["500" "k"] _] (geoScopeFiler [lev       "500" "k" vin    sco]))
-  ([_         [vin] [sco] [lev]        ["500" "k"] _]           (geoScopeFiler [lev       "500" "k" vin    sco]))
-  ([_         [vin] [sco] [lev]        ["500" "k"] _]           (geoScopeFiler [lev       "500" "k" vin    sco]))
-  ([_         _     [sco] [lev "113"]  ["500" "k"] _]           (geoScopeFiler [lev       "500" "k" "2012" sco]))
-  ([& anything-else] nil))
+  ([[lev sco] [vin]       _      _]                                      (geoScopeFiler [lev       "500" "k" vin    sco])) ; 90-00
+  ([_         [vin]       [sco]  ["outline"]  ["500" "k"] _]             (geoScopeFiler ["outline" "500" "k" vin    sco])) ; 2010
+  ([_         [vin]       [sco]  ["uac" "10"] ["500" "k"] _]             (geoScopeFiler ["uac"     "500" "k" vin    sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev _     ] ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" "2012" sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev]        ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" "2012" sco])) ; 2012
+  ([_         [vin]       [sco]  [lev]        ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" vin    sco])) ; 2013+
+  ([_         [vin]       [sco]  [lev _     ] ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" vin    sco])) ; 2013+
+  ([_         ["2010"]    ["us"] ["860"]      _           ["500" "k"] _] nil) ;; abandon ship (500m zctas)
+  ([_         [vin]       [sco]  [lev]        _           ["500" "k"] _] (geoScopeFiler [lev       "500" "k" vin    sco])) ; 2010
+  ([& anything-else]                                                     nil))
 
 (defn filename->>geopath
   "
@@ -391,15 +403,31 @@
 
 
 
+#_(fs/access "./GeoJSON/500k/103/01/congressional-district.json"
+             fs/constants.F_OK
+             (fn [err] (if (nil? err)
+                         (pprint "There")
+                         (pprint "Not there"))))
+;=> nil
+;"There"
+
+
+(defn fsCheck->put!
+  [val, =port=]
+  (fs/access val
+             fs/constants.F_OK
+             (fn [err] (if (nil? err)
+                         (do (put! =port= (str "there")) (close! =port=))
+                         (do (put! =port= val) (close! =port=))))))
+
 (defn fsRead->put!
   [val, =port=]
   (pprint (str "fsRead'ing: " val))
-  (fs/readFile
-    val
-    (fn [err, file]
-      (if (= (type err) (type js/Error))
-        (throw err)
-        (put! =port= file #(close! =port=))))))
+  (fs/readFile val
+               (fn [err, file]
+                 (if (= (type err) (type js/Error))
+                   (throw (js/Error. err))
+                   (put! =port= file #(close! =port=))))))
 
 #_(let [c (chan 1)]
     (go (fsRead->put!
@@ -420,80 +448,25 @@
 ;; long time!!! Solved by wrapping the desired output like so:
 ;; `(js/JSON.stringify <<output>>)`
 ;; ===============================================================
-;
-;(js/console.log #js {:key "value"})
-;
-;(js/console.log (big-json/stringify
-;                  #js {:body #js {:key "value"}}
-;                  (fn [err data]
-;                    data)))
-
-#_(defn zip->json->put!
-    [val =port=]
-    (let [ob #js {}]
-      (pprint (str "zip->json'ing..."))
-      (take! (cpa/value-port (shpjs val))
-             (fn [res]
-               (let [json (jsOb/set ob "body" res)]
-                 (put! =port=
-                       (big-json/stringify
-                         json
-                         (fn [err data]
-                           (if (= (type err) (type js/Error))
-                             (throw (js/Error. err))
-                             data)))
-                       #(close! =port=)))))))
-
-;(big-json/stringify (js-obj "body" (js-obj "key" "value"))
-;                    #(js/console.log %2))
-;
-;(js/console.log (js-obj "body" (js-obj "key1" "value1")))
-
-#_(defn zip->json->put! ; very slow and not sure it even works for the large payload.
-    [val =port=]
-    (pprint (str "zip->json'ing..."))
-    (take! (cpa/value-port (shpjs val))
-           (fn [res]
-               (big-json/stringify
-                 (js-obj "body" res)
-                 (fn [err json]
-                   (if (= (type err) (type js/Error))
-                     (throw (js/Error. err))
-                     (put! =port= json #(close! =port=))))))))
 
 (defn zip->json->put!
   [val =port=]
   (pprint (str "zip->json'ing..."))
   (take! (cpa/value-port (shpjs val))
          (fn [res] (put! =port=
-                         res
+                         (js/JSON.stringify res)
                          #(close! =port=)))))
-#_(defn zip->json->put!
-    [val =port=]
-    (pprint (str "zip->json'ing..."))
-    (take! (cpa/value-port (shpjs val))
-           (fn [res] (put! =port=
-                           (js/JSON.stringify res)
-                           #(close! =port=)))))
 
 
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~
-
-
-;; TODO: THIS!!!!
-
-(let [=zip= (chan 1)
-      =json= (chan 1)]
-  (go (fsRead->put!
-        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-        =zip=)
-      (pipeline-async 1 =json= zip->json->put! =zip=)
-      (js/console.log (<! =json=)))) ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
+#_(let [=zip= (chan 1)
+        =json= (chan 1)]
+    (go (fsRead->put!
+          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+          =zip=)
+        (pipeline-async 1 =json= zip->json->put! =zip=)
+        (js/console.log (<! =json=))))
+;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
 ;
@@ -501,29 +474,6 @@
 ;"zip->json'ing..."
 ;
 ;{"type":"FeatureCollection","features":[{"type" ... works
-
-
-(defn mkdir->fsW!
-  "
-  Takes some geojson and a directory and - internally - calls Node `fs/writeFile`
-  to store the geojson into the directory.
-  "
-  [val]
-  (let [{:keys [directory filepath json]} val]
-    (pprint (str "Ensuring Directory: " directory))
-    (mkdirp
-      directory
-      (fn [err]
-        (if (= (type err) (type js/Error))
-          (js/console.log (str "Error creating directory: " filepath))
-          (fs/writeFile
-            filepath
-            json
-            (fn [err]
-              (if (= (type err) (type js/Error))
-                (js/console.log (str "Error writing file: " filepath))
-                (js/console.log (str "Wrote GeoJSON to: " filepath))))))))))
-
 
 ;;                  88~\
 ;;  Y88b  /       _888__  e88~-_  888-~\ 888-~88e-~88e
@@ -550,13 +500,36 @@
   [directory filepath]
   (transducified (partial geo-directory directory filepath)))
 
-(def geotest
-  ["test directory 1"
-   "test json 1",
-   "test directory 2"
-   "test json 2",
-   "test directory 3"
-   "test json 3"])
+#_(def geotest
+    ["test directory 1"
+     "test json 1",
+     "test directory 2"
+     "test json 2",
+     "test directory 3"
+     "test json 3"])
+
+(defn mkdir->fsW!
+  "
+  Takes some geojson and a directory and - internally - calls Node `fs/writeFile`
+  to store the geojson into the directory.
+  "
+  [val]
+  (let [{:keys [directory filepath json]} val]
+    (pprint (str "Ensuring Directory: " directory))
+    (mkdirp
+      directory
+      (fn [err]
+        (if (= (type err) (type js/Error))
+          (js/console.log (str "Error creating directory: " filepath))
+          (fs/writeFile
+            filepath
+            json
+            (fn [err]
+              (if (= (type err) (type js/Error))
+                (js/console.log (str "Error writing file: " filepath))
+                (js/console.log (str "Wrote GeoJSON to: " filepath))))))))))
+
+
 
 #_(into [] (x-geo-directory "geotest directory" "filepath") geotest)
 ;; =>
@@ -581,34 +554,49 @@
 (defn go=>zip=>json=>
   [=path=]
   (go-loop []
-    (let [path (<! =path=)]
-      (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-        (let [=zip=  (chan 1)
-              =json= (chan 1 (x-geo-directory directory filepath))]
-          (do
-            (fsRead->put! path =zip=)
-            (pipeline-async 1 =json= zip->json->put! =zip=)
-            (mkdir->fsW! (<! =json=))))
-        (pprint (str "No :geoKeyMap match found for: " path))))
-    (recur)))
+           (let [path (<! =path=)]
+             (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+               (let [=test-path= (chan 1)]
+                 (do
+                   (fsCheck->put! filepath =test-path=)
+                   (if (not= "there" (<! =test-path=))
+                       (let [=zip= (chan 1)
+                             =json= (chan 1 (x-geo-directory directory filepath))]
+                         (do (fsRead->put! path =zip=)
+                             (pipeline-async 1 =json= zip->json->put! =zip=)
+                             (mkdir->fsW! (<! =json=))
+                             (recur)))
+                       (do (pprint (str "File already exists: " path))
+                           (recur)))))
+               (do (pprint (str "No :geoKeyMap match found for: " path))
+                   (recur))))))
 
-(let [=c= (chan 1)]
-  (go (>! =c= "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip")
-      (go=>zip=>json=> =c=)
-      (close! =c=)))
+#_(let [path "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"]
+    (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+      (pprint (str "Already existing directory: " directory " Filepath: " filepath))
+      (let [=test-path= (chan 1)
+            open-path (<! (fsCheck->put! filepath =test-path=))]
+        (if (not= "there" open-path)
+          (pprint (str "Not there"))
+          (pprint (str "There"))))))
 
-
-;; FIXME: Implement backpressure here...
+#_(let [=c= (chan 1)]
+    (go (>! =c= "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip")
+        (go=>zip=>json=> =c=)
+        (close! =c=)))
 
 (defn megaShpGeoJSON
   "Takes a path to a list (vector) of paths to some zipfiles and - for each item in the list - based on the filename (if present) translates the zipfile to geojson, creates a directory structure (if needed) to store them and stores them in there."
   [paths-vec]
   (let [=path= (chan 1)]
     (go=>zip=>json=> =path=)
-    (go (doseq [path paths-vec]
-          (>! =path= path)))))
+    (go (if (= nil (doseq [path paths-vec] (>! =path= path)))
+          (js/console.log "\n ======================== \n
+                           \n === FINISHED PARSING === \n
+                           \n === Wrapping up .... === \n
+                           \n ======================== \n")))))
 
-(megaShpGeoJSON geos_abv/paths) ; OMFG.... it works
+(megaShpGeoJSON geos/paths) ; OMFG.... it works
 
 
 
