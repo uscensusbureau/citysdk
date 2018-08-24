@@ -1,5 +1,3 @@
-(ns geojson.core)
-
 # Cartography Files from the US Census Bureau
 
 ## FTP asset structure
@@ -449,13 +447,12 @@ Vintage       | i0           | i1          | i2                | i3             
 ## File Structure for Geo Files
 
 - 500K
-  - Vintage
-    - 1990
-      - National level files
-      - 01 (state code)
-        - State level files
-        - 001 (county code)
-          - County level files (block-groups and blocks (TBD))
+  - 1990 (vintage or session of congress)
+    - National level files
+    - 01 (state fips)
+      - State level files
+      - 001 (county fips) <- TBD
+        - County level files (block-groups and blocks (TBD))
 
 ## Summary Level Codes
 
@@ -678,8 +675,8 @@ Vintage       | i0           | i1          | i2                | i3             
 - [x] Public Use Microdata Area (PUMA)
 - [x] School Districts
 - [x] State Legislative District - Upper and Lower
-- [ ] Subbarrio (Puerto Rico only)
-- [ ] Traffic Analysis Zone (TAZ)
+- [ ] Subbarrio (Puerto Rico only) <- Not available via API (TBD)
+- [ ] Traffic Analysis Zone (TAZ) <- Not available via API (TBD)
 
    
 Codes:
@@ -745,6 +742,9 @@ query components:
 [link](https://factfinder.census.gov/service/Overview.html)
 
 # WGET
+---
+# Note: do this at your own risk. If too eager, Census will blacklist your IP address.
+---
 
 To get a recursive search through folders (branches) and assets (leaves) in a subdomain:
 `wget -r -np -R "index.html*" -e robots=off https://www2.census.gov/geo/tiger/PREVGENZ/`

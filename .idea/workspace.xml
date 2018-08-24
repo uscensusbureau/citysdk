@@ -38,26 +38,26 @@
     <session id="364820673">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="19" />
+          <entry key="project.closed" value="20" />
           <entry key="project.open.time.10" value="1" />
           <entry key="project.open.time.11" value="2" />
           <entry key="project.open.time.12" value="3" />
           <entry key="project.open.time.13" value="4" />
           <entry key="project.open.time.14" value="1" />
-          <entry key="project.open.time.15" value="4" />
+          <entry key="project.open.time.15" value="5" />
           <entry key="project.open.time.17" value="3" />
           <entry key="project.open.time.18" value="2" />
           <entry key="project.open.time.19" value="2" />
           <entry key="project.open.time.42" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="24" />
+          <entry key="project.opened" value="25" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="ClojureScript" value="17" />
           <entry key="EDN" value="3" />
-          <entry key="JSON" value="124" />
+          <entry key="JSON" value="126" />
           <entry key="Markdown" value="8" />
           <entry key="PLAIN_TEXT" value="9" />
           <entry key="XML" value="17" />
@@ -71,8 +71,8 @@
           <entry key="edn" value="49" />
           <entry key="gitattributes" value="91" />
           <entry key="gitignore" value="20" />
-          <entry key="json" value="10" />
-          <entry key="md" value="1043" />
+          <entry key="json" value="19" />
+          <entry key="md" value="1377" />
           <entry key="txt" value="1" />
         </counts>
       </usages-collector>
@@ -81,8 +81,8 @@
           <entry key="Clojure" value="1656" />
           <entry key="ClojureScript" value="55402" />
           <entry key="EDN" value="49" />
-          <entry key="JSON" value="10" />
-          <entry key="Markdown" value="1043" />
+          <entry key="JSON" value="19" />
+          <entry key="Markdown" value="1377" />
           <entry key="PLAIN_TEXT" value="112" />
         </counts>
       </usages-collector>
@@ -94,7 +94,7 @@
           <entry key="geojson" value="1" />
           <entry key="gitattributes" value="2" />
           <entry key="gitignore" value="2" />
-          <entry key="json" value="124" />
+          <entry key="json" value="126" />
           <entry key="md" value="8" />
           <entry key="nrepl-port" value="1" />
           <entry key="txt" value="2" />
@@ -106,20 +106,11 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../src/geojson/core.cljs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="690">
-              <caret line="579" column="36" lean-forward="true" selection-start-line="579" selection-start-column="36" selection-end-line="579" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../src/geojson/cartoFileStructure.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="FIRST">
-              <first_editor relative-caret-position="580">
-                <caret line="222" column="49" lean-forward="true" selection-start-line="222" selection-start-column="49" selection-end-line="222" selection-end-column="49" />
+              <first_editor relative-caret-position="-494">
+                <caret line="688" column="34" lean-forward="true" selection-start-line="688" selection-start-column="34" selection-end-line="688" selection-end-column="34" />
               </first_editor>
               <second_editor />
             </state>
@@ -173,8 +164,9 @@
         <option value="$PROJECT_DIR$/../pom.xml" />
         <option value="$PROJECT_DIR$/../.gitattributes" />
         <option value="$PROJECT_DIR$/../.gitignore" />
-        <option value="$PROJECT_DIR$/../src/geojson/cartoFileStructure.md" />
         <option value="$PROJECT_DIR$/../src/geojson/core.cljs" />
+        <option value="$PROJECT_DIR$/../package.json" />
+        <option value="$PROJECT_DIR$/../src/geojson/cartoFileStructure.md" />
       </list>
     </option>
   </component>
@@ -199,11 +191,11 @@
       <path value="$PROJECT_DIR$/../package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="2725" />
-    <option name="y" value="221" />
-    <option name="width" value="1481" />
-    <option name="height" value="1571" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-13" />
+    <option name="y" value="-13" />
+    <option name="width" value="2592" />
+    <option name="height" value="1852" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -254,8 +246,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -393,11 +385,12 @@
       <workItem from="1534961792490" duration="7045000" />
       <workItem from="1534973432876" duration="22722000" />
       <workItem from="1535053302704" duration="8827000" />
+      <workItem from="1535123215247" duration="729000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="446667000" />
+    <option name="totallyTimeSpent" value="447396000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -409,9 +402,9 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="2725" y="221" width="1481" height="1571" extended-state="0" />
+    <frame x="-7" y="-7" width="1577" height="1016" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17311752" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16458195" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -556,13 +549,6 @@
       </provider>
     </entry>
     <entry file="file://C:/Program Files/nodejs/node_modules/npm/package.json" />
-    <entry file="file://$PROJECT_DIR$/../package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../shadow-cljs.edn">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
@@ -598,11 +584,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2000/zip-code-tabulation-area-2000.json">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-35357" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2000/zip-code-tabulation-area-2000.json" />
     <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2000/zip-code-tabulation-area.json">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="-62583">
@@ -615,47 +597,31 @@
         <state relative-caret-position="-20" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2015/zip-code-tabulation-area-2015.json">
-      <provider selected="true" editor-type-id="LargeFileEditor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2015/zip-code-tabulation-area-2015.json" />
     <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2016/zip-code-tabulation-area.json">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="-20" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2016/zip-code-tabulation-area-2016.json">
-      <provider selected="true" editor-type-id="LargeFileEditor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2016/zip-code-tabulation-area-2016.json" />
     <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2014/zip-code-tabulation-area.json">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="-2620" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2014/zip-code-tabulation-area-2014.json">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-920" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2014/zip-code-tabulation-area-2014.json" />
     <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2013/zip-code-tabulation-area.json">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="-1700" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2013/zip-code-tabulation-area-2013.json">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-460" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2013/zip-code-tabulation-area-2013.json" />
     <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2017/zip-code-tabulation-area.json">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="-1500" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2017/zip-code-tabulation-area-2017.json">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-300" />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/../GeoJSON/500k/2017/zip-code-tabulation-area-2017.json" />
     <entry file="file://$PROJECT_DIR$/../.gitattributes">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="100">
@@ -670,20 +636,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../src/geojson/cartoFileStructure.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="FIRST">
-          <first_editor relative-caret-position="580">
-            <caret line="222" column="49" lean-forward="true" selection-start-line="222" selection-start-column="49" selection-end-line="222" selection-end-column="49" />
-          </first_editor>
-          <second_editor />
+    <entry file="file://$PROJECT_DIR$/../package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="620">
+          <caret line="31" column="22" lean-forward="true" selection-start-line="31" selection-start-column="22" selection-end-line="31" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../src/geojson/core.cljs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="690">
-          <caret line="579" column="36" lean-forward="true" selection-start-line="579" selection-start-column="36" selection-end-line="579" selection-end-column="36" />
+          <caret line="579" column="36" selection-start-line="579" selection-start-column="36" selection-end-line="579" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../src/geojson/cartoFileStructure.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="FIRST">
+          <first_editor relative-caret-position="-494">
+            <caret line="688" column="34" lean-forward="true" selection-start-line="688" selection-start-column="34" selection-end-line="688" selection-end-column="34" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
