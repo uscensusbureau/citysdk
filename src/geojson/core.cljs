@@ -315,14 +315,14 @@
   directory ontology in which to store the file.
   "
   ([[lev sco] [vin]       _      _]                                      (geoScopeFiler [lev       "500" "k" vin    sco])) ; 90-00
-  ([_         [vin]       [sco]  ["outline"]  ["500" "k"] _]             (geoScopeFiler ["outline" "500" "k" vin    sco])) ; 2010
-  ([_         [vin]       [sco]  ["uac" "10"] ["500" "k"] _]             (geoScopeFiler ["uac"     "500" "k" vin    sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev _     ] ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" "2012" sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev]        ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" "2012" sco])) ; 2012
-  ([_         [vin]       [sco]  [lev]        ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" vin    sco])) ; 2013+
-  ([_         [vin]       [sco]  [lev _     ] ["500" "k"] _]             (geoScopeFiler [lev       "500" "k" vin    sco])) ; 2013+
-  ([_         ["2010"]    ["us"] ["860"]      _           ["500" "k"] _] nil) ;; abandon ship (500m zctas)
-  ([_         [vin]       [sco]  [lev]        _           ["500" "k"] _] (geoScopeFiler [lev       "500" "k" vin    sco])) ; 2010
+  ([_         [vin]       [sco]  ["outline"]  [res mes] _]               (geoScopeFiler ["outline" res   mes vin    sco])) ; 2010
+  ([_         [vin]       [sco]  ["uac" "10"] [res mes] _]               (geoScopeFiler ["uac"     res   mes vin    sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev _     ] [res mes] _]               (geoScopeFiler [lev       res   mes "2012" sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev]        [res mes] _]               (geoScopeFiler [lev       res   mes "2012" sco])) ; 2012
+  ([_         [vin]       [sco]  [lev]        [res mes] _]               (geoScopeFiler [lev       res   mes vin    sco])) ; 2013+
+  ([_         [vin]       [sco]  [lev _     ] [res mes] _]               (geoScopeFiler [lev       res   mes vin    sco])) ; 2013+
+  ([_         ["2010"]    ["us"] ["860"]      _           ["500" "k"] _] nil) ;; abandon ship (500k zctas)
+  ([_         [vin]       [sco]  [lev]        _           [res   mes] _] (geoScopeFiler [lev       res   mes vin    sco])) ; 2010
   ([& anything-else]                                                     nil))
 
 (defn filename->>geopath
