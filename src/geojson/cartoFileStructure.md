@@ -180,9 +180,11 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 7) for zbp, `zipcode` for all others: `zip-code-tabulation-area`
 8) Confirm that US boundary hasn't changed since 1990 (earliest available = 2010)
 
-## Rosetta Stones (all files end in .zip)
+# Rosetta Stones
 
-Note: "Incoherent" means that the GeoJSON doesn't contain enough information to construct a GEOID (!), that the stats API doesn't avail the data (?) at this level or both (?!).
+Note: "Incoherent" means that the 
+1) GeoJSON doesn't contain enough information to construct a GEOID (!)
+2) that the stats API doesn't avail the data (?) at this level
 
 Key                                                           | 1990                     | GEOID                                        | Notes
 ------------------------------------------------------------- | ------------------------ | -------------------------------------------- | -----
@@ -200,7 +202,7 @@ american-indian-area!alaska-native-area!hawaiian-home-land    | ir99_d90_shp    
 metropolitan-statistical-area!micropolitan-statistical-area   | ma99_90_shp              | "MSA":"0380"                                 | Incoherent?
 combined-statistical-area                                     | x                        |                                              |
 new-england-city-and-town-area                                | x                        |                                              | 
-urban-area                                                    | ua99_d90_shp             | "UA":"0380"                                  | Incoherent
+urban-area                                                    | ua99_d90_shp             | "UA":"0380"                                  | Incoherent!
 congressional-district                                        | x                        |                                              | (3)
 school-district-'elementary'                                  | x                        |                                              | 
 school-district-'secondary'                                   | x                        |                                              | 
@@ -227,7 +229,7 @@ alaska-native-regional-corporation                            | an02_d00_shp    
 american-indian-area!alaska-native-area!hawaiian-home-land    | na99_d00_shp             | "AIANACE":"6165"                             | Incoherent?
 metropolitan-statistical-area!micropolitan-statistical-area   | x                        | x                                            |
 combined-statistical-area                                     | x                        | x                                            |
-new-england-city-and-town-area                                | ne99_d00_shp             | FIXME: add `ne` geoKeyMap to `:2000`         |
+new-england-city-and-town-area                                | ne99_d00_shp             | "NECMA":"1123"                               | Incoherent?
 urban-area                                                    | ua99_d00_shp             | "UA":"45748"                                 | Incoherent?
 congressional-district                                        | x                        | x                                            | (3) 
 school-district-'elementary'                                  | se01_d00_shp             | "STATE":"44","SD_E":"00360"                  |
@@ -238,7 +240,6 @@ public-use-microdata-area                                     | x               
 zip-code-tabulation-area                                      | zt01_d00_shp             | "ZCTA":"99782"                               | 
 state-legislative-district-'upper-chamber'                    | su01_d00_shp             | "STATE":"44","SLDU":"033"                    |
 state-legislative-district-'lower-chamber'                    | sl01_d00_shp             | "STATE":"44","SLDL":"063"                    |
-
 
 
 Key                                                           | 2010                     | GEOID                                        | Notes
@@ -264,7 +265,7 @@ school-district-'secondary'                                   | x               
 school-district-'unified'                                     | gz_2010_01_970_00_500k   | "STATE":"44","SDUNI":"00120"                 |
 block-group                                                   | gz_2010_01_150_00_500k   | "STATE":"44","COUNTY":"001","TRACT":"030602","BLKGRP":"1" |
 public-use-microdata-area                                     | x                        | x                                            |
-zip-code-tabulation-area                                      | gz_2010_us_860_00_500k   | Quote: `this is a bfjo, punted               | Remove from `geoKeyMap`
+zip-code-tabulation-area                                      | gz_2010_us_860_00_500k   | `this is a bfjo, punted`                     | 
 state-legislative-district-'upper-chamber'                    | gz_2010_01_610_u2_500k   | "STATE":"44","SLDU":"004"                    |
 state-legislative-district-'lower-chamber'                    | gz_2010_01_620_l2_500k   | "STATE":"44","SLDL":"001"                    |
 
@@ -297,7 +298,6 @@ state-legislative-district-'upper-chamber'                    | cb_rd13_01_sldu_
 state-legislative-district-'lower-chamber'                    | cb_rd13_01_sldl_500k     | "GEOID":"44061"                              | `use`
 
 
-
 Key                                                           | 2013                     | GEOID                                         | NOTES
 ------------------------------------------------------------- | :----------------------- | --------------------------------------------- | ------
 nation                                                        | cb_2013_us_nation_500k   | "GEOID":"US"                                  |
@@ -324,6 +324,7 @@ public-use-microdata-area                                     | cb_2013_01_puma1
 zip-code-tabulation-area                                      | cb_2013_us_zcta510_500k  | "GEOID10":"36522"                             | `use`
 state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k     | "GEOID":"44011"                               |
 state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k     | "GEOID":"44062"                               |
+
 
 Key                                                           | 2014                     | GEOID                                         | Notes
 ------------------------------------------------------------- | :----------------------- | --------------------------------------------- | ------
@@ -667,7 +668,7 @@ Vintage       | i0           | i1          | i2                | i3             
 - [x] County
 - [x] County Within Congressional District
 - [x] Division
-- [?] Metropolitan and Micropolitan Statistical Area and Related Statistical Area
+- [ ] Metropolitan and Micropolitan Statistical Area and Related Statistical Area <- Questions remain
 - [x] Nation (U.S. Outline)
 - [x] Region
 - [x] State
@@ -692,13 +693,6 @@ Vintage       | i0           | i1          | i2                | i3             
    
 Codes:
 1) Follow up: Need clarification on alignment between cartography files and api geography
-
-```clojure
-(let [level (last geoHiearchy)
-      vintage vintage]
-    (cond (= level :county)
-          (get from vintage path))
-```
 
 ## Functions
 
