@@ -74,10 +74,9 @@
 ;; A stateful transducer is needed to change the behavior based on which item in the collection we are "on".
 (defn xf-zipmap-1st
   "
-  Stateful transducer, which stores the first item as a list
-  of a keys to apply (via `zipmap`) to the rest of the items
-  in a collection. Serves to turn the Census API response into
-  a more conventional JSON format.
+  Stateful transducer, which stores the first item as a list of a keys to apply
+  (via `zipmap`) to the rest of the items in a collection. Serves to turn the
+  Census API response into a more conventional JSON format.
   "
   [rf]
   (let [prep (volatile! nil)]
@@ -94,12 +93,11 @@
 ;; If you want to pass an argument into your transducer, wrap it in another function, which takes the arg and returns a transducer containing it.
 (defn xf-geo+stat
   "
-  A function, which returns a transducer after being passed
-  an integer argument denoting the number of values the user
-  requested. The transducer is used to transform each item
-  from the Census API response collection into a new map with
-  a hierarchy that will enable deep-merging of the stats with
-  a GeoJSON `feature`s `:properties` map.
+  A function, which returns a transducer after being passed an integer argument
+  denoting the number of values the user requested. The transducer is used to
+  transform each item from the Census API response collection into a new map with
+  a hierarchy that will enable deep-merging of the stats with a GeoJSON
+  `feature`s `:properties` map.
   "
   [vars#]
   (fn [rf]
@@ -129,13 +127,12 @@
 
 (defn xf-stats->map
   "
-  A higher order transducer function, which returns a transducer
-  after being passed an integer argument denoting the number of
-  values the user requested. The transducer is used to transform
-  *the entire* Census API response collection into a new map,
-  which will enable deep-merging of the stats with a GeoJSON
-  `feature`s `:properties` map. Designed as a `core.async`
-  channel transducer.
+  A higher order transducer function, which returns a transducer after being
+  passed an integer argument denoting the number of values the user requested.
+  The transducer is used to transform *the entire* Census API response
+  collection into a new map, which will enable deep-merging of the stats with a
+  GeoJSON `feature`s `:properties` map. Designed as a `core.async` channel
+  transducer.
   "
   [vars#]
   (fn [rf]
@@ -146,11 +143,12 @@
        (rf result (transduce (xf-1-stat->map vars#) conj item))))))
 
 (defn xf-geo+feature
-  "A function, which returns a transducer after being passed an
-  integer argument denoting the number of values the user requested.
-  The transducer is used to transform each item withing a GeoJSON
-  FeatureCollection into a new map with a hierarchy that will
-  enable deep-merging of the stats with a stat map."
+  "
+  A function, which returns a transducer after being passed an integer argument
+  denoting the number of values the user requested. The transducer is used to
+  transform each item withing a GeoJSON FeatureCollection into a new map with a
+  hierarchy that will enable deep-merging of the stats with a stat map.
+  "
   [rf]
   (fn
     ([] (rf))
@@ -160,10 +158,9 @@
 
 (defn xf-features->map
   "
-  This is a transducer, which uses a transducer to operate over a list,
-  which is returned as a single response from an HTTP request.
-  This transducer is meant to be used in concert with a `core.async`
-  channel.
+  This is a transducer, which uses a transducer to operate over a list, which is
+  returned as a single response from an HTTP request. This transducer is meant
+  to be used in concert with a `core.async` channel.
   "
   [rf]
   (fn
@@ -176,8 +173,10 @@
 
 ;; Deep Merge function [stolen](https://gist.github.com/danielpcox/c70a8aa2c36766200a95)
 (defn deep-merge
-  "Recursively merges two maps together along matching key paths.
-  Implements `clojure/core.merge-with`."
+  "
+  Recursively merges two maps together along matching key paths. Implements
+  `clojure/core.merge-with`.
+  "
   [v & vs]
   (letfn [(rec-merge [v1 v2]
             (if (and (map? v1) (map? v2))
@@ -190,10 +189,9 @@
 ;; map destructuring courtesy [Arthur Ulfeldt](https://stackoverflow.com/a/12505774)
 (defn merge-xfilter
   "
-  Takes two keys that serve to filter a merged list of two maps,
-  which returns a list of only those maps which have both keys.
-  Each key identifies of the merged maps.
-  This ensures the returned list contains only the overlap
+  Takes two keys that serve to filter a merged list of two maps, which returns a
+  list of only those maps which have both keys. Each key identifies of the
+  merged maps. This ensures the returned list contains only the overlap
   between the two, i.e., excluding non-merged maps.
   "
   [var1 var2]
@@ -214,11 +212,10 @@
 
 (defn merge-geo+stats
   "
-  Higher Order Function, which takes two vars and returns another
-  function, which does a collection-level transformation,
-  which takes two input map-collections, merges them and then
-  filters them to return only those map-items, which contain
-  an identifying key from each source map.
+  Higher Order Function, which takes two vars and returns another function,
+  which does a collection-level transformation, which takes two input
+  map-collections, merges them and then filters them to return only those
+  map-items, which contain an identifying key from each source map.
   "
   [var1 var2]
   (fn [stats-map geo-map]
@@ -241,18 +238,16 @@
 
 (defn merge-geo-stats->map
   "
-  Takes an arg map to configure a call the Census' statistics
-  API as well as a matching GeoJSON file. The match is based
-  on `vintage` and `geoHierarchy` of the arg map. The calls
-  are spun up (simultaneously) into parallel `core.async`
-  processes for speed. Both calls return their results via a
-  `core.async` channel (`chan`) - for later merger - via `put!`.
-  The results from the Census stats `chan` are passed into a local
-  `chan` to store the state.  A `deep-merge` into the local `chan`
-  combines the stats results with the GeoJSON values.
-  Note that the GeoJSON results can be a superset of the Census
-  stats' results. Thus, superfluous GeoJSON values are filtered out
-  via a `remove` operation on the collection in the local `chan`.
+  Takes an arg map to configure a call the Census' statistics API as well as a
+  matching GeoJSON file. The match is based on `vintage` and `geoHierarchy` of
+  the arg map. The calls are spun up (simultaneously) into parallel `core.async`
+  processes for speed. Both calls return their results via a `core.async`
+  channel (`chan`) - for later merger - via `put!`. The results from the Census
+  stats `chan` are passed into a local `chan` to store the state.  A
+  `deep-merge` into the local `chan` combines the stats results with the GeoJSON
+  values. Note that the GeoJSON results can be a superset of the Census stats'
+  results. Thus, superfluous GeoJSON values are filtered out via a `remove`
+  operation on the collection in the local `chan`.
   "
   [args]
   (let [stats-call (stats-url-builder args)

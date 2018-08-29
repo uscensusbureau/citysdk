@@ -111,7 +111,8 @@
                                                                  :2015 "necta"
                                                                  :2016 "necta"
                                                                  :2017 "necta"
-                                                                 :2010 "350"}
+                                                                 :2010 "350"
+                                                                 :2000 "ne"}
    :combined-new-england-city-and-town-area                     {:2016 "cnecta"
                                                                  :2017 "cnecta"}
    :urban-area                                                  {:2013 "ua"

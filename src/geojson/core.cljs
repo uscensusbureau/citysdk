@@ -69,7 +69,8 @@
        (map-target-idx map-xx->vin 2)
        (map #(vec %))))
 
-(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
+#_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
+
 ; TODO: If geoKeyMap requires additional config to enable pattern matching for
 ; TODO: API + GeoJSON merger, update this:
 
@@ -491,5 +492,5 @@
                            \n === Wrapping up .... === \n
                            \n ======================== \n")))))
 
-;; (batch=>zip-paths=>convert=>geojson geos_abv/paths)
+(batch=>zip-paths=>convert=>geojson geos/paths)
 
