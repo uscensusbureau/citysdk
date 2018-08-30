@@ -79,10 +79,15 @@
   Searches a single item from an inverted geoKeyMap and checks for a match
   against the provided vintage/level abbreviation code pair. Returns the `name`
   of the key (string) if matched and `nil` if mismatched.
+
+  Inputs:
+  1) vintage = string
+  2) level abbreviation = string
+  3) a map with a single key/value set
   "
   [vintage level [k v]]
   (if-let [[_ v2] (find k (keyword vintage))]
-    (if (= v2 level) (name v) nil)
+    (if (= (first v2) [:abbr level]) (name v) nil)
     nil))
 
 (defn keySearch
@@ -90,6 +95,10 @@
   Searches the entire geoKeyMap (inverted) for matches against a provided
   vintage and level abbreviation returning a string for the verbose geoKeyMap
   key match if successful and an empty string ('') if not.
+
+  Inputs:
+  1) vintage = string
+  2) level abbreviation = string
   "
   [vintage level]
   (apply str (remove nil? (map #(vin+lev=?key vintage level %)
@@ -492,5 +501,4 @@
                            \n === Wrapping up .... === \n
                            \n ======================== \n")))))
 
-(batch=>zip-paths=>convert=>geojson geos/paths)
-
+;(batch=>zip-paths=>convert=>geojson geos/paths)

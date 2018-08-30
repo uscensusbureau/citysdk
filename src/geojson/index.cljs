@@ -10,178 +10,178 @@
 
 
 (def geoKeyMap
-  {:nation                                                      {:2010 "outline"
-                                                                 :2013 "nation"
-                                                                 :2014 "nation"
-                                                                 :2015 "nation"
-                                                                 :2016 "nation"
-                                                                 :2017 "nation"}
-   :region                                                      {:2013 "region"
-                                                                 :2014 "region"
-                                                                 :2015 "region"
-                                                                 :2016 "region"
-                                                                 :2017 "region"
-                                                                 :2010 "020"
-                                                                 :2000 "rg"}
-   :division                                                    {:2013 "division"
-                                                                 :2014 "division"
-                                                                 :2015 "division"
-                                                                 :2016 "division"
-                                                                 :2017 "division"
-                                                                 :2010 "030"
-                                                                 :2000 "dv"}
-   :state                                                       {:2013 "state"
-                                                                 :2014 "state"
-                                                                 :2015 "state"
-                                                                 :2016 "state"
-                                                                 :2017 "state"
-                                                                 :2010 "040"
-                                                                 :1990 "st"
-                                                                 :2000 "st"}
-   :consolidated-cities                                         {:2000 "cc"
-                                                                 :2010 "170"
-                                                                 :2013 "concity"
-                                                                 :2014 "concity"
-                                                                 :2015 "concity"
-                                                                 :2016 "concity"
-                                                                 :2017 "concity"}
-   :county                                                      {:2013 "county"
-                                                                 :2014 "county"
-                                                                 :2015 "county"
-                                                                 :2016 "county"
-                                                                 :2017 "county"
-                                                                 :2010 "050"
-                                                                 :1990 "co"
-                                                                 :2000 "co"}
-   :county-subdivision                                          {:2013 "cousub"
-                                                                 :2014 "cousub"
-                                                                 :2015 "cousub"
-                                                                 :2016 "cousub"
-                                                                 :2017 "cousub"
-                                                                 :2010 "060"
-                                                                 :1990 "cs"
-                                                                 :2000 "cs"}
-   :tract                                                       {:2013 "tract"
-                                                                 :2014 "tract"
-                                                                 :2015 "tract"
-                                                                 :2016 "tract"
-                                                                 :2017 "tract"
-                                                                 :2010 "140"
-                                                                 :1990 "tr"
-                                                                 :2000 "tr"}
-   :place                                                       {:2013 "place"
-                                                                 :2014 "place"
-                                                                 :2015 "place"
-                                                                 :2016 "place"
-                                                                 :2017 "place"
-                                                                 :2010 "160"
-                                                                 :1990 "pl"
-                                                                 :2000 "pl"}
-   :alaska-native-regional-corporation                          {:2013 "anrc"
-                                                                 :2014 "anrc"
-                                                                 :2015 "anrc"
-                                                                 :2016 "anrc"
-                                                                 :2017 "anrc"
-                                                                 :2010 "230"
-                                                                 :1990 "an"
-                                                                 :2000 "an"}
-   :american-indian-area!alaska-native-area!hawaiian-home-land  {:2013 "aiannh"
-                                                                 :2014 "aiannh"
-                                                                 :2015 "aiannh"
-                                                                 :2016 "aiannh"
-                                                                 :2017 "aiannh"
-                                                                 :2010 "250"
-                                                                 :1990 "ir"
-                                                                 :2000 "na"}
-   :metropolitan-statistical-area!micropolitan-statistical-area {:2013 "cbsa"
-                                                                 :2014 "cbsa"
-                                                                 :2015 "cbsa"
-                                                                 :2016 "cbsa"
-                                                                 :2017 "cbsa"
-                                                                 :2010 "310"
-                                                                 :1990 "ma"}
-   :combined-statistical-area                                   {:2013 "csa"
-                                                                 :2014 "csa"
-                                                                 :2015 "csa"
-                                                                 :2016 "csa"
-                                                                 :2017 "csa"
-                                                                 :2010 "330"}
-   :new-england-city-and-town-area                              {:2013 "necta"
-                                                                 :2014 "necta"
-                                                                 :2015 "necta"
-                                                                 :2016 "necta"
-                                                                 :2017 "necta"
-                                                                 :2010 "350"
-                                                                 :2000 "ne"}
-   :combined-new-england-city-and-town-area                     {:2016 "cnecta"
-                                                                 :2017 "cnecta"}
-   :urban-area                                                  {:2013 "ua"
-                                                                 :2014 "ua"
-                                                                 :2015 "ua"
-                                                                 :2016 "ua"
-                                                                 :2017 "ua"
-                                                                 :2012 "uac"
-                                                                 :1990 "ua"
-                                                                 :2000 "ua"}
-   :congressional-district                                      {:103  "cd"
-                                                                 :104  "cd"
-                                                                 :105  "cd"
-                                                                 :106  "cd"
-                                                                 :107  "cd"
-                                                                 :108  "cd"
-                                                                 :109  "cd"
-                                                                 :110  "cd"
-                                                                 :2013 "cd"
-                                                                 :2014 "cd"
-                                                                 :2015 "cd"
-                                                                 :2016 "cd"
-                                                                 :2017 "cd"
-                                                                 :2012 "cd"
-                                                                 :2010 "500"}
-   :school-district-'elementary'                                {:2016 "elsd"
-                                                                 :2017 "elsd"
-                                                                 :2000 "se"}
-   :school-district-'secondary'                                 {:2016 "scsd"
-                                                                 :2017 "scsd"
-                                                                 :2000 "ss"}
-   :school-district-'unified'                                   {:2016 "unsd"
-                                                                 :2017 "unsd"
-                                                                 :2010 "970"
-                                                                 :2000 "sn"}
-   :block-group                                                 {:2013 "bg"
-                                                                 :2014 "bg"
-                                                                 :2015 "bg"
-                                                                 :2016 "bg"
-                                                                 :2017 "bg"
-                                                                 :2010 "150"
-                                                                 :1990 "bg"
-                                                                 :2000 "bg"}
-   :public-use-microdata-area                                   {:2013 "puma"
-                                                                 :2014 "puma"
-                                                                 :2015 "puma"
-                                                                 :2016 "puma"
-                                                                 :2017 "puma"}
-   :zip-code-tabulation-area                                    {:2013 "zcta"
-                                                                 :2014 "zcta"
-                                                                 :2015 "zcta"
-                                                                 :2016 "zcta"
-                                                                 :2017 "zcta"
-                                                                 :2010 "860" ;; this is a bfjo, punted
-                                                                 :2000 "zt"} ;; zipcodes are *not* the same
-   :state-legislative-district-'upper-chamber'                  {:2013 "sldu"
-                                                                 :2014 "sldu"
-                                                                 :2015 "sldu"
-                                                                 :2016 "sldu"
-                                                                 :2017 "sldu"
-                                                                 :2012 "sldu"
-                                                                 :2010 "610"
-                                                                 :2000 "su"}
-   :state-legislative-district-'lower-chamber'                  {:2013 "sldl"
-                                                                 :2014 "sldl"
-                                                                 :2015 "sldl"
-                                                                 :2016 "sldl"
-                                                                 :2017 "sldl"
-                                                                 :2012 "sldl"
-                                                                 :2010 "620"
-                                                                 :2000 "sl"}})
+  {:nation                                                      {:2010 {:abbr "outline"  :geo-target []}
+                                                                 :2013 {:abbr "nation"   :geo-target []}
+                                                                 :2014 {:abbr "nation"   :geo-target []}
+                                                                 :2015 {:abbr "nation"   :geo-target []}
+                                                                 :2016 {:abbr "nation"   :geo-target []}
+                                                                 :2017 {:abbr "nation"   :geo-target []}}
+   :region                                                      {:2013 {:abbr "region"   :geo-target []}
+                                                                 :2014 {:abbr "region"   :geo-target []}
+                                                                 :2015 {:abbr "region"   :geo-target []}
+                                                                 :2016 {:abbr "region"   :geo-target []}
+                                                                 :2017 {:abbr "region"   :geo-target []}
+                                                                 :2010 {:abbr "020"      :geo-target []}
+                                                                 :2000 {:abbr "rg"       :geo-target []}}
+   :division                                                    {:2013 {:abbr "division" :geo-target []}
+                                                                 :2014 {:abbr "division" :geo-target []}
+                                                                 :2015 {:abbr "division" :geo-target []}
+                                                                 :2016 {:abbr "division" :geo-target []}
+                                                                 :2017 {:abbr "division" :geo-target []}
+                                                                 :2010 {:abbr "030"      :geo-target []}
+                                                                 :2000 {:abbr "dv"       :geo-target []}}
+   :state                                                       {:2013 {:abbr "state"    :geo-target []}
+                                                                 :2014 {:abbr "state"    :geo-target []}
+                                                                 :2015 {:abbr "state"    :geo-target []}
+                                                                 :2016 {:abbr "state"    :geo-target []}
+                                                                 :2017 {:abbr "state"    :geo-target []}
+                                                                 :2010 {:abbr "040"      :geo-target []}
+                                                                 :1990 {:abbr "st"       :geo-target []}
+                                                                 :2000 {:abbr "st"       :geo-target []}}
+   :consolidated-cities                                         {:2000 {:abbr "cc"       :geo-target []}
+                                                                 :2010 {:abbr "170"      :geo-target []}
+                                                                 :2013 {:abbr "concity"  :geo-target []}
+                                                                 :2014 {:abbr "concity"  :geo-target []}
+                                                                 :2015 {:abbr "concity"  :geo-target []}
+                                                                 :2016 {:abbr "concity"  :geo-target []}
+                                                                 :2017 {:abbr "concity"  :geo-target []}}
+   :county                                                      {:2013 {:abbr "county"   :geo-target []}
+                                                                 :2014 {:abbr "county"   :geo-target []}
+                                                                 :2015 {:abbr "county"   :geo-target []}
+                                                                 :2016 {:abbr "county"   :geo-target []}
+                                                                 :2017 {:abbr "county"   :geo-target []}
+                                                                 :2010 {:abbr "050"      :geo-target []}
+                                                                 :1990 {:abbr "co"       :geo-target []}
+                                                                 :2000 {:abbr "co"       :geo-target []}}
+   :county-subdivision                                          {:2013 {:abbr "cousub"   :geo-target []}
+                                                                 :2014 {:abbr "cousub"   :geo-target []}
+                                                                 :2015 {:abbr "cousub"   :geo-target []}
+                                                                 :2016 {:abbr "cousub"   :geo-target []}
+                                                                 :2017 {:abbr "cousub"   :geo-target []}
+                                                                 :2010 {:abbr "060"      :geo-target []}
+                                                                 :1990 {:abbr "cs"       :geo-target []}
+                                                                 :2000 {:abbr "cs"       :geo-target []}}
+   :tract                                                       {:2013 {:abbr "tract"    :geo-target []}
+                                                                 :2014 {:abbr "tract"    :geo-target []}
+                                                                 :2015 {:abbr "tract"    :geo-target []}
+                                                                 :2016 {:abbr "tract"    :geo-target []}
+                                                                 :2017 {:abbr "tract"    :geo-target []}
+                                                                 :2010 {:abbr "140"      :geo-target []}
+                                                                 :1990 {:abbr "tr"       :geo-target []}
+                                                                 :2000 {:abbr "tr"       :geo-target []}}
+   :place                                                       {:2013 {:abbr "place"    :geo-target []}
+                                                                 :2014 {:abbr "place"    :geo-target []}
+                                                                 :2015 {:abbr "place"    :geo-target []}
+                                                                 :2016 {:abbr "place"    :geo-target []}
+                                                                 :2017 {:abbr "place"    :geo-target []}
+                                                                 :2010 {:abbr "160"      :geo-target []}
+                                                                 :1990 {:abbr "pl"       :geo-target []}
+                                                                 :2000 {:abbr "pl"       :geo-target []}}
+   :alaska-native-regional-corporation                          {:2013 {:abbr "anrc"     :geo-target []}
+                                                                 :2014 {:abbr "anrc"     :geo-target []}
+                                                                 :2015 {:abbr "anrc"     :geo-target []}
+                                                                 :2016 {:abbr "anrc"     :geo-target []}
+                                                                 :2017 {:abbr "anrc"     :geo-target []}
+                                                                 :2010 {:abbr "230"      :geo-target []}
+                                                                 :1990 {:abbr "an"       :geo-target []}
+                                                                 :2000 {:abbr "an"       :geo-target []}}
+   :american-indian-area!alaska-native-area!hawaiian-home-land  {:2013 {:abbr "aiannh"   :geo-target []}
+                                                                 :2014 {:abbr "aiannh"   :geo-target []}
+                                                                 :2015 {:abbr "aiannh"   :geo-target []}
+                                                                 :2016 {:abbr "aiannh"   :geo-target []}
+                                                                 :2017 {:abbr "aiannh"   :geo-target []}
+                                                                 :2010 {:abbr "250"      :geo-target []}
+                                                                 :1990 {:abbr "ir"       :geo-target []}
+                                                                 :2000 {:abbr "na"       :geo-target []}}
+   :metropolitan-statistical-area!micropolitan-statistical-area {:2013 {:abbr "cbsa"     :geo-target []}
+                                                                 :2014 {:abbr "cbsa"     :geo-target []}
+                                                                 :2015 {:abbr "cbsa"     :geo-target []}
+                                                                 :2016 {:abbr "cbsa"     :geo-target []}
+                                                                 :2017 {:abbr "cbsa"     :geo-target []}
+                                                                 :2010 {:abbr "310"      :geo-target []}
+                                                                 :1990 {:abbr "ma"       :geo-target []}}
+   :combined-statistical-area                                   {:2013 {:abbr "csa"      :geo-target []}
+                                                                 :2014 {:abbr "csa"      :geo-target []}
+                                                                 :2015 {:abbr "csa"      :geo-target []}
+                                                                 :2016 {:abbr "csa"      :geo-target []}
+                                                                 :2017 {:abbr "csa"      :geo-target []}
+                                                                 :2010 {:abbr "330"      :geo-target []}}
+   :new-england-city-and-town-area                              {:2013 {:abbr "necta"    :geo-target []}
+                                                                 :2014 {:abbr "necta"    :geo-target []}
+                                                                 :2015 {:abbr "necta"    :geo-target []}
+                                                                 :2016 {:abbr "necta"    :geo-target []}
+                                                                 :2017 {:abbr "necta"    :geo-target []}
+                                                                 :2010 {:abbr "350"      :geo-target []}
+                                                                 :2000 {:abbr "ne"       :geo-target []}}
+   :combined-new-england-city-and-town-area                     {:2016 {:abbr "cnecta"   :geo-target []}
+                                                                 :2017 {:abbr "cnecta"   :geo-target []}}
+   :urban-area                                                  {:2013 {:abbr "ua"       :geo-target []}
+                                                                 :2014 {:abbr "ua"       :geo-target []}
+                                                                 :2015 {:abbr "ua"       :geo-target []}
+                                                                 :2016 {:abbr "ua"       :geo-target []}
+                                                                 :2017 {:abbr "ua"       :geo-target []}
+                                                                 :2012 {:abbr "uac"      :geo-target []}
+                                                                 :1990 {:abbr "ua"       :geo-target []}
+                                                                 :2000 {:abbr "ua"       :geo-target []}}
+   :congressional-district                                      {:103  {:abbr "cd"       :geo-target []}
+                                                                 :104  {:abbr "cd"       :geo-target []}
+                                                                 :105  {:abbr "cd"       :geo-target []}
+                                                                 :106  {:abbr "cd"       :geo-target []}
+                                                                 :107  {:abbr "cd"       :geo-target []}
+                                                                 :108  {:abbr "cd"       :geo-target []}
+                                                                 :109  {:abbr "cd"       :geo-target []}
+                                                                 :110  {:abbr "cd"       :geo-target []}
+                                                                 :2013 {:abbr "cd"       :geo-target []}
+                                                                 :2014 {:abbr "cd"       :geo-target []}
+                                                                 :2015 {:abbr "cd"       :geo-target []}
+                                                                 :2016 {:abbr "cd"       :geo-target []}
+                                                                 :2017 {:abbr "cd"       :geo-target []}
+                                                                 :2012 {:abbr "cd"       :geo-target []}
+                                                                 :2010 {:abbr "500"      :geo-target []}}
+   :school-district-'elementary'                                {:2016 {:abbr "elsd"     :geo-target []}
+                                                                 :2017 {:abbr "elsd"     :geo-target []}
+                                                                 :2000 {:abbr "se"       :geo-target []}}
+   :school-district-'secondary'                                 {:2016 {:abbr "scsd"     :geo-target []}
+                                                                 :2017 {:abbr "scsd"     :geo-target []}
+                                                                 :2000 {:abbr "ss"       :geo-target []}}
+   :school-district-'unified'                                   {:2016 {:abbr "unsd"     :geo-target []}
+                                                                 :2017 {:abbr "unsd"     :geo-target []}
+                                                                 :2010 {:abbr "970"      :geo-target []}
+                                                                 :2000 {:abbr "sn"       :geo-target []}}
+   :block-group                                                 {:2013 {:abbr "bg"       :geo-target []}
+                                                                 :2014 {:abbr "bg"       :geo-target []}
+                                                                 :2015 {:abbr "bg"       :geo-target []}
+                                                                 :2016 {:abbr "bg"       :geo-target []}
+                                                                 :2017 {:abbr "bg"       :geo-target []}
+                                                                 :2010 {:abbr "150"      :geo-target []}
+                                                                 :1990 {:abbr "bg"       :geo-target []}
+                                                                 :2000 {:abbr "bg"       :geo-target []}}
+   :public-use-microdata-area                                   {:2013 {:abbr "puma"     :geo-target []}
+                                                                 :2014 {:abbr "puma"     :geo-target []}
+                                                                 :2015 {:abbr "puma"     :geo-target []}
+                                                                 :2016 {:abbr "puma"     :geo-target []}
+                                                                 :2017 {:abbr "puma"     :geo-target []}}
+   :zip-code-tabulation-area                                    {:2013 {:abbr "zcta"     :geo-target []}
+                                                                 :2014 {:abbr "zcta"     :geo-target []}
+                                                                 :2015 {:abbr "zcta"     :geo-target []}
+                                                                 :2016 {:abbr "zcta"     :geo-target []}
+                                                                 :2017 {:abbr "zcta"     :geo-target []}
+                                                                 :2010 {:abbr "860"      :geo-target []} ;; this is a bfjo, punted
+                                                                 :2000 {:abbr "zt"       :geo-target []}} ;; zipcodes are *not* the same
+   :state-legislative-district-'upper-chamber'                  {:2013 {:abbr "sldu"     :geo-target []}
+                                                                 :2014 {:abbr "sldu"     :geo-target []}
+                                                                 :2015 {:abbr "sldu"     :geo-target []}
+                                                                 :2016 {:abbr "sldu"     :geo-target []}
+                                                                 :2017 {:abbr "sldu"     :geo-target []}
+                                                                 :2012 {:abbr "sldu"     :geo-target []}
+                                                                 :2010 {:abbr "610"      :geo-target []}
+                                                                 :2000 {:abbr "su"       :geo-target []}}
+   :state-legislative-district-'lower-chamber'                  {:2013 {:abbr "sldl"     :geo-target []}
+                                                                 :2014 {:abbr "sldl"     :geo-target []}
+                                                                 :2015 {:abbr "sldl"     :geo-target []}
+                                                                 :2016 {:abbr "sldl"     :geo-target []}
+                                                                 :2017 {:abbr "sldl"     :geo-target []}
+                                                                 :2012 {:abbr "sldl"     :geo-target []}
+                                                                 :2010 {:abbr "620"      :geo-target []}
+                                                                 :2000 {:abbr "sl"       :geo-target []}}})
 
