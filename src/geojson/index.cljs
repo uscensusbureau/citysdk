@@ -9,179 +9,179 @@
 ;;  Y8"'8D                                       _/                                 888
 
 
-(def geoKeyMap
-  {:nation                                                      {:2010 {:abbr "outline"  :geo-target []}
-                                                                 :2013 {:abbr "nation"   :geo-target []}
-                                                                 :2014 {:abbr "nation"   :geo-target []}
-                                                                 :2015 {:abbr "nation"   :geo-target []}
-                                                                 :2016 {:abbr "nation"   :geo-target []}
-                                                                 :2017 {:abbr "nation"   :geo-target []}}
-   :region                                                      {:2013 {:abbr "region"   :geo-target []}
-                                                                 :2014 {:abbr "region"   :geo-target []}
-                                                                 :2015 {:abbr "region"   :geo-target []}
-                                                                 :2016 {:abbr "region"   :geo-target []}
-                                                                 :2017 {:abbr "region"   :geo-target []}
-                                                                 :2010 {:abbr "020"      :geo-target []}
-                                                                 :2000 {:abbr "rg"       :geo-target []}}
-   :division                                                    {:2013 {:abbr "division" :geo-target []}
-                                                                 :2014 {:abbr "division" :geo-target []}
-                                                                 :2015 {:abbr "division" :geo-target []}
-                                                                 :2016 {:abbr "division" :geo-target []}
-                                                                 :2017 {:abbr "division" :geo-target []}
-                                                                 :2010 {:abbr "030"      :geo-target []}
-                                                                 :2000 {:abbr "dv"       :geo-target []}}
-   :state                                                       {:2013 {:abbr "state"    :geo-target []}
-                                                                 :2014 {:abbr "state"    :geo-target []}
-                                                                 :2015 {:abbr "state"    :geo-target []}
-                                                                 :2016 {:abbr "state"    :geo-target []}
-                                                                 :2017 {:abbr "state"    :geo-target []}
-                                                                 :2010 {:abbr "040"      :geo-target []}
-                                                                 :1990 {:abbr "st"       :geo-target []}
-                                                                 :2000 {:abbr "st"       :geo-target []}}
-   :consolidated-cities                                         {:2000 {:abbr "cc"       :geo-target []}
-                                                                 :2010 {:abbr "170"      :geo-target []}
-                                                                 :2013 {:abbr "concity"  :geo-target []}
-                                                                 :2014 {:abbr "concity"  :geo-target []}
-                                                                 :2015 {:abbr "concity"  :geo-target []}
-                                                                 :2016 {:abbr "concity"  :geo-target []}
-                                                                 :2017 {:abbr "concity"  :geo-target []}}
-   :county                                                      {:2013 {:abbr "county"   :geo-target []}
-                                                                 :2014 {:abbr "county"   :geo-target []}
-                                                                 :2015 {:abbr "county"   :geo-target []}
-                                                                 :2016 {:abbr "county"   :geo-target []}
-                                                                 :2017 {:abbr "county"   :geo-target []}
-                                                                 :2010 {:abbr "050"      :geo-target []}
-                                                                 :1990 {:abbr "co"       :geo-target []}
-                                                                 :2000 {:abbr "co"       :geo-target []}}
-   :county-subdivision                                          {:2013 {:abbr "cousub"   :geo-target []}
-                                                                 :2014 {:abbr "cousub"   :geo-target []}
-                                                                 :2015 {:abbr "cousub"   :geo-target []}
-                                                                 :2016 {:abbr "cousub"   :geo-target []}
-                                                                 :2017 {:abbr "cousub"   :geo-target []}
-                                                                 :2010 {:abbr "060"      :geo-target []}
-                                                                 :1990 {:abbr "cs"       :geo-target []}
-                                                                 :2000 {:abbr "cs"       :geo-target []}}
-   :tract                                                       {:2013 {:abbr "tract"    :geo-target []}
-                                                                 :2014 {:abbr "tract"    :geo-target []}
-                                                                 :2015 {:abbr "tract"    :geo-target []}
-                                                                 :2016 {:abbr "tract"    :geo-target []}
-                                                                 :2017 {:abbr "tract"    :geo-target []}
-                                                                 :2010 {:abbr "140"      :geo-target []}
-                                                                 :1990 {:abbr "tr"       :geo-target []}
-                                                                 :2000 {:abbr "tr"       :geo-target []}}
-   :place                                                       {:2013 {:abbr "place"    :geo-target []}
-                                                                 :2014 {:abbr "place"    :geo-target []}
-                                                                 :2015 {:abbr "place"    :geo-target []}
-                                                                 :2016 {:abbr "place"    :geo-target []}
-                                                                 :2017 {:abbr "place"    :geo-target []}
-                                                                 :2010 {:abbr "160"      :geo-target []}
-                                                                 :1990 {:abbr "pl"       :geo-target []}
-                                                                 :2000 {:abbr "pl"       :geo-target []}}
-   :alaska-native-regional-corporation                          {:2013 {:abbr "anrc"     :geo-target []}
-                                                                 :2014 {:abbr "anrc"     :geo-target []}
-                                                                 :2015 {:abbr "anrc"     :geo-target []}
-                                                                 :2016 {:abbr "anrc"     :geo-target []}
-                                                                 :2017 {:abbr "anrc"     :geo-target []}
-                                                                 :2010 {:abbr "230"      :geo-target []}
-                                                                 :1990 {:abbr "an"       :geo-target []}
-                                                                 :2000 {:abbr "an"       :geo-target []}}
-   :american-indian-area!alaska-native-area!hawaiian-home-land  {:2013 {:abbr "aiannh"   :geo-target []}
-                                                                 :2014 {:abbr "aiannh"   :geo-target []}
-                                                                 :2015 {:abbr "aiannh"   :geo-target []}
-                                                                 :2016 {:abbr "aiannh"   :geo-target []}
-                                                                 :2017 {:abbr "aiannh"   :geo-target []}
-                                                                 :2010 {:abbr "250"      :geo-target []}
-                                                                 :1990 {:abbr "ir"       :geo-target []}
-                                                                 :2000 {:abbr "na"       :geo-target []}}
-   :metropolitan-statistical-area!micropolitan-statistical-area {:2013 {:abbr "cbsa"     :geo-target []}
-                                                                 :2014 {:abbr "cbsa"     :geo-target []}
-                                                                 :2015 {:abbr "cbsa"     :geo-target []}
-                                                                 :2016 {:abbr "cbsa"     :geo-target []}
-                                                                 :2017 {:abbr "cbsa"     :geo-target []}
-                                                                 :2010 {:abbr "310"      :geo-target []}
-                                                                 :1990 {:abbr "ma"       :geo-target []}}
-   :combined-statistical-area                                   {:2013 {:abbr "csa"      :geo-target []}
-                                                                 :2014 {:abbr "csa"      :geo-target []}
-                                                                 :2015 {:abbr "csa"      :geo-target []}
-                                                                 :2016 {:abbr "csa"      :geo-target []}
-                                                                 :2017 {:abbr "csa"      :geo-target []}
-                                                                 :2010 {:abbr "330"      :geo-target []}}
-   :new-england-city-and-town-area                              {:2013 {:abbr "necta"    :geo-target []}
-                                                                 :2014 {:abbr "necta"    :geo-target []}
-                                                                 :2015 {:abbr "necta"    :geo-target []}
-                                                                 :2016 {:abbr "necta"    :geo-target []}
-                                                                 :2017 {:abbr "necta"    :geo-target []}
-                                                                 :2010 {:abbr "350"      :geo-target []}
-                                                                 :2000 {:abbr "ne"       :geo-target []}}
-   :combined-new-england-city-and-town-area                     {:2016 {:abbr "cnecta"   :geo-target []}
-                                                                 :2017 {:abbr "cnecta"   :geo-target []}}
-   :urban-area                                                  {:2013 {:abbr "ua"       :geo-target []}
-                                                                 :2014 {:abbr "ua"       :geo-target []}
-                                                                 :2015 {:abbr "ua"       :geo-target []}
-                                                                 :2016 {:abbr "ua"       :geo-target []}
-                                                                 :2017 {:abbr "ua"       :geo-target []}
-                                                                 :2012 {:abbr "uac"      :geo-target []}
-                                                                 :1990 {:abbr "ua"       :geo-target []}
-                                                                 :2000 {:abbr "ua"       :geo-target []}}
-   :congressional-district                                      {:103  {:abbr "cd"       :geo-target []}
-                                                                 :104  {:abbr "cd"       :geo-target []}
-                                                                 :105  {:abbr "cd"       :geo-target []}
-                                                                 :106  {:abbr "cd"       :geo-target []}
-                                                                 :107  {:abbr "cd"       :geo-target []}
-                                                                 :108  {:abbr "cd"       :geo-target []}
-                                                                 :109  {:abbr "cd"       :geo-target []}
-                                                                 :110  {:abbr "cd"       :geo-target []}
-                                                                 :2013 {:abbr "cd"       :geo-target []}
-                                                                 :2014 {:abbr "cd"       :geo-target []}
-                                                                 :2015 {:abbr "cd"       :geo-target []}
-                                                                 :2016 {:abbr "cd"       :geo-target []}
-                                                                 :2017 {:abbr "cd"       :geo-target []}
-                                                                 :2012 {:abbr "cd"       :geo-target []}
-                                                                 :2010 {:abbr "500"      :geo-target []}}
-   :school-district-'elementary'                                {:2016 {:abbr "elsd"     :geo-target []}
-                                                                 :2017 {:abbr "elsd"     :geo-target []}
-                                                                 :2000 {:abbr "se"       :geo-target []}}
-   :school-district-'secondary'                                 {:2016 {:abbr "scsd"     :geo-target []}
-                                                                 :2017 {:abbr "scsd"     :geo-target []}
-                                                                 :2000 {:abbr "ss"       :geo-target []}}
-   :school-district-'unified'                                   {:2016 {:abbr "unsd"     :geo-target []}
-                                                                 :2017 {:abbr "unsd"     :geo-target []}
-                                                                 :2010 {:abbr "970"      :geo-target []}
-                                                                 :2000 {:abbr "sn"       :geo-target []}}
-   :block-group                                                 {:2013 {:abbr "bg"       :geo-target []}
-                                                                 :2014 {:abbr "bg"       :geo-target []}
-                                                                 :2015 {:abbr "bg"       :geo-target []}
-                                                                 :2016 {:abbr "bg"       :geo-target []}
-                                                                 :2017 {:abbr "bg"       :geo-target []}
-                                                                 :2010 {:abbr "150"      :geo-target []}
-                                                                 :1990 {:abbr "bg"       :geo-target []}
-                                                                 :2000 {:abbr "bg"       :geo-target []}}
-   :public-use-microdata-area                                   {:2013 {:abbr "puma"     :geo-target []}
-                                                                 :2014 {:abbr "puma"     :geo-target []}
-                                                                 :2015 {:abbr "puma"     :geo-target []}
-                                                                 :2016 {:abbr "puma"     :geo-target []}
-                                                                 :2017 {:abbr "puma"     :geo-target []}}
-   :zip-code-tabulation-area                                    {:2013 {:abbr "zcta"     :geo-target []}
-                                                                 :2014 {:abbr "zcta"     :geo-target []}
-                                                                 :2015 {:abbr "zcta"     :geo-target []}
-                                                                 :2016 {:abbr "zcta"     :geo-target []}
-                                                                 :2017 {:abbr "zcta"     :geo-target []}
-                                                                 :2010 {:abbr "860"      :geo-target []} ;; this is a bfjo, punted
-                                                                 :2000 {:abbr "zt"       :geo-target []}} ;; zipcodes are *not* the same
-   :state-legislative-district-'upper-chamber'                  {:2013 {:abbr "sldu"     :geo-target []}
-                                                                 :2014 {:abbr "sldu"     :geo-target []}
-                                                                 :2015 {:abbr "sldu"     :geo-target []}
-                                                                 :2016 {:abbr "sldu"     :geo-target []}
-                                                                 :2017 {:abbr "sldu"     :geo-target []}
-                                                                 :2012 {:abbr "sldu"     :geo-target []}
-                                                                 :2010 {:abbr "610"      :geo-target []}
-                                                                 :2000 {:abbr "su"       :geo-target []}}
-   :state-legislative-district-'lower-chamber'                  {:2013 {:abbr "sldl"     :geo-target []}
-                                                                 :2014 {:abbr "sldl"     :geo-target []}
-                                                                 :2015 {:abbr "sldl"     :geo-target []}
-                                                                 :2016 {:abbr "sldl"     :geo-target []}
-                                                                 :2017 {:abbr "sldl"     :geo-target []}
-                                                                 :2012 {:abbr "sldl"     :geo-target []}
-                                                                 :2010 {:abbr "620"      :geo-target []}
-                                                                 :2000 {:abbr "sl"       :geo-target []}}})
+(def geoKeyMap                                                                                                                     ; :ID-props Examples:
+  {:nation                                                      {:2010 {:abbr "outline"  :ID-props []}                             ; NA
+                                                                 :2013 {:abbr "nation"   :ID-props [:GEOID]}                       ; "US"
+                                                                 :2014 {:abbr "nation"   :ID-props [:GEOID]}                       ; "US"
+                                                                 :2015 {:abbr "nation"   :ID-props [:GEOID]}                       ; "US"
+                                                                 :2016 {:abbr "nation"   :ID-props [:GEOID]}                       ; "US"
+                                                                 :2017 {:abbr "nation"   :ID-props [:GEOID]}}                      ; "US"
+   :region                                                      {:2013 {:abbr "region"   :ID-props [:GEOID]}                       ; "4"
+                                                                 :2014 {:abbr "region"   :ID-props [:GEOID]}                       ; "4"
+                                                                 :2015 {:abbr "region"   :ID-props [:GEOID]}                       ; "4"
+                                                                 :2016 {:abbr "region"   :ID-props [:GEOID]}                       ; "4"
+                                                                 :2017 {:abbr "region"   :ID-props [:GEOID]}                       ; "4"
+                                                                 :2010 {:abbr "020"      :ID-props [:REGION]}                      ; "4"
+                                                                 :2000 {:abbr "rg"       :ID-props [:REGION]}}                     ; "4"
+   :division                                                    {:2013 {:abbr "division" :ID-props [:GEOID]}                       ; "3"
+                                                                 :2014 {:abbr "division" :ID-props [:GEOID]}                       ; "3"
+                                                                 :2015 {:abbr "division" :ID-props [:GEOID]}                       ; "3"
+                                                                 :2016 {:abbr "division" :ID-props [:GEOID]}                       ; "3"
+                                                                 :2017 {:abbr "division" :ID-props [:GEOID]}                       ; "3"
+                                                                 :2010 {:abbr "030"      :ID-props [:DIVISION]}                    ; "3"
+                                                                 :2000 {:abbr "dv"       :ID-props [:DIVISION]}}                   ; "3"
+   :state                                                       {:2013 {:abbr "state"    :ID-props [:GEOID]}                       ; "01"
+                                                                 :2014 {:abbr "state"    :ID-props [:GEOID]}                       ; "01"
+                                                                 :2015 {:abbr "state"    :ID-props [:GEOID]}                       ; "01"
+                                                                 :2016 {:abbr "state"    :ID-props [:GEOID]}                       ; "01"
+                                                                 :2017 {:abbr "state"    :ID-props [:GEOID]}                       ; "01"
+                                                                 :2010 {:abbr "040"      :ID-props [:STATE]}                       ; "01"
+                                                                 :2000 {:abbr "st"       :ID-props [:STATE]}                       ; "01"
+                                                                 :1990 {:abbr "st"       :ID-props [:ST]}}                         ; "01"
+   :consolidated-cities                                         {:2000 {:abbr "cc"       :ID-props [:STATE :CONCITFP]}             ; "30", "11390"
+                                                                 :2010 {:abbr "170"      :ID-props [:STATE :CONCIT]}               ; "47", "52004"
+                                                                 :2013 {:abbr "concity"  :ID-props [:GEOID]}                       ; "2148003"
+                                                                 :2014 {:abbr "concity"  :ID-props [:GEOID]}                       ; "2148003"
+                                                                 :2015 {:abbr "concity"  :ID-props [:GEOID]}                       ; "2148003"
+                                                                 :2016 {:abbr "concity"  :ID-props [:GEOID]}                       ; "2148003"
+                                                                 :2017 {:abbr "concity"  :ID-props [:GEOID]}}                      ; "2148003"
+   :county                                                      {:2013 {:abbr "county"   :ID-props [:GEOID]}                       ; "01005"
+                                                                 :2014 {:abbr "county"   :ID-props [:GEOID]}                       ; "01005"
+                                                                 :2015 {:abbr "county"   :ID-props [:GEOID]}                       ; "01005"
+                                                                 :2016 {:abbr "county"   :ID-props [:GEOID]}                       ; "01005"
+                                                                 :2017 {:abbr "county"   :ID-props [:GEOID]}                       ; "01005"
+                                                                 :2010 {:abbr "050"      :ID-props [:STATE :COUNTY]}               ; "01", "077"
+                                                                 :2000 {:abbr "co"       :ID-props [:STATE :COUNTY]}               ; "01", "077"
+                                                                 :1990 {:abbr "co"       :ID-props [:ST :CO]}}                     ; "01", "077"
+   :county-subdivision                                          {:2013 {:abbr "cousub"   :ID-props [:GEOID]}                       ; "01077040"
+                                                                 :2014 {:abbr "cousub"   :ID-props [:GEOID]}                       ; "01077040"
+                                                                 :2015 {:abbr "cousub"   :ID-props [:GEOID]}                       ; "01077040"
+                                                                 :2016 {:abbr "cousub"   :ID-props [:GEOID]}                       ; "01077040"
+                                                                 :2017 {:abbr "cousub"   :ID-props [:GEOID]}                       ; "01077040"
+                                                                 :2010 {:abbr "060"      :ID-props [:STATE :COUNTY :COUSUB]}       ;? "01","073","93204"
+                                                                 :2000 {:abbr "cs"       :ID-props [:STATE :COUNTY :COUSUBFP]}     ;? "44","007","80780"
+                                                                 :1990 {:abbr "cs"       :ID-props [:GEOID]}}                      ; "01077040"
+   :tract                                                       {:2013 {:abbr "tract"    :ID-props [:GEOID]}                       ; "44001030200"
+                                                                 :2014 {:abbr "tract"    :ID-props [:GEOID]}                       ; "44001030200"
+                                                                 :2015 {:abbr "tract"    :ID-props [:GEOID]}                       ; "44001030200"
+                                                                 :2016 {:abbr "tract"    :ID-props [:GEOID]}                       ; "44001030200"
+                                                                 :2017 {:abbr "tract"    :ID-props [:GEOID]}                       ; "44001030200"
+                                                                 :2010 {:abbr "140"      :ID-props [:STATE :COUNTY :TRACT]}        ; "44","001","030100"
+                                                                 :2000 {:abbr "tr"       :ID-props [:STATE :COUNTY :TRACT]}        ; "44","007","011402"
+                                                                 :1990 {:abbr "tr"       :ID-props [:ST :CO :TRACTBASE :TRACTSUF]}}; "01","077","0113","" ="00"
+   :place                                                       {:2013 {:abbr "place"    :ID-props [:GEOID]}                       ; "4419180"
+                                                                 :2014 {:abbr "place"    :ID-props [:GEOID]}                       ; "4419180"
+                                                                 :2015 {:abbr "place"    :ID-props [:GEOID]}                       ; "4419180"
+                                                                 :2016 {:abbr "place"    :ID-props [:GEOID]}                       ; "4419180"
+                                                                 :2017 {:abbr "place"    :ID-props [:GEOID]}                       ; "4419180"
+                                                                 :2010 {:abbr "160"      :ID-props [:STATE :PLACE]}                ; "44","14140"
+                                                                 :2000 {:abbr "pl"       :ID-props [:STATE :PLACEFP]}              ; "44","80780"
+                                                                 :1990 {:abbr "pl"       :ID-props [:GEOID]}}                      ; "011023"
+   :alaska-native-regional-corporation                          {:2013 {:abbr "anrc"     :ID-props [:GEOID]}                       ; "0220010"
+                                                                 :2014 {:abbr "anrc"     :ID-props [:GEOID]}                       ; "0220010"
+                                                                 :2015 {:abbr "anrc"     :ID-props [:GEOID]}                       ; "0206370"
+                                                                 :2016 {:abbr "anrc"     :ID-props [:GEOID]}                       ; "0206370"
+                                                                 :2017 {:abbr "anrc"     :ID-props [:GEOID]}                       ; "0206370"
+                                                                 :2010 {:abbr "230"      :ID-props [:STATE :ANRC]}                 ; "02","00590"
+                                                                 :2000 {:abbr "an"       :ID-props [:STATE :ANRCFP]}               ; "02","03950"
+                                                                 :1990 {:abbr "an"       :ID-props [:ANRC]}}                       ;? "63"
+   :american-indian-area!alaska-native-area!hawaiian-home-land  {:2013 {:abbr "aiannh"   :ID-props [:GEOID]}                       ; "9560"
+                                                                 :2014 {:abbr "aiannh"   :ID-props [:GEOID]}                       ; "9560"
+                                                                 :2015 {:abbr "aiannh"   :ID-props [:GEOID]}                       ; "9560"
+                                                                 :2016 {:abbr "aiannh"   :ID-props [:GEOID]}                       ; "9560"
+                                                                 :2017 {:abbr "aiannh"   :ID-props [:GEOID]}                       ; "9560"
+                                                                 :2010 {:abbr "250"      :ID-props [:AIANHH]}                      ; "5138"
+                                                                 :2000 {:abbr "na"       :ID-props [:AIANACE]}                     ; "6165"
+                                                                 :1990 {:abbr "ir"       :ID-props [:IR]}}                         ; "6220"
+   :metropolitan-statistical-area!micropolitan-statistical-area {:2013 {:abbr "cbsa"     :ID-props [:GEOID]}                       ; "38300"
+                                                                 :2014 {:abbr "cbsa"     :ID-props [:GEOID]}                       ; "15660"
+                                                                 :2015 {:abbr "cbsa"     :ID-props [:GEOID]}                       ; "15660"
+                                                                 :2016 {:abbr "cbsa"     :ID-props [:GEOID]}                       ; "15660"
+                                                                 :2017 {:abbr "cbsa"     :ID-props [:GEOID]}                       ; "15660"
+                                                                 :2010 {:abbr "310"      :ID-props [:CBSA]}                        ; "10020"
+                                                                 :1990 {:abbr "ma"       :ID-props [:MSA]}}                        ;? "0380" (*MSA may =/= CBSA*)
+   :combined-statistical-area                                   {:2013 {:abbr "csa"      :ID-props [:GEOID]}                       ; "430"
+                                                                 :2014 {:abbr "csa"      :ID-props [:GEOID]}                       ; "430"
+                                                                 :2015 {:abbr "csa"      :ID-props [:GEOID]}                       ; "430"
+                                                                 :2016 {:abbr "csa"      :ID-props [:GEOID]}                       ; "430"
+                                                                 :2017 {:abbr "csa"      :ID-props [:GEOID]}                       ; "430"
+                                                                 :2010 {:abbr "330"      :ID-props [:CSA]}}                        ; "102"
+   :new-england-city-and-town-area                              {:2013 {:abbr "necta"    :ID-props [:GEOID]}                       ; "70450"
+                                                                 :2014 {:abbr "necta"    :ID-props [:GEOID]}                       ; "70450"
+                                                                 :2015 {:abbr "necta"    :ID-props [:GEOID]}                       ; "70450"
+                                                                 :2016 {:abbr "necta"    :ID-props [:GEOID]}                       ; "70450"
+                                                                 :2017 {:abbr "necta"    :ID-props [:GEOID]}                       ; "70450"
+                                                                 :2010 {:abbr "350"      :ID-props [:NECTA]}                       ; "70450"
+                                                                 :2000 {:abbr "ne"       :ID-props [:NECMA]}}                      ;? "1123" (*NECMA may =/= NECTA*)
+   :combined-new-england-city-and-town-area                     {:2016 {:abbr "cnecta"   :ID-props [:GEOID]}                       ; "710"
+                                                                 :2017 {:abbr "cnecta"   :ID-props [:GEOID]}}                      ; "710"
+   :urban-area                                                  {:2013 {:abbr "ua"       :ID-props [:GEOID10]}                     ; "71155"
+                                                                 :2014 {:abbr "ua"       :ID-props [:GEOID10]}                     ; "58600"
+                                                                 :2015 {:abbr "ua"       :ID-props [:GEOID10]}                     ; "58600"
+                                                                 :2016 {:abbr "ua"       :ID-props [:GEOID10]}                     ; "58600"
+                                                                 :2017 {:abbr "ua"       :ID-props [:GEOID10]}                     ; "58600"
+                                                                 :2012 {:abbr "uac"      :ID-props [:UACE10]}                      ; "79282"
+                                                                 :2000 {:abbr "ua"       :ID-props [:UA]}                          ;? "45748"
+                                                                 :1990 {:abbr "ua"       :ID-props [:UA]}}                         ;? "0380"
+   :congressional-district                                      {:103  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :104  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :105  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :106  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :107  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :108  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :109  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :110  {:abbr "cd"       :ID-props [:STATE :CD]}                   ; "44","01"
+                                                                 :2013 {:abbr "cd"       :ID-props [:GEOID]}                       ; "0401"
+                                                                 :2014 {:abbr "cd"       :ID-props [:GEOID]}                       ; "0633"
+                                                                 :2015 {:abbr "cd"       :ID-props [:GEOID]}                       ; "0633"
+                                                                 :2016 {:abbr "cd"       :ID-props [:GEOID]}                       ; "0633"
+                                                                 :2017 {:abbr "cd"       :ID-props [:GEOID]}                       ; "0633"
+                                                                 :2012 {:abbr "cd"       :ID-props [:GEOID]}                       ; "0633"
+                                                                 :2010 {:abbr "500"      :ID-props [:STATE :CD]}}                  ; "44","01"
+   :school-district-'elementary'                                {:2016 {:abbr "elsd"     :ID-props [:GEOID]}                       ; "4400510"
+                                                                 :2017 {:abbr "elsd"     :ID-props [:GEOID]}                       ; "4400510"
+                                                                 :2000 {:abbr "se"       :ID-props [:STATE :SD_E]}}                ; "44","00360"
+   :school-district-'secondary'                                 {:2016 {:abbr "scsd"     :ID-props [:GEOID]}                       ; "4400420"
+                                                                 :2017 {:abbr "scsd"     :ID-props [:GEOID]}                       ; "4400420"
+                                                                 :2000 {:abbr "ss"       :ID-props [:STATE :SD_S]}}                ; "44","00420"
+   :school-district-'unified'                                   {:2016 {:abbr "unsd"     :ID-props [:GEOID]}                       ; "4400990"
+                                                                 :2017 {:abbr "unsd"     :ID-props [:GEOID]}                       ; "4400990"
+                                                                 :2010 {:abbr "970"      :ID-props [:STATE :SDUNI]}                ; "44","00120"
+                                                                 :2000 {:abbr "sn"       :ID-props [:STATE :SD_U]}}                ; "44","00270"
+   :block-group                                                 {:2013 {:abbr "bg"       :ID-props [:GEOID]}                       ; "440070136002"
+                                                                 :2014 {:abbr "bg"       :ID-props [:GEOID]}                       ; "440070140003"
+                                                                 :2015 {:abbr "bg"       :ID-props [:GEOID]}                       ; "440070140003"
+                                                                 :2016 {:abbr "bg"       :ID-props [:GEOID]}                       ; "440090509011"
+                                                                 :2017 {:abbr "bg"       :ID-props [:GEOID]}                       ; "440090509011"
+                                                                 :2010 {:abbr "150"      :ID-props [:STATE :COUNTY :TRACT :BLKGRP]}; "44","001","030602","1"
+                                                                 :2000 {:abbr "bg"       :ID-props [:STATE :COUNTY :TRACT :BLKGROUP]}; "44","007","011402","8"
+                                                                 :1990 {:abbr "bg"       :ID-props [:GEOID]}}                      ; "010770113001"
+   :public-use-microdata-area                                   {:2013 {:abbr "puma"     :ID-props [:GEOID10]}                     ; "4400400"
+                                                                 :2014 {:abbr "puma"     :ID-props [:GEOID10]}                     ; "4400103"
+                                                                 :2015 {:abbr "puma"     :ID-props [:GEOID10]}                     ; "4400103"
+                                                                 :2016 {:abbr "puma"     :ID-props [:GEOID10]}                     ; "4400300"
+                                                                 :2017 {:abbr "puma"     :ID-props [:GEOID10]}}                    ; "4400300"
+   :zip-code-tabulation-area                                    {:2013 {:abbr "zcta"     :ID-props [:GEOID10]}                     ; "36522"
+                                                                 :2014 {:abbr "zcta"     :ID-props [:GEOID10]}                     ; "36426"
+                                                                 :2015 {:abbr "zcta"     :ID-props [:GEOID10]}                     ; "36426"
+                                                                 :2016 {:abbr "zcta"     :ID-props [:GEOID10]}                     ; "36426"
+                                                                 :2017 {:abbr "zcta"     :ID-props [:GEOID10]}                     ; "36426"
+                                                                 :2010 {:abbr "860"      :ID-props []}                             ; this is a bfjo, punted
+                                                                 :2000 {:abbr "zt"       :ID-props [:ZCTA]}}                       ; "99782"
+   :state-legislative-district-'upper-chamber'                  {:2013 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
+                                                                 :2014 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
+                                                                 :2015 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
+                                                                 :2016 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
+                                                                 :2017 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
+                                                                 :2012 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
+                                                                 :2010 {:abbr "610"      :ID-props [:STATE :SLDU]}                 ; "44038"
+                                                                 :2000 {:abbr "su"       :ID-props [:STATE :SLDU]}}                ; "44","033"
+   :state-legislative-district-'lower-chamber'                  {:2013 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"  
+                                                                 :2014 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
+                                                                 :2015 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
+                                                                 :2016 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
+                                                                 :2017 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
+                                                                 :2012 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
+                                                                 :2010 {:abbr "620"      :ID-props [:STATE :SLDL]}                 ; "44","001"
+                                                                 :2000 {:abbr "sl"       :ID-props [:STATE :SLDL]}}})              ; "44","063"
 
