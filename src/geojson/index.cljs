@@ -176,7 +176,7 @@
                                                                  :2012 {:abbr "sldu"     :ID-props [:GEOID]}                       ; "44038"
                                                                  :2010 {:abbr "610"      :ID-props [:STATE :SLDU]}                 ; "44038"
                                                                  :2000 {:abbr "su"       :ID-props [:STATE :SLDU]}}                ; "44","033"
-   :state-legislative-district-'lower-chamber'                  {:2013 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"  
+   :state-legislative-district-'lower-chamber'                  {:2013 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
                                                                  :2014 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
                                                                  :2015 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
                                                                  :2016 {:abbr "sldl"     :ID-props [:GEOID]}                       ; "44061"
