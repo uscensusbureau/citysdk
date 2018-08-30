@@ -197,13 +197,13 @@ consolidated-cities                                           | x               
 county-subdivision                                            | cs01_d90_shp             | "GEOID":"01077040"                           | "ST":"01","CO":"077","MCD":"040","GEOID":"01077040",
 tract                                                         | tr01_d90_shp             | "ST":"01","CO":"077","TRACTBASE":"0113","TRACTSUF":"" | "" = 00
 place                                                         | pl01_d90_shp             | "GEOID":"011023"                             | 
-alaska-native-regional-corp oration                           | an02_d90_shp             | "ANRC":"63"                                  | Incoherent!
-american-indian-area!alaska-native-area!hawaiian-home-land    | ir99_d90_shp             | "IR":"6220"                                  | Incoherent?
-metropolitan-statistical-area!micropolitan-statistical-area   | ma99_90_shp              | "MSA":"0380"                                 | Incoherent?
+alaska-native-regional-corp oration                           | an02_d90_shp             | "ANRC":"63"                                  | [details](bit.ly/1990-ANRC-FIPS)
+american-indian-area!alaska-native-area!hawaiian-home-land    | ir99_d90_shp             | "IR":"6220"                                  | 
+metropolitan-statistical-area!micropolitan-statistical-area   | ma99_90_shp              | "MSA":"0380"                                 | ?! *MSA may =/= CBSA*
 combined-statistical-area                                     | x                        |                                              |
 new-england-city-and-town-area                                | x                        |                                              |
 combined-new-england-city-and-town-area                       | x                        |                                              | 
-urban-area                                                    | ua99_d90_shp             | "UA":"0380"                                  | Incoherent!
+urban-area                                                    | ua99_d90_shp             | "UA":"0380"                                  | [details](https://www2.census.gov/geo/pdfs/reference/ua/1990uas.pdf)
 congressional-district                                        | x                        |                                              | (3)
 school-district-'elementary'                                  | x                        |                                              | 
 school-district-'secondary'                                   | x                        |                                              | 
@@ -223,16 +223,16 @@ division                                                      | dv99_d00_shp    
 state                                                         | st01_d00_shp             | "STATE":"04"                                 |
 county                                                        | co01_d00_shp             | "STATE":"02","COUNTY":"185"                  |
 consolidated-cities                                           | cc99_d00_shp             | "STATE":"30","CONCITFP":"11390"              |           
-county-subdivision                                            | cs01_d00_shp             | "STATE":"44","COUNTY":"007","COUSUBFP":"80780"| "STATE":"01","COUNTY":"077","MCD":"040","COUSUBFP":"93384"
+county-subdivision                                            | cs01_d00_shp             | "STATE":"44","COUNTY":"007","COUSUBFP":"80780"| ? should "MCD":"040" be included in the GEOID ?
 tract                                                         | tr01_d00_shp             | "STATE":"44","COUNTY":"007","TRACT":"011402" |
 place                                                         | pl01_d00_shp             | "STATE":"44","PLACEFP":"80780"               | 
 alaska-native-regional-corporation                            | an02_d00_shp             | "STATE":"02","ANRCFP":"03950"                | 
-american-indian-area!alaska-native-area!hawaiian-home-land    | na99_d00_shp             | "AIANACE":"6165"                             | Incoherent?
+american-indian-area!alaska-native-area!hawaiian-home-land    | na99_d00_shp             | "AIANACE":"6165"                             | 
 metropolitan-statistical-area!micropolitan-statistical-area   | x                        | x                                            |
 combined-statistical-area                                     | x                        | x                                            |
-new-england-city-and-town-area                                | ne99_d00_shp             | "NECMA":"1123"                               | *NECMA may =/= NECTA*
+new-england-city-and-town-area                                | ne99_d00_shp             | "NECMA":"1123"                               | ?! *NECMA may =/= NECTA*
 combined-new-england-city-and-town-area                       | x                        |                                              |
-urban-area                                                    | ua99_d00_shp             | "UA":"45748"                                 | Incoherent?
+urban-area                                                    | ua99_d00_shp             | "UA":"45748"                                 | https://www2.census.gov/geo/docs/reference/ua/ua2k.txt
 congressional-district                                        | x                        | x                                            | (3) 
 school-district-'elementary'                                  | se01_d00_shp             | "STATE":"44","SD_E":"00360"                  |
 school-district-'secondary'                                   | ss01_d00_shp             | "STATE":"44","SD_S":"00420"                  |
@@ -252,7 +252,7 @@ division                                                      | gz_2010_us_030_0
 state                                                         | gz_2010_us_040_00_500k   | "STATE":"25"                                 |
 consolidated-cities                                           | gz_2010_09_170_00_500k   | "STATE":"47","CONCIT":"52004"                |
 county                                                        | gz_2010_us_050_00_500k   | "STATE":"01","COUNTY":"029"                  |
-county-subdivision                                            | gz_2010_01_060_00_500k   | "STATE":"01","COUNTY":"073","COUSUB":"93204" | "GEO_ID":"0600000US0107393204","STATE":"01","COUNTY":"073","COUSUB":"93204",
+county-subdivision                                            | gz_2010_01_060_00_500k   | "STATE":"01","COUNTY":"073","COUSUB":"93204" | "GEO_ID":"0600000US0107393204"
 tract                                                         | gz_2010_01_140_00_500k   | "STATE":"44","COUNTY":"001","TRACT":"030100" |
 place                                                         | gz_2010_01_160_00_500k   | "STATE":"44","PLACE":"14140"                 |
 alaska-native-regional-corporation                            | gz_2010_02_230_00_500k   | "STATE":"02","ANRC":"00590"                  |
@@ -291,15 +291,15 @@ combined-statistical-area                                     | x               
 new-england-city-and-town-area                                | x                        |                                              |
 combined-new-england-city-and-town-area                       | x                        |                                              |
 urban-area                                                    | cb_2012_us_uac10_500k    | "UACE10":"79282"                             |
-congressional-district                                        | cb_rd13_us_cd113_500k    | "GEOID":"0101"                               | `use`
+congressional-district                                        | cb_rd13_us_cd113_500k    | "GEOID":"0101"                               | 
 school-district-'elementary'                                  | x                        |                                              | 
 school-district-'secondary'                                   | x                        |                                              |
 school-district-'unified'                                     | x                        |                                              |
 block-group                                                   | x                        |                                              |
 public-use-microdata-area                                     | x                        |                                              |
 zip-code-tabulation-area                                      | x                        |                                              |
-state-legislative-district-'upper-chamber'                    | cb_rd13_01_sldu_500k     | "GEOID":"44008"                              | `use`
-state-legislative-district-'lower-chamber'                    | cb_rd13_01_sldl_500k     | "GEOID":"44061"                              | `use`
+state-legislative-district-'upper-chamber'                    | cb_rd13_01_sldu_500k     | "GEOID":"44008"                              | 
+state-legislative-district-'lower-chamber'                    | cb_rd13_01_sldl_500k     | "GEOID":"44061"                              | 
 
 
 Key                                                           | 2013                     | GEOID                                        | NOTES
@@ -319,14 +319,14 @@ metropolitan-statistical-area!micropolitan-statistical-area   | cb_2013_us_cbsa_
 combined-statistical-area                                     | cb_2013_us_csa_500k      | "GEOID":"430"                                |    
 new-england-city-and-town-area                                | cb_2013_us_necta_500k    | "GEOID":"71650"                              |
 combined-new-england-city-and-town-area                       | x                        |                                              |
-urban-area                                                    | cb_2013_us_ua10_500k     | "GEOID10":"71155"                            | `use`
+urban-area                                                    | cb_2013_us_ua10_500k     | "GEOID10":"71155"                            | 
 congressional-district                                        | cb_2013_us_cd113_500k    | "GEOID":"0401"                               |
 school-district-'elementary'                                  | x                        |                                              |
 school-district-'secondary'                                   | x                        |                                              |
 school-district-'unified'                                     | x                        |                                              |
 block-group                                                   | cb_2013_01_bg_500k       | "GEOID":"440070136002"                       |
-public-use-microdata-area                                     | cb_2013_01_puma10_500k   | "GEOID10":"4400400"                          | `use`
-zip-code-tabulation-area                                      | cb_2013_us_zcta510_500k  | "GEOID10":"36522"                            | `use`
+public-use-microdata-area                                     | cb_2013_01_puma10_500k   | "GEOID10":"4400400"                          | 
+zip-code-tabulation-area                                      | cb_2013_us_zcta510_500k  | "GEOID10":"36522"                            | 
 state-legislative-district-'upper-chamber'                    | cb_2013_01_sldu_500k     | "GEOID":"44011"                              |
 state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_500k     | "GEOID":"44062"                              |
 
@@ -347,14 +347,14 @@ metropolitan-statistical-area!micropolitan-statistical-area   | cb_2014_us_cbsa_
 combined-statistical-area                                     | cb_2014_us_csa_500k      | "GEOID":"352"                                |   
 new-england-city-and-town-area                                | cb_2014_us_necta_500k    | "GEOID":"70450"                              |
 combined-new-england-city-and-town-area                       | x                        |                                              | 
-urban-area                                                    | cb_2014_us_ua10_500k     | "GEOID10":"58600"                            | `use`
+urban-area                                                    | cb_2014_us_ua10_500k     | "GEOID10":"58600"                            | 
 congressional-district                                        | cb_2014_us_cd114_500k    | "GEOID":"0633"                               | 
 school-district-'elementary'                                  | x                        |                                              |     
 school-district-'secondary'                                   | x                        |                                              |     
 school-district-'unified'                                     | x                        |                                              |         
 block-group                                                   | cb_2014_01_bg_500k       | "GEOID":"440070140003"                       |   
-public-use-microdata-area                                     | cb_2014_01_puma10_500k   | "GEOID10":"4400103"                          | `use`
-zip-code-tabulation-area                                      | cb_2014_us_zcta510_500k  | "GEOID10":"36426"                            | `use`
+public-use-microdata-area                                     | cb_2014_01_puma10_500k   | "GEOID10":"4400103"                          | 
+zip-code-tabulation-area                                      | cb_2014_us_zcta510_500k  | "GEOID10":"36426"                            | 
 state-legislative-district-'upper-chamber'                    | cb_2014_01_sldu_500k     | "GEOID":"44014"                              |  
 state-legislative-district-'lower-chamber'                    | cb_2014_01_sldl_500k     | "GEOID":"44001"                              |     
 
@@ -376,14 +376,14 @@ metropolitan-statistical-area!micropolitan-statistical-area   | cb_2015_us_cbsa_
 combined-statistical-area                                     | cb_2015_us_csa_500k      | "GEOID":"352"                                |   
 new-england-city-and-town-area                                | cb_2015_us_necta_500k    | "GEOID":"70450"                              |
 combined-new-england-city-and-town-area                       | x                        |                                              | 
-urban-area                                                    | cb_2015_us_ua10_500k     | "GEOID10":"58600"                            | `use`
+urban-area                                                    | cb_2015_us_ua10_500k     | "GEOID10":"58600"                            | 
 congressional-district                                        | cb_2015_us_cd114_500k    | "GEOID":"0633"                               | 
 school-district-'elementary'                                  | x                        |                                              |     
 school-district-'secondary'                                   | x                        |                                              |     
 school-district-'unified'                                     | x                        |                                              |         
 block-group                                                   | cb_2015_01_bg_500k       | "GEOID":"440070140003"                       |   
-public-use-microdata-area                                     | cb_2015_01_puma10_500k   | "GEOID10":"4400103"                          | `use`
-zip-code-tabulation-area                                      | cb_2015_us_zcta510_500k  | "GEOID10":"36426"                            | `use`
+public-use-microdata-area                                     | cb_2015_01_puma10_500k   | "GEOID10":"4400103"                          | 
+zip-code-tabulation-area                                      | cb_2015_us_zcta510_500k  | "GEOID10":"36426"                            | 
 state-legislative-district-'upper-chamber'                    | cb_2015_01_sldu_500k     | "GEOID":"44014"                              |  
 state-legislative-district-'lower-chamber'                    | cb_2015_01_sldl_500k     | "GEOID":"44001"                              |     
 
@@ -447,6 +447,13 @@ state-legislative-district-'lower-chamber'                    | cb_2017_01_sldl_
 
 
 
+## Notations
+1) Source for Summary Level codes: [AFF](https://factfinder.census.gov/help/en/summary_level_code_list.htm)
+2) Listed as 2010 [here](https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html)
+3) Listing of Sessions of Congress [by year](https://en.wikipedia.org/wiki/List_of_United_States_Congresses)
+
+
+
 # Patterns
 Vintage       | i0           | i1          | i2                | i3              | i4          | i5          | i6
 ------------- | ------------ | ----------- | ----------------- | --------------- | ----------- | ----------- | ---
@@ -456,11 +463,6 @@ Vintage       | i0           | i1          | i2                | i3             
  2010         |  ["gz"]      |  ["2010"]   | ["us"]            | ["970"]         | ["00"]      | ["500" "k"] | ["zip"]
  2013 - 2017  |  ["cb"]      |  ["2013"]   | ["us"]            | ["tract"]       | ["500" "k"] | ["zip"]     |   
 
-
-## Notations
-1) Source for Summary Level codes: [AFF](https://factfinder.census.gov/help/en/summary_level_code_list.htm)
-2) Listed as 2010 [here](https://www.census.gov/geo/maps-data/data/cbf/cbf_ua.html)
-3) Listing of Sessions of Congress [by year](https://en.wikipedia.org/wiki/List_of_United_States_Congresses)
 
 ## File Structure for Geo Files
 

@@ -335,14 +335,14 @@
                          #(close! =port=)))))
 
 
-#_(let [=zip= (chan 1)
-        =json= (chan 1)]
-    (go (fsR-file->put!
-          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-          =zip=)
-        (pipeline-async 1 =json= zip->geojson->put! =zip=)
-        (js/console.log (<! =json=))))
+(let [=zip= (chan 1)
+      =json= (chan 1)]
+  (go (fsR-file->put!
+        ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+        =zip=)
+      (pipeline-async 1 =json= zip->geojson->put! =zip=)
+      (js/console.log (<! =json=))))
 ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
