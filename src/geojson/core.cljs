@@ -79,10 +79,15 @@
   Searches a single item from an inverted geoKeyMap and checks for a match
   against the provided vintage/level abbreviation code pair. Returns the `name`
   of the key (string) if matched and `nil` if mismatched.
+
+  Inputs:
+  1) vintage = string
+  2) level abbreviation = string
+  3) a map with a single key/value set
   "
   [vintage level [k v]]
   (if-let [[_ v2] (find k (keyword vintage))]
-    (if (= v2 level) (name v) nil)
+    (if (= (first v2) [:abbr level]) (name v) nil)
     nil))
 
 (defn keySearch
@@ -90,6 +95,10 @@
   Searches the entire geoKeyMap (inverted) for matches against a provided
   vintage and level abbreviation returning a string for the verbose geoKeyMap
   key match if successful and an empty string ('') if not.
+
+  Inputs:
+  1) vintage = string
+  2) level abbreviation = string
   "
   [vintage level]
   (apply str (remove nil? (map #(vin+lev=?key vintage level %)
@@ -326,14 +335,14 @@
                          #(close! =port=)))))
 
 
-#_(let [=zip= (chan 1)
-        =json= (chan 1)]
-    (go (fsR-file->put!
-          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-          =zip=)
-        (pipeline-async 1 =json= zip->geojson->put! =zip=)
-        (js/console.log (<! =json=))))
+(let [=zip= (chan 1)
+      =json= (chan 1)]
+  (go (fsR-file->put!
+        ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+        =zip=)
+      (pipeline-async 1 =json= zip->geojson->put! =zip=)
+      (js/console.log (<! =json=))))
 ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -492,5 +501,4 @@
                            \n === Wrapping up .... === \n
                            \n ======================== \n")))))
 
-(batch=>zip-paths=>convert=>geojson geos/paths)
-
+;(batch=>zip-paths=>convert=>geojson geos/paths)
