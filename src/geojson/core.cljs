@@ -87,7 +87,7 @@
   "
   [vintage level [k v]]
   (if-let [[_ v2] (find k (keyword vintage))]
-    (if (= (first v2) [:abbr level]) (name v) nil)
+    (if (= (second (first v2)) level) (name v) nil)
     nil))
 
 (defn keySearch
@@ -335,8 +335,8 @@
                          #(close! =port=)))))
 
 
-(let [=zip= (chan 1)
-      =json= (chan 1)]
+( let [=zip= (chan 1)
+       =json= (chan 1)]
   (go (fsR-file->put!
         ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
         "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
