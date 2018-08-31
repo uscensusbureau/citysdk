@@ -264,10 +264,10 @@
         (close! =features=)
         (close! =stats=))))
 
-(merge-geo-stats->map {:vintage      "2016"
-                       :sourcePath   ["acs" "acs5"]
-                       :geoHierarchy {:state "01"
-                                      :county "*"}
-                       :values       ["B01001_001E"]
-                       :statsKey     stats-key})
+#_(merge-geo-stats->map {:vintage      "2016"
+                         :sourcePath   ["acs" "acs5"]
+                         :geoHierarchy {:state "01"
+                                        :county "*"}
+                         :values       ["B01001_001E"]
+                         :statsKey     stats-key})
                        ;; add `:predicates` and count them for `vars#`})
