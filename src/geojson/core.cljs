@@ -76,7 +76,7 @@
 
 (defn vin+lev=?key
   "
-  Searches a single item from an inverted geoKeyMap and checks for a match
+  Searches a single item from the geoKeyMap (inverted) and checks for a match
   against the provided vintage/level abbreviation code pair. Returns the `name`
   of the key (string) if matched and `nil` if mismatched.
 
@@ -335,14 +335,14 @@
                          #(close! =port=)))))
 
 
-( let [=zip= (chan 1)
-       =json= (chan 1)]
-  (go (fsR-file->put!
-        ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-        "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-        =zip=)
-      (pipeline-async 1 =json= zip->geojson->put! =zip=)
-      (js/console.log (<! =json=))))
+#_(let [=zip= (chan 1)
+        =json= (chan 1)]
+    (go (fsR-file->put!
+          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+          =zip=)
+        (pipeline-async 1 =json= zip->geojson->put! =zip=)
+        (js/console.log (<! =json=))))
 ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -501,4 +501,4 @@
                            \n === Wrapping up .... === \n
                            \n ======================== \n")))))
 
-;(batch=>zip-paths=>convert=>geojson geos/paths)
+#_(batch=>zip-paths=>convert=>geojson geos/paths)
