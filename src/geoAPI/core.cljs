@@ -11,6 +11,8 @@
             ["dotenv" :as env]
             [clojure.repl :refer [source]]))
 
+(def base-url "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
+
 (defn get->put!->port
   [url port]
   (let [args {:response-format :json
@@ -22,46 +24,30 @@
 
 (defn geo-url-builder
   "Composes a URL to call raw GeoJSON files hosted on Github"
-  [{:keys [vintage geoHierarchy]}]
-  (let [for (last geoHierarchy)]
-    (if-let [{:keys [state]} geoHierarchy]
-      (do (pprint state)
-          (pprint for))
-      (pprint for))))
+  [{:keys [vintage geoResolution geoHierarchy]}]
+  (let [[for _] (last geoHierarchy)
+        {:keys [state]} geoHierarchy]
+    (if (= nil state)
+      (str (s/join "/" [base-url geoResolution vintage (name for)]) ".json")
+      (str (s/join "/" [base-url geoResolution vintage state (name for)]) ".json"))))
 
-(comment
-  (s/replace-first
-    (s/replace
-      (str
-        "https://api.census.gov/data/"
-        (str vintage)
-        (s/join (map #(str "/" %) sourcePath))
-        "?get=" (s/join "," values)
-        (if (some? predicates)
-          (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
-          "")
-        (if (= 1 (count geoHierarchy))
-          (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-          (str "&in=" (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
-               "&for=" (kv-pair->str (last geoHierarchy) ":")))
-        "&key=" statsKey)
-      #"-|'|!" {"-" "%20" "'" ")" "!" "/"})
-    #"[)]" "("))
+(geo-url-builder {:vintage       "2016"
+                  :sourcePath    ["acs" "acs5"]
+                  :geoHierarchy  {:state "01"
+                                  :county "*"}
+                  :geoResolution "500k"
+                  :values        ["B01001_001E"]})
+                  ; :statsKey      stats-key})
+(geo-url-builder {:vintage       "2016"
+                  :sourcePath    ["acs" "acs5"]
+                  :geoHierarchy  {:county "*"}
+                  :geoResolution "500k"
+                  :values        ["B01001_001E"]})
 
-(geo-url-builder {:vintage      "2016"
-                  :sourcePath   ["acs" "acs5"]
-                  :geoHierarchy {:state "01"
-                                 :county "*"}
-                  :values       ["B01001_001E"]})
-                  ; :statsKey     stats-key})
-(geo-url-builder {:vintage      "2016"
-                  :sourcePath   ["acs" "acs5"]
-                  :geoHierarchy {:county "*"}
-                  :values       ["B01001_001E"]})
-
-(geo-url-builder {:vintage      "2016"
-                  :sourcePath   ["acs" "acs5"]
-                  :geoHierarchy {:state "01"
-                                 :county "001"
-                                 :tract "*"}
-                  :values       ["B01001_001E"]})
+(geo-url-builder {:vintage       "2016"
+                  :sourcePath    ["acs" "acs5"]
+                  :geoHierarchy  {:state "01"
+                                  :county "001"
+                                  :tract "*"}
+                  :geoResolution "500k"
+                  :values        ["B01001_001E"]})

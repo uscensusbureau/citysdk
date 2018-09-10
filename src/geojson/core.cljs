@@ -76,7 +76,7 @@
 
 (defn vin+lev=?key
   "
-  Searches a single item from an inverted geoKeyMap and checks for a match
+  Searches a single item from the geoKeyMap (inverted) and checks for a match
   against the provided vintage/level abbreviation code pair. Returns the `name`
   of the key (string) if matched and `nil` if mismatched.
 

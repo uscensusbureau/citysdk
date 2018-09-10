@@ -10,7 +10,10 @@
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
             ["fs" :as fs]
-            [clojure.repl :refer [source]]))
+            [clojure.repl :refer [source]]
+            [geoAPI.core :as geo]))
+
+(def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
 (defn get-json->put!
   [base-url keywords?]
@@ -255,7 +258,7 @@
         =features= (chan 1 xf-features->map #(pprint "features fail! " %))
         =stats= (chan 1 (xf-stats->map vars#) #(pprint "stats fail! " %))
         =merged= (async/map (merge-geo+stats (keyword (first (get args :values))) :GEOID) [=stats= =features=])]
-    (go (get-features->put!->port "https://raw.githubusercontent.com/loganpowell/geojson/master/src/archive/test.geojson" =features=)
+    (go (get-features->put!->port (geo/geo-url-builder args) =features=)
         (pipeline-async 1 =merged= identity =features=))
     (go (get->put!->port stats-call =stats=)
         (pipeline-async 1 =merged= identity =stats=)
@@ -264,10 +267,33 @@
         (close! =features=)
         (close! =stats=))))
 
-#_(merge-geo-stats->map {:vintage      "2016"
-                         :sourcePath   ["acs" "acs5"]
-                         :geoHierarchy {:state "01"
-                                        :county "*"}
-                         :values       ["B01001_001E"]
-                         :statsKey     stats-key})
+(merge-geo-stats->map {:vintage      "2016"
+                       :sourcePath   ["acs" "acs5"]
+                       :geoHierarchy {:state "01"
+                                      :county "*"}
+                       :geoResolution "500k"
+                       :values       ["B01001_001E"]
+                       :statsKey     stats-key})
                        ;; add `:predicates` and count them for `vars#`})
+
+
+(geo/geo-url-builder {:vintage       "2016"
+                      :sourcePath    ["acs" "acs5"]
+                      :geoHierarchy  {:state "01"
+                                      :county "*"}
+                      :geoResolution "500k"
+                      :values        ["B01001_001E"]})
+; :statsKey      stats-key})
+(geo/geo-url-builder {:vintage       "2016"
+                      :sourcePath    ["acs" "acs5"]
+                      :geoHierarchy  {:county "*"}
+                      :geoResolution "500k"
+                      :values        ["B01001_001E"]})
+
+(geo/geo-url-builder {:vintage       "2016"
+                      :sourcePath    ["acs" "acs5"]
+                      :geoHierarchy  {:state "01"
+                                      :county "001"
+                                      :tract "*"}
+                      :geoResolution "500k"
+                      :values        ["B01001_001E"]})
