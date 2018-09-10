@@ -16,8 +16,8 @@
     :2016 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
     :2015 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
     :2014 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
-    :2013 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}}                      ; "US"
-    ;:2010 {:lev<-file "outline"  :scopes [:us       ] :id<-json []}}                           ; NA (no properties from which to choose)
+    :2013 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
+    :2010 {:lev<-file "outline"  :scopes [:us       ] :id<-json []}}                            ; no usable construct
    :region
    {
     :2017 {:lev<-file "region"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "4"
@@ -132,8 +132,8 @@
     :2015 {:lev<-file "cbsa"     :scopes [:us       ] :id<-json [:GEOID]}                       ; "15660"
     :2014 {:lev<-file "cbsa"     :scopes [:us       ] :id<-json [:GEOID]}                       ; "15660"
     :2013 {:lev<-file "cbsa"     :scopes [:us       ] :id<-json [:GEOID]}                       ; "38300"
-    :2010 {:lev<-file "310"      :scopes [:us       ] :id<-json [:CBSA]}                        ; "10020"
-    :1990 {:lev<-file "ma"       :scopes [:us       ] :id<-json [:MSA]}}                        ;? "0380" (*MSA may =/= CBSA*)
+    :2010 {:lev<-file "310"      :scopes [:us       ] :id<-json [:CBSA]}}                       ; "10020"
+    ;:1990 {:lev<-file "ma"       :scopes [:us       ] :id<-json [:MSA]}}                       ; "0380": MSA =/= CBSA
    :combined-statistical-area
    {
     :2017 {:lev<-file "csa"      :scopes [:us       ] :id<-json [:GEOID]}                       ; "430"
@@ -142,6 +142,11 @@
     :2014 {:lev<-file "csa"      :scopes [:us       ] :id<-json [:GEOID]}                       ; "430"
     :2013 {:lev<-file "csa"      :scopes [:us       ] :id<-json [:GEOID]}                       ; "430"
     :2010 {:lev<-file "330"      :scopes [:us       ] :id<-json [:CSA]}}                        ; "102"
+   :combined-new-england-city-and-town-area
+   {
+    :2017 {:lev<-file "cnecta"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "710"
+    :2016 {:lev<-file "cnecta"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "710"
+    :2010 {:lev<-file "335"      :scopes [:us       ] :id<-json []}}                            ; TODO
    :new-england-city-and-town-area
    {
     :2017 {:lev<-file "necta"    :scopes [:us       ] :id<-json [:GEOID]}                       ; "70450"
@@ -149,12 +154,8 @@
     :2015 {:lev<-file "necta"    :scopes [:us       ] :id<-json [:GEOID]}                       ; "70450"
     :2014 {:lev<-file "necta"    :scopes [:us       ] :id<-json [:GEOID]}                       ; "70450"
     :2013 {:lev<-file "necta"    :scopes [:us       ] :id<-json [:GEOID]}                       ; "70450"
-    :2010 {:lev<-file "350"      :scopes [:us       ] :id<-json [:NECTA]}                       ; "70450"
-    :2000 {:lev<-file "ne"       :scopes [:us       ] :id<-json [:NECMA]}}                      ;? "1123" (*NECMA may =/= NECTA*)
-   :combined-new-england-city-and-town-area
-   {
-    :2017 {:lev<-file "cnecta"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "710"
-    :2016 {:lev<-file "cnecta"   :scopes [:us       ] :id<-json [:GEOID]}}                      ; "710"
+    :2010 {:lev<-file "350"      :scopes [:us       ] :id<-json [:NECTA]}}                      ; "70450"
+    ;:2000 {:lev<-file "ne"       :scopes [:us       ] :id<-json [:NECMA]}}                     ; "1123" NECMA =/= NECTA
    :urban-area
    {
     :2017 {:lev<-file "ua"       :scopes [:us       ] :id<-json [:GEOID10]}                     ; "58600"
@@ -182,38 +183,6 @@
     :105  {:lev<-file "cd"       :scopes [:state    ] :id<-json [:STATE :CD]}                   ; "44","01"
     :104  {:lev<-file "cd"       :scopes [:state    ] :id<-json [:STATE :CD]}                   ; "44","01"
     :103  {:lev<-file "cd"       :scopes [:state    ] :id<-json [:STATE :CD]}}                  ; "44","01"
-   :school-district-'elementary'
-   {
-    :2017 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
-    :2016 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
-    :2000 {:lev<-file "se"       :scopes [:state    ] :id<-json [:STATE :SD_E]}}                ; "44","00360"
-   :school-district-'secondary'
-   {
-    :2017 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
-    :2016 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
-    :2000 {:lev<-file "ss"       :scopes [:state    ] :id<-json [:STATE :SD_S]}}                ; "44","00420"
-   :school-district-'unified'
-   {
-    :2017 {:lev<-file "unsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400990"
-    :2016 {:lev<-file "unsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400990"
-    :2010 {:lev<-file "970"      :scopes [:state    ] :id<-json [:STATE :SDUNI]}                ; "44","00120"
-    :2000 {:lev<-file "sn"       :scopes [:state    ] :id<-json [:STATE :SD_U]}}                ; "44","00270"
-   :public-use-microdata-area
-   {
-    :2017 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400300"
-    :2016 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400300"
-    :2015 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400103"
-    :2014 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400103"
-    :2013 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}}                    ; "4400400"
-   :zip-code-tabulation-area
-   {
-    :2017 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
-    :2016 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
-    :2015 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
-    :2014 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
-    :2013 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36522"
-    ;:2010 {:lev<-file "860"      :scopes [:us       ] :id<-json []}                             ; this is a bfjo, punted
-    :2000 {:lev<-file "zt"       :scopes [:us :state] :id<-json [:ZCTA]}}                       ; "99782"
    :state-legislative-district-'upper-chamber'
    {
     :2017 {:lev<-file "sldu"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44038"
@@ -233,5 +202,39 @@
     :2013 {:lev<-file "sldl"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44061"
     :2012 {:lev<-file "sldl"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44061"
     :2010 {:lev<-file "620"      :scopes [:state    ] :id<-json [:STATE :SLDL]}                 ; "44","001"
-    :2000 {:lev<-file "sl"       :scopes [:state    ] :id<-json [:STATE :SLDL]}}})              ; "44","063"
+    :2000 {:lev<-file "sl"       :scopes [:state    ] :id<-json [:STATE :SLDL]}}              ; "44","063"
+   :zip-code-tabulation-area
+   {
+    :2017 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
+    :2016 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
+    :2015 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
+    :2014 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
+    :2013 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36522"
+    ;:2010 {:lev<-file "860"      :scopes [:us       ] :id<-json []}                            ; this is a bfjo, punted
+    :2000 {:lev<-file "zt"       :scopes [:us :state] :id<-json [:ZCTA]}}                       ; "99782"
+   :school-district-'elementary'
+   {
+    :2017 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
+    :2016 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
+    :2010 {:lev<-file "950"      :scopes [:state    ] :id<-json []}                             ; TODO
+    :2000 {:lev<-file "se"       :scopes [:state    ] :id<-json [:STATE :SD_E]}}                ; "44","00360"
+   :school-district-'secondary'
+   {
+    :2017 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
+    :2016 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
+    :2010 {:lev<-file "960"      :scopes [:state    ] :id<-json []}                             ; TODO
+    :2000 {:lev<-file "ss"       :scopes [:state    ] :id<-json [:STATE :SD_S]}}                ; "44","00420"
+   :school-district-'unified'
+   {
+    :2017 {:lev<-file "unsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400990"
+    :2016 {:lev<-file "unsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400990"
+    :2010 {:lev<-file "970"      :scopes [:state    ] :id<-json [:STATE :SDUNI]}                ; "44","00120"
+    :2000 {:lev<-file "sn"       :scopes [:state    ] :id<-json [:STATE :SD_U]}}                ; "44","00270"
+   :public-use-microdata-area
+   {
+    :2017 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400300"
+    :2016 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400300"
+    :2015 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400103"
+    :2014 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}                     ; "4400103"
+    :2013 {:lev<-file "puma"     :scopes [:state    ] :id<-json [:GEOID10]}}})                  ; "4400400"
 

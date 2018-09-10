@@ -199,7 +199,7 @@ tract                                                         | tr01_d90_shp    
 place                                                         | pl01_d90_shp             | "GEOID":"011023"                             | 
 alaska-native-regional-corp oration                           | an02_d90_shp             | "ANRC":"63"                                  | [details](https://bit.ly/1990-ANRC-FIPS)
 american-indian-area!alaska-native-area!hawaiian-home-land    | ir99_d90_shp             | "IR":"6220"                                  | 
-metropolitan-statistical-area!micropolitan-statistical-area   | ma99_90_shp              | "MSA":"0380"                                 | ?! *MSA may =/= CBSA*
+metropolitan-statistical-area!micropolitan-statistical-area   | ~~ma99_90_shp~~          | ~~"MSA":"0380"~~                             | *MSA =/= CBSA*
 combined-statistical-area                                     | x                        |                                              |
 new-england-city-and-town-area                                | x                        |                                              |
 combined-new-england-city-and-town-area                       | x                        |                                              | 
@@ -223,15 +223,15 @@ division                                                      | dv99_d00_shp    
 state                                                         | st01_d00_shp             | "STATE":"04"                                 |
 county                                                        | co01_d00_shp             | "STATE":"02","COUNTY":"185"                  |
 consolidated-cities                                           | cc99_d00_shp             | "STATE":"30","CONCITFP":"11390"              |           
-county-subdivision                                            | cs01_d00_shp             | "STATE":"44","COUNTY":"007","COUSUBFP":"80780"| ? should "MCD":"040" be included in the GEOID ?
+county-subdivision                                            | cs01_d00_shp             | "STATE":"44","COUNTY":"007","COUSUBFP":"80780"| "MCD":"040" no longer used
 tract                                                         | tr01_d00_shp             | "STATE":"44","COUNTY":"007","TRACT":"011402" |
 place                                                         | pl01_d00_shp             | "STATE":"44","PLACEFP":"80780"               | 
 alaska-native-regional-corporation                            | an02_d00_shp             | "STATE":"02","ANRCFP":"03950"                | 
 american-indian-area!alaska-native-area!hawaiian-home-land    | na99_d00_shp             | "AIANACE":"6165"                             | 
 metropolitan-statistical-area!micropolitan-statistical-area   | x                        | x                                            |
 combined-statistical-area                                     | x                        | x                                            |
-new-england-city-and-town-area                                | ne99_d00_shp             | "NECMA":"1123"                               | ?! *NECMA may =/= NECTA*
-combined-new-england-city-and-town-area                       | x                        |                                              |
+new-england-city-and-town-area                                | ~~ne99_d00_shp~~         | ~~"NECMA":"1123"~~                           | *NECMA =/= NECTA*
+combined-new-england-city-and-town-area                       | x                        | x                                            |
 urban-area                                                    | ua99_d00_shp             | "UA":"45748"                                 | https://www2.census.gov/geo/docs/reference/ua/ua2k.txt
 congressional-district                                        | x                        | x                                            | (3) 
 school-district-'elementary'                                  | se01_d00_shp             | "STATE":"44","SD_E":"00360"                  |
@@ -260,15 +260,15 @@ american-indian-area!alaska-native-area!hawaiian-home-land    | gz_2010_us_250_0
 metropolitan-statistical-area!micropolitan-statistical-area   | gz_2010_us_310_m1_500k   | "CBSA":"10020"                               |
 combined-statistical-area                                     | gz_2010_us_330_m1_500k   | "CSA":"102"                                  |
 new-england-city-and-town-area                                | gz_2010_us_350_m1_500k   | "NECTA":"70450"                              |
-combined-new-england-city-and-town-area                       | x                        |                                              |
-urban-area                                                    | x                        | x                                            | (1) 
+combined-new-england-city-and-town-area                       | gz_2010_us_335_m1_500k   |                                              |
+urban-area                                                    | x                        |                                              | (1) 
 congressional-district                                        | gz_2010_us_500_11_5m     | "STATE":"44","CD":"01"                       | Same for CDs in 103-110
-school-district-'elementary'                                  | x                        | x                                            |
-school-district-'secondary'                                   | x                        | x                                            |
+school-district-'elementary'                                  | gz_2010_55_950_00_500k   |                                              |
+school-district-'secondary'                                   | gz_2010_55_960_00_500k   |                                              |
 school-district-'unified'                                     | gz_2010_01_970_00_500k   | "STATE":"44","SDUNI":"00120"                 |
 block-group                                                   | gz_2010_01_150_00_500k   | "STATE":"44","COUNTY":"001","TRACT":"030602","BLKGRP":"1" |
 public-use-microdata-area                                     | x                        | x                                            |
-zip-code-tabulation-area                                      | gz_2010_us_860_00_500k   | `this is a bfjo, punted`                     | 
+zip-code-tabulation-area                                      | ~~gz_2010_us_860_00_500k~~|                                             | this is a bfjo, punted 
 state-legislative-district-'upper-chamber'                    | gz_2010_01_610_u2_500k   | "STATE":"44","SLDU":"004"                    |
 state-legislative-district-'lower-chamber'                    | gz_2010_01_620_l2_500k   | "STATE":"44","SLDL":"001"                    |
 
@@ -333,7 +333,7 @@ state-legislative-district-'lower-chamber'                    | cb_2013_01_sldl_
 
 Key                                                           | 2016 - 2017              | GEOID                                         | Notes
 ------------------------------------------------------------- | :----------------------- | --------------------------------------------- | -----
-nation                                                        | cb_2016_us_nation_5m     | "GEOID":"US"                                  | 
+nation                                                        | cb_2016_us_nation_5m     | "GEOID":"US"                                  | no 500k available
 region                                                        | cb_2016_us_region_500k   | "GEOID":"1"                                   |
 division                                                      | cb_2016_us_division_500k | "GEOID":"1"                                   |
 state                                                         | cb_2016_us_state_500k    | "GEOID":"02"                                  |
