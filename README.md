@@ -1,8 +1,8 @@
-README.md
-
 # Census Cartography Files in GeoJSON Format
 
 The Census Bureau publishes both high and low accuracy geographic area files to accommodate the widest possible variety of user needs (within feasibility). Cartography Files are simplified representations of selected geographic areas from the Census Bureau’s Master Address File/Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) system. These boundary files are specifically designed for small scale thematic mapping.
+
+For a while now, we have published our cartography files in the [`.shp`](https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html) format. More recently, we expanded our portfolio of available formats to [`.kml`](https://www.census.gov/geo/maps-data/data/tiger-kml.html). It is with this release that we follow suit with the community at large to release these boundaries in `.json` (GeoJSON) format.
 
 ### Cartography Files Included in this Repo
 
