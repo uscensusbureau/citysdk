@@ -142,9 +142,9 @@ https://www2.census.gov/geo/tiger/PREVGENZ/tr/tr00shp/tr01_d00_shp.zip
 | 15  | new-england-city-and-town-area                                | ne            | necta                 |           |           | 3     |
 | 16  | urban-area                                                    | ua            | ua10                  |           |           | 3     |
 | 17  | congressional-district                                        | cd...         | cd99...               | api?      |           | 5     |
-| 18  | school-district-'elementary'                                  | se..          | elsd                  | geo/api   |           |       |
-| 19  | school-district-'secondary'                                   | ss..          | scsd                  | geo/api   |           |       |
-| 20  | school-district-'unified'                                     | sn..          | unsd                  | geo/api   |           |       |
+| 18  | school-district-_elementary'                                  | se..          | elsd                  | geo/api   |           |       |
+| 19  | school-district-_secondary'                                   | ss..          | scsd                  | geo/api   |           |       |
+| 20  | school-district-_unified'                                     | sn..          | unsd                  | geo/api   |           |       |
 |     | place-remainder                                               | x             | x                     |           |           |       |
 | 21  | block-group                                                   | bg..          | .._bg                 | geo/api   | api       |       |
 | 22  | public-use-microdata-area                                     | p1..          | .._puma10             | geo/api?  |           | 6     |
@@ -205,9 +205,9 @@ new-england-city-and-town-area                                | x               
 combined-new-england-city-and-town-area                       | x                        |                                              | 
 urban-area                                                    | ua99_d90_shp             | "UA":"0380"                                  | [details](https://www2.census.gov/geo/pdfs/reference/ua/1990uas.pdf)
 congressional-district                                        | x                        |                                              | (3)
-school-district-'elementary'                                  | x                        |                                              | 
-school-district-'secondary'                                   | x                        |                                              | 
-school-district-'unified'                                     | x                        |                                              | 
+school-district-_elementary'                                  | x                        |                                              | 
+school-district-_secondary'                                   | x                        |                                              | 
+school-district-_unified'                                     | x                        |                                              | 
 block-group                                                   | bg01_d90_shp             | "GEOID":"010770113001"                       | 
 public-use-microdata-area                                     | x                        |                                              |
 zip-code-tabulation-area                                      | x                        |                                              | 
@@ -234,9 +234,9 @@ new-england-city-and-town-area                                | ~~ne99_d00_shp~~
 combined-new-england-city-and-town-area                       | x                        | x                                            |
 urban-area                                                    | ua99_d00_shp             | "UA":"45748"                                 | https://www2.census.gov/geo/docs/reference/ua/ua2k.txt
 congressional-district                                        | x                        | x                                            | (3) 
-school-district-'elementary'                                  | se01_d00_shp             | "STATE":"44","SD_E":"00360"                  |
-school-district-'secondary'                                   | ss01_d00_shp             | "STATE":"44","SD_S":"00420"                  |
-school-district-'unified'                                     | sn01_d00_shp             | "STATE":"44","SD_U":"00270"                  |
+school-district-_elementary'                                  | se01_d00_shp             | "STATE":"44","SD_E":"00360"                  |
+school-district-_secondary'                                   | ss01_d00_shp             | "STATE":"44","SD_S":"00420"                  |
+school-district-_unified'                                     | sn01_d00_shp             | "STATE":"44","SD_U":"00270"                  |
 block-group                                                   | bg01_d00_shp             | "STATE":"44","COUNTY":"007","TRACT":"011402","BLKGROUP":"8" |
 public-use-microdata-area                                     | x                        | x                                            | only p1/5
 zip-code-tabulation-area                                      | zt01_d00_shp             | "ZCTA":"99782"                               | 
@@ -263,9 +263,9 @@ new-england-city-and-town-area                                | gz_2010_us_350_m
 combined-new-england-city-and-town-area                       | gz_2010_us_335_m1_500k   |                                              |
 urban-area                                                    | x                        |                                              | (1) 
 congressional-district                                        | gz_2010_us_500_11_5m     | "STATE":"44","CD":"01"                       | Same for CDs in 103-110
-school-district-'elementary'                                  | gz_2010_55_950_00_500k   |                                              |
-school-district-'secondary'                                   | gz_2010_55_960_00_500k   |                                              |
-school-district-'unified'                                     | gz_2010_01_970_00_500k   | "STATE":"44","SDUNI":"00120"                 |
+school-district-_elementary'                                  | gz_2010_55_950_00_500k   |                                              |
+school-district-_secondary'                                   | gz_2010_55_960_00_500k   |                                              |
+school-district-_unified'                                     | gz_2010_01_970_00_500k   | "STATE":"44","SDUNI":"00120"                 |
 block-group                                                   | gz_2010_01_150_00_500k   | "STATE":"44","COUNTY":"001","TRACT":"030602","BLKGRP":"1" |
 public-use-microdata-area                                     | x                        | x                                            |
 zip-code-tabulation-area                                      | ~~gz_2010_us_860_00_500k~~|                                             | this is a bfjo, punted 
@@ -292,9 +292,9 @@ new-england-city-and-town-area                                | x               
 combined-new-england-city-and-town-area                       | x                        |                                              |
 urban-area                                                    | cb_2012_us_uac10_500k    | "UACE10":"79282"                             |
 congressional-district                                        | cb_rd13_us_cd113_500k    | "GEOID":"0101"                               | 
-school-district-'elementary'                                  | x                        |                                              | 
-school-district-'secondary'                                   | x                        |                                              |
-school-district-'unified'                                     | x                        |                                              |
+school-district-_elementary'                                  | x                        |                                              | 
+school-district-_secondary'                                   | x                        |                                              |
+school-district-_unified'                                     | x                        |                                              |
 block-group                                                   | x                        |                                              |
 public-use-microdata-area                                     | x                        |                                              |
 zip-code-tabulation-area                                      | x                        |                                              |
@@ -321,9 +321,9 @@ new-england-city-and-town-area                                | cb_2013_us_necta
 combined-new-england-city-and-town-area                       | x                        |                                              |
 urban-area                                                    | cb_2013_us_ua10_500k     | "GEOID10":"71155"                            | 
 congressional-district                                        | cb_2013_us_cd113_500k    | "GEOID":"0401"                               |
-school-district-'elementary'                                  | x                        |                                              |
-school-district-'secondary'                                   | x                        |                                              |
-school-district-'unified'                                     | x                        |                                              |
+school-district-_elementary'                                  | x                        |                                              |
+school-district-_secondary'                                   | x                        |                                              |
+school-district-_unified'                                     | x                        |                                              |
 block-group                                                   | cb_2013_01_bg_500k       | "GEOID":"440070136002"                       |
 public-use-microdata-area                                     | cb_2013_01_puma10_500k   | "GEOID10":"4400400"                          | 
 zip-code-tabulation-area                                      | cb_2013_us_zcta510_500k  | "GEOID10":"36522"                            | 
@@ -350,9 +350,9 @@ new-england-city-and-town-area                                | cb_2016_us_necta
 combined-new-england-city-and-town-area                       | cb_2016_us_cnecta_500k   | "GEOID":"710"                                 |             
 urban-area                                                    | cb_2016_us_ua10_500k     | "GEOID10":"44789"                             |                 
 congressional-district                                        | cb_2016_us_cd115_500k    | "GEOID":"1309"                                |              
-school-district-'elementary'                                  | cb_2016_01_elsd_500k     | "GEOID":"4400510"                             |                 
-school-district-'secondary'                                   | cb_2016_01_scsd_500k     | "GEOID":"4400420"                             |                 
-school-district-'unified'                                     | cb_2016_01_unsd_500k     | "GEOID":"4400990"                             |                 
+school-district-_elementary'                                  | cb_2016_01_elsd_500k     | "GEOID":"4400510"                             |                 
+school-district-_secondary'                                   | cb_2016_01_scsd_500k     | "GEOID":"4400420"                             |                 
+school-district-_unified'                                     | cb_2016_01_unsd_500k     | "GEOID":"4400990"                             |                 
 block-group                                                   | cb_2016_01_bg_500k       | "GEOID":"440090509011"                        |                      
 public-use-microdata-area                                     | cb_2016_01_puma10_500k   | "GEOID10":"4400300"                           |                   
 zip-code-tabulation-area                                      | cb_2016_us_zcta510_500k  | "GEOID10":"35442"                             |                 
