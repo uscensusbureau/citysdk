@@ -54,7 +54,12 @@
       #"-|'|!" {"-" "%20" "'" ")" "!" "/"})
     #"[)]" "("))
 
-;(def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
+#_(stats-url-builder {:vintage      "2016"
+                      :sourcePath   ["acs" "acs5"]
+                      :geoHierarchy {:state "01" :county "073" :tract "000100"}
+                      :variables    ["B01001_001E" "B01001_001M"]
+                      :statsKey     stats-key})               ;; input your key
+;=> "https://api.census.gov/data/2016/acs/acs5?get=&in=state:01%20county:073&for=tract:000100&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3"
 
 (defn zipmap-1st [rows key]
   (if (= :keywords key)
@@ -239,6 +244,54 @@
     (do (GET url args) port)))
 
 
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
+
+
+(defn transducified [f]
+  "
+  A function that takes a standard function (taking a single argument) and
+  augments it with the structure of a transducer function.
+  "
+  (fn [rf]
+    (fn
+      ([] (rf))
+      ([acc] (rf acc))
+      ([acc val] (rf acc (f val))))))
+
+(defn feature-collector
+  "
+  Takes a directory, filepath and some GeoJSON and composes it into a map with
+  cooresponding keys.
+  "
+  [vec-]
+  (js-obj "type" "FeatureCollection" "features" vec-))
+
+
+(defn x-feature-collector
+  "
+  Turns the geojson-config function into a transducer.
+  "
+  [vec-]
+  (transducified (feature-collector vec-)))
+
+
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
+
+
+
+
+
+
 (defn merge-geo-stats->map
   "
   Takes an arg map to configure a call the Census' statistics API as well as a
@@ -265,17 +318,24 @@
         (<! =merged=)
         (js/console.log "done!")
         (close! =features=)
-        (close! =stats=))))
+        (close! =stats=)
+        (close! =merged=))))
 
 (merge-geo-stats->map {:vintage      "2016"
                        :sourcePath   ["acs" "acs5"]
-                       :geoHierarchy {:state "01"
+                       :geoHierarchy {:state "01" ; TODO: function to find out the `:scopes` for `for` and use `:us` if not available at `:state`
                                       :county "*"}
                        :geoResolution "500k"
                        :values       ["B01001_001E"]
                        :statsKey     stats-key})
                        ;; add `:predicates` and count them for `vars#`})
 
+(pprint (merge-geo-stats->map {:vintage      "2016"
+                               :sourcePath   ["acs" "acs5"]
+                               :geoHierarchy {:county "*"}
+                               :geoResolution "500k"
+                               :values       ["B01001_001E"]
+                               :statsKey     stats-key}))
 
 (geo/geo-url-builder {:vintage       "2016"
                       :sourcePath    ["acs" "acs5"]
