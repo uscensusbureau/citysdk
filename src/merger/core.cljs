@@ -36,29 +36,29 @@
 (defn stats-url-builder
   "Composes a URL to call Census' statistics API"
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
-  (s/replace-first
-    (s/replace
-      (str
-        "https://api.census.gov/data/"
-        (str vintage)
-        (s/join (map #(str "/" %) sourcePath))
-        "?get=" (s/join "," values)
-        (if (some? predicates)
-          (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
-          "")
-        (if (= 1 (count geoHierarchy))
-          (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-          (str "&in=" (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
-               "&for=" (kv-pair->str (last geoHierarchy) ":")))
-        "&key=" statsKey)
-      #"-|'|!" {"-" "%20" "'" ")" "!" "/"})
-    #"[)]" "("))
+  (str "https://api.census.gov/data/"
+       (str vintage)
+       (s/join (map #(str "/" %) sourcePath))
+       "?get=" (s/join "," values)
+       (if (some? predicates)
+         (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
+         "")
+       (s/replace
+         (if (= 1 (count geoHierarchy))
+           (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
+           (str "&in=" (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
+                "&for=" (kv-pair->str (last geoHierarchy) ":")))
+         #"-|_|'|!"
+         {"-" "%20" "_" "(" "'" ")" "!" "/"})
+       "&key=" statsKey))
 
-#_(stats-url-builder {:vintage      "2016"
-                      :sourcePath   ["acs" "acs5"]
-                      :geoHierarchy {:state "01" :county "073" :tract "000100"}
-                      :variables    ["B01001_001E" "B01001_001M"]
-                      :statsKey     stats-key})               ;; input your key
+
+(stats-url-builder {:vintage      "2016"
+                    :sourcePath   ["acs" "acs5"]
+                    :geoHierarchy {:state "01" :county "073" :tract "000100"}
+                    :values       ["B01001_001E" "B01001_001M"]
+                    :predicates   {:test "0:11000"}
+                    :statsKey     stats-key})               ;; input your key
 ;=> "https://api.census.gov/data/2016/acs/acs5?get=&in=state:01%20county:073&for=tract:000100&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3"
 
 (defn zipmap-1st [rows key]

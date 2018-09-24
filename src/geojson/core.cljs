@@ -233,7 +233,7 @@
   ;; => "500k/2010/combined-statistical-area.json"
 
   (filename->>geopath "gz_2010_01_970_00_500k.zip")
-  ;; => "500k/2010/01/school-district-'unified'.json"
+  ;; => "500k/2010/01/school-district-_unified'.json"
 
   (filename->>geopath "cb_2014_us_nation_5m.zip")
   ;; => "5m/2014/nation.json"
@@ -501,4 +501,4 @@
                            \n === Wrapping up .... === \n
                            \n ======================== \n")))))
 
-#_(batch=>zip-paths=>convert=>geojson geos/paths)
+(batch=>zip-paths=>convert=>geojson geos/paths)
