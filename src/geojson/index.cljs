@@ -202,7 +202,7 @@
     :2013 {:lev<-file "sldl"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44061"
     :2012 {:lev<-file "sldl"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44061"
     :2010 {:lev<-file "620"      :scopes [:state    ] :id<-json [:STATE :SLDL]}                 ; "44","001"
-    :2000 {:lev<-file "sl"       :scopes [:state    ] :id<-json [:STATE :SLDL]}}              ; "44","063"
+    :2000 {:lev<-file "sl"       :scopes [:state    ] :id<-json [:STATE :SLDL]}}                ; "44","063"
    :zip-code-tabulation-area
    {
     :2017 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36426"
