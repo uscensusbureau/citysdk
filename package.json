@@ -29,7 +29,8 @@
     "dotenv": "^5.0.1",
     "mkdirp": "^0.5.1",
     "shpjs": "^3.4.2",
-    "xmlhttprequest": "^1.8.0"
+    "xmlhttprequest": "^1.8.0",
+    "xregexp": "^4.2.0"
   },
   "devDependencies": {
     "shadow-cljs": "^2.6.1"

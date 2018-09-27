@@ -11,92 +11,14 @@
             ["dotenv" :as env]
             ["fs" :as fs]
             [clojure.repl :refer [source]]
-            [geoAPI.core :as geo]))
+            [geoAPI.core :as geo]
+            [utils.core :refer [=IO=>I=O= =IO=>Icb xf<< xf!<< map-target map-target-idcs]]
+            [statsAPI.core :as stats]))
 
-(def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
-
-(defn get-json->put!
-  [base-url keywords?]
-  (let [=resp= (chan)
-        args (merge
-               {:response-format :json
-                :handler         #(put! =resp= %)
-                :error-handler   #(prn (str "ERROR: " %))}
-               (when-let [keywords? {:keywords? keywords?}]
-                 keywords?))]
-    (do
-      (GET base-url args)
-      =resp=)))
-
-;; Now that we're using `core.async`, we'll have to move our success-handler out of `cljs-ajax` in order  for the response that is put into the channel to be handled once it is taken out. Observe:
-
-(defn kv-pair->str [[k v] separator]
-  (s/join separator [(name k) (str v)]))
-
-(defn stats-url-builder
-  "Composes a URL to call Census' statistics API"
-  [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
-  (str "https://api.census.gov/data/"
-       (str vintage)
-       (s/join (map #(str "/" %) sourcePath))
-       "?get=" (s/join "," values)
-       (if (some? predicates)
-         (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
-         "")
-       (s/replace
-         (if (= 1 (count geoHierarchy))
-           (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-           (str "&in=" (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
-                "&for=" (kv-pair->str (last geoHierarchy) ":")))
-         #"-|_|'|!"
-         {"-" "%20" "_" "(" "'" ")" "!" "/"})
-       "&key=" statsKey))
+;; Examples ==============================
+;; =======================================
 
 
-(stats-url-builder {:vintage      "2016"
-                    :sourcePath   ["acs" "acs5"]
-                    :geoHierarchy {:state "01" :county "073" :tract "000100"}
-                    :values       ["B01001_001E" "B01001_001M"]
-                    :predicates   {:test "0:11000"}
-                    :statsKey     stats-key})               ;; input your key
-;=> "https://api.census.gov/data/2016/acs/acs5?get=&in=state:01%20county:073&for=tract:000100&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3"
-
-(defn zipmap-1st [rows key]
-  (if (= :keywords key)
-    (map (partial zipmap (vec (map keyword (first rows)))) (rest rows))
-    (map (partial zipmap (first rows)) (rest rows))))
-
-;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
-
-; ~~~888~~~                                        888
-;    888    888-~\   /~~~8e  888-~88e  d88~\  e88~\888 888  888  e88~~\  e88~~8e  888-~\  d88~\
-;    888    888          88b 888  888 C888   d888  888 888  888 d888    d888  88b 888    C888
-;    888    888     e88~-888 888  888  Y88b  8888  888 888  888 8888    8888__888 888     Y88b
-;    888    888    C888  888 888  888   888D Y888  888 888  888 Y888    Y888    , 888      888D
-;    888    888     "88_-888 888  888 \_88P   "88_/888 "88_-888  "88__/  '88___/  888    \_88P
-;
-;
-
-; ===============================
-
-;; A stateful transducer is needed to change the behavior based on which item in the collection we are "on".
-(defn xf-zipmap-1st
-  "
-  Stateful transducer, which stores the first item as a list of a keys to apply
-  (via `zipmap`) to the rest of the items in a collection. Serves to turn the
-  Census API response into a more conventional JSON format.
-  "
-  [rf]
-  (let [prep (volatile! nil)]
-    (fn
-      ([] (rf))
-      ([result] (rf result))
-      ([result item]
-       (let [prev @prep]
-         (if (nil? prev)
-           (do (vreset! prep (vec (map keyword item)))
-               nil)
-           (rf result (zipmap prev (vec item)))))))))
 
 ;; If you want to pass an argument into your transducer, wrap it in another function, which takes the arg and returns a transducer containing it.
 (defn xf-geo+stat
@@ -116,10 +38,31 @@
        (rf result {(keyword (reduce str (vals (take-last (- (count item) vars#) item))))
                    {:properties item}})))))
 
+;; Examples ==============================
+
+(transduce (xf-geo+stat 2) conj ({:B01001_001E "491042",
+                                  :NAME "State Senate District 9 (2016), Florida",
+                                  :B00001_001E "29631",
+                                  :state "12",
+                                  :state legislative district (upper chamber) "009"
+                                  {:B01001_001E "491350",
+                                   :NAME "State Senate District 6 (2016), Florida",
+                                   :B00001_001E "29938",
+                                   :state "12",
+                                   :state legislative district (upper chamber) "006"}
+                                  {:B01001_001E "486727",
+                                   :NAME "State Senate District 4 (2016), Florida",
+                                   :B00001_001E "28800",
+                                   :state "12",
+                                   :state legislative district (upper chamber) "004"}}))
+
+
+;; =======================================
+
 ;; `xf-zipmap-1st` is a transducer, which means we can use it sans `()`s, while `xf-geo+stat` RETURNS a transducer, which requires us to wrap the function in `()`s to return that internal transducer.
 (defn xf-1-stat->map [vars#]
   (comp
-    xf-zipmap-1st
+    (stats/xf!-csv-response->JSON)
     (xf-geo+stat vars#)))
 
 (defn get->put!->port
@@ -244,41 +187,6 @@
     (do (GET url args) port)))
 
 
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~
-
-
-(defn transducified [f]
-  "
-  A function that takes a standard function (taking a single argument) and
-  augments it with the structure of a transducer function.
-  "
-  (fn [rf]
-    (fn
-      ([] (rf))
-      ([acc] (rf acc))
-      ([acc val] (rf acc (f val))))))
-
-(defn feature-collector
-  "
-  Takes a directory, filepath and some GeoJSON and composes it into a map with
-  cooresponding keys.
-  "
-  [vec-]
-  (js-obj "type" "FeatureCollection" "features" vec-))
-
-
-(defn x-feature-collector
-  "
-  Turns the geojson-config function into a transducer.
-  "
-  [vec-]
-  (transducified (feature-collector vec-)))
-
 
 ;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
 ;       888     d888   \  888   \   d888   \
@@ -306,7 +214,7 @@
   operation on the collection in the local `chan`.
   "
   [args]
-  (let [stats-call (stats-url-builder args)
+  (let [stats-call (stats/stats-url-builder args)
         vars# (count (get args :values))
         =features= (chan 1 xf-features->map #(pprint "features fail! " %))
         =stats= (chan 1 (xf-stats->map vars#) #(pprint "stats fail! " %))
@@ -327,7 +235,7 @@
                                       :county "*"}
                        :geoResolution "500k"
                        :values       ["B01001_001E"]
-                       :statsKey     stats-key})
+                       :statsKey     stats/stats-key})
                        ;; add `:predicates` and count them for `vars#`})
 
 (pprint (merge-geo-stats->map {:vintage      "2016"
@@ -335,7 +243,7 @@
                                :geoHierarchy {:county "*"}
                                :geoResolution "500k"
                                :values       ["B01001_001E"]
-                               :statsKey     stats-key}))
+                               :statsKey     stats/stats-key}))
 
 (geo/geo-url-builder {:vintage       "2016"
                       :sourcePath    ["acs" "acs5"]

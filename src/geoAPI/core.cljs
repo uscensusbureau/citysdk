@@ -5,7 +5,6 @@
             [cljs.core.async :refer-macros [go go-loop alt!]]
             [ajax.core :as http :refer [GET POST]]
             [oops.core :as obj]
-            [traversy.lens :as lens]
             [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
@@ -24,12 +23,16 @@
 
 (defn geo-url-builder
   "Composes a URL to call raw GeoJSON files hosted on Github"
-  [{:keys [vintage geoResolution geoHierarchy]}]
+  [{:keys [vintage sourcePath geoResolution geoHierarchy]}]
   (let [[for _] (last geoHierarchy)
         {:keys [state]} geoHierarchy]
     (if (= nil state)
       (str (s/join "/" [base-url geoResolution vintage (name for)]) ".json")
       (str (s/join "/" [base-url geoResolution vintage state (name for)]) ".json"))))
+
+
+;; Psedo
+; create a map/index for :sourcePath -> vintage manipulation (e.g., CBP: [20)
 
 (geo-url-builder {:vintage       "2016"
                   :sourcePath    ["acs" "acs5"]

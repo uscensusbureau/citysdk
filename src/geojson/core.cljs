@@ -17,7 +17,8 @@
             [clojure.repl :refer [source doc]]
             [geojson.filepaths :as geos]
             [geojson.index :as index]
-            [geojson.filepaths_abv :as geos_abv]))
+            [geojson.filepaths_abv :as geos_abv]
+            [utils.core :refer [map-target]]))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -42,14 +43,6 @@
               :else %)
        vtr))
 
-(defn map-target-idx
-  "
-  Maps a provided function to a specific index of a provided collection of
-  collections.
-  "
-  [fnc idx coll]
-  (map-indexed #(if (zero? (mod (inc %1) idx)) (fnc %2) %2) coll))
-
 (defn filename->>pattern
   "
   Breaks apart a Census Tiger filename and cleans it into meaningful parts.
@@ -66,7 +59,7 @@
   (->> (s/split string #"_|\.")
        (map #(re-seq #"[a-z]+|[0-9]+" %))
        (map (fn [y] (remove #(= "d" %) y)))
-       (map-target-idx map-xx->vin 2)
+       (map-target map-xx->vin 2)
        (map #(vec %))))
 
 #_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')

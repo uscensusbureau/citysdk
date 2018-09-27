@@ -56,6 +56,6 @@
     {:fips "60" :vins [1990 2000           2013 2014 2015 2016] :short "AS" :long "American Samoa"}
     {:fips "66" :vins [1990 2000           2013 2014 2015 2016] :short "GU" :long "Guam"}
     {:fips "69" :vins [1990 2000           2013 2014 2015 2016] :short "MP" :long "Northern Mariana Islands"}
-    {:fips "70" :vins [1990]                                    :short "PW" :long "Palau"}
+    {:fips "70" :vins [1990                                   ] :short "PW" :long "Palau"}
     {:fips "72" :vins [1990 2000 2010 2012 2013 2014 2015 2016] :short "PR" :long "Puerto Rico"}
     {:fips "78" :vins [1990 2000           2013 2014 2015 2016] :short "VI" :long "Virgin Islands of the United States"}])

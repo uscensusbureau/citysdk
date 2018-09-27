@@ -16,8 +16,8 @@
     :2016 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
     :2015 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
     :2014 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
-    :2013 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "US"
-    :2010 {:lev<-file "outline"  :scopes [:us       ] :id<-json []}}                            ; no usable construct
+    :2013 {:lev<-file "nation"   :scopes [:us       ] :id<-json [:GEOID]}}                      ; "US"
+    ;:2010 {:lev<-file "outline"  :scopes [:us       ] :id<-json []}}                           ; no usable construct
    :region
    {
     :2017 {:lev<-file "region"   :scopes [:us       ] :id<-json [:GEOID]}                       ; "4"
@@ -216,13 +216,13 @@
    {
     :2017 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
     :2016 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
-    :2010 {:lev<-file "950"      :scopes [:state    ] :id<-json []}                             ; TODO
+    :2010 {:lev<-file "950"      :scopes [:state    ] :id<-json [:STATE :SDELM]}                ; "44","00360"
     :2000 {:lev<-file "se"       :scopes [:state    ] :id<-json [:STATE :SD_E]}}                ; "44","00360"
    :school-district-_secondary'
    {
     :2017 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
     :2016 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
-    :2010 {:lev<-file "960"      :scopes [:state    ] :id<-json []}                             ; TODO
+    :2010 {:lev<-file "960"      :scopes [:state    ] :id<-json [:STATE :SDSEC]}                ; "44","00420"
     :2000 {:lev<-file "ss"       :scopes [:state    ] :id<-json [:STATE :SD_S]}}                ; "44","00420"
    :school-district-_unified'
    {
