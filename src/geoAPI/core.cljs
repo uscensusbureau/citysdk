@@ -19,13 +19,15 @@
   [{:keys [vintage sourcePath geoResolution geoHierarchy]}]
   (let [[for _] (last geoHierarchy)
         {:keys [state]} geoHierarchy]
-    (if (= nil state)
+    (if (or (= state "*") (= state nil))
       (str (s/join "/" [base-url geoResolution vintage (name for)]) ".json")
       (str (s/join "/" [base-url geoResolution vintage state (name for)]) ".json"))))
 
 
 ;; Psedo
 ; create a map/index for :sourcePath -> vintage manipulation (e.g., CBP: [20)
+
+;; Examples ====================================
 
 (geo-url-builder {:vintage       "2016"
                   :sourcePath    ["acs" "acs5"]
@@ -36,7 +38,8 @@
                   ; :statsKey      stats-key})
 (geo-url-builder {:vintage       "2016"
                   :sourcePath    ["acs" "acs5"]
-                  :geoHierarchy  {:county "*"}
+                  :geoHierarchy  {:state "*"
+                                  :county "*"}
                   :geoResolution "500k"
                   :values        ["B01001_001E"]})
 
@@ -47,3 +50,4 @@
                                   :tract "*"}
                   :geoResolution "500k"
                   :values        ["B01001_001E"]})
+;; ===============================================

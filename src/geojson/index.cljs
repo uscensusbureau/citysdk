@@ -183,7 +183,7 @@
     :105  {:lev<-file "cd"       :scopes [:state    ] :id<-json [:STATE :CD]}                   ; "44","01"
     :104  {:lev<-file "cd"       :scopes [:state    ] :id<-json [:STATE :CD]}                   ; "44","01"
     :103  {:lev<-file "cd"       :scopes [:state    ] :id<-json [:STATE :CD]}}                  ; "44","01"
-   :state-legislative-district-_upper-chamber'
+   :state-legislative-district-_upper-chamber_
    {
     :2017 {:lev<-file "sldu"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44038"
     :2016 {:lev<-file "sldu"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44038"
@@ -193,7 +193,7 @@
     :2012 {:lev<-file "sldu"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44038"
     :2010 {:lev<-file "610"      :scopes [:state    ] :id<-json [:STATE :SLDU]}                 ; "44038"
     :2000 {:lev<-file "su"       :scopes [:state    ] :id<-json [:STATE :SLDU]}}                ; "44","033"
-   :state-legislative-district-_lower-chamber'
+   :state-legislative-district-_lower-chamber_
    {
     :2017 {:lev<-file "sldl"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44061"
     :2016 {:lev<-file "sldl"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "44061"
@@ -212,19 +212,19 @@
     :2013 {:lev<-file "zcta"     :scopes [:us       ] :id<-json [:GEOID10]}                     ; "36522"
     ;:2010 {:lev<-file "860"      :scopes [:us       ] :id<-json []}                            ; this is a bfjo, punted
     :2000 {:lev<-file "zt"       :scopes [:us :state] :id<-json [:ZCTA]}}                       ; "99782"
-   :school-district-_elementary'
+   :school-district-_elementary_
    {
     :2017 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
     :2016 {:lev<-file "elsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400510"
     :2010 {:lev<-file "950"      :scopes [:state    ] :id<-json [:STATE :SDELM]}                ; "44","00360"
     :2000 {:lev<-file "se"       :scopes [:state    ] :id<-json [:STATE :SD_E]}}                ; "44","00360"
-   :school-district-_secondary'
+   :school-district-_secondary_
    {
     :2017 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
     :2016 {:lev<-file "scsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400420"
     :2010 {:lev<-file "960"      :scopes [:state    ] :id<-json [:STATE :SDSEC]}                ; "44","00420"
     :2000 {:lev<-file "ss"       :scopes [:state    ] :id<-json [:STATE :SD_S]}}                ; "44","00420"
-   :school-district-_unified'
+   :school-district-_unified_
    {
     :2017 {:lev<-file "unsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400990"
     :2016 {:lev<-file "unsd"     :scopes [:state    ] :id<-json [:GEOID]}                       ; "4400990"
