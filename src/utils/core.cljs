@@ -93,19 +93,19 @@
 ;; Tested 1: working
 
 
-(defn xfxfify
+(defn xfxf<<
   "
   Transducer, which wraps a transducer to provide the right level of contract
   for a core.async chan through which data is not an item, but a collection.
   I.e., treating the collection as a single transducible item.
   "
-  [xfn]
+  [xfn rf-]
   (fn [rf]
     (fn
       ([] (rf))
       ([result] (rf result))
       ([result item]
-       (rf result (transduce xfn conj item))))))
+       (rf result (transduce xfn rf- item))))))
 
 ;; Examples ==============================
 
