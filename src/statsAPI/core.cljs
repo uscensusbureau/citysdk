@@ -1,7 +1,7 @@
 (ns statsAPI.core
   (:require [cljs.core.async
              :as async
-             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async]]
+             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline pipeline-async]]
             [cljs.core.async :refer-macros [go go-loop alt!]]
             [ajax.core :refer [GET POST]]
             [oops.core :as obj]
@@ -9,7 +9,7 @@
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
             [geoAPI.core :as geo]
-            [utils.core :refer [=IO=>I=O= xf<< xf!<< xfxf<< map-target map-target-idcs map-idcs-range map-rename-keys IO-ajax-GET-json]]))
+            [utils.core :as u]))
 
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
@@ -43,20 +43,20 @@
 
 ;; Examples ==============================
 
-(stats-url-builder {:vintage      "2016"
-                    :sourcePath   ["acs" "acs5"]
-                    :geoHierarchy {:state "01" :county "073" :tract "000100"}
-                    :values       ["B01001_001E" "B01001_001M"]
-                    :statsKey     stats-key})               ;; input your key
+#_(stats-url-builder {:vintage      "2016"
+                      :sourcePath   ["acs" "acs5"]
+                      :geoHierarchy {:state "01" :county "073" :tract "000100"}
+                      :values       ["B01001_001E" "B01001_001M"]
+                      :statsKey     stats-key})               ;; input your key
 
 ; => https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3
 
-(stats-url-builder {:vintage      "2016"
-                    :sourcePath   ["acs" "acs5"]
-                    :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                    :values       ["B01001_001E" "NAME"]
-                    :predicates   {:B00001_001E "0:30000"}
-                    :statsKey     stats-key})
+#_(stats-url-builder {:vintage      "2016"
+                      :sourcePath   ["acs" "acs5"]
+                      :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                      :values       ["B01001_001E" "NAME"]
+                      :predicates   {:B00001_001E "0:30000"}
+                      :statsKey     stats-key})
 
 ; => https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3
 ;; =======================================
@@ -98,25 +98,25 @@
 
 ;; A stateful transducer is needed to change the behavior based on which item in the collection we are "on".
 
-(clj->js {:vintage      "2016"
-          :sourcePath   ["acs" "acs5"]
-          :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber' "*"}
-          :values       ["B01001_001E" "NAME"]
-          :predicates   {:B00001_001E "0:30000"}
-          :statsKey     stats-key})
+#_(clj->js {:vintage      "2016"
+            :sourcePath   ["acs" "acs5"]
+            :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber' "*"}
+            :values       ["B01001_001E" "NAME"]
+            :predicates   {:B00001_001E "0:30000"}
+            :statsKey     stats-key})
 
-(js->clj {:vintage      "2016"
-          :sourcePath   ["acs" "acs5"]
-          :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber' "*"}
-          :values       ["B01001_001E" "NAME"]
-          :predicates   {:B00001_001E "0:30000"}
-          :statsKey     stats-key})
+#_(js->clj {:vintage      "2016"
+            :sourcePath   ["acs" "acs5"]
+            :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber' "*"}
+            :values       ["B01001_001E" "NAME"]
+            :predicates   {:B00001_001E "0:30000"}
+            :statsKey     stats-key})
 
 (defn json-args->clj-keys
   [json key]
   (let [geoJS (obj/oget json (name key))
         geoCljs (js->clj geoJS)
-        geoKeys (map-rename-keys str->key geoCljs)]
+        geoKeys (u/map-rename-keys str->key geoCljs)]
     (obj/oset! json key (clj->js geoKeys))
     (js->clj json :keywordize-keys true)))
 
@@ -162,26 +162,26 @@
   If provided `:keywords` as an argument, will return a map with Clojure keys.
   Otherwise, will return map keys as strings.
   "
-  ([{:keys [values predicates]}] xf!-csv-response->JSON values predicates nil)
+  ([{:keys [values predicates]}] (xf!-csv-response->JSON [{:keys [values predicates]} nil]))
   ([{:keys [values predicates]} keywords?]
    (let [parse-range [0 (+ (count values) (count predicates))]]
-     (xf!<< (fn [state xf result input]
-              (let [prev @state]
-                (if (nil? prev)
-                    (if (= keywords? :keywords)
-                        (do (vreset! state (mapv str->key input)) nil)
-                        (do (vreset! state input) nil))
-                    (if (= keywords? :keywords)
-                        (xf result
-                            (zipmap (vec (map keyword @state))
-                                    (map-idcs-range parse-if-number
-                                                    parse-range
-                                                    input)))
-                        (xf result
-                            (zipmap @state
-                                    (map-idcs-range parse-if-number
-                                                    parse-range
-                                                    input)))))))))))
+     (u/xf!<< (fn [state xf result input]
+                (let [prev @state]
+                  (if (nil? prev)
+                      (if (= keywords? :keywords)
+                          (do (vreset! state (mapv str->key input)) nil)
+                          (do (vreset! state input) nil))
+                      (if (= keywords? :keywords)
+                          (xf result
+                              (zipmap (vec (map keyword @state))
+                                      (u/map-idcs-range parse-if-number
+                                                      parse-range
+                                                      input)))
+                          (xf result
+                              (zipmap @state
+                                      (u/map-idcs-range parse-if-number
+                                                      parse-range
+                                                      input)))))))))))
 
 ;; Examples ==============================
 
@@ -246,34 +246,58 @@
   ([json-args cb keywords?]
    (let [args  (json-args->clj-keys json-args :geoHierarchy)
          url   (stats-url-builder args)
-         =res= (chan 1 (xfxf<< (xf!-csv-response->JSON args keywords?) conj))]
+         =res= (chan 1 (u/xfxf<< (xf!-csv-response->JSON args keywords?) conj))]
      (pprint (str url))
-     (go ((=IO=>I=O= IO-ajax-GET-json) url =res=)
+     (go ((u/=IO=>I=O= u/IO-ajax-GET-json) url =res=)
          (if (= keywords? :keywords)
-             (take! =res= cb)
-             (take! =res= #(cb (js/JSON.stringify (clj->js %)))))))))
+           (take! =res= cb)
+           (take! =res= #(cb (js/JSON.stringify (clj->js %)))))))))
+
 
 ;; Examples ==============================
 
-(get-census-JSON #js {"vintage"      "2016"
-                      "sourcePath"   #js ["acs" "acs5"]
-                      "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
-                      "values"       #js ["B01001_001E" "NAME"]
-                      "predicates"   #js {"B00001_001E" "0:30000"}
-                      "statsKey"     stats-key}
-                 pprint)
+#_(get-census-JSON #js {"vintage"      "2016"
+                        "sourcePath"   #js ["acs" "acs5"]
+                        "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
+                        "values"       #js ["B01001_001E" "NAME"]
+                        "predicates"   #js {"B00001_001E" "0:30000"}
+                        "statsKey"     stats-key}
+                   js/console.log)
+                 ;pprint)
                  ;:keywords)
-; =>
-;[{"B01001_001E" 494981,
-;  "NAME" "State Senate District 40 (2016), Florida",
-;  "B00001_001E" 29661,
-;  "state" "12",
-;  "state legislative district (upper chamber)" "040"}
-; {"B01001_001E" 492259,
-;  "NAME" "State Senate District 36 (2016), Florida",
-;  "B00001_001E" 29475,
-;  "state" "12",
-;  "state legislative district (upper chamber)" "036"}]
+
 ;; =======================================
 
-(count {"B00001_001E" "0:30000" "B00001_002E" "0:30000"})
+
+(defn IO-census-JSON
+  "
+  Library function, which takes a JSON object as input, constructs a call to the
+  Census API and returns the data as _standard JSON_ (rather than the default
+  csv-like format from the naked API).
+  "
+  [=I= =O=]
+  (go (let [args  (<! =I=)
+            url   (stats-url-builder args)
+            =url= (chan 1)
+            =res= (chan 1)]
+        (pprint (str url))
+        (>! =url= url)
+        (pipeline-async 1 =res= (u/=IO=>I=O= u/IO-ajax-GET-json) =url=)
+        (pipeline 1 =O= (u/xfxf<< (xf!-csv-response->JSON args :keywords) conj) =res=))))
+
+;; Examples ==============================
+
+#_(let [=I= (chan 1)
+        =O= (chan 1)]
+    (go (>! =I= {:vintage      "2016"
+                 :sourcePath   ["acs" "acs5"]
+                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                 :values       ["B01001_001E" "NAME"]
+                 :predicates   {:B00001_001E "0:30000"}
+                 :statsKey     stats-key})
+        (IO-census-JSON =I= =O=)
+        (pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
+
+;; =======================================

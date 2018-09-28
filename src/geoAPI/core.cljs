@@ -8,17 +8,10 @@
             [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
-            [clojure.repl :refer [source]]))
+            [clojure.repl :refer [source]]
+            [utils.core :as u]))
 
 (def base-url "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
-
-(defn get->put!->port
-  [url port]
-  (let [args {:response-format :json
-              :handler         (fn [r] (put! port r))
-              :error-handler   #(prn (str "ERROR: " %))
-              :keywords?       true}]
-    (do (GET url args) port)))
 
 
 (defn geo-url-builder

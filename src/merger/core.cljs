@@ -44,17 +44,14 @@
                                   :NAME "State Senate District 9 (2016), Florida",
                                   :B00001_001E "29631",
                                   :state "12",
-                                  :state legislative district (upper chamber) "009"
                                   {:B01001_001E "491350",
                                    :NAME "State Senate District 6 (2016), Florida",
                                    :B00001_001E "29938",
-                                   :state "12",
-                                   :state legislative district (upper chamber) "006"}
+                                   :state "12",}
                                   {:B01001_001E "486727",
                                    :NAME "State Senate District 4 (2016), Florida",
                                    :B00001_001E "28800",
-                                   :state "12",
-                                   :state legislative district (upper chamber) "004"}}))
+                                   :state "12",}}))
 
 
 ;; =======================================
@@ -62,7 +59,7 @@
 ;; `xf-zipmap-1st` is a transducer, which means we can use it sans `()`s, while `xf-geo+stat` RETURNS a transducer, which requires us to wrap the function in `()`s to return that internal transducer.
 (defn xf-1-stat->map [vars#]
   (comp
-    (stats/xf!-csv-response->JSON)
+    (stats/xf!-csv-response->JSON conj)
     (xf-geo+stat vars#)))
 
 (defn get->put!->port
