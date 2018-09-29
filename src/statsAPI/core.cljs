@@ -112,32 +112,6 @@
             :predicates   {:B00001_001E "0:30000"}
             :statsKey     stats-key})
 
-(defn json-args->clj-keys
-  [json key]
-  (let [geoJS (obj/oget json (name key))
-        geoCljs (js->clj geoJS)
-        geoKeys (u/map-rename-keys str->key geoCljs)]
-    (obj/oset! json key (clj->js geoKeys))
-    (js->clj json :keywordize-keys true)))
-
-;; Examples ==============================
-
-#_(json-args->clj-keys #js {"vintage"      "2016"
-                            "sourcePath"   #js ["acs" "acs5"]
-                            "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
-                            "values"       #js ["B01001_001E" "NAME"]
-                            "predicates"   #js {"B00001_001E" "0:30000"}
-                            "statsKey"     stats-key}
-                       :geoHierarchy)
-
-; =>
-;{:vintage "2016",
-; :sourcePath ["acs" "acs5"],
-; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
-; :values ["B01001_001E" "NAME"],
-; :predicates {:B00001_001E "0:30000"},
-; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
-;; =======================================
 
 ; ~~~888~~~                                        888
 ;    888    888-~\   /~~~8e  888-~88e  d88~\  e88~\888 888  888  e88~~\  e88~~8e  888-~\  d88~\
@@ -236,19 +210,19 @@
 ;; =======================================
 
 
-(defn get-census-JSON
+(defn getCensusJSON
   "
   Library function, which takes a JSON object as input, constructs a call to the
   Census API and returns the data as _standard JSON_ (rather than the default
   csv-like format from the naked API).
   "
-  ([json-args cb] (get-census-JSON json-args cb nil))
+  ([json-args cb] (getCensusJSON json-args cb nil))
   ([json-args cb keywords?]
-   (let [args  (json-args->clj-keys json-args :geoHierarchy)
+   (let [args  (u/json-args->clj-keys json-args :geoHierarchy)
          url   (stats-url-builder args)
          =res= (chan 1 (u/xfxf<< (xf!-csv-response->JSON args keywords?) conj))]
      (pprint (str url))
-     (go ((u/=IO=>I=O= u/IO-ajax-GET-json) url =res=)
+     (do ((u/=IO=>I=O= u/IO-ajax-GET-json) url =res=)
          (if (= keywords? :keywords)
            (take! =res= cb)
            (take! =res= #(cb (js/JSON.stringify (clj->js %)))))))))
@@ -256,24 +230,23 @@
 
 ;; Examples ==============================
 
-#_(get-census-JSON #js {"vintage"      "2016"
-                        "sourcePath"   #js ["acs" "acs5"]
-                        "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
-                        "values"       #js ["B01001_001E" "NAME"]
-                        "predicates"   #js {"B00001_001E" "0:30000"}
-                        "statsKey"     stats-key}
-                   js/console.log)
-                 ;pprint)
-                 ;:keywords)
+#_(getCensusJSON #js {"vintage"        "2016"
+                      "sourcePath"   #js ["acs" "acs5"]
+                      "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
+                      "values"       #js ["B01001_001E" "NAME"]
+                      "predicates"   #js {"B00001_001E" "0:30000"}
+                      "statsKey"     stats-key}
+                 js/console.log)
+;pprint)
+;:keywords)
 
 ;; =======================================
 
 
 (defn IO-census-JSON
   "
-  Library function, which takes a JSON object as input, constructs a call to the
-  Census API and returns the data as _standard JSON_ (rather than the default
-  csv-like format from the naked API).
+  Internal function for calling the Census API using a Clojure Map and getting
+  stats returned as a clojure map.
   "
   [=I= =O=]
   (go (let [args  (<! =I=)
@@ -282,7 +255,9 @@
             =res= (chan 1)]
         (pprint (str url))
         (>! =url= url)
+        ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
         (pipeline-async 1 =res= (u/=IO=>I=O= u/IO-ajax-GET-json) =url=)
+        ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
         (pipeline 1 =O= (u/xfxf<< (xf!-csv-response->JSON args :keywords) conj) =res=))))
 
 ;; Examples ==============================

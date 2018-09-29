@@ -150,16 +150,16 @@
   Pattern matches against incoming file structures to create a harmonized
   directory ontology in which to store the file.
   "
-  ([[lev sco] [vin]       _      _]                                      (scope-geoPath [lev       "500" "k" vin    sco])) ; 90-00
-  ([_         [vin]       [sco]  ["outline"]  [res mes] _]               (scope-geoPath ["outline" res   mes vin    sco])) ; 2010
-  ([_         [vin]       [sco]  ["uac" "10"] [res mes] _]               (scope-geoPath ["uac"     res   mes vin    sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev _     ] [res mes] _]               (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev]        [res mes] _]               (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
-  ([_         [vin]       [sco]  [lev]        [res mes] _]               (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
-  ([_         [vin]       [sco]  [lev _     ] [res mes] _]               (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
-  ([_         ["2010"]    ["us"] ["860"]      _           ["500" "k"] _] nil) ;; abandon ship (500k zctas)
-  ([_         [vin]       [sco]  [lev]        _           [res   mes] _] (scope-geoPath [lev       res   mes vin    sco])) ; 2010
-  ([& anything-else]                                                     nil))
+  ([[lev sco] [vin]       _      _]                                       (scope-geoPath [lev       "500" "k" vin    sco])) ; 90-00
+  ([_         [vin]       [sco]  ["outline" ] [res mes] _]                (scope-geoPath ["outline" res   mes vin    sco])) ; 2010
+  ([_         [vin]       [sco]  ["uac" "10"] [res mes] _]                (scope-geoPath ["uac"     res   mes vin    sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev _     ] [res mes] _]                (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev  ]      [res mes] _]                (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
+  ([_         [vin]       [sco]  [lev  ]      [res mes] _]                (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
+  ([_         [vin]       [sco]  [lev _     ] [res mes] _]                (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
+  ([_         ["2010"]    ["us"] ["860"]      _            ["500" "k"] _] nil) ;; abandon ship (500k zctas)
+  ([_         [vin]       [sco]  [lev  ]      _            [res   mes] _] (scope-geoPath [lev       res   mes vin    sco])) ; 2010
+  ([& anything-else]                                                      nil))
 
 (defn filename->>geopath
   "

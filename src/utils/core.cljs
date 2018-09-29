@@ -3,7 +3,8 @@
             [cljs.core.async :refer-macros [go]]
             [ajax.core :as ajax :refer [GET POST]]
             [com.rpl.specter :refer [transform multi-path INDEXED-VALS selected? FIRST LAST ALL]]
-            [cljs.pprint :refer [pprint]]))
+            [cljs.pprint :refer [pprint]]
+            [oops.core :as obj]))
 
 
 (defn =IO=>I=O=
@@ -183,6 +184,33 @@
 ;(map-rename-keys name {:a "c" :b "d"})
 ;=> {"a" "c", "b" "d"}
 
+(defn json-args->clj-keys
+  [json key]
+  (let [geoJS (obj/oget json (name key))
+        geoCljs (js->clj geoJS)
+        geoKeys (u/map-rename-keys str->key geoCljs)]
+    (obj/oset! json key (clj->js geoKeys))
+    (js->clj json :keywordize-keys true)))
+
+;; Examples ==============================
+
+#_(json-args->clj-keys #js {"vintage"      "2016"
+                            "sourcePath"   #js ["acs" "acs5"]
+                            "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
+                            "values"       #js ["B01001_001E" "NAME"]
+                            "predicates"   #js {"B00001_001E" "0:30000"}
+                            "statsKey"     stats-key}
+                       :geoHierarchy)
+
+; =>
+;{:vintage "2016",
+; :sourcePath ["acs" "acs5"],
+; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
+; :values ["B01001_001E" "NAME"],
+; :predicates {:B00001_001E "0:30000"},
+; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+;; =======================================
+
 (defn IO-ajax-GET-json
   "
   I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
@@ -190,7 +218,7 @@
   "
   [=URL= =RES=]
   (let [args {:response-format :json
-              :handler         #(go (>! =RES= %))
+              :handler         #(go (>! =RES= %) (close! =RES=))
               :error-handler   #(prn (str "ERROR: " %))
               :keywords? true}]
     (go (GET (<! =URL=) args))))
