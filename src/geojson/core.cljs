@@ -17,7 +17,8 @@
             [clojure.repl :refer [source doc]]
             [geojson.filepaths :as geos]
             [geojson.index :as index]
-            [geojson.filepaths_abv :as geos_abv]))
+            [geojson.filepaths_abv :as geos_abv]
+            [utils.core :refer [map-target]]))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -42,14 +43,6 @@
               :else %)
        vtr))
 
-(defn map-target-idx
-  "
-  Maps a provided function to a specific index of a provided collection of
-  collections.
-  "
-  [fnc idx coll]
-  (map-indexed #(if (zero? (mod (inc %1) idx)) (fnc %2) %2) coll))
-
 (defn filename->>pattern
   "
   Breaks apart a Census Tiger filename and cleans it into meaningful parts.
@@ -66,7 +59,7 @@
   (->> (s/split string #"_|\.")
        (map #(re-seq #"[a-z]+|[0-9]+" %))
        (map (fn [y] (remove #(= "d" %) y)))
-       (map-target-idx map-xx->vin 2)
+       (map-target map-xx->vin 2)
        (map #(vec %))))
 
 #_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
@@ -147,9 +140,6 @@
 ;       888     Y888   /  888   /   Y888   /
 ;       888      `88_-~   888_-~     `88_-~
 
-
-;; TODO: Rename functions, move geoKeyMap to its own namespace and include in this namespace
-;; TODO: Checkout pattern (below) match for 2012 sldl and sldu (e.g. "C:\Users\Surface\Downloads\www2.census.gov\geo\tiger\GENZ2012\sldl\cb_rd13_48_sldl_500k.zip")
 ;; TODO: Add REAMDE with defninitions and links to resources.
 
 (defun file-pattern=<<geoPath
@@ -157,16 +147,16 @@
   Pattern matches against incoming file structures to create a harmonized
   directory ontology in which to store the file.
   "
-  ([[lev sco] [vin]       _      _]                                      (scope-geoPath [lev       "500" "k" vin    sco])) ; 90-00
-  ([_         [vin]       [sco]  ["outline"]  [res mes] _]               (scope-geoPath ["outline" res   mes vin    sco])) ; 2010
-  ([_         [vin]       [sco]  ["uac" "10"] [res mes] _]               (scope-geoPath ["uac"     res   mes vin    sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev _     ] [res mes] _]               (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev]        [res mes] _]               (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
-  ([_         [vin]       [sco]  [lev]        [res mes] _]               (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
-  ([_         [vin]       [sco]  [lev _     ] [res mes] _]               (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
-  ([_         ["2010"]    ["us"] ["860"]      _           ["500" "k"] _] nil) ;; abandon ship (500k zctas)
-  ([_         [vin]       [sco]  [lev]        _           [res   mes] _] (scope-geoPath [lev       res   mes vin    sco])) ; 2010
-  ([& anything-else]                                                     nil))
+  ([[lev sco] [vin]       _      _]                                       (scope-geoPath [lev       "500" "k" vin    sco])) ; 90-00
+  ([_         [vin]       [sco]  ["outline" ] [res mes] _]                (scope-geoPath ["outline" res   mes vin    sco])) ; 2010
+  ([_         [vin]       [sco]  ["uac" "10"] [res mes] _]                (scope-geoPath ["uac"     res   mes vin    sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev _     ] [res mes] _]                (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev  ]      [res mes] _]                (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
+  ([_         [vin]       [sco]  [lev  ]      [res mes] _]                (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
+  ([_         [vin]       [sco]  [lev _     ] [res mes] _]                (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
+  ([_         ["2010"]    ["us"] ["860"]      _            ["500" "k"] _] nil) ;; abandon ship (500k zctas)
+  ([_         [vin]       [sco]  [lev  ]      _            [res   mes] _] (scope-geoPath [lev       res   mes vin    sco])) ; 2010
+  ([& anything-else]                                                      nil))
 
 (defn filename->>geopath
   "
@@ -193,7 +183,7 @@
   (filename->>geopath "zt01_d00_shp.zip")
   ;; => "500k/2000/01/zip-code-tabulation-area.json"
 
-  (filename->>geopath "cm_sa_96_shp.zip")
+  (filename->>geopath "cb_rd13_48_sldl_500k.zip")
   ;; => nil
 
   (filename->>geopath "tb99_d00_shp.zip")
