@@ -13,6 +13,9 @@
             [utils.core :refer [strs->keys keys->strs map-idcs-range map-over-keys json-args->clj-keys =IO=>I=O= IO-ajax-GET-json xfxf<< xf!<<]]
             [geojson.index :refer [geoKeyMap]]))
 
+;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
+;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+
 (def base-url "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 
 (defn geo-error
@@ -21,16 +24,17 @@
               (str "in vintage: " vin)
               (str "at resolution: " res)
               (str "...:vintage {...:scope [...resolution]} sets available for this geography:")
-              (if-let [vins  (get-in geoKeyMap [lev])]
+              (if-let [vins (get-in geoKeyMap [lev])]
                 (map-over-keys #(get-in % [:scopes]) vins)
-                "No sets available :(")]]
+                (str "No sets available for " (name lev)))]]
     strs))
+
 
 (defn geo-url-builder
   "Composes a URL to call raw GeoJSON files hosted on Github"
   ([res vin lev] (geo-url-builder res vin lev nil))
   ([res vin lev st]
-   (if (= st nil)
+   (if (nil? st)
      (str (s/join "/" [base-url res vin (name lev)]) ".json")
      (str (s/join "/" [base-url res vin st (name lev)]) ".json"))))
 
@@ -38,10 +42,10 @@
   ([res vin lev USr]     (geo-scoper res vin lev USr nil nil))
   ([res vin lev USr STr] (geo-scoper res vin lev USr STr nil))
   ([res vin lev USr STr st]
-   (let [STr? (not (= (some #(= res %) STr) nil))
-         USr? (not (= (some #(= res %) USr) nil))
-         st?  (not (= st nil))
-         us?  (= st nil)]
+   (let [STr? (not (nil? (some #(= res %) STr)))
+         USr? (not (nil? (some #(= res %) USr)))
+         st?  (not (nil? st))
+         us?  (nil? st)]
      ;(prn (str "vin: " vin " res: " res " lev: " lev " USr: " USr " STr: " STr " st: " st)))))
      (cond
        (and st? STr?)                  (geo-url-builder res vin lev st) ;asks for state, state available
@@ -49,12 +53,24 @@
        (and (and st? USr?) (not STr?)) (geo-url-builder res vin lev)    ;asks for state, state unavailable, us available
        :else                           (geo-error res vin lev)))))
 
+(defn lg-warn->geo
+  ([res vin lev USr]      (lg-warn->geo res vin lev USr nil nil))
+  ([res vin lev USr STr]  (lg-warn->geo res vin lev USr STr nil))
+  ([res vin lev USr STr st]
+   (let [strs ["Warning, you are about to make a large/very large GeoJSON request."
+               "Expect the request to take some time and consider local caching."
+               "This request may also cause default VM heap capacity to overflow."
+               "Heap capacity may be increase via `--max-old-space-size=`."]]
+     (do (prn strs)
+         (geo-scoper res vin lev USr STr st)))))
 
 (defun geo-pattern-matcher
   "
   Takes a pattern of maps and triggers the URL builder accordingly
   "
-  ([[nil _   _   _         _                    ]] "")                                 ; no request for GeoJSON
+  ([[nil _   _   _         _                    ]] "")                                  ; no request for GeoJSON
+  ([["500k" vin (_ :guard #(or (nil? %) (= "*" %))) [:zip-code-tabulation-area _]{:us USr :state nil }]] (lg-warn->geo "500k" vin :zip-code-tabulation-area USr nil st)) ; big request!
+  ([["500k" vin (_ :guard #(or (nil? %) (= "*" %))) [:county _]                  {:us USr :state nil }]] (lg-warn->geo "500k" vin :county USr nil st)) ; big request!
   ([[res vin _   [lev _  ] nil                  ]] (geo-error res vin lev))             ; no valid geography
   ([[res vin _   [lev _  ] {:us USr :state nil }]] (geo-scoper res vin lev USr))        ; no state resolutions available, try :us
   ([[res vin nil [lev "*"] {:us USr :state _   }]] (geo-scoper res vin lev USr))        ; tries to get geo for all us
@@ -114,6 +130,12 @@
                      :geoHierarchy  {:state "*"
                                      :tract "*"}
                      :geoResolution "500k"
+                     :values        ["B01001_001E"]})
+  (geo-url-composer {:vintage       "2016"
+                     :sourcePath    ["acs" "acs5"]
+                     :geoHierarchy  {:state "*"
+                                     :zip-code-tabulation-area "*"}
+                     :geoResolution "500k"
                      :values        ["B01001_001E"]}))
 
 ;; ===============================================
@@ -137,11 +159,11 @@
 (getCensusGeoJSON #js {"vintage"       "2016"
                        "sourcePath"    #js ["acs" "acs5"]
                        ;"geoHierarchy"  #js {"state" "12" "state legislative-district (upper chamber)" "*"}
-                       "geoHierarchy"  #js {"zip code tabulation area" "*"} ; @ 1 minute
+                       "geoHierarchy"  #js {"zip code tabulation area" "*"} ; @1 min - @3 min with js/JSON.stringify
                        "geoResolution" "500k"
                        "values"        #js ["B01001_001E" "NAME"]
                        "predicates"    #js {"B00001_001E" "0:30000"}}
-               js/console.log)
+               #(js/console.log (js/JSON.stringify %)))
 
 ;; ===================================================
 
@@ -168,7 +190,7 @@
                :sourcePath   ["acs" "acs5"]
                ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
                ;:geoHierarchy {:county "*"} ;; @ 30 seconds
-               :geoHierarchy {:zip-code-tabulation-area "*"}
+               :geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
                :geoResolution "500k"
                :values       ["B01001_001E" "NAME"]
                :predicates   {:B00001_001E "0:30000"}})
