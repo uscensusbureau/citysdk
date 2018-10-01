@@ -2,7 +2,8 @@
   (:require [cljs.core.async :refer [chan put! take! >! <! close!]]
             [cljs.core.async :refer-macros [go]]
             [ajax.core :as ajax :refer [GET POST]]
-            [com.rpl.specter :refer [transform multi-path INDEXED-VALS selected? FIRST LAST ALL]]
+            [cuerdas.core :as s]
+            [com.rpl.specter :refer [transform multi-path INDEXED-VALS MAP-KEYS MAP-VALS selected? FIRST LAST ALL]]
             [cljs.pprint :refer [pprint]]
             [oops.core :as obj]))
 
@@ -107,6 +108,7 @@
       ([result] (rf result))
       ([result item]
        (rf result (transduce xfn rf- item))))))
+;; Tested 1: working
 
 ;; Examples ==============================
 
@@ -155,7 +157,7 @@
 
 ; Example ===============================
 
-;(map-target-idcs inc [0 1 2] [1 2 3 4 5])
+(map-target-idcs inc [0 1 2] [1 2 3 4 5])
 ; => [2 3 4 4 5]
 
 ; Also works:
@@ -171,24 +173,71 @@
   [f [r-start r-end] coll]
   (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
 
+;; also works: (transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
+;=> [0 2 2 4 4 6 6]
+
+
 ;(map-idcs-range inc [0 2] [1 2 3 4 5])
 ;=> [2 3 3 4 5]
 
 (defn map-rename-keys
   "
-  Applies a function to rename the keys in a map
+  Applies a function over the keys in a provided map
   "
-  [fn mp]
-  (transform [ALL FIRST] fn mp))
+  [f m]
+  (transform MAP-KEYS f m))
 
 ;(map-rename-keys name {:a "c" :b "d"})
 ;=> {"a" "c", "b" "d"}
+
+(defn map-over-keys
+  "
+  Applies a function to all values of a provided map
+  "
+  [f m]
+  (transform MAP-VALS f m))
+
+;(map-over-keys inc {:a 1 :b 2 :c 3})
+;=> {:a 2, :b 3, :c 4}
+
+(defn keys->strs
+  [s]
+  (s/replace
+    s
+    #"-_|_|!|-"
+    {"-_" " (" "_" ")" "!" "/" "-" " "}))
+
+(defn strs->keys
+  [s]
+  (s/replace
+    s
+    #" \(|\)|/| "
+    {" (" "-_" ")" "_" "/" "!" " " "-"}))
+
+;; Examples ==============================
+
+;(keys->strs "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else")
+; => "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else"
+
+;(strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else")
+;=> "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
+
+;(mapv strs->keys ["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"])
+; => ["B01001_001E"
+; "NAME"
+; "B00001_001E"
+; "state"
+; "state-legislative-district-_upper-chamber_"]
+
+;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
+
+;; =======================================
 
 (defn json-args->clj-keys
   [json key]
   (let [geoJS (obj/oget json (name key))
         geoCljs (js->clj geoJS)
-        geoKeys (u/map-rename-keys str->key geoCljs)]
+        geoKeys (map-rename-keys strs->keys geoCljs)]
     (obj/oset! json key (clj->js geoKeys))
     (js->clj json :keywordize-keys true)))
 

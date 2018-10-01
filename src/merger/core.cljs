@@ -216,7 +216,7 @@
         =features= (chan 1 xf-features->map #(pprint "features fail! " %))
         =stats= (chan 1 (xf-stats->map vars#) #(pprint "stats fail! " %))
         =merged= (async/map (merge-geo+stats (keyword (first (get args :values))) :GEOID) [=stats= =features=])]
-    (go (get-features->put!->port (geo/geo-url-builder args) =features=)
+    (go (get-features->put!->port (geo/geo-scope-finder args) =features=)
         (pipeline-async 1 =merged= identity =features=))
     (go (get->put!->port stats-call =stats=)
         (pipeline-async 1 =merged= identity =stats=)
@@ -242,23 +242,23 @@
                                :values       ["B01001_001E"]
                                :statsKey     stats/stats-key}))
 
-(geo/geo-url-builder {:vintage       "2016"
-                      :sourcePath    ["acs" "acs5"]
-                      :geoHierarchy  {:state "01"
-                                      :county "*"}
-                      :geoResolution "500k"
-                      :values        ["B01001_001E"]})
+(geo/geo-scope-finder {:vintage      "2016"
+                       :sourcePath    ["acs" "acs5"]
+                       :geoHierarchy  {:state "01"
+                                       :county "*"}
+                       :geoResolution "500k"
+                       :values        ["B01001_001E"]})
 ; :statsKey      stats-key})
-(geo/geo-url-builder {:vintage       "2016"
-                      :sourcePath    ["acs" "acs5"]
-                      :geoHierarchy  {:county "*"}
-                      :geoResolution "500k"
-                      :values        ["B01001_001E"]})
+(geo/geo-scope-finder {:vintage      "2016"
+                       :sourcePath    ["acs" "acs5"]
+                       :geoHierarchy  {:county "*"}
+                       :geoResolution "500k"
+                       :values        ["B01001_001E"]})
 
-(geo/geo-url-builder {:vintage       "2016"
-                      :sourcePath    ["acs" "acs5"]
-                      :geoHierarchy  {:state "01"
-                                      :county "001"
-                                      :tract "*"}
-                      :geoResolution "500k"
-                      :values        ["B01001_001E"]})
+(geo/geo-scope-finder {:vintage      "2016"
+                       :sourcePath    ["acs" "acs5"]
+                       :geoHierarchy  {:state "01"
+                                       :county "001"
+                                       :tract "*"}
+                       :geoResolution "500k"
+                       :values        ["B01001_001E"]})

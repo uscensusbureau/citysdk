@@ -140,9 +140,6 @@
 ;       888     Y888   /  888   /   Y888   /
 ;       888      `88_-~   888_-~     `88_-~
 
-
-;; TODO: Rename functions, move geoKeyMap to its own namespace and include in this namespace
-;; TODO: Checkout pattern (below) match for 2012 sldl and sldu (e.g. "C:\Users\Surface\Downloads\www2.census.gov\geo\tiger\GENZ2012\sldl\cb_rd13_48_sldl_500k.zip")
 ;; TODO: Add REAMDE with defninitions and links to resources.
 
 (defun file-pattern=<<geoPath
@@ -186,7 +183,7 @@
   (filename->>geopath "zt01_d00_shp.zip")
   ;; => "500k/2000/01/zip-code-tabulation-area.json"
 
-  (filename->>geopath "cm_sa_96_shp.zip")
+  (filename->>geopath "cb_rd13_48_sldl_500k.zip")
   ;; => nil
 
   (filename->>geopath "tb99_d00_shp.zip")
