@@ -1,27 +1,73 @@
 (ns merger.core
-  (:require [cljs.core.async
-             :as async
-             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline-async]]
-            [cljs.core.async :refer-macros [go go-loop alt!]]
-            [ajax.core :as http :refer [GET POST]]
-            [cognitect.transit :as t]
-            [oops.core :as obj]
+  (:require [cljs.core.async :as async
+             :refer [chan
+                     put!
+                     take!
+                     >!
+                     <!
+                     pipe
+                     timeout
+                     close!
+                     alts!
+                     pipeline-async]
+             :refer-macros [go go-loop alt!]]
+            [ajax.core :refer [GET POST]]
             [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
             ["dotenv" :as env]
             ["fs" :as fs]
             [clojure.repl :refer [source]]
             [geoAPI.core :as geo]
-            [utils.core :refer [=IO=>I=O= =IO=>Icb xf<< xf!<< map-target map-target-idcs]]
-            [statsAPI.core :as stats]))
+            [utils.core :refer [throw-err
+                                strs->keys
+                                keys->strs
+                                map-idcs-range
+                                json-args->clj-keys
+                                =IO=>I=O=
+                                IO-ajax-GET-json
+                                xfxf<<
+                                xf!<<
+                                xf<<]]
+            [statsAPI.core :refer [IO-census-stats
+                                   xf!-csv-response->JSON]]
+            [geoAPI.core :refer [IO-census-GeoJSON]]))
 
 ;; Examples ==============================
+
+#_(let [=I= (chan 1)
+        =O= (chan 1)]
+    (go (>! =I= {:vintage      "2016"
+                 :sourcePath   ["acs" "acs5"]
+                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                 :values       ["B01001_001E" "NAME"]
+                 :predicates   {:B00001_001E "0:30000"}
+                 :statsKey     stats-key})
+        (IO-census-stats =I= =O=)
+        ;(if (= (type (<! =O=)) cljs.core/List) ;
+        ;  (pprint "GOOD TO GO")
+        ;  (pprint "brrrr.... "))
+        (pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
+
+
+;; TODO continued...
+#_(type (quote ({:B01001_001E 494981,
+                 :NAME "State Senate District 40 (2016), Florida",
+                 :B00001_001E 29661,
+                 :state "12",
+                 :state-legislative-district-_upper-chamber_ "040"
+                 {:B01001_001E 492259,
+                  :NAME "State Senate District 36 (2016), Florida",
+                  :B00001_001E 29475,
+                  :state "12",
+                  :state-legislative-district-_upper-chamber_ "036"}})))
+
 ;; =======================================
 
 
-
 ;; If you want to pass an argument into your transducer, wrap it in another function, which takes the arg and returns a transducer containing it.
-(defn xf-geo+stat
+(defn xf<-geo+stat
   "
   A function, which returns a transducer after being passed an integer argument
   denoting the number of values the user requested. The transducer is used to
@@ -30,28 +76,24 @@
   `feature`s `:properties` map.
   "
   [vars#]
-  (fn [rf]
-    (fn
-      ([] (rf))
-      ([result] (rf result))
-      ([result item]
-       (rf result {(keyword (reduce str (vals (take-last (- (count item) vars#) item))))
-                   {:properties item}})))))
+  (xf<< (fn [xf result input]
+          (xf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
+                      {:properties input}}))))
 
 ;; Examples ==============================
 
-(transduce (xf-geo+stat 2) conj ({:B01001_001E "491042",
-                                  :NAME "State Senate District 9 (2016), Florida",
-                                  :B00001_001E "29631",
-                                  :state "12",
+(transduce (xf<-geo+stat 3) conj [{:B01001_001E "491042",
+                                   :NAME         "State Senate District 9 (2016), Florida",
+                                   :B00001_001E  "29631",
+                                   :state        "12"}
                                   {:B01001_001E "491350",
                                    :NAME "State Senate District 6 (2016), Florida",
                                    :B00001_001E "29938",
-                                   :state "12",}
+                                   :state "12"}
                                   {:B01001_001E "486727",
                                    :NAME "State Senate District 4 (2016), Florida",
                                    :B00001_001E "28800",
-                                   :state "12",}}))
+                                   :state "12"}])
 
 
 ;; =======================================
@@ -59,8 +101,8 @@
 ;; `xf-zipmap-1st` is a transducer, which means we can use it sans `()`s, while `xf-geo+stat` RETURNS a transducer, which requires us to wrap the function in `()`s to return that internal transducer.
 (defn xf-1-stat->map [vars#]
   (comp
-    (stats/xf!-csv-response->JSON conj)
-    (xf-geo+stat vars#)))
+    (xf!-csv-response->JSON conj)
+    (xf<-geo+stat vars#)))
 
 (defn get->put!->port
   [url port]
@@ -73,7 +115,7 @@
 
 ;; When working with `core.async` it's important to understand what you expect the shape of your data flowing into your channels will look like. In the case below, a single request using `cljs-ajax` will return a list of results, so we deal with this list after it is retrieved rather than as part of the `chan` establishment. When we plan on using transducers as a way to treat a stream or flow of individual items as a collection **over time** via a channel, we can do so by adding such a transducer to the `chan` directly (e.g.: `let [port (chan 1 (xform-each-item))]`
 
-(defn xf-stats->map
+(defn xfxf<-stats->map
   "
   A higher order transducer function, which returns a transducer after being
   passed an integer argument denoting the number of values the user requested.
@@ -83,26 +125,21 @@
   transducer.
   "
   [vars#]
-  (fn [rf]
-    (fn
-      ([] (rf))
-      ([result] (rf result))
-      ([result item]
-       (rf result (transduce (xf-1-stat->map vars#) conj item))))))
+  (xfxf<<
+    (xf<-geo+stat vars#) conj))
 
-(defn xf-geo+feature
+(def xfxf<-geo+feature
   "
   A function, which returns a transducer after being passed an integer argument
   denoting the number of values the user requested. The transducer is used to
   transform each item withing a GeoJSON FeatureCollection into a new map with a
   hierarchy that will enable deep-merging of the stats with a stat map.
   "
-  [rf]
-  (fn
-    ([] (rf))
-    ([result] (rf result))
-    ([result item]
-     (rf result {(keyword (get-in item [:properties :GEOID])) item}))))
+  (xfxf<<
+    (xf<<
+      (fn [xf result input]
+        (xf result {(keyword (get-in input [:properties :GEOID])) input})))
+    conj))
 
 (defn xf-features->map
   "
@@ -115,7 +152,7 @@
     ([] (rf))
     ([result] (rf result))
     ([result item]
-     (rf result (transduce xf-geo+feature conj item)))))
+     (rf result (transduce xfxf<-geo+feature conj item)))))
 
 
 
@@ -214,7 +251,7 @@
   (let [stats-call (stats/stats-url-builder args)
         vars# (count (get args :values))
         =features= (chan 1 xf-features->map #(pprint "features fail! " %))
-        =stats= (chan 1 (xf-stats->map vars#) #(pprint "stats fail! " %))
+        =stats= (chan 1 (xfxf<-stats->map vars#) #(pprint "stats fail! " %))
         =merged= (async/map (merge-geo+stats (keyword (first (get args :values))) :GEOID) [=stats= =features=])]
     (go (get-features->put!->port (geo/geo-scope-finder args) =features=)
         (pipeline-async 1 =merged= identity =features=))

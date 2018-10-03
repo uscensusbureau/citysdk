@@ -1,12 +1,35 @@
 (ns utils.core
-  (:require [cljs.core.async :refer [chan put! take! >! <! close!]]
+  (:require [cljs.core.async :refer [chan
+                                     put!
+                                     take!
+                                     >!
+                                     <!
+                                     close!]]
             [cljs.core.async :refer-macros [go]]
-            [ajax.core :as ajax :refer [GET POST]]
+            [ajax.core :as ajax :refer [GET
+                                        POST]]
             [cuerdas.core :as s]
-            [com.rpl.specter :refer [transform multi-path INDEXED-VALS MAP-KEYS MAP-VALS selected? FIRST LAST ALL]]
+            [com.rpl.specter :refer [transform
+                                     multi-path
+                                     INDEXED-VALS
+                                     MAP-KEYS
+                                     MAP-VALS
+                                     selected?
+                                     FIRST
+                                     LAST
+                                     ALL]]
             [cljs.pprint :refer [pprint]]
             [oops.core :as obj]))
 
+(defn throw-err
+  "
+  Throws an error... meant to be used in transducer `comp`osed with another
+  transducer or as `(map u/throw-error)`.
+  "
+  [x]
+  (if (instance? js/Error x)
+    (throw x)
+    x))
 
 (defn =IO=>I=O=
   "
@@ -131,7 +154,6 @@
 ;   "004"]])
 ;; =======================================
 
-
 (defn map-target
   "
   Maps a provided function to a specific index + 1 of a provided collection.
@@ -157,7 +179,7 @@
 
 ; Example ===============================
 
-(map-target-idcs inc [0 1 2] [1 2 3 4 5])
+#_(map-target-idcs inc [0 1 2] [1 2 3 4 5])
 ; => [2 3 4 4 5]
 
 ; Also works:
@@ -173,12 +195,16 @@
   [f [r-start r-end] coll]
   (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
 
+; Example ===============================
+
 ;; also works: (transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
 ;=> [0 2 2 4 4 6 6]
 
 
 ;(map-idcs-range inc [0 2] [1 2 3 4 5])
 ;=> [2 3 3 4 5]
+; =======================================
+
 
 (defn map-rename-keys
   "
@@ -230,7 +256,6 @@
 ; "state-legislative-district-_upper-chamber_"]
 
 ;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
-
 ;; =======================================
 
 (defn json-args->clj-keys
@@ -242,22 +267,22 @@
     (js->clj json :keywordize-keys true)))
 
 ;; Examples ==============================
-
-#_(json-args->clj-keys #js {"vintage"      "2016"
-                            "sourcePath"   #js ["acs" "acs5"]
-                            "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
-                            "values"       #js ["B01001_001E" "NAME"]
-                            "predicates"   #js {"B00001_001E" "0:30000"}
-                            "statsKey"     stats-key}
-                       :geoHierarchy)
-
-; =>
-;{:vintage "2016",
-; :sourcePath ["acs" "acs5"],
-; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
-; :values ["B01001_001E" "NAME"],
-; :predicates {:B00001_001E "0:30000"},
-; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+;
+;#_(json-args->clj-keys #js {"vintage"      "2016"
+;                            "sourcePath"   #js ["acs" "acs5"]
+;                            "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
+;                            "values"       #js ["B01001_001E" "NAME"]
+;                            "predicates"   #js {"B00001_001E" "0:30000"}
+;                            "statsKey"     stats-key}
+;                       :geoHierarchy)
+;
+;; =>
+;;{:vintage "2016",
+;; :sourcePath ["acs" "acs5"],
+;; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
+;; :values ["B01001_001E" "NAME"],
+;; :predicates {:B00001_001E "0:30000"},
+;; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 ;; =======================================
 
 (defn IO-ajax-GET-json
@@ -267,8 +292,8 @@
   "
   [=URL= =RES=]
   (let [args {:response-format :json
-              :handler         #(go (>! =RES= %) (close! =RES=))
-              :error-handler   #(prn (str "ERROR: " %))
+              :handler         (fn [r] (go (>! =RES= r) (close! =RES=)))
+              :error-handler   (fn [e] (go (>! =RES= (js/Error. (get-in e [:parse-error :original-text]))) (close! =RES=)))
               :keywords? true}]
     (go (GET (<! =URL=) args))))
 
