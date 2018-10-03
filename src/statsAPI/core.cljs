@@ -209,13 +209,13 @@
 
 ;; Examples ==============================
 
-#_(getCensusStats #js {"vintage"     "2016"
-                       "sourcePath"   #js ["acs" "acs5"]
-                       "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                       "values"       #js ["B01001_001E" "NAME"]
-                       "predicates"   #js {"B00001_001E" "0:30000"}
-                       "statsKey"     stats-key}
-                  (fn [r] (js/console.log r)))
+(getCensusStats #js {"vintage"     "2016"
+                     "sourcePath"   #js ["acs" "acs5"]
+                     "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
+                     "values"       #js ["B01001_001E" "NAME"]
+                     "predicates"   #js {"B00001_001E" "0:30000"}
+                     "statsKey"     stats-key}
+                (fn [r] (js/console.log r)))
 ;pprint)
 ;:keywords)
 
@@ -241,20 +241,20 @@
 
 ;; Examples ==============================
 
-#_(let [=I= (chan 1)
-        =O= (chan 1)]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}
-                 :statsKey     stats-key})
-        (IO-census-stats =I= =O=)
-        ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
+(let [=I= (chan 1)
+      =O= (chan 1)]
+  (go (>! =I= {:vintage      "2016"
+               :sourcePath   ["acs" "acs5"]
+               :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+               :values       ["B01001_001E" "NAME"]
+               :predicates   {:B00001_001E "0:30000"}
+               :statsKey     stats-key})
+      (IO-census-stats =I= =O=)
+      ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
+      ;  (pprint "GOOD TO GO")
+      ;  (pprint "brrrr.... "))
+      (pprint (<! =O=))
+      (close! =I=)
+      (close! =O=)))
 
 ;; =======================================

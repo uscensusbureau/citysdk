@@ -185,15 +185,16 @@
 
 ;; Examples  ========================================
 
-#_(getCensusGeoJSON #js {"vintage"       "2016"
-                         "sourcePath"    #js ["acs" "acs5"]
-                         "geoHierarchy"  #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                         ;"geoHierarchy"  #js {"zip code tabulation area" "*"} ; @1 min - @3 min with js/JSON.stringify
-                         "geoResolution" "500k"
-                         "values"        #js ["B01001_001E" "NAME"]
-                         "predicates"    #js {"B00001_001E" "0:30000"}}
-                    #(js/console.log %)
-                    true)
+(getCensusGeoJSON #js {"vintage"       "2016"
+                       "sourcePath"    #js ["acs" "acs5"]
+                       ;"geoHierarchy"  #js {"state" "12" "state legislative district (upper chamber)" "*"}
+                       "geoHierarchy"  #js {"county" "*"}
+                       ;"geoHierarchy"  #js {"zip code tabulation area" "*"} ; @1 min - @3 min with js/JSON.stringify
+                       "geoResolution" "500k"
+                       "values"        #js ["B01001_001E" "NAME"]
+                       "predicates"    #js {"B00001_001E" "0:30000"}}
+                  #(js/console.log %)
+                  true)
 ;; ===================================================
 
 (defn IO-census-GeoJSON
