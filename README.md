@@ -1,6 +1,8 @@
 # Census Cartography Files in GeoJSON Format
 
-The Census Bureau publishes both high and low accuracy geographic area files to accommodate the widest possible variety of user needs (within feasibility). Cartography Files are simplified representations of selected geographic areas from the Census Bureau’s Master Address File/Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) system. These boundary files are specifically designed for small scale thematic mapping.
+## Utility
+
+The Census Bureau publishes both high and low accuracy geographic area files to accommodate the widest possible variety of user needs (within feasibility). Cartography Files are simplified representations of selected geographic areas from the Census Bureau’s Master Address File/Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) system. _These boundary files are specifically designed for small scale thematic mapping (i.e., for visualizations)_.
 
 For a while now, we have published our cartography files in the [`.shp`](https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html) format. More recently, we expanded our portfolio of available formats to [`.kml`](https://www.census.gov/geo/maps-data/data/tiger-kml.html). It is with this release that we follow suit with the community at large to release these boundaries in `.json` (GeoJSON) format.
 
@@ -26,6 +28,31 @@ The following tables represent the availability of various geographic summary le
 
 Geographic Area Type                                          | 1990  | 2000  | 2010 |  2012 | 2013 - 2015 | 2016 - 2017                             
 ------------------------------------------------------------- | :---: | :---: |:---: | :---: | :---------: | :---------:    
+`us`                                                          |       |       | ✔    |       | ✔           | ✔         
+`region`                                                      |       | ✔     | ✔   |        | ✔          | ✔         
+`division`                                                    |       | ✔     | ✔   |        | ✔          | ✔         
+`state`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`county`                                                      | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`consolidated-cities`                                         |       | ✔     | ✔   |        | ✔          | ✔         
+`county-subdivision`                                          | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`tract`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`place`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`alaska-native-regional-corporation`                          | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`american-indian-area!alaska-native-area!hawaiian-home-land`  | ✔     | ✔    | ✔    |       | ✔           | ✔         
+`metropolitan-statistical-area!micropolitan-statistical-area` |       |       | ✔    |       | ✔           | ✔         
+`combined-statistical-area`                                   |       |       | ✔    |       | ✔           | ✔         
+`new-england-city-and-town-area`                              |       |       | ✔    |       | ✔           | ✔         
+`combined-new-england-city-and-town-area`                     |       |       | ✔    |       |             | ✔         
+`urban-area`                                                  | ✔     | ✔    |      | ✔     | ✔           | ✔         
+`congressional-district`                                      |       |       | ✔    | ✔     | ✔          | ✔         
+`school-district-_elementary_`                                |       | ✔     | ✔   |        |             | ✔         
+`school-district-_secondary_`                                 |       | ✔     | ✔   |        |             | ✔         
+`school-district-_unified_`                                   |       | ✔     | ✔   |        |             | ✔         
+`block-group`                                                 | ✔     | ✔    |  ✔   |       |  ✔          | ✔         
+`public-use-microdata-area`                                   |       |       |      |        |  ✔         | ✔         
+`zip-code-tabulation-area`                                    |       | ✔     |     |        |  ✔          | ✔         
+`state-legislative-district-_upper-chamber_`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
+`state-legislative-district-_lower-chamber_`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 us                                                            |       |       | ✔    |       | ✔           | ✔         
 region                                                        |       | ✔     | ✔   |        | ✔          | ✔         
 division                                                      |       | ✔     | ✔   |        | ✔          | ✔         
@@ -53,6 +80,7 @@ state-legislative-district-'upper-chamber'                    |       | ✔     
 state-legislative-district-'lower-chamber'                    |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 
 
+
 # More Information
 - For more information about the files translated herein please visit the Census Bureau's [Cartographic Boundary File Description
  Page](https://www.census.gov/geo/maps-data/data/cbf/cbf_description.html)
@@ -61,5 +89,5 @@ state-legislative-district-'lower-chamber'                    |       | ✔     
 
 ## Community
 - Join us on [Gitter](https://gitter.im/uscensusbureau/general)
-- Join us on [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/enQtMjQ3NzUyNTM3NDU3LTZmNGI1MmQzY2Y2ZTU1ODJhNDQwMmY2YmZiNmFkNzg4YmJkYmQzZjQyNDhkNDYxN2JhYjkxZDEwMGI2OGU5NzQ)
-
+- Join us on [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/enQtMjQ3NzUyNTM3NDU3LTZmNGI1MmQzY2Y2ZTU1ODJhNDQwMmY2YmZiNmFkNzg4YmJkYmQzZjQyNDhkNDYxN2JhYjkxZDEwMGI2OGU5NzQ) @ the `#cartography` channel.
+- Send us an email: [cnmp.developers.list@census.gov](mailto:cnmp.developers.list@census.gov)

@@ -1,7 +1,16 @@
 (ns geojson.core
-  (:require [cljs.core.async
-             :refer [chan put! take! >! <! timeout close! alts! pipeline-async]
-             :refer-macros [go go-loop alt!]]
+  (:require [cljs.core.async :refer [chan
+                                     put!
+                                     take!
+                                     >!
+                                     <!
+                                     timeout
+                                     close!
+                                     alts!
+                                     pipeline-async]
+             :refer-macros [go
+                            go-loop
+                            alt!]]
             [clojure.string :as s]
             [clojure.set :refer [map-invert]]
             [cljs.pprint :refer [pprint]]
@@ -140,7 +149,6 @@
 ;       888     Y888   /  888   /   Y888   /
 ;       888      `88_-~   888_-~     `88_-~
 
-;; TODO: Add REAMDE with defninitions and links to resources.
 
 (defun file-pattern=<<geoPath
   "
@@ -252,6 +260,8 @@
 ;  888-_88"  888 888-_88"   "88___/  888 888 888  888  "88___/        "88_-888 \_88P    /     888  888  "88__/
 ;  888           888                                                                  _/
 
+;; Examples ========================================
+
 ;; These functions have the signature required to act as async conduits within
 ;; `core.async`s `pipeline-async` function...
 
@@ -262,6 +272,7 @@
                          (pprint "Not there"))))
 ;=> nil
 ;"There"
+;; ==================================================
 
 
 (defn fsCheck->put!
@@ -290,6 +301,8 @@
                    (throw (js/Error. err))
                    (put! =port= file #(close! =port=))))))
 
+;; Examples =========================================
+
 #_(let [c (chan 1)]
     (go (fsR-file->put!
           "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -300,6 +313,7 @@
 ;"fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
 ;
 ;#object[Buffer PK    'Iï¿½Dcï¿½L  ï¿½   ` cb_2013_01_c ...works
+;; ==================================================
 
 
 ;; =================== IMPORTANT NOTE ==========================
@@ -309,6 +323,7 @@
 ;; long time!!! Solved by wrapping the desired output like so:
 ;; `(js/JSON.stringify <<output>>)`
 ;; ===============================================================
+
 
 (defn zip->geojson->put!
   "
@@ -324,6 +339,7 @@
                          (js/JSON.stringify res)
                          #(close! =port=)))))
 
+;; Examples ========================================
 
 #_(let [=zip= (chan 1)
         =json= (chan 1)]
@@ -341,6 +357,7 @@
 ;"zip->json'ing..."
 ;
 ;{"type":"FeatureCollection","features":[{"type" ... works
+;; ==================================================
 
 ;;                  88~\
 ;;  Y88b  /       _888__  e88~-_  888-~\ 888-~88e-~88e
@@ -378,6 +395,8 @@
   [directory filepath]
   (transducified (partial geojson-config directory filepath)))
 
+;; Examples ========================================
+
 #_(def geotest
     ["test directory 1"
      "test json 1",
@@ -394,7 +413,7 @@
 ; {:directory "geotest directory", :json "test json 2"}
 ; {:directory "geotest directory", :json "test directory 3"}
 ; {:directory "geotest directory", :json "test json 3"}]
-
+;; ==================================================
 
 (defn geo+config->mkdirp->fsW!
   "
@@ -491,4 +510,4 @@
                            \n === Wrapping up .... === \n
                            \n ======================== \n")))))
 
-(batch=>zip-paths=>convert=>geojson geos/paths)
+;(batch=>zip-paths=>convert=>geojson geos/paths)
