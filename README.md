@@ -53,31 +53,6 @@ Geographic Area Type                                          | 1990  | 2000  | 
 `zip-code-tabulation-area`                                    |       | ✔     |     |        |  ✔          | ✔         
 `state-legislative-district-_upper-chamber_`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 `state-legislative-district-_lower-chamber_`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
-us                                                            |       |       | ✔    |       | ✔           | ✔         
-region                                                        |       | ✔     | ✔   |        | ✔          | ✔         
-division                                                      |       | ✔     | ✔   |        | ✔          | ✔         
-state                                                         | ✔     | ✔    | ✔    |       | ✔           | ✔         
-county                                                        | ✔     | ✔    | ✔    |       | ✔           | ✔         
-consolidated-cities                                           |       | ✔     | ✔   |        | ✔          | ✔         
-county-subdivision                                            | ✔     | ✔    | ✔    |       | ✔           | ✔         
-tract                                                         | ✔     | ✔    | ✔    |       | ✔           | ✔         
-place                                                         | ✔     | ✔    | ✔    |       | ✔           | ✔         
-alaska-native-regional-corp oration                           | ✔     | ✔    | ✔    |       | ✔           | ✔         
-american-indian-area!alaska-native-area!hawaiian-home-land    | ✔     | ✔    | ✔    |       | ✔           | ✔         
-metropolitan-statistical-area!micropolitan-statistical-area   |       |       | ✔    |       | ✔           | ✔         
-combined-statistical-area                                     |       |       | ✔    |       | ✔           | ✔         
-new-england-city-and-town-area                                |       |       | ✔    |       | ✔           | ✔         
-combined-new-england-city-and-town-area                       |       |       | ✔    |       |             | ✔         
-urban-area                                                    | ✔     | ✔    |      | ✔     | ✔           | ✔         
-congressional-district                                        |       |       | ✔    | ✔     | ✔          | ✔         
-school-district-'elementary'                                  |       | ✔     | ✔   |        |             | ✔         
-school-district-'secondary'                                   |       | ✔     | ✔   |        |             | ✔         
-school-district-'unified'                                     |       | ✔     | ✔   |        |             | ✔         
-block-group                                                   | ✔     | ✔    |  ✔   |       |  ✔          | ✔         
-public-use-microdata-area                                     |       |       |      |        |  ✔         | ✔         
-zip-code-tabulation-area                                      |       | ✔     |     |        |  ✔          | ✔         
-state-legislative-district-'upper-chamber'                    |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
-state-legislative-district-'lower-chamber'                    |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 
 
 
