@@ -113,19 +113,19 @@
   ([{:keys [values predicates]}] (xf!-csv-response->JSON [{:keys [values predicates]} nil]))
   ([{:keys [values predicates]} keywords?]
    (let [parse-range [0 (+ (count values) (count predicates))]]
-     (xf!<< (fn [state xf result input]
+     (xf!<< (fn [state rf result input]
               (let [prev @state]
                 (if (nil? prev)
                     (if (= keywords? :keywords)
                         (do (vreset! state (mapv strs->keys input)) nil)
                         (do (vreset! state input) nil))
                     (if (= keywords? :keywords)
-                        (xf result
+                        (rf result
                             (zipmap (vec (map keyword @state))
                                     (map-idcs-range parse-if-number
                                                     parse-range
                                                     input)))
-                        (xf result
+                        (rf result
                             (zipmap @state
                                     (map-idcs-range parse-if-number
                                                     parse-range
@@ -183,7 +183,7 @@
 ;[{"B01001_001E":491042,"NAME":"State Senate District 9 (2016), Florida","B00001_001E":29631,"state":"12","state legislative district (upper chamber)":"009"},...]
 ;; =======================================
 
-(defn xfxf!-res-w-err-handler
+(defn xfxf!-e?->csv->JSON
   [args keywords?]
   (comp
     (map throw-err)
@@ -199,8 +199,8 @@
   ([json-args cb keywords?]
    (let [args  (json-args->clj-keys json-args :geoHierarchy)
          url   (stats-url-builder args)
-         =res= (chan 1 (xfxf!-res-w-err-handler args keywords?))]
-     (pprint (str url))
+         =res= (chan 1 (xfxf!-e?->csv->JSON args keywords?))]
+     (prn url)
      (do ((=IO=>I=O= IO-ajax-GET-json) url =res=)
          (if (= keywords? :keywords)
            (take! =res= cb)
@@ -209,15 +209,15 @@
 
 ;; Examples ==============================
 
-(getCensusStats #js {"vintage"     "2016"
-                     "sourcePath"   #js ["acs" "acs5"]
-                     "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                     "values"       #js ["B01001_001E" "NAME"]
-                     "predicates"   #js {"B00001_001E" "0:30000"}
-                     "statsKey"     stats-key}
-                (fn [r] (js/console.log r)))
-;pprint)
-;:keywords)
+#_(getCensusStats #js {"vintage"     "2016"
+                       "sourcePath"   #js ["acs" "acs5"]
+                       "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
+                       "values"       #js ["B01001_001E" "NAME"]
+                       "predicates"   #js {"B00001_001E" "0:30000"}
+                       "statsKey"     stats-key}
+                  ;(fn [r] (js/console.log r)))
+                  pprint
+                  :keywords)
 
 ;; =======================================
 
@@ -231,30 +231,32 @@
   (go (let [args  (<! =I=)
             url   (stats-url-builder args)
             =url= (chan 1)
-            =res= (chan 1 (xfxf!-res-w-err-handler args :keywords))]
-        (pprint (str url))
+            =res= (chan 1 (xfxf!-e?->csv->JSON args :keywords))]
+        ;(prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
         (pipeline-async 1 =res= (=IO=>I=O= IO-ajax-GET-json) =url=)
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
-        (>! =O= (<! =res=)))))
+        (>! =O= (<! =res=))
+        (close! =url=)
+        (close! =res=))))
 
 ;; Examples ==============================
 
-(let [=I= (chan 1)
-      =O= (chan 1)]
-  (go (>! =I= {:vintage      "2016"
-               :sourcePath   ["acs" "acs5"]
-               :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-               :values       ["B01001_001E" "NAME"]
-               :predicates   {:B00001_001E "0:30000"}
-               :statsKey     stats-key})
-      (IO-census-stats =I= =O=)
-      ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
-      ;  (pprint "GOOD TO GO")
-      ;  (pprint "brrrr.... "))
-      (pprint (<! =O=))
-      (close! =I=)
-      (close! =O=)))
+#_(let [=I= (chan 1)
+        =O= (chan 1)]
+    (go (>! =I= {:vintage      "2016"
+                 :sourcePath   ["acs" "acs5"]
+                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                 :values       ["B01001_001E" "NAME"]
+                 :predicates   {:B00001_001E "0:30000"}
+                 :statsKey     stats-key})
+        (IO-census-stats =I= =O=)
+        ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
+        ;  (pprint "GOOD TO GO")
+        ;  (pprint "brrrr.... "))
+        (pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 ;; =======================================

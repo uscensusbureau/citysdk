@@ -1,23 +1,24 @@
 (ns utils.core
-  (:require [cljs.core.async :refer [chan
-                                     put!
-                                     take!
-                                     >!
-                                     <!
-                                     close!]]
+  (:require [cljs.core.async
+             :refer [chan
+                     put!
+                     take!
+                     >!
+                     <!
+                     close!]]
             [cljs.core.async :refer-macros [go]]
-            [ajax.core :as ajax :refer [GET
-                                        POST]]
+            [ajax.core :refer [GET POST]]
             [cuerdas.core :as s]
-            [com.rpl.specter :refer [transform
-                                     multi-path
-                                     INDEXED-VALS
-                                     MAP-KEYS
-                                     MAP-VALS
-                                     selected?
-                                     FIRST
-                                     LAST
-                                     ALL]]
+            [com.rpl.specter
+             :refer [transform
+                     multi-path
+                     INDEXED-VALS
+                     MAP-KEYS
+                     MAP-VALS
+                     selected?
+                     FIRST
+                     LAST
+                     ALL]]
             [cljs.pprint :refer [pprint]]
             [oops.core :as obj]))
 
@@ -39,12 +40,12 @@
   This is good for kicking off async functions, but also is the required
   signature/contract for `pipeline-async`.
   "
-  [f]                                  ; takes an async I/O function
-  (fn [I =O=]                          ; returns a function with a sync input / `chan` output
-    (let [=I= (chan 1)]                ; create internal `chan`
-      (go (>! =I= I)                   ; put sync `I` into `=I=`
-          (f =I= =O=)                  ; call the wrapped function with the newly created `=I=`
-          (close! =I=)))))             ; close the port to flush out values
+  [f]                       ; takes an async I/O function
+  (fn [I =O=]               ; returns a function with a sync input / `chan` output
+    (let [=I= (chan 1)]     ; create internal `chan`
+      (go (>! =I= I)        ; put sync `I` into `=I=`
+          (f =I= =O=)       ; call the wrapped function with the newly created `=I=`
+          (close! =I=)))))  ; close the port to flush out values
 ;; Tested 1: working
 
 (defn =IO=>Icb
@@ -83,11 +84,11 @@
     (xf result {(keyword (get-in input [:properties :GEOID])) input}))
   "
   [f]
-  (fn [xf]
+  (fn [rf]
     (fn
-      ([] (xf))
-      ([result] (xf result))
-      ([result input] (f xf result input)))))
+      ([] (rf))
+      ([result] (rf result))
+      ([result input] (f rf result input)))))
 ;; Tested 1: working
 
 (defn xf!<<
@@ -109,12 +110,12 @@
             (xf result (zipmap prev (vec item))))))
   "
   [f]
-  (fn [xf]
+  (fn [rf]
     (let [state (volatile! nil)]
       (fn
-        ([] (xf))
-        ([result] (xf result))
-        ([result input] (f state xf result input))))))
+        ([] (rf))
+        ([result] (rf result))
+        ([result input] (f state rf result input))))))
 ;; Tested 1: working
 
 

@@ -11,9 +11,6 @@
              :refer-macros [go]]
             [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
-            [oops.core :as obj]
-            ["dotenv" :as env]
-            [clojure.repl :refer [source]]
             [defun.core :refer-macros [defun]]
             [utils.core
              :refer [throw-err
@@ -176,8 +173,7 @@
    (let [args  (json-args->clj-keys json-args :geoHierarchy)
          url   (geo-url-composer args)
          =res= (chan 1 (map throw-err))]
-     ;(pprint args)
-     ;(pprint (str url))
+     (prn url)
      (do ((=IO=>I=O= IO-ajax-GET-json) url =res=)
          (if url? (take! =res= #(cb #js {:url url
                                          :response (js/JSON.stringify (clj->js %))}))
@@ -185,16 +181,16 @@
 
 ;; Examples  ========================================
 
-(getCensusGeoJSON #js {"vintage"       "2016"
-                       "sourcePath"    #js ["acs" "acs5"]
-                       ;"geoHierarchy"  #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                       "geoHierarchy"  #js {"county" "*"}
-                       ;"geoHierarchy"  #js {"zip code tabulation area" "*"} ; @1 min - @3 min with js/JSON.stringify
-                       "geoResolution" "500k"
-                       "values"        #js ["B01001_001E" "NAME"]
-                       "predicates"    #js {"B00001_001E" "0:30000"}}
-                  #(js/console.log %)
-                  true)
+#_(getCensusGeoJSON #js {"vintage"       "2016"
+                         "sourcePath"    #js ["acs" "acs5"]
+                         ;"geoHierarchy"  #js {"state" "12" "state legislative district (upper chamber)" "*"}
+                         ;"geoHierarchy"  #js {"county" "*"}
+                         "geoHierarchy"  #js {"zip code tabulation area" "*"} ; @1 min - @3 min with js/JSON.stringify
+                         "geoResolution" "500k"
+                         "values"        #js ["B01001_001E" "NAME"]
+                         "predicates"    #js {"B00001_001E" "0:30000"}}
+                    #(js/console.log %)
+                    true)
 ;; ===================================================
 
 (defn IO-census-GeoJSON
@@ -206,10 +202,11 @@
   (go (let [args  (<! =I=)
             url   (geo-url-composer args)
             =url= (chan 1)]
-        (pprint (str url))
+        ;(prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 1 =O= (=IO=>I=O= IO-ajax-GET-json) =url=))))
+        (pipeline-async 1 =O= (=IO=>I=O= IO-ajax-GET-json) =url=)
+        (close! =url=))))
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 
 ;; Examples ==============================
@@ -218,9 +215,9 @@
         =O= (chan 1 (map throw-err))]
     (go (>! =I= {:vintage      "2016"
                  :sourcePath   ["acs" "acs5"]
-                 ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
                  ;:geoHierarchy {:county "*"} ;; @ 30 seconds
-                 :geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
+                 ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
                  :geoResolution "500k"
                  :values       ["B01001_001E" "NAME"]
                  :predicates   {:B00001_001E "0:30000"}})

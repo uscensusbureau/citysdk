@@ -1,160 +1,154 @@
 (ns merger.core
-  (:require [cljs.core.async :as async
-             :refer [chan
-                     put!
-                     take!
-                     >!
-                     <!
-                     pipe
-                     timeout
-                     close!
-                     alts!
-                     pipeline-async]
+  (:require [cljs.core.async
+             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline pipeline-async promise-chan]
+             :as async
              :refer-macros [go go-loop alt!]]
             [ajax.core :refer [GET POST]]
-            [clojure.string :as s]
             [cljs.pprint :refer [pprint]]
-            ["dotenv" :as env]
-            ["fs" :as fs]
             [clojure.repl :refer [source]]
-            [geoAPI.core :as geo]
-            [utils.core :refer [throw-err
-                                strs->keys
-                                keys->strs
-                                map-idcs-range
-                                json-args->clj-keys
-                                =IO=>I=O=
-                                IO-ajax-GET-json
-                                xfxf<<
-                                xf!<<
-                                xf<<]]
-            [statsAPI.core :refer [IO-census-stats
-                                   xf!-csv-response->JSON]]
-            [geoAPI.core :refer [IO-census-GeoJSON]]))
-
-;; Examples ==============================
-
-#_(let [=I= (chan 1)
-        =O= (chan 1)]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}
-                 :statsKey     stats-key})
-        (IO-census-stats =I= =O=)
-        ;(if (= (type (<! =O=)) cljs.core/List) ;
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
-
-
-;; TODO continued...
-#_(type (quote ({:B01001_001E 494981,
-                 :NAME "State Senate District 40 (2016), Florida",
-                 :B00001_001E 29661,
-                 :state "12",
-                 :state-legislative-district-_upper-chamber_ "040"
-                 {:B01001_001E 492259,
-                  :NAME "State Senate District 36 (2016), Florida",
-                  :B00001_001E 29475,
-                  :state "12",
-                  :state-legislative-district-_upper-chamber_ "036"}})))
-
-;; =======================================
-
+            [geoAPI.core :refer [IO-census-GeoJSON]]
+            [geojson.index :refer [geoKeyMap]]
+            [statsAPI.core
+             :refer [IO-census-stats
+                     stats-key]]
+            [utils.core
+             :refer [throw-err
+                     strs->keys
+                     keys->strs
+                     map-idcs-range
+                     json-args->clj-keys
+                     =IO=>I=O=
+                     IO-ajax-GET-json
+                     xfxf<<
+                     xf!<<
+                     xf<<]]))
 
 ;; If you want to pass an argument into your transducer, wrap it in another function, which takes the arg and returns a transducer containing it.
-(defn xf<-geo+stat
+(defn xf<-stats+geoids
   "
-  A function, which returns a transducer after being passed an integer argument
-  denoting the number of values the user requested. The transducer is used to
-  transform each item from the Census API response collection into a new map with
-  a hierarchy that will enable deep-merging of the stats with a GeoJSON
-  `feature`s `:properties` map.
+  Higher-order transducer (to enable transduction of a list conveyed via `chan`).
+  Takes an integer argument denoting the number of stat vars the user requested.
+  The transducer is used to transform each item from the Census API response
+  collection into a new map with a hierarchy that will enable deep-merging of
+  the stats with a GeoJSON `feature`s `:properties` map.
   "
   [vars#]
-  (xf<< (fn [xf result input]
-          (xf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
+  (xf<< (fn [rf result input]
+          (rf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
                       {:properties input}}))))
 
 ;; Examples ==============================
 
-(transduce (xf<-geo+stat 3) conj [{:B01001_001E "491042",
-                                   :NAME         "State Senate District 9 (2016), Florida",
-                                   :B00001_001E  "29631",
-                                   :state        "12"}
-                                  {:B01001_001E "491350",
-                                   :NAME "State Senate District 6 (2016), Florida",
-                                   :B00001_001E "29938",
-                                   :state "12"}
-                                  {:B01001_001E "486727",
-                                   :NAME "State Senate District 4 (2016), Florida",
-                                   :B00001_001E "28800",
-                                   :state "12"}])
-
-
+#_(transduce (xf<-stats+geoids 3) conj [{:B01001_001E                                494981,
+                                         :NAME                                       "State Senate District 40 (2016), Florida",
+                                         :B00001_001E                                29661,
+                                         :state                                      "12",
+                                         :state-legislative-district-_upper-chamber_ "040"}
+                                        {:B01001_001E                                492259,
+                                         :NAME                                       "State Senate District 36 (2016), Florida",
+                                         :B00001_001E                                29475,
+                                         :state                                      "12",
+                                         :state-legislative-district-_upper-chamber_ "036"}
+                                        {:B01001_001E                                493899,
+                                         :NAME                                       "State Senate District 35 (2016), Florida",
+                                         :B00001_001E                                25615,
+                                         :state                                      "12",
+                                         :state-legislative-district-_upper-chamber_ "035"}])
 ;; =======================================
 
-;; `xf-zipmap-1st` is a transducer, which means we can use it sans `()`s, while `xf-geo+stat` RETURNS a transducer, which requires us to wrap the function in `()`s to return that internal transducer.
-(defn xf-1-stat->map [vars#]
-  (comp
-    (xf!-csv-response->JSON conj)
-    (xf<-geo+stat vars#)))
-
-(defn get->put!->port
-  [url port]
-  (let [args {:response-format :json
-              :handler         (fn [r]
-                                 (put! port r))
-              :error-handler   #(prn (str "ERROR: " %))
-              :keywords?       true}]
-    (do (GET url args) port)))
-
-;; When working with `core.async` it's important to understand what you expect the shape of your data flowing into your channels will look like. In the case below, a single request using `cljs-ajax` will return a list of results, so we deal with this list after it is retrieved rather than as part of the `chan` establishment. When we plan on using transducers as a way to treat a stream or flow of individual items as a collection **over time** via a channel, we can do so by adding such a transducer to the `chan` directly (e.g.: `let [port (chan 1 (xform-each-item))]`
-
-(defn xfxf<-stats->map
+(defn get-geoid?s
   "
-  A higher order transducer function, which returns a transducer after being
-  passed an integer argument denoting the number of values the user requested.
-  The transducer is used to transform *the entire* Census API response
-  collection into a new map, which will enable deep-merging of the stats with a
-  GeoJSON `feature`s `:properties` map. Designed as a `core.async` channel
-  transducer.
+  Takes the request argument and pulls out a vector of the component identifiers
+  from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
+  in deep-merging with statistics.
   "
-  [vars#]
-  (xfxf<<
-    (xf<-geo+stat vars#) conj))
+  [{:keys [geoHierarchy vintage]}]
+  (let [[& ids] (get-in geoKeyMap [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
+    ids))
 
-(def xfxf<-geo+feature
+(defn geoid<-feature
   "
-  A function, which returns a transducer after being passed an integer argument
-  denoting the number of values the user requested. The transducer is used to
+  Takes the component ids from with the GeoJSON and a single feature to
+  generate a :GEOID if not available within the GeoJSON.
+  "
+  [ids m]
+  (keyword (reduce str (map #(get-in m [:properties %]) ids))))
+
+
+;; Examples ==============================
+
+#_(-> (get-geoid?s {:vintage      "2010"
+                    :sourcePath   ["acs" "acs5"]
+                    ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                    :geoHierarchy {:county "*"} ;; @ 30 seconds
+                    ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
+                    :geoResolution "500k"
+                    :values       ["B01001_001E" "NAME"]
+                    :predicates   {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
+                    :statsKey     stats-key})
+      (geoid<-feature {:type "Feature",
+                       :properties
+                             {:STATEFP  "01",
+                              :GEOID    "01005",
+                              :STATE "123"
+                              :COUNTY "456"}
+                       :geometry
+                             {:type "Polygon",
+                              :coordinates
+                                    [[[-85.748032 31.619181]
+                                      [-85.729832 31.632373]]]}}))
+
+; => :123456
+;; =======================================
+
+(defn xf<-features+geoids
+  "
+  A function, which returns a transducer after being passed a. The transducer is used to
   transform each item withing a GeoJSON FeatureCollection into a new map with a
   hierarchy that will enable deep-merging of the stats with a stat map.
   "
-  (xfxf<<
-    (xf<<
-      (fn [xf result input]
-        (xf result {(keyword (get-in input [:properties :GEOID])) input})))
-    conj))
-
-(defn xf-features->map
-  "
-  This is a transducer, which uses a transducer to operate over a list, which is
-  returned as a single response from an HTTP request. This transducer is meant
-  to be used in concert with a `core.async` channel.
-  "
-  [rf]
-  (fn
-    ([] (rf))
-    ([result] (rf result))
-    ([result item]
-     (rf result (transduce xfxf<-geo+feature conj item)))))
+  [ids]
+  (xf<<
+    (fn [rf result input]
+      (rf result {(geoid<-feature ids input) input})))) ;
 
 
+;; Examples ==============================
+
+#_(transduce (xf<-features+geoids
+               (get-geoid?s {:vintage      "2010"
+                             :sourcePath   ["acs" "acs5"]
+                             ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                             :geoHierarchy {:county "*"} ;; @ 30 seconds
+                             ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
+                             :geoResolution "500k"
+                             :values       ["B01001_001E" "NAME"]
+                             :predicates   {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
+                             :statsKey     stats-key}))
+             conj
+             [{:type "Feature",
+               :properties
+                     {:STATEFP  "01",
+                      :GEOID    "01005",
+                      :STATE "123"
+                      :COUNTY "456"}
+               :geometry
+                     {:type "Polygon",
+                      :coordinates
+                            [[[-85.748032 31.619181]
+                              [-85.729832 31.632373]]]}}
+              {:type "Feature",
+               :properties
+                     {:STATEFP  "01",
+                      :GEOID    "01005",
+                      :STATE "789"
+                      :COUNTY "1011"}
+               :geometry
+                     {:type "Polygon",
+                      :coordinates
+                            [[[-85.748032 31.619181]
+                              [-85.729832 31.632373]]]}}])
+;==========================================
 
 ;; Deep Merge function [stolen](https://gist.github.com/danielpcox/c70a8aa2c36766200a95)
 (defn deep-merge
@@ -172,24 +166,24 @@
       v)))
 
 ;; map destructuring courtesy [Arthur Ulfeldt](https://stackoverflow.com/a/12505774)
-(defn merge-xfilter
+
+(defn xf<-merged->filter
   "
-  Takes two keys that serve to filter a merged list of two maps, which returns a
-  list of only those maps which have both keys. Each key identifies of the
-  merged maps. This ensures the returned list contains only the overlap
+  Transducer, which takes 2->3 keys that serve to filter a merged list of two
+  maps to return a function, which returns a list of only those maps which have
+  a key from both maps. The presence of both keys within the map signifies that
+  the maps have merged. This ensures the returned list contains only the overlap
   between the two, i.e., excluding non-merged maps.
   "
-  [var1 var2]
-  (fn [rf]
-    (fn
-      ([] (rf))
-      ([result] (rf result))
-      ([result item]
-       (let [[k v] (first item)]
-         (if (or (nil? (get-in v [:properties var1]))
-                 (nil? (get-in v [:properties var2])))
-           (rf result)
-           (rf result v)))))))
+  [s-key1 s-key2 g-key]
+  (xf<<
+    (fn [rf result item]
+     (let [[_ v] (first item)]
+       (if (or (and (nil? (get-in v [:properties s-key1]))
+                    (nil? (get-in v [:properties s-key2])))
+               (nil? (get-in v [:properties g-key])))
+         (rf result)
+         (rf result v))))))
 
 ; ===============================
 ; TODO: combine merge-xfilter clj->js and js/JSON.stringify into a single transducer (comp)
@@ -197,44 +191,82 @@
 
 (defn merge-geo+stats
   "
-  Higher Order Function, which takes two vars and returns another function,
-  which does a collection-level transformation, which takes two input
-  map-collections, merges them and then filters them to return only those
-  map-items, which contain an identifying key from each source map.
+  Higher Order Function to be used in concert with `core.async/map`, which takes
+  two variables (two Clojure keywords) and returns a function, which takes two
+  input maps and deep-merges them into one based on common key paths,
+  and then filters them to return only those map-items that contain an
+  identifying key from each source map. Used to remove unmerged items.
   "
-  [var1 var2]
-  (fn [stats-map geo-map]
+  [s-key1 s-key2 g-key]
+  (fn [stats-coll geo-coll]
     (->>
-      (for [[_ pairs] (group-by keys (concat stats-map geo-map))]
+      (for [[_ pairs] (group-by keys (concat stats-coll geo-coll))]
         (apply deep-merge pairs))
-      (transduce (merge-xfilter var1 var2) conj)
-      (clj->js)
-      (js/JSON.stringify))))
-
-
-(defn get-features->put!->port
-  [url port]
-  (let [args {:response-format :json
-              :handler         (fn [r] (put! port (get r :features)))
-              :error-handler   #(prn (str "ERROR: " %))
-              :keywords?       true}]
-    (do (GET url args) port)))
+      (transduce (xf<-merged->filter s-key1 s-key2 g-key) conj))))
+      ;(clj->js)
+      ;(js/JSON.stringify))))
 
 
 
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~
+;; Examples =================================
+
+#_((merge-geo+stats :NAME nil :GEOID)
+   [{:12040 {:type "Feature",
+             :properties
+                   {:STATEFP "01",
+                    :GEOID "01005",
+                    :STATE "123",
+                    :COUNTY "456"},
+             :geometry
+                   {:type "Polygon",
+                    :coordinates [[[-85.748032 31.619181]
+                                   [-85.729832 31.632373]]]}}}
+    {:12035 {:type "Feature",
+             :properties
+                   {:STATEFP "01",
+                    :GEOID "01005",
+                    :STATE "789",
+                    :COUNTY "1011"},
+             :geometry
+                   {:type "Polygon",
+                    :coordinates [[[-85.748032 31.619181]
+                                   [-85.729832 31.632373]]]}}}]
+   [{:12040 {:properties
+                   {:B01001_001E 494981,
+                    :NAME "State Senate District 40 (2016), Florida",
+                    :B00001_001E 29661,
+                    :state "12",
+                    :state-legislative-district-_upper-chamber_ "040"}}}
+    {:12036 {:properties
+                   {:B01001_001E 492259,
+                    :NAME "State Senate District 36 (2016), Florida",
+                    :B00001_001E 29475,
+                    :state "12",
+                    :state-legislative-district-_upper-chamber_ "036"}}}
+    {:12035 {:properties
+                   {:B01001_001E 493899,
+                    :NAME "State Senate District 35 (2016), Florida",
+                    :B00001_001E 25615,
+                    :state "12",
+                    :state-legislative-district-_upper-chamber_ "035"}}}])
+;==========================================
 
 
+(defn xfxf-e?->features+geoids
+  [ids]
+  (comp
+    (map throw-err)
+    (map #(get % :features))
+    (xfxf<< (xf<-features+geoids ids) conj)))
+
+(defn xfxf-e?->stats+geoids
+  [vars#]
+  (comp
+    (map throw-err)
+    (xfxf<< (xf<-stats+geoids vars#) conj)))
 
 
-
-
-(defn merge-geo-stats->map
+(defn IO-geo+stats
   "
   Takes an arg map to configure a call the Census' statistics API as well as a
   matching GeoJSON file. The match is based on `vintage` and `geoHierarchy` of
@@ -247,55 +279,87 @@
   results. Thus, superfluous GeoJSON values are filtered out via a `remove`
   operation on the collection in the local `chan`.
   "
-  [args]
-  (let [stats-call (stats/stats-url-builder args)
-        vars# (count (get args :values))
-        =features= (chan 1 xf-features->map #(pprint "features fail! " %))
-        =stats= (chan 1 (xfxf<-stats->map vars#) #(pprint "stats fail! " %))
-        =merged= (async/map (merge-geo+stats (keyword (first (get args :values))) :GEOID) [=stats= =features=])]
-    (go (get-features->put!->port (geo/geo-scope-finder args) =features=)
-        (pipeline-async 1 =merged= identity =features=))
-    (go (get->put!->port stats-call =stats=)
-        (pipeline-async 1 =merged= identity =stats=)
-        (<! =merged=)
-        (js/console.log "done!")
-        (close! =features=)
+  [=I= =O=]
+  (go (let [args       (<! =I=)
+            ids        (get-geoid?s args)
+            vars#      (+ (count (get args :values)) (count (get args :predicates)))
+            =args=     (promise-chan)
+            =stats=    (chan 1 (xfxf-e?->stats+geoids vars#))
+            =features= (chan 1 (xfxf-e?->features+geoids ids))
+            s-key1     (keyword (first (get args :values)))
+            s-key2     (keyword (first (get args :predicates)))
+            g-key      (first ids)
+            =merged=   (async/map (merge-geo+stats s-key1 s-key2 g-key) [=stats= =features=])] ; GD: how long it took to realize I didn't have to explicitly pipe the channels in here!
+        (>! =args= args)
+        (prn s-key1)
+        (prn s-key2)
+        (prn g-key)
+        (pipeline-async 1 =stats=    (=IO=>I=O= IO-census-stats)   =args=)
+        (pipeline-async 1 =features= (=IO=>I=O= IO-census-GeoJSON) =args=)
+        (>! =O= (<! =merged=))
+        (close! =args=)
         (close! =stats=)
-        (close! =merged=))))
+        (close! =features=)
+        (close! =merged=)
+        (js/console.log "done!"))))
 
-(merge-geo-stats->map {:vintage      "2016"
-                       :sourcePath   ["acs" "acs5"]
-                       :geoHierarchy {:state "01" ; TODO: function to find out the `:scopes` for `for` and use `:us` if not available at `:state`
-                                      :county "*"}
-                       :geoResolution "500k"
-                       :values       ["B01001_001E"]
-                       :statsKey     stats/stats-key})
-                       ;; add `:predicates` and count them for `vars#`})
+;; Example =========================================
 
-(pprint (merge-geo-stats->map {:vintage      "2016"
-                               :sourcePath   ["acs" "acs5"]
-                               :geoHierarchy {:county "*"}
-                               :geoResolution "500k"
-                               :values       ["B01001_001E"]
-                               :statsKey     stats/stats-key}))
+#_(go (let [=I= (chan 1)
+            =O= (chan 1)]
+        (>! =I= {:vintage       "2016"
+                 :sourcePath    ["acs" "acs5"]
+                 :geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                 ;:geoHierarchy {:county "*"} ;; @ 30 seconds
+                 ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
+                 :geoResolution "500k"
+                 :values        ["B01001_001E" "NAME"]
+                 :predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
+                 :statsKey      stats-key})
+        (IO-geo+stats =I= =O=)
+        (pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
-(geo/geo-scope-finder {:vintage      "2016"
-                       :sourcePath    ["acs" "acs5"]
-                       :geoHierarchy  {:state "01"
-                                       :county "*"}
-                       :geoResolution "500k"
-                       :values        ["B01001_001E"]})
-; :statsKey      stats-key})
-(geo/geo-scope-finder {:vintage      "2016"
-                       :sourcePath    ["acs" "acs5"]
-                       :geoHierarchy  {:county "*"}
-                       :geoResolution "500k"
-                       :values        ["B01001_001E"]})
+;===================================================
 
-(geo/geo-scope-finder {:vintage      "2016"
-                       :sourcePath    ["acs" "acs5"]
-                       :geoHierarchy  {:state "01"
-                                       :county "001"
-                                       :tract "*"}
-                       :geoResolution "500k"
-                       :values        ["B01001_001E"]})
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
+
+;; TODO: add (clj->js {:type "FeatureCollection" :features features}) as a transducer?
+
+;; Examples ==============================
+
+#_(let [=I= (chan 1)
+        =O= (chan 1)]
+    (go (>! =I= {:vintage      "2016"
+                 :sourcePath   ["acs" "acs5"]
+                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                 :values       ["B01001_001E" "NAME"]
+                 :predicates   {:B00001_001E "0:30000"}
+                 :statsKey     stats-key})
+        (IO-census-stats =I= =O=)
+        ;; TODO handle bad requests...
+        ;(if (= (type (<! =O=)) cljs.core/List) ;
+        ;  (pprint "GOOD TO GO")
+        ;  (pprint "brrrr.... "))
+        (pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
+
+#_(type (quote ({:B01001_001E 494981,
+                 :NAME "State Senate District 40 (2016), Florida",
+                 :B00001_001E 29661,
+                 :state "12",
+                 :state-legislative-district-_upper-chamber_ "040"
+                 {:B01001_001E 492259,
+                  :NAME "State Senate District 36 (2016), Florida",
+                  :B00001_001E 29475,
+                  :state "12",
+                  :state-legislative-district-_upper-chamber_ "036"}})))
+
+;; =======================================
