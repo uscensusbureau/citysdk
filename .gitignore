@@ -1,6 +1,7 @@
 node_modules
 .idea
 .shadow-cljs
+.env
 projectFilesBackup
 test
 .gitattributes

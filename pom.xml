@@ -76,6 +76,11 @@
             <artifactId>specter</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>frankiesardo</groupId>
+            <artifactId>linked</artifactId>
+            <version>1.3.0</version>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>

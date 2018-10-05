@@ -6,11 +6,12 @@
             [ajax.core :refer [GET POST]]
             [cljs.pprint :refer [pprint]]
             [clojure.repl :refer [source]]
-            [geoAPI.core :refer [IO-census-GeoJSON]]
+            [geoAPI.core :refer [IO-pp->census-GeoJSON]]
             [geojson.index :refer [geoKeyMap]]
             [statsAPI.core
-             :refer [IO-census-stats
+             :refer [IO-pp->census-stats
                      stats-key]]
+            [linked.core :as linked]
             [utils.core
              :refer [throw-err
                      strs->keys
@@ -23,7 +24,10 @@
                      xf!<<
                      xf<<]]))
 
-;; If you want to pass an argument into your transducer, wrap it in another function, which takes the arg and returns a transducer containing it.
+(comment
+;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
+  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
+
 (defn xf<-stats+geoids
   "
   Higher-order transducer (to enable transduction of a list conveyed via `chan`).
@@ -192,8 +196,8 @@
 (defn merge-geo+stats
   "
   Higher Order Function to be used in concert with `core.async/map`, which takes
-  two variables (two Clojure keywords) and returns a function, which takes two
-  input maps and deep-merges them into one based on common key paths,
+  three Clojure keywords and returns a function, which takes two
+  input maps and deep-merges them into one based on common keys,
   and then filters them to return only those map-items that contain an
   identifying key from each source map. Used to remove unmerged items.
   "
@@ -282,46 +286,72 @@
   [=I= =O=]
   (go (let [args       (<! =I=)
             ids        (get-geoid?s args)
-            vars#      (+ (count (get args :values)) (count (get args :predicates)))
+            vars#      (+ (count (get args :values))
+                          (count (get args :predicates)))
             =args=     (promise-chan)
-            =stats=    (chan 1 (xfxf-e?->stats+geoids vars#))
-            =features= (chan 1 (xfxf-e?->features+geoids ids))
+            =stats=    (chan 1
+                             (xfxf-e?->stats+geoids vars#))
+            =features= (chan 1
+                             (xfxf-e?->features+geoids ids))
             s-key1     (keyword (first (get args :values)))
-            s-key2     (keyword (first (get args :predicates)))
+            s-key2     (first (keys (get args :predicates)))
             g-key      (first ids)
-            =merged=   (async/map (merge-geo+stats s-key1 s-key2 g-key) [=stats= =features=])] ; GD: how long it took to realize I didn't have to explicitly pipe the channels in here!
+            =merged=   (async/map
+                         (merge-geo+stats s-key1 s-key2 g-key)
+                         [=stats= =features=])]                 ; Notes (1)
+        (prn args)
         (>! =args= args)
-        (prn s-key1)
-        (prn s-key2)
-        (prn g-key)
-        (pipeline-async 1 =stats=    (=IO=>I=O= IO-census-stats)   =args=)
-        (pipeline-async 1 =features= (=IO=>I=O= IO-census-GeoJSON) =args=)
-        (>! =O= (<! =merged=))
-        (close! =args=)
-        (close! =stats=)
-        (close! =features=)
-        (close! =merged=)
-        (js/console.log "done!"))))
+        (IO-pp->census-stats =args= =stats=)                    ; Notes (2)
+        (IO-pp->census-GeoJSON =args= =features=)               ; Notes (2)
+        (>! =O= (<! =merged=))                                  ; Notes (3)
+        (close! =args=)                                         ; Notes (4)
+        (js/console.log "working on it...."))))
 
 ;; Example =========================================
 
-#_(go (let [=I= (chan 1)
-            =O= (chan 1)]
-        (>! =I= {:vintage       "2016"
-                 :sourcePath    ["acs" "acs5"]
-                 :geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 ;:geoHierarchy {:county "*"} ;; @ 30 seconds
-                 ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
-                 :geoResolution "500k"
-                 :values        ["B01001_001E" "NAME"]
-                 :predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
-                 :statsKey      stats-key})
-        (IO-geo+stats =I= =O=)
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
+(go (let [=I= (chan 1)
+          =O= (chan 1)]
+      (>! =I= {:vintage       "2016"
+               :sourcePath    ["acs" "acs5"]
+               ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+               ;:geoHierarchy  {:county "*"} ;; @ 5 minutes
+               :geoHierarchy  (linked/map :state "12" :county "*") ; Fixme: HOW TO GET THIS INTO ARGS?
+               ;:geoHierarchy {:zip-code-tabulation-area "*"} ; @ 17 minutes for completion
+               :geoResolution "500k"
+               :values        ["B01001_001E" "NAME"]
+               ;:predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
+               :statsKey      stats-key})
+      (IO-geo+stats =I= =O=)
+      (js/console.log
+        (js/JSON.stringify
+          (js-obj "type" "FeatureCollection"
+                  "features" (clj->js (<! =O=)))))
+      ;(pprint (<! =O=))
+      (js/console.log "Done!")
+      (close! =I=)
+      (close! =O=)))
 
-;===================================================
+;; ==================================================
+
+
+;   888b    |            d8
+;   |Y88b   |  e88~-_  _d88__  e88~~8e   d88~\
+;   | Y88b  | d888   i  888   d888  88b C888
+;   |  Y88b | 8888   |  888   8888__888  Y88b
+;   |   Y88b| Y888   '  888   Y888    ,   888D
+;   |    Y888  `88_-~   '88_/  '88___/  \_88P
+
+(comment
+  {:1   "GD: how long it took to realize I didn't have to explicitly pipe the channels in here! `async/map` does that. Initially used `pipeline-async`"
+   :2 "Initially, used `pipeline-async` here as well - MOAR pipline-async! - however, internally, the `IO-...` functions use `pipeline-async` and wrapping a pipeline inside another creates an infinite loop :("
+   :3 "`async/map closes =merged= automatically when either input chan (=stats= or =features=) is closed"
+   :4 "pipline-async (used internally by `IO-...` functions) closes the to (=O=) channels (=stats= & =features=) upon closing this"})
+
+
+
+
+
+
 
 ;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
 ;       888     d888   \  888   \   d888   \
@@ -330,6 +360,7 @@
 ;       888     Y888   /  888   /   Y888   /
 ;       888      `88_-~   888_-~     `88_-~
 
+;; TODO: args are getting flipped inside of :geoHierarchy, causing stats-url-builder to malfunction...
 ;; TODO: add (clj->js {:type "FeatureCollection" :features features}) as a transducer?
 
 ;; Examples ==============================
@@ -342,7 +373,7 @@
                  :values       ["B01001_001E" "NAME"]
                  :predicates   {:B00001_001E "0:30000"}
                  :statsKey     stats-key})
-        (IO-census-stats =I= =O=)
+        (IO-pp->census-stats =I= =O=)
         ;; TODO handle bad requests...
         ;(if (= (type (<! =O=)) cljs.core/List) ;
         ;  (pprint "GOOD TO GO")
