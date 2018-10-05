@@ -55,6 +55,7 @@ Geographic Area Type                                          | 1990  | 2000  | 
 `state-legislative-district-_lower-chamber_`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 
 
+
 # More Information
 - For more information about the files translated herein please visit the Census Bureau's [Cartographic Boundary File Description
  Page](https://www.census.gov/geo/maps-data/data/cbf/cbf_description.html)
