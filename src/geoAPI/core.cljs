@@ -193,7 +193,7 @@
                     true)
 ;; ===================================================
 
-(defn IO-census-GeoJSON
+(defn IO-pp->census-GeoJSON
   "
   Internal function for calling the Census API using a Clojure Map and getting
   stats returned as a clojure map.
@@ -202,7 +202,7 @@
   (go (let [args  (<! =I=)
             url   (geo-url-composer args)
             =url= (chan 1)]
-        ;(prn url)
+        (prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
         (pipeline-async 1 =O= (=IO=>I=O= IO-ajax-GET-json) =url=)
@@ -221,7 +221,7 @@
                  :geoResolution "500k"
                  :values       ["B01001_001E" "NAME"]
                  :predicates   {:B00001_001E "0:30000"}})
-        (IO-census-GeoJSON =I= =O=)
+        (IO-pp->census-GeoJSON =I= =O=)
         ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
         ;  (pprint "GOOD TO GO")
         ;  (pprint "brrrr.... "))
