@@ -18,7 +18,7 @@
                      keys->strs
                      map-idcs-range
                      json-args->clj-keys
-                     =IO=>I=O=
+                     I=O<<=IO=
                      IO-ajax-GET-json
                      xfxf<<
                      xf!<<
@@ -154,22 +154,21 @@
                               [-85.729832 31.632373]]]}}])
 ;==========================================
 
-;; Deep Merge function [stolen](https://gist.github.com/danielpcox/c70a8aa2c36766200a95)
-(defn deep-merge
+(defn deep-merge-with
   "
   Recursively merges two maps together along matching key paths. Implements
   `clojure/core.merge-with`.
-  "
-  [v & vs]
-  (letfn [(rec-merge [v1 v2]
-            (if (and (map? v1) (map? v2))
-              (merge-with deep-merge v1 v2)
-              v2))]
-    (if (some identity vs)
-      (reduce #(rec-merge %1 %2) v vs)
-      v)))
 
-;; map destructuring courtesy [Arthur Ulfeldt](https://stackoverflow.com/a/12505774)
+  [stolen](https://gist.github.com/danielpcox/c70a8aa2c36766200a95#gistcomment-2711849)
+  "
+  [& maps]
+  (apply merge-with
+         (fn [& args]
+           (if (every? map? args)
+             (apply deep-merge-with args)
+             (last args)))
+         maps))
+
 
 (defn xf<-merged->filter
   "
@@ -205,7 +204,7 @@
   (fn [stats-coll geo-coll]
     (->>
       (for [[_ pairs] (group-by keys (concat stats-coll geo-coll))]
-        (apply deep-merge pairs))
+        (apply deep-merge-with pairs))
       (transduce (xf<-merged->filter s-key1 s-key2 g-key) conj))))
       ;(clj->js)
       ;(js/JSON.stringify))))
@@ -269,6 +268,27 @@
     (map throw-err)
     (xfxf<< (xf<-stats+geoids vars#) conj)))
 
+(defn deep-reverse
+  "
+  Recursively merges two maps together along matching key paths. Implements
+  `clojure/core.merge-with`.
+  "
+  [[& kvs]]
+  ;(into {} (reverse (map #(if (map? %) (deep-reverse %) %) kvs))))
+  ; => {:b1 {:a3 "a3", :b3 "b3"}, :a1 {:a2 "a2", :b2 "b2"}}
+  (loop [res (rest kvs)
+         acc {}]
+    (if (= res nil)
+      acc
+      (recur ()))))
+
+(deep-reverse {:a1 {:a2 "a2" :b2 "b2"} :b1 {:a3 "a3" :b3 "b3"}})
+
+(let [[& kvs] {:a1 {:a2 "a2" :b2 "b2"} :b1 {:a3 "a3" :b3 "b3"}}]
+  (apply reverse kvs))
+  ;(prn v))
+
+
 
 (defn IO-geo+stats
   "
@@ -315,8 +335,8 @@
                :sourcePath    ["acs" "acs5"]
                ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
                ;:geoHierarchy  {:county "*"} ;; @ 5 minutes
-               :geoHierarchy  (linked/map :state "12" :county "*") ; Fixme: HOW TO GET THIS INTO ARGS?
-               ;:geoHierarchy {:zip-code-tabulation-area "*"} ; @ 17 minutes for completion
+               ;:geoHierarchy  (linked/map :state "12" :county "*") ; Fixme: HOW TO GET THIS INTO ARGS?
+               :geoHierarchy {:zip-code-tabulation-area "*"} ; @ 17 minutes for completion
                :geoResolution "500k"
                :values        ["B01001_001E" "NAME"]
                ;:predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`

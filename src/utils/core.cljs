@@ -1,26 +1,76 @@
 (ns utils.core
   (:require [cljs.core.async
-             :refer [chan
-                     put!
-                     take!
-                     >!
-                     <!
-                     close!]]
-            [cljs.core.async :refer-macros [go]]
+             :refer [chan put! take! >! <! close! promise-chan]
+             :refer-macros [go]]
+            [cljs.test
+             :refer-macros [deftest is run-tests async testing]]
             [ajax.core :refer [GET POST]]
             [cuerdas.core :as s]
             [com.rpl.specter
-             :refer [transform
-                     multi-path
+             :refer [multi-path
+                     if-path
                      INDEXED-VALS
                      MAP-KEYS
                      MAP-VALS
                      selected?
                      FIRST
                      LAST
-                     ALL]]
+                     ALL
+                     STAY
+                     continue-then-stay]
+             :refer-macros [recursive-path transform]]
             [cljs.pprint :refer [pprint]]
+            [linked.core :as linked]
+            [clojure.walk :refer [postwalk]]
             [oops.core :as obj]))
+
+(def MAP-NODES
+  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
+  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
+
+(defn deep-reverse-map
+  "Recursively reverses the order of the key/value _pairs_ inside a map"
+  {:test
+   #(is (= (deep-reverse-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+           {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
+  [m]
+  (transform MAP-NODES
+             #(into {} (reverse %))
+             m))
+
+;(test deep-reverse-map)
+
+(defn deep-linked-map
+  "
+  Recursively converts any map into a `linked` map (preserves insertion order)
+  TODO - Testing:
+  [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
+  "
+  [m]
+  (transform MAP-NODES
+             #(into (linked/map) (vec %))
+             m))
+
+; Examples =============================================
+
+; Note, inside a go-block, it seems that any map literals are immediately
+; changed into `hash-map`, so the only way to preserve an `array-map` is to
+; `let` bind the args into a variable before invoking the go-block
+
+#_(let [mp1 {:vintage      "2016"
+             :sourcePath   ["acs" "acs5"]
+             :geoHierarchy {:state "12" :county "*"}
+             :values       ["B01001_001E" "NAME"]
+             :predicates   {:B00001_001E "0:30000"}
+             :statsKey     "test key"}]
+    (go (let [=I= (promise-chan (map deep-linked-map))]
+          (>! =I= mp1)
+          (prn (str "mp1:"))
+          (prn mp1)
+          (prn (str "<! =I=:"))
+          (prn (<! =I=)))))
+
+; =======================================================
 
 (defn throw-err
   "
@@ -32,7 +82,7 @@
     (throw x)
     x))
 
-(defn =IO=>I=O=
+(defn I=O<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
   input.
@@ -48,7 +98,7 @@
           (close! =I=)))))  ; close the port to flush out values
 ;; Tested 1: working
 
-(defn =IO=>Icb
+(defn Icb<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
   input and expose the output to a callback. Note the async `take!` operation on
@@ -60,16 +110,18 @@
   'enduring relationships' or concerted application between other async
   functions (e.g., exposing asynchronous functions as a library).
   "
-  [f]                                  ; takes an async I/O function
-  (fn [I cb]                           ; returns a function with sync input  / callback for output
-    (let [=I= (chan 1)                 ; create two internal `chan`s for i/o
-          =O= (chan 1)]
-      (do (go (>! =I= I)               ; put the sync `I` into `=I=`
-              (f =I= =O=))             ; apply the async I/O function with the internal `chan`s
-          (take! =O= cb)               ; use callback function on the value taken from the `o-ch`
-          (close! =I=)                 ; close the ports to flush the values
-          (close! =O=)))))
-;; Untested
+  [f]                                       ; takes an async I/O function
+  (fn [I cb]                                ; returns a function with sync input  / callback for output
+    (let [=I= (chan 1)                      ; create two internal `chan`s for i/o
+          =O= (chan 1 (map throw-err))
+          args I]                           ; preserves any `array-map`s input
+      (do (go (>! =I= args)                 ; put the sync `I` into `=I=`
+              (f =I= =O=))                  ; apply the async I/O function with the internal `chan`s
+          (take! =O= #(do (cb %)            ; use async `take!` to allow lambdas/closures
+                          (close! =I=)      ; close the ports to flush the values
+                          (close! =O=)))))))
+
+;; Tested 1: working
 
 (defn xf<<
   "
@@ -140,7 +192,7 @@
         =O= (chan 1)
         =I= (chan 1)]
     (go (>! =I= url)
-        ((=IO=>I=O= IO-ajax-GET-json) url =O=)
+        ((I=O<<=IO= IO-ajax-GET-json) url =O=)
         (pprint (<! =O=))))
 ;=>
 ; [["B01001_001E"

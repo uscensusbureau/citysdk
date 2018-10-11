@@ -18,11 +18,13 @@
                      keys->strs
                      map-idcs-range
                      json-args->clj-keys
-                     =IO=>I=O=
+                     I=O<<=IO=
+                     Icb<<=IO=
                      IO-ajax-GET-json
                      xfxf<<
                      xf!<<
-                     xf<<]]))
+                     xf<<
+                     deep-reverse-map]]))
 
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
@@ -189,6 +191,53 @@
     (map throw-err)
     (xfxf<< (xf!-csv-response->JSON args keywords?) conj)))
 
+
+(defn IO-pp->census-stats
+  "
+  Internal function for calling the Census API using a Clojure Map and getting
+  stats returned as a clojure map.
+
+  Note: Inside `go` blocks, any map literals `{}` are converted into hash-maps.
+  Make sure to bind the args in a wrapping `(let [args ...(go` rather than from
+  within a shared `go` context.
+  "
+  [=I= =O=]
+  (go (let [args  (<! =I=)
+            url   (stats-url-builder args)
+            =url= (chan 1)
+            =res= (chan 1 (xfxf!-e?->csv->JSON args :keywords))]
+        (prn (str "IO-pp->census-stats url: " url))
+        (prn (str "IO-pp->census-stats args: " args))
+        (>! =url= url)
+        ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
+        (pipeline-async 1 =res= (I=O<<=IO= IO-ajax-GET-json) =url=)
+        ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
+        (>! =O= (<! =res=))
+        (close! =url=)
+        (close! =res=))))
+
+
+;; Examples ==============================
+
+#_(let [=I= (chan 1)
+        =O= (chan 1)
+        args {:vintage      "2016"
+              :sourcePath   ["acs" "acs5"]
+              ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+              :geoHierarchy {:state "12" :county "*"} ;
+              :values       ["B01001_001E" "NAME"]
+              :predicates   {:B00001_001E "0:30000"}
+              :statsKey     stats-key}]
+    (go (>! =I= args)
+        (IO-pp->census-stats =I= =O=)
+        ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
+        ;  (pprint "GOOD TO GO")
+        ;  (pprint "brrrr.... "))
+        (pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
+;; =======================================
+
 (defn getCensusStats
   "
   Library function, which takes a JSON object as input, constructs a call to the
@@ -197,15 +246,10 @@
   "
   ([json-args cb] (getCensusStats json-args cb nil))
   ([json-args cb keywords?]
-   (let [args  (json-args->clj-keys json-args :geoHierarchy)
-         url   (stats-url-builder args)
-         =res= (chan 1 (xfxf!-e?->csv->JSON args keywords?))]
-     (prn url)
-     (do ((=IO=>I=O= IO-ajax-GET-json) url =res=)
-         (if (= keywords? :keywords)
-           (take! =res= cb)
-           (take! =res= #(cb (js/JSON.stringify (clj->js %)))))))))
-
+   (let [args  (json-args->clj-keys json-args :geoHierarchy)]
+     (if (= keywords? :keywords)
+       ((Icb<<=IO= IO-pp->census-stats) args cb)
+       ((Icb<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %))))))))
 
 ;; Examples ==============================
 
@@ -218,45 +262,12 @@
                   ;(fn [r] (js/console.log r)))
                   pprint
                   :keywords)
-
 ;; =======================================
 
 
-(defn IO-pp->census-stats
-  "
-  Internal function for calling the Census API using a Clojure Map and getting
-  stats returned as a clojure map.
-  "
-  [=I= =O=]
-  (go (let [args  (<! =I=)
-            url   (stats-url-builder args)
-            =url= (chan 1)
-            =res= (chan 1 (xfxf!-e?->csv->JSON args :keywords))]
-        (prn url)
-        (>! =url= url)
-        ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 1 =res= (=IO=>I=O= IO-ajax-GET-json) =url=)
-        ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
-        (>! =O= (<! =res=))
-        (close! =url=)
-        (close! =res=))))
-
-;; Examples ==============================
-
-#_(let [=I= (chan 1)
-        =O= (chan 1)]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}
-                 :statsKey     stats-key})
-        (IO-pp->census-stats =I= =O=)
-        ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
-
-;; =======================================
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
