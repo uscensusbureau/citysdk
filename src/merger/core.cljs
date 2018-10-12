@@ -1,28 +1,23 @@
 (ns merger.core
-  (:require [cljs.core.async
-             :refer [chan put! take! >! <! pipe timeout close! alts! pipeline pipeline-async promise-chan]
-             :as async
-             :refer-macros [go go-loop alt!]]
-            [ajax.core :refer [GET POST]]
-            [cljs.pprint :refer [pprint]]
-            [clojure.repl :refer [source]]
-            [geoAPI.core :refer [IO-pp->census-GeoJSON]]
-            [geojson.index :refer [geoKeyMap]]
-            [statsAPI.core
-             :refer [IO-pp->census-stats
-                     stats-key]]
-            [linked.core :as linked]
-            [utils.core
-             :refer [throw-err
-                     strs->keys
-                     keys->strs
-                     map-idcs-range
-                     json-args->clj-keys
-                     I=O<<=IO=
-                     IO-ajax-GET-json
-                     xfxf<<
-                     xf!<<
-                     xf<<]]))
+  (:require
+    [cljs.core.async
+     :refer [chan put! take! >! <! pipe timeout close! alts! pipeline
+             pipeline-async promise-chan]
+     :as async
+     :refer-macros [go go-loop alt!]]
+    [ajax.core :refer [GET POST]]
+    [cljs.pprint :refer [pprint]]
+    [clojure.repl :refer [source]]
+    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
+    [geojson.index :refer [geoKeyMap]]
+    [statsAPI.core
+     :refer [IO-pp->census-stats stats-key]]
+    [geojson.core
+     :refer [geo+config->mkdirp->fsW!]]
+    [utils.core
+     :refer [throw-err strs->keys keys->strs map-idcs-range
+             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
+             json-geo-args?->clj-keys]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -268,28 +263,6 @@
     (map throw-err)
     (xfxf<< (xf<-stats+geoids vars#) conj)))
 
-(defn deep-reverse
-  "
-  Recursively merges two maps together along matching key paths. Implements
-  `clojure/core.merge-with`.
-  "
-  [[& kvs]]
-  ;(into {} (reverse (map #(if (map? %) (deep-reverse %) %) kvs))))
-  ; => {:b1 {:a3 "a3", :b3 "b3"}, :a1 {:a2 "a2", :b2 "b2"}}
-  (loop [res (rest kvs)
-         acc {}]
-    (if (= res nil)
-      acc
-      (recur ()))))
-
-(deep-reverse {:a1 {:a2 "a2" :b2 "b2"} :b1 {:a3 "a3" :b3 "b3"}})
-
-(let [[& kvs] {:a1 {:a2 "a2" :b2 "b2"} :b1 {:a3 "a3" :b3 "b3"}}]
-  (apply reverse kvs))
-  ;(prn v))
-
-
-
 (defn IO-geo+stats
   "
   Takes an arg map to configure a call the Census' statistics API as well as a
@@ -304,55 +277,82 @@
   operation on the collection in the local `chan`.
   "
   [=I= =O=]
-  (go (let [args       (<! =I=)
+  (go (let [I          (<! =I=)
+            args       (json-geo-args?->clj-keys I)
             ids        (get-geoid?s args)
             vars#      (+ (count (get args :values))
                           (count (get args :predicates)))
-            =args=     (promise-chan)
-            =stats=    (chan 1
-                             (xfxf-e?->stats+geoids vars#))
-            =features= (chan 1
-                             (xfxf-e?->features+geoids ids))
             s-key1     (keyword (first (get args :values)))
             s-key2     (first (keys (get args :predicates)))
             g-key      (first ids)
+            =args=     (promise-chan)
+            =stats=    (chan 1 (xfxf-e?->stats+geoids vars#))
+            =features= (chan 1 (xfxf-e?->features+geoids ids))
             =merged=   (async/map
                          (merge-geo+stats s-key1 s-key2 g-key)
                          [=stats= =features=])]                 ; Notes (1)
-        (prn args)
+        ;(prn args)
         (>! =args= args)
         (IO-pp->census-stats =args= =stats=)                    ; Notes (2)
         (IO-pp->census-GeoJSON =args= =features=)               ; Notes (2)
         (>! =O= (<! =merged=))                                  ; Notes (3)
         (close! =args=)                                         ; Notes (4)
-        (js/console.log "working on it...."))))
+        (prn "working on it...."))))
 
 ;; Example =========================================
 
-(go (let [=I= (chan 1)
-          =O= (chan 1)]
-      (>! =I= {:vintage       "2016"
-               :sourcePath    ["acs" "acs5"]
-               ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-               ;:geoHierarchy  {:county "*"} ;; @ 5 minutes
-               ;:geoHierarchy  (linked/map :state "12" :county "*") ; Fixme: HOW TO GET THIS INTO ARGS?
-               :geoHierarchy {:zip-code-tabulation-area "*"} ; @ 17 minutes for completion
-               :geoResolution "500k"
-               :values        ["B01001_001E" "NAME"]
-               ;:predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
-               :statsKey      stats-key})
-      (IO-geo+stats =I= =O=)
-      (js/console.log
-        (js/JSON.stringify
-          (js-obj "type" "FeatureCollection"
-                  "features" (clj->js (<! =O=)))))
-      ;(pprint (<! =O=))
-      (js/console.log "Done!")
-      (close! =I=)
-      (close! =O=)))
+(let [args {:vintage       "2016"
+            :sourcePath    ["acs" "acs5"]
+            ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+            :geoHierarchy  {:county "*"} ;; @ 1 minute
+            ;:geoHierarchy  { :state "12" :county "*"}
+            ;:geoHierarchy {:zip-code-tabulation-area "*"} ; @ 2 minutes for completion
+            :geoResolution "500k"
+            :values        ["B01001_001E" "NAME"]
+            :predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
+            :statsKey      stats-key}]
+  (go (let [=I= (chan 1)
+            =O= (chan 1)]
+        (>! =I= args)
+        (IO-geo+stats =I= =O=)
+        (js/console.log
+          (js/JSON.stringify
+            (js-obj "type" "FeatureCollection"
+                    "features" (clj->js (<! =O=)))))
+        ;(pprint (<! =O=))
+        (js/console.log "Done!")
+        (close! =I=)
+        (close! =O=))))
 
 ;; ==================================================
 
+(defn getCensusStatsWithGeoJSON
+  ([args cb] (getCensusStatsWithGeoJSON args cb false))
+  ([args cb clojure?]
+   (if clojure?
+     ((Icb<<=IO= IO-geo+stats) args cb)
+     ((Icb<<=IO= IO-geo+stats) args
+      #(cb (js/JSON.stringify #js { "type" "FeatureCollection"
+                                    "features" (clj->js %)}))))))
+
+;; Example =========================================
+
+#_(let [args {:vintage       "2016"
+              :sourcePath    ["acs" "acs5"]
+              ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+              :geoHierarchy  {:county "*"} ;; @ 1 minute
+              ;:geoHierarchy  { :state "12" :county "*"}
+              ;:geoHierarchy {:zip-code-tabulation-area "*"} ; @ 17 minutes for completion
+              :geoResolution "500k"
+              :values        ["B01001_001E" "NAME"]
+              ;:predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
+              :statsKey      stats-key}]
+    (getCensusStatsWithGeoJSON args
+                               #_#(geo+config->mkdirp->fsW!
+                                   {:directory "./src/json/"
+                                    :filepath "./src/json/county-test.json"
+                                    :json %})
+                               js/console.log))
 
 ;   888b    |            d8
 ;   |Y88b   |  e88~-_  _d88__  e88~~8e   d88~\
@@ -380,8 +380,6 @@
 ;       888     Y888   /  888   /   Y888   /
 ;       888      `88_-~   888_-~     `88_-~
 
-;; TODO: args are getting flipped inside of :geoHierarchy, causing stats-url-builder to malfunction...
-;; TODO: add (clj->js {:type "FeatureCollection" :features features}) as a transducer?
 
 ;; Examples ==============================
 

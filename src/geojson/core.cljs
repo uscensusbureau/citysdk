@@ -1,33 +1,24 @@
 (ns geojson.core
-  (:require [cljs.core.async :refer [chan
-                                     put!
-                                     take!
-                                     >!
-                                     <!
-                                     timeout
-                                     close!
-                                     alts!
-                                     pipeline-async]
-             :refer-macros [go
-                            go-loop
-                            alt!]]
-            [clojure.string :as s]
-            [clojure.set :refer [map-invert]]
-            [cljs.pprint :refer [pprint]]
-            [defun.core :refer-macros [defun]]
-            [cljs-promises.async
-             :as cpa
-             :refer [pair-port]
-             :refer-macros [<?]]
-            ["fs" :as fs]
-            ["path" :as path]
-            ["shpjs" :as shpjs]
-            ["mkdirp" :as mkdirp]
-            [clojure.repl :refer [source doc]]
-            [geojson.filepaths :as geos]
-            [geojson.index :as index]
-            [geojson.filepaths_abv :as geos_abv]
-            [utils.core :refer [map-target]]))
+  (:require
+    [cljs.core.async :refer [chan put! take! >! <! timeout close! alts! pipeline-async]
+     :refer-macros [go go-loop alt!]]
+    [clojure.string :as s]
+    [clojure.set :refer [map-invert]]
+    [cljs.pprint :refer [pprint]]
+    [defun.core :refer-macros [defun]]
+    [cljs-promises.async
+     :as cpa
+     :refer [pair-port]
+     :refer-macros [<?]]
+    ["fs" :as fs]
+    ["path" :as path]
+    ["shpjs" :as shpjs]
+    ["mkdirp" :as mkdirp]
+    [clojure.repl :refer [source doc]]
+    [geojson.filepaths :as geos]
+    [geojson.index :as index]
+    [geojson.filepaths_abv :as geos_abv]
+    [utils.core :refer [map-target]]))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -420,21 +411,20 @@
   Takes some geojson and a directory and - internally - calls Node `fs/writeFile`
   to store the geojson into the directory, creating the directory first if needed.
   "
-  [val]
-  (let [{:keys [directory filepath json]} val]
-    (pprint (str "Ensuring Directory: " directory))
-    (mkdirp
-      directory
-      (fn [err]
-        (if (= (type err) (type js/Error))
-          (js/console.log (str "Error creating directory: " filepath))
-          (fs/writeFile
-            filepath
-            json
-            (fn [err]
-              (if (= (type err) (type js/Error))
-                (js/console.log (str "Error writing file: " filepath))
-                (js/console.log (str "Wrote GeoJSON to: " filepath))))))))))
+  [{:keys [directory filepath json]}]
+  (pprint (str "Ensuring Directory: " directory))
+  (mkdirp
+    directory
+    (fn [err]
+      (if (= (type err) (type js/Error))
+        (js/console.log (str "Error creating directory: " filepath))
+        (fs/writeFile
+          filepath
+          json
+          (fn [err]
+            (if (= (type err) (type js/Error))
+              (js/console.log (str "Error writing file: " filepath))
+              (js/console.log (str "Wrote GeoJSON to: " filepath)))))))))
 
 
 (defn =>read=>convert=>write=>loop

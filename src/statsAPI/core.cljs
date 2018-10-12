@@ -1,30 +1,17 @@
 (ns statsAPI.core
-  (:require [cljs.core.async
-             :refer [chan
-                     take!
-                     >!
-                     <!
-                     close!
-                     pipeline-async]
-             :refer-macros [go]]
-            [ajax.core :refer [GET POST]]
-            [oops.core :as obj]
-            [cuerdas.core :as s]
-            [cljs.pprint :refer [pprint]]
-            ["dotenv" :as env]
-            [utils.core
-             :refer [throw-err
-                     strs->keys
-                     keys->strs
-                     map-idcs-range
-                     json-args->clj-keys
-                     I=O<<=IO=
-                     Icb<<=IO=
-                     IO-ajax-GET-json
-                     xfxf<<
-                     xf!<<
-                     xf<<
-                     deep-reverse-map]]))
+  (:require
+    [cljs.core.async
+     :refer [chan take! >! <! close! pipeline-async]
+     :refer-macros [go]]
+    [ajax.core :refer [GET POST]]
+    [oops.core :as obj]
+    [cuerdas.core :as s]
+    [cljs.pprint :refer [pprint]]
+    ["dotenv" :as env]
+    [utils.core
+     :refer [throw-err strs->keys keys->strs map-idcs-range
+             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
+             json-geo-args?->clj-keys]]))
 
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
@@ -36,18 +23,18 @@
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
   (str "https://api.census.gov/data/"
        (str vintage)
-       (s/join (map #(str "/" %)
-                    sourcePath))
+       (s/join (map #(str "/" %) sourcePath))
        "?get="
-       (s/join "," values)
+       (if (some? values)
+           (s/join "," values)
+           "")
        (if (some? predicates)
            (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
            "")
        (keys->strs
          (if (= 1 (count geoHierarchy))
              (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-             (str "&in=" (s/join "%20" (map #(kv-pair->str % ":")
-                                            (butlast geoHierarchy)))
+             (str "&in="  (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
                   "&for=" (kv-pair->str (last geoHierarchy) ":"))))
        "&key=" statsKey))
 
@@ -202,12 +189,12 @@
   within a shared `go` context.
   "
   [=I= =O=]
-  (go (let [args  (<! =I=)
+  (go (let [I     (<! =I=)
+            args  (json-geo-args?->clj-keys I)
             url   (stats-url-builder args)
             =url= (chan 1)
             =res= (chan 1 (xfxf!-e?->csv->JSON args :keywords))]
-        (prn (str "IO-pp->census-stats url: " url))
-        (prn (str "IO-pp->census-stats args: " args))
+        (prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
         (pipeline-async 1 =res= (I=O<<=IO= IO-ajax-GET-json) =url=)
@@ -244,24 +231,36 @@
   Census API and returns the data as _standard JSON_ (rather than the default
   csv-like format from the naked API).
   "
-  ([json-args cb] (getCensusStats json-args cb nil))
-  ([json-args cb keywords?]
-   (let [args  (json-args->clj-keys json-args :geoHierarchy)]
-     (if (= keywords? :keywords)
-       ((Icb<<=IO= IO-pp->census-stats) args cb)
-       ((Icb<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %))))))))
+  ([args cb] (getCensusStats args cb nil))
+  ([args cb keywords?]
+   (if (= keywords? :keywords)
+     ((Icb<<=IO= IO-pp->census-stats) args cb)
+     ((Icb<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
 
 ;; Examples ==============================
 
-#_(getCensusStats #js {"vintage"     "2016"
-                       "sourcePath"   #js ["acs" "acs5"]
-                       "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                       "values"       #js ["B01001_001E" "NAME"]
-                       "predicates"   #js {"B00001_001E" "0:30000"}
-                       "statsKey"     stats-key}
-                  ;(fn [r] (js/console.log r)))
-                  pprint
-                  :keywords)
+#_(getCensusStats
+    #js {"vintage"     "2016"
+         "sourcePath"   #js ["acs" "acs5"]
+         "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
+         "values"       #js ["B01001_001E" "NAME"]
+         "predicates"   #js {"B00001_001E" "0:30000"}
+         "statsKey"     stats-key}
+    (fn [r] (js/console.log r)))
+  ;pprint
+  ;:keywords)
+
+#_(getCensusStats
+    {:vintage "2016",
+     :sourcePath ["acs" "acs5"],
+     :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
+     :values ["B01001_001E" "NAME"],
+     :predicates {:B00001_001E "0:30000"},
+     :statsKey stats-key}
+    (fn [r] (js/console.log r)))
+  ;pprint
+  ;:keywords)
+
 ;; =======================================
 
 
