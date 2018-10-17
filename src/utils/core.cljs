@@ -1,26 +1,202 @@
 (ns utils.core
-  (:require [cljs.core.async
-             :refer [chan
-                     put!
-                     take!
-                     >!
-                     <!
-                     close!]]
-            [cljs.core.async :refer-macros [go]]
-            [ajax.core :refer [GET POST]]
-            [cuerdas.core :as s]
-            [com.rpl.specter
-             :refer [transform
-                     multi-path
-                     INDEXED-VALS
-                     MAP-KEYS
-                     MAP-VALS
-                     selected?
-                     FIRST
-                     LAST
-                     ALL]]
-            [cljs.pprint :refer [pprint]]
-            [oops.core :as obj]))
+  (:require
+    [cljs.core.async
+     :refer [chan put! take! >! <! close! promise-chan]
+     :refer-macros [go]]
+    [cljs.test
+     :refer-macros [deftest is run-tests async testing]]
+    [ajax.core :refer [GET POST]]
+    [cuerdas.core :as s]
+    [com.rpl.specter
+     :refer [multi-path if-path INDEXED-VALS MAP-KEYS MAP-VALS selected? setval
+             FIRST LAST ALL STAY continue-then-stay]
+     :refer-macros [recursive-path transform]]
+    [cljs.pprint :refer [pprint]]
+    [linked.core :as linked]
+    [clojure.walk :refer [postwalk]]
+    [oops.core :as obj]
+    [geojson.index :refer [geoKeyMap]]))
+
+(def vec-type cljs.core/PersistentVector)
+(def amap-type cljs.core/PersistentArrayMap)
+
+(def MAP-NODES
+  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
+  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
+
+(defn deep-reverse-map
+  "Recursively reverses the order of the key/value _pairs_ inside a map"
+  {:test
+   #(is (= (deep-reverse-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+           {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
+  [m]
+  (transform MAP-NODES
+             #(into {} (reverse %))
+             m))
+
+;(test deep-reverse-map)
+
+(defn deep-linked-map
+  "
+  Recursively converts any map into a `linked` map (preserves insertion order)
+  TODO - Testing:
+  [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
+  "
+  [m]
+  (transform MAP-NODES
+             #(into (linked/map) (vec %))
+             m))
+
+; Examples =============================================
+
+; Note, inside a go-block, it seems that any map literals are immediately
+; changed into `hash-map`, so the only way to preserve an `array-map` is to
+; `let` bind the args into a variable before invoking the go-block
+
+#_(let [mp1 {:vintage      "2016"
+             :sourcePath   ["acs" "acs5"]
+             :geoHierarchy {:state "12" :county "*"}
+             :values       ["B01001_001E" "NAME"]
+             :predicates   {:B00001_001E "0:30000"}
+             :statsKey     "test key"}]
+    (go (let [=I= (promise-chan (map deep-linked-map))]
+          (>! =I= mp1)
+          (prn (str "mp1:"))
+          (prn mp1)
+          (prn (str "<! =I=:"))
+          (prn (<! =I=)))))
+
+; =======================================================
+
+
+(defn map-rename-keys
+  "
+  Applies a function over the keys in a provided map
+  "
+  [f m]
+  (transform MAP-KEYS f m))
+
+;(map-rename-keys name {:a "c" :b "d"})
+;=> {"a" "c", "b" "d"}
+
+(defn map-over-keys
+  "
+  Applies a function to all values of a provided map
+  "
+  [f m]
+  (transform MAP-VALS f m))
+
+;(map-over-keys inc {:a 1 :b 2 :c 3})
+;=> {:a 2, :b 3, :c 4}
+
+(defn keys->strs
+  [s]
+  (s/replace
+    s
+    #"-_|_|!|-"
+    {"-_" " (" "_" ")" "!" "/" "-" " "}))
+
+(defn strs->keys
+  [s]
+  (s/replace
+    s
+    #" \(|\)|/| "
+    {" (" "-_" ")" "_" "/" "!" " " "-"}))
+
+;; Examples ==============================
+;
+;(keys->strs "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
+; => "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else")
+;
+;(strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else")
+;=> "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
+;
+;(mapv strs->keys ["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"]
+; => ["B01001_001E"]
+; "NAME"
+; "B00001_001E"
+; "state"
+; "state-legislative-district-_upper-chamber_")
+;
+;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
+;; =======================================
+
+
+(defn IO-ajax-GET-json
+  "
+  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
+  GET request to the provided URL and puts the response in the output (=O=) port.
+  "
+  [=URL= =RES=]
+  (let [args {:response-format :json
+              :handler         (fn [r] (go (>! =RES= r) (close! =RES=)))
+              :error-handler   (fn [e] (go (>! =RES= (js/Error. (get-in e [:parse-error :original-text]))) (close! =RES=)))
+              :keywords? true}]
+    (go (GET (<! =URL=) args))))
+
+; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
+
+; Example ===============================
+
+#_(let [=URL= (chan 1)
+        =RES= (chan 1)]
+    (go (>! =URL= "https://api.census.gov/data/2016/acs/acs5/geography.json")
+        (IO-ajax-GET-json =URL= =RES=)
+        (pprint (<! =RES=))))
+; =>
+;{:fips
+; [{:name "us", :geoLevelDisplay "010", :referenceDate "2015-01-01"}
+;  {:name "region", :geoLevelDisplay "020", :referenceDate "2015-01-01"}
+;  {:name "division",
+;   :geoLevelDisplay "030",
+;   :referenceDate "2015-01-01"}
+;  {:name "state", :geoLevelDisplay "040", :referenceDate "2015-01-01"}
+;  {:name "county",
+;   :geoLevelDisplay "050",
+;   :referenceDate "2015-01-01",
+;   :requires ["state"],
+;   :wildcard ["state"],
+;   :optionalWithWCFor "state"}...]}
+; =======================================
+
+
+
+(defn json-geo-args?->clj-keys
+  [args]
+  (let [js-selector "geoHierarchy"]
+    (if (= (type args) cljs.core/PersistentArrayMap)
+      args
+      (let [geoJS   (obj/oget args js-selector)
+            geoCljs (js->clj geoJS)
+            geoKeys (map-rename-keys strs->keys geoCljs)]
+        (do (obj/oset! args js-selector (clj->js geoKeys))
+            (js->clj args :keywordize-keys true))))))
+
+;; Examples ==============================
+
+#_(json-geo-args?->clj-keys
+    #js {"vintage"      "2016"
+         "sourcePath"   #js ["acs" "acs5"]
+         "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
+         "values"       #js ["B01001_001E" "NAME"]
+         "predicates"   #js {"B00001_001E" "0:30000"}
+         "statsKey"     "stats-key"})
+
+#_(json-geo-args?->clj-keys
+    {:vintage "2016",
+     :sourcePath ["acs" "acs5"],
+     :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
+     :values ["B01001_001E" "NAME"],
+     :predicates {:B00001_001E "0:30000"},
+     :statsKey "stats-key"})
+;; =>
+;;{:vintage "2016",
+;; :sourcePath ["acs" "acs5"],
+;; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
+;; :values ["B01001_001E" "NAME"],
+;; :predicates {:B00001_001E "0:30000"},
+;; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+;; =======================================
 
 (defn throw-err
   "
@@ -32,7 +208,7 @@
     (throw x)
     x))
 
-(defn =IO=>I=O=
+(defn I=O<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
   input.
@@ -48,7 +224,7 @@
           (close! =I=)))))  ; close the port to flush out values
 ;; Tested 1: working
 
-(defn =IO=>Icb
+(defn Icb<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
   input and expose the output to a callback. Note the async `take!` operation on
@@ -60,16 +236,18 @@
   'enduring relationships' or concerted application between other async
   functions (e.g., exposing asynchronous functions as a library).
   "
-  [f]                                  ; takes an async I/O function
-  (fn [I cb]                           ; returns a function with sync input  / callback for output
-    (let [=I= (chan 1)                 ; create two internal `chan`s for i/o
-          =O= (chan 1)]
-      (do (go (>! =I= I)               ; put the sync `I` into `=I=`
-              (f =I= =O=))             ; apply the async I/O function with the internal `chan`s
-          (take! =O= cb)               ; use callback function on the value taken from the `o-ch`
-          (close! =I=)                 ; close the ports to flush the values
-          (close! =O=)))))
-;; Untested
+  [f]                                       ; takes an async I/O function
+  (fn [I cb]                                ; returns a function with sync input  / callback for output
+    (let [=I= (chan 1)                      ; create two internal `chan`s for i/o
+          =O= (chan 1 (map throw-err))
+          args I]                           ; preserves any `array-map`s input
+      (do (go (>! =I= args)
+              (f =I= =O=))                  ; apply the async I/O function with the internal `chan`s
+          (take! =O= #(do (cb %)            ; use async `take!` to allow lambdas/closures
+                          (close! =I=)      ; close the ports to flush the values
+                          (close! =O=)))))))
+
+;; Tested 1: working
 
 (defn xf<<
   "
@@ -140,7 +318,7 @@
         =O= (chan 1)
         =I= (chan 1)]
     (go (>! =I= url)
-        ((=IO=>I=O= IO-ajax-GET-json) url =O=)
+        ((I=O<<=IO= IO-ajax-GET-json) url =O=)
         (pprint (<! =O=))))
 ;=>
 ; [["B01001_001E"
@@ -204,122 +382,5 @@
 
 ;(map-idcs-range inc [0 2] [1 2 3 4 5])
 ;=> [2 3 3 4 5]
-; =======================================
-
-
-(defn map-rename-keys
-  "
-  Applies a function over the keys in a provided map
-  "
-  [f m]
-  (transform MAP-KEYS f m))
-
-;(map-rename-keys name {:a "c" :b "d"})
-;=> {"a" "c", "b" "d"}
-
-(defn map-over-keys
-  "
-  Applies a function to all values of a provided map
-  "
-  [f m]
-  (transform MAP-VALS f m))
-
-;(map-over-keys inc {:a 1 :b 2 :c 3})
-;=> {:a 2, :b 3, :c 4}
-
-(defn keys->strs
-  [s]
-  (s/replace
-    s
-    #"-_|_|!|-"
-    {"-_" " (" "_" ")" "!" "/" "-" " "}))
-
-(defn strs->keys
-  [s]
-  (s/replace
-    s
-    #" \(|\)|/| "
-    {" (" "-_" ")" "_" "/" "!" " " "-"}))
-
-;; Examples ==============================
-
-;(keys->strs "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else")
-; => "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else"
-
-;(strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else")
-;=> "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
-
-;(mapv strs->keys ["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"])
-; => ["B01001_001E"
-; "NAME"
-; "B00001_001E"
-; "state"
-; "state-legislative-district-_upper-chamber_"]
-
-;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
-;; =======================================
-
-(defn json-args->clj-keys
-  [json key]
-  (let [geoJS (obj/oget json (name key))
-        geoCljs (js->clj geoJS)
-        geoKeys (map-rename-keys strs->keys geoCljs)]
-    (obj/oset! json key (clj->js geoKeys))
-    (js->clj json :keywordize-keys true)))
-
-;; Examples ==============================
-;
-;#_(json-args->clj-keys #js {"vintage"      "2016"
-;                            "sourcePath"   #js ["acs" "acs5"]
-;                            "geoHierarchy" #js {"state" "12" "state legislative-district (upper chamber)" "*"}
-;                            "values"       #js ["B01001_001E" "NAME"]
-;                            "predicates"   #js {"B00001_001E" "0:30000"}
-;                            "statsKey"     stats-key}
-;                       :geoHierarchy)
-;
-;; =>
-;;{:vintage "2016",
-;; :sourcePath ["acs" "acs5"],
-;; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
-;; :values ["B01001_001E" "NAME"],
-;; :predicates {:B00001_001E "0:30000"},
-;; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
-;; =======================================
-
-(defn IO-ajax-GET-json
-  "
-  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
-  GET request to the provided URL and puts the response in the output (=O=) port.
-  "
-  [=URL= =RES=]
-  (let [args {:response-format :json
-              :handler         (fn [r] (go (>! =RES= r) (close! =RES=)))
-              :error-handler   (fn [e] (go (>! =RES= (js/Error. (get-in e [:parse-error :original-text]))) (close! =RES=)))
-              :keywords? true}]
-    (go (GET (<! =URL=) args))))
-
-; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
-
-; Example ===============================
-
-#_(let [=URL= (chan 1)
-        =RES= (chan 1)]
-    (go (>! =URL= "https://api.census.gov/data/2016/acs/acs5/geography.json")
-        (IO-ajax-GET-json =URL= =RES=)
-        (pprint (<! =RES=))))
-; =>
-;{:fips
-; [{:name "us", :geoLevelDisplay "010", :referenceDate "2015-01-01"}
-;  {:name "region", :geoLevelDisplay "020", :referenceDate "2015-01-01"}
-;  {:name "division",
-;   :geoLevelDisplay "030",
-;   :referenceDate "2015-01-01"}
-;  {:name "state", :geoLevelDisplay "040", :referenceDate "2015-01-01"}
-;  {:name "county",
-;   :geoLevelDisplay "050",
-;   :referenceDate "2015-01-01",
-;   :requires ["state"],
-;   :wildcard ["state"],
-;   :optionalWithWCFor "state"}...]}
 ; =======================================
 

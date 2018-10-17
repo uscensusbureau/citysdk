@@ -1,28 +1,17 @@
 (ns statsAPI.core
-  (:require [cljs.core.async
-             :refer [chan
-                     take!
-                     >!
-                     <!
-                     close!
-                     pipeline-async]
-             :refer-macros [go]]
-            [ajax.core :refer [GET POST]]
-            [oops.core :as obj]
-            [cuerdas.core :as s]
-            [cljs.pprint :refer [pprint]]
-            ["dotenv" :as env]
-            [utils.core
-             :refer [throw-err
-                     strs->keys
-                     keys->strs
-                     map-idcs-range
-                     json-args->clj-keys
-                     =IO=>I=O=
-                     IO-ajax-GET-json
-                     xfxf<<
-                     xf!<<
-                     xf<<]]))
+  (:require
+    [cljs.core.async
+     :refer [chan take! >! <! close! pipeline-async]
+     :refer-macros [go]]
+    [ajax.core :refer [GET POST]]
+    [oops.core :as obj]
+    [cuerdas.core :as s]
+    [cljs.pprint :refer [pprint]]
+    ["dotenv" :as env]
+    [utils.core
+     :refer [throw-err strs->keys keys->strs map-idcs-range
+             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
+             json-geo-args?->clj-keys]]))
 
 (def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
@@ -34,18 +23,18 @@
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
   (str "https://api.census.gov/data/"
        (str vintage)
-       (s/join (map #(str "/" %)
-                    sourcePath))
+       (s/join (map #(str "/" %) sourcePath))
        "?get="
-       (s/join "," values)
+       (if (some? values)
+           (s/join "," values)
+           "")
        (if (some? predicates)
            (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
            "")
        (keys->strs
          (if (= 1 (count geoHierarchy))
              (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-             (str "&in=" (s/join "%20" (map #(kv-pair->str % ":")
-                                            (butlast geoHierarchy)))
+             (str "&in="  (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
                   "&for=" (kv-pair->str (last geoHierarchy) ":"))))
        "&key=" statsKey))
 
@@ -189,68 +178,44 @@
     (map throw-err)
     (xfxf<< (xf!-csv-response->JSON args keywords?) conj)))
 
-(defn getCensusStats
-  "
-  Library function, which takes a JSON object as input, constructs a call to the
-  Census API and returns the data as _standard JSON_ (rather than the default
-  csv-like format from the naked API).
-  "
-  ([json-args cb] (getCensusStats json-args cb nil))
-  ([json-args cb keywords?]
-   (let [args  (json-args->clj-keys json-args :geoHierarchy)
-         url   (stats-url-builder args)
-         =res= (chan 1 (xfxf!-e?->csv->JSON args keywords?))]
-     (prn url)
-     (do ((=IO=>I=O= IO-ajax-GET-json) url =res=)
-         (if (= keywords? :keywords)
-           (take! =res= cb)
-           (take! =res= #(cb (js/JSON.stringify (clj->js %)))))))))
-
-
-;; Examples ==============================
-
-#_(getCensusStats #js {"vintage"     "2016"
-                       "sourcePath"   #js ["acs" "acs5"]
-                       "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                       "values"       #js ["B01001_001E" "NAME"]
-                       "predicates"   #js {"B00001_001E" "0:30000"}
-                       "statsKey"     stats-key}
-                  ;(fn [r] (js/console.log r)))
-                  pprint
-                  :keywords)
-
-;; =======================================
-
 
 (defn IO-pp->census-stats
   "
   Internal function for calling the Census API using a Clojure Map and getting
   stats returned as a clojure map.
+
+  Note: Inside `go` blocks, any map literals `{}` are converted into hash-maps.
+  Make sure to bind the args in a wrapping `(let [args ...(go` rather than from
+  within a shared `go` context.
   "
   [=I= =O=]
-  (go (let [args  (<! =I=)
+  (go (let [I     (<! =I=)
+            args  (json-geo-args?->clj-keys I)
             url   (stats-url-builder args)
             =url= (chan 1)
             =res= (chan 1 (xfxf!-e?->csv->JSON args :keywords))]
         (prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 1 =res= (=IO=>I=O= IO-ajax-GET-json) =url=)
+        (pipeline-async 1 =res= (I=O<<=IO= IO-ajax-GET-json) =url=)
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
         (>! =O= (<! =res=))
         (close! =url=)
         (close! =res=))))
 
+
 ;; Examples ==============================
 
 #_(let [=I= (chan 1)
-        =O= (chan 1)]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}
-                 :statsKey     stats-key})
+        =O= (chan 1)
+        args {:vintage      "2016"
+              :sourcePath   ["acs" "acs5"]
+              ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+              :geoHierarchy {:state "12" :county "*"} ;
+              :values       ["B01001_001E" "NAME"]
+              :predicates   {:B00001_001E "0:30000"}
+              :statsKey     stats-key}]
+    (go (>! =I= args)
         (IO-pp->census-stats =I= =O=)
         ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
         ;  (pprint "GOOD TO GO")
@@ -258,5 +223,50 @@
         (pprint (<! =O=))
         (close! =I=)
         (close! =O=)))
+;; =======================================
+
+(defn getCensusStats
+  "
+  Library function, which takes a JSON object as input, constructs a call to the
+  Census API and returns the data as _standard JSON_ (rather than the default
+  csv-like format from the naked API).
+  "
+  ([args cb] (getCensusStats args cb nil))
+  ([args cb keywords?]
+   (if (= keywords? :keywords)
+     ((Icb<<=IO= IO-pp->census-stats) args cb)
+     ((Icb<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
+
+;; Examples ==============================
+
+#_(getCensusStats
+    #js {"vintage"     "2016"
+         "sourcePath"   #js ["acs" "acs5"]
+         "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
+         "values"       #js ["B01001_001E" "NAME"]
+         "predicates"   #js {"B00001_001E" "0:30000"}
+         "statsKey"     stats-key}
+    (fn [r] (js/console.log r)))
+  ;pprint
+  ;:keywords)
+
+#_(getCensusStats
+    {:vintage "2016",
+     :sourcePath ["acs" "acs5"],
+     :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
+     :values ["B01001_001E" "NAME"],
+     :predicates {:B00001_001E "0:30000"},
+     :statsKey stats-key}
+    (fn [r] (js/console.log r)))
+  ;pprint
+  ;:keywords)
 
 ;; =======================================
+
+
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
