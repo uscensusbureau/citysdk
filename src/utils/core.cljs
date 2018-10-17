@@ -17,6 +17,9 @@
     [oops.core :as obj]
     [geojson.index :refer [geoKeyMap]]))
 
+(def vec-type cljs.core/PersistentVector)
+(def amap-type cljs.core/PersistentArrayMap)
+
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
   (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
