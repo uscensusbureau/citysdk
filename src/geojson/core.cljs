@@ -4,18 +4,15 @@
     [clojure.string :as s]
     [clojure.set :refer [map-invert]]
     [defun.core :refer-macros [defun]]
-    [cljs-promises.async
-     :as cpa
-     :refer [pair-port]
-     :refer-macros [<?]]
+    [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
+    [geojson.index :as index]
+    [utils.core :as ut]
+    [geojson.filepaths :as geos]
+    [geojson.filepaths_abv :as geos_abv]
     ["fs" :as fs]
     ["path" :as path]
     ["shpjs" :as shpjs]
-    ["mkdirp" :as mkdirp]
-    [geojson.filepaths :as geos]
-    [geojson.index :as index]
-    [geojson.filepaths_abv :as geos_abv]
-    [utils.core :as ut]))
+    ["mkdirp" :as mkdirp]))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -112,8 +109,10 @@
   "
   [[lev res m vin & etc]]
   (let [geopath (s/join "/" (list* vin etc))]
-    {:filepath (str "./GeoJSON/" (s/join "/" [(apply str res m) geopath (apply str (keySearch vin lev) ".json")]))
-     :directory (str "./GeoJSON/" (s/join "/" [(apply str res m) geopath]))}))
+    {:filepath  (str "./GeoJSON/"
+                     (s/join "/" [(apply str res m) geopath (apply str (keySearch vin lev) ".json")]))
+     :directory (str "./GeoJSON/"
+                     (s/join "/" [(apply str res m) geopath]))}))
 
 
 (defn scope-geoPath
@@ -491,9 +490,9 @@
   (let [=path= (<|/chan 1)]
     (=>read=>convert=>write=>loop =path=)
     (<|/go (if (= nil (doseq [path paths-vec] (<|/>! =path= path)))
-               (prn "\n ======================== \n
-                     \n === FINISHED PARSING === \n
-                     \n === Wrapping up .... === \n
-                     \n ======================== \n")))))
+               (js/console.log "\n ======================== \n
+                                \n === FINISHED PARSING === \n
+                                \n === Wrapping up .... === \n
+                                \n ======================== \n")))))
 
-;(batch=>zip-paths=>convert=>geojson geos/paths)
+#_(batch=>zip-paths=>convert=>geojson geos_abv/paths)

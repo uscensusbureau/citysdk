@@ -5,12 +5,12 @@
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
     [geojson.index :refer [geoKeyMap]]
-    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
-    [statsAPI.core :refer [IO-pp->census-stats]]
-    [geojson.core :refer [geo+config->mkdirp->fsW!]]
     [test.core :as ts :refer [stats-key]]
     [wmsAPI.core :as wms]
-    [utils.core :as ut]))
+    [utils.core :as ut]
+    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
+    [statsAPI.core :refer [IO-pp->census-stats]]
+    [geojson.core :refer [geo+config->mkdirp->fsW!]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -281,15 +281,16 @@
                =args=     (<|/promise-chan)
                =stats=    (<|/chan 1 (xfxf-e?->stats+geoids vars#))
                =features= (<|/chan 1 (xfxf-e?->features+geoids ids))
-               =merged=   (<|/map
-                            (merge-geo+stats s-key1 s-key2 g-key)
-                            [=stats= =features=])]                 ; Notes (1)
+               =merged=   (<|/map  (merge-geo+stats s-key1 s-key2 g-key)
+                                   [=stats= =features=]
+                                   1)]                     ; Notes (1)
            ;(prn args)
            (<|/>! =args= args)
-           (IO-pp->census-stats =args= =stats=)                    ; Notes (2)
-           (IO-pp->census-GeoJSON =args= =features=)               ; Notes (2)
-           (<|/>! =O= (<|/<! =merged=))                                  ; Notes (3)
-           (<|/close! =args=)                                         ; Notes (4)
+           (IO-pp->census-stats =args= =stats=)           ; Notes (2)
+           (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
+           (<|/>! =O= {:type "FeatureCollection"
+                       :features (<|/<! =merged=)})                   ; Notes (3)
+           (<|/close! =args=)                             ; Notes (4)
            (prn "working on it...."))))
 
 ;; Example =========================================
@@ -316,19 +317,20 @@
    (if clojure?
      ((wms/Icb<-args<<=IO= IO-geo+stats) args cb)
      ((wms/Icb<-args<<=IO= IO-geo+stats) args
-      #(cb (js/JSON.stringify #js { "type" "FeatureCollection"
-                                    "features" (clj->js %)}))))))
+      #_#(cb (js/JSON.stringify #js {"type" "FeatureCollection"
+                                     "features" (clj->js %)}))
+      #(cb (js/JSON.stringify (clj->js %)))))))
 
 ;; Example =========================================
 
 
-(getCensusStatsWithGeoJSON
-  ts/test-js-args-1
-  #_#(geo+config->mkdirp->fsW!
-      {:directory "./src/json/"
-       :filepath "./src/json/county-test.json"
-       :json %})
-  js/console.log)
+#_(getCensusStatsWithGeoJSON
+    ts/test-js-args-1
+    #_#(geo+config->mkdirp->fsW!
+        {:directory "./src/json/"
+         :filepath "./src/json/county-test.json"
+         :json %})
+    js/console.log)
 
 ;   888b    |            d8
 ;   |Y88b   |  e88~-_  _d88__  e88~~8e   d88~\
@@ -380,11 +382,11 @@
                  :NAME "State Senate District 40 (2016), Florida",
                  :B00001_001E 29661,
                  :state "12",
-                 :state-legislative-district-_upper-chamber_ "040"
-                 {:B01001_001E 492259,
-                  :NAME "State Senate District 36 (2016), Florida",
-                  :B00001_001E 29475,
-                  :state "12",
-                  :state-legislative-district-_upper-chamber_ "036"}})))
+                 :state-legislative-district-_upper-chamber_ "040"}
+                {:B01001_001E 492259,
+                 :NAME "State Senate District 36 (2016), Florida",
+                 :B00001_001E 29475,
+                 :state "12",
+                 :state-legislative-district-_upper-chamber_ "036"})))
 
 ;; =======================================

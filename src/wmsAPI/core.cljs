@@ -218,7 +218,7 @@
                    (<|/close! =res=))))))
 
 
-(let [args ts/test-args-3
+(let [args ts/test-args-1
       =args-in=  (<|/chan 1)
       =args-out= (<|/chan 1)]
   (<|/go (<|/>! =args-in= args)
