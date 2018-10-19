@@ -1,10 +1,8 @@
 (ns geojson.core
   (:require
-    [cljs.core.async :refer [chan put! take! >! <! timeout close! alts! pipeline-async]
-     :refer-macros [go go-loop alt!]]
+    [cljs.core.async :as <|]
     [clojure.string :as s]
     [clojure.set :refer [map-invert]]
-    [cljs.pprint :refer [pprint]]
     [defun.core :refer-macros [defun]]
     [cljs-promises.async
      :as cpa
@@ -14,11 +12,10 @@
     ["path" :as path]
     ["shpjs" :as shpjs]
     ["mkdirp" :as mkdirp]
-    [clojure.repl :refer [source doc]]
     [geojson.filepaths :as geos]
     [geojson.index :as index]
     [geojson.filepaths_abv :as geos_abv]
-    [utils.core :refer [map-target]]))
+    [utils.core :as ut]))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -59,7 +56,7 @@
   (->> (s/split string #"_|\.")
        (map #(re-seq #"[a-z]+|[0-9]+" %))
        (map (fn [y] (remove #(= "d" %) y)))
-       (map-target map-xx->vin 2)
+       (ut/map-target map-xx->vin 2)
        (map #(vec %))))
 
 #_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
@@ -276,8 +273,8 @@
   (fs/access val
              fs/constants.F_OK
              (fn [err] (if (nil? err)
-                         (do (put! =port= (str "there")) (close! =port=))
-                         (do (put! =port= val) (close! =port=))))))
+                         (do (<|/put! =port= (str "there")) (<|/close! =port=))
+                         (do (<|/put! =port= val) (<|/close! =port=))))))
 
 (defn fsR-file->put!
   "
@@ -285,12 +282,12 @@
   in `chan` when reading complete.
   "
   [val, =port=]
-  (pprint (str "fsRead'ing: " val))
+  (prn (str "fsRead'ing: " val))
   (fs/readFile val
                (fn [err, file]
-                 (if (= (type err) (type js/Error))
-                   (throw (js/Error. err))
-                   (put! =port= file #(close! =port=))))))
+                 (if (= (type err) ut/err-type)
+                   (throw (ut/error err))
+                   (<|/put! =port= file #(<|/close! =port=))))))
 
 ;; Examples =========================================
 
@@ -324,22 +321,22 @@
   the GeoJSON is `take!`en out of the `value-port` and `put!` into a passed `chan`.
   "
   [val =port=]
-  (pprint (str "zip->json'ing..."))
-  (take! (cpa/value-port (shpjs val))
-         (fn [res] (put! =port=
-                         (js/JSON.stringify res)
-                         #(close! =port=)))))
+  (prn (str "zip->json'ing..."))
+  (<|/take! (cpa/value-port (shpjs val))
+         (fn [res] (<|/put! =port=
+                            (js/JSON.stringify res)
+                            #(<|/close! =port=)))))
 
 ;; Examples ========================================
 
-#_(let [=zip= (chan 1)
-        =json= (chan 1)]
-    (go (fsR-file->put!
-          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-          =zip=)
-        (pipeline-async 1 =json= zip->geojson->put! =zip=)
-        (js/console.log (<! =json=))))
+#_(let [=zip= (<|/chan 1)
+        =json= (<|/chan 1)]
+    (<|/go (fsR-file->put!
+             ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+             "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+             =zip=)
+        (<|/pipeline-async 1 =json= zip->geojson->put! =zip=)
+        (js/console.log (<|/<! =json=))))
 ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -396,7 +393,7 @@
      "test directory 3"
      "test json 3"])
 
-#_(into [] (x-geojson-config "geotest directory" "filepath") geotest)
+;(into [] (x-geojson-config "geotest directory" "filepath") geotest)
 ;; =>
 ;[{:directory "geotest directory", :json "test directory 1"}
 ; {:directory "geotest directory", :json "test json 1"}
@@ -412,19 +409,18 @@
   to store the geojson into the directory, creating the directory first if needed.
   "
   [{:keys [directory filepath json]}]
-  (pprint (str "Ensuring Directory: " directory))
-  (mkdirp
-    directory
-    (fn [err]
-      (if (= (type err) (type js/Error))
-        (js/console.log (str "Error creating directory: " filepath))
-        (fs/writeFile
-          filepath
-          json
+  (prn (str "Ensuring Directory: " directory))
+  (mkdirp directory
           (fn [err]
-            (if (= (type err) (type js/Error))
-              (js/console.log (str "Error writing file: " filepath))
-              (js/console.log (str "Wrote GeoJSON to: " filepath)))))))))
+            (if (= (type err) ut/err-type)
+              (prn (str "Error creating directory: " filepath))
+              (fs/writeFile
+                filepath
+                json
+                (fn [err]
+                  (if (= (type err) ut/err-type)
+                    (prn (str "Error writing file: " filepath))
+                    (prn (str "Wrote GeoJSON to: " filepath)))))))))
 
 
 (defn =>read=>convert=>write=>loop
@@ -439,31 +435,31 @@
   3.2) Store the GeoJSON with the appropriate name `(ns geojson.index)`
   "
   [=path=]
-  (go-loop []
-    (let [path (<! =path=)]
+  (<|/go-loop []
+    (let [path (<|/<! =path=)]
       (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-        (let [=test-path= (chan 1)]
+        (let [=test-path= (<|/chan 1)]
           (do (fsCheck->put! filepath =test-path=)
-              (if (not= "there" (<! =test-path=))
-                  (let [=zip= (chan 1)
-                        =json= (chan 1 (x-geojson-config directory filepath))]
+              (if (not= "there" (<|/<! =test-path=))
+                  (let [=zip= (<|/chan 1)
+                        =json= (<|/chan 1 (x-geojson-config directory filepath))]
                     (do (fsR-file->put! path =zip=)
-                        (pipeline-async 1 =json= zip->geojson->put! =zip=)
-                        (geo+config->mkdirp->fsW! (<! =json=))
+                        (<|/pipeline-async 1 =json= zip->geojson->put! =zip=)
+                        (geo+config->mkdirp->fsW! (<|/<! =json=))
                         (recur)))
-                  (do (pprint (str "File already exists: " path))
+                  (do (prn (str "File already exists: " path))
                       (recur)))))
-        (do (pprint (str "No :geoKeyMap match found for: " path))
+        (do (prn (str "No :geoKeyMap match found for: " path))
             (recur))))))
 
 #_(let [path "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"]
     (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-      (pprint (str "Already existing directory: " directory " Filepath: " filepath))
-      (let [=test-path= (chan 1)
-            open-path (<! (fsCheck->put! filepath =test-path=))]
+      (prn (str "Already existing directory: " directory " Filepath: " filepath))
+      (let [=test-path= (<|/chan 1)
+            open-path (<|/<! (fsCheck->put! filepath =test-path=))]
         (if (not= "there" open-path)
-          (pprint (str "Not there"))
-          (pprint (str "There"))))))
+          (prn (str "Not there"))
+          (prn (str "There"))))))
 
 #_(let [=c= (chan 1)]
     (go (>! =c= "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip")
@@ -492,12 +488,12 @@
   through each step of the process before moving onto the next in the file list.
   "
   [paths-vec]
-  (let [=path= (chan 1)]
+  (let [=path= (<|/chan 1)]
     (=>read=>convert=>write=>loop =path=)
-    (go (if (= nil (doseq [path paths-vec] (>! =path= path)))
-          (js/console.log "\n ======================== \n
-                           \n === FINISHED PARSING === \n
-                           \n === Wrapping up .... === \n
-                           \n ======================== \n")))))
+    (<|/go (if (= nil (doseq [path paths-vec] (<|/>! =path= path)))
+               (prn "\n ======================== \n
+                     \n === FINISHED PARSING === \n
+                     \n === Wrapping up .... === \n
+                     \n ======================== \n")))))
 
 ;(batch=>zip-paths=>convert=>geojson geos/paths)

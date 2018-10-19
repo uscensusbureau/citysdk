@@ -1,22 +1,19 @@
 (ns geoAPI.core
   (:require
-    [cljs.core.async
-     :refer [chan put! take! >! <! close! pipeline-async pipeline]
-     :refer-macros [go]]
+    [cljs.core.async :as <|]
     [clojure.string :as s]
-    [cljs.pprint :refer [pprint]]
     [defun.core :refer-macros [defun]]
-    [geojson.core
-     :refer [geo+config->mkdirp->fsW!]]
-    [utils.core
-     :refer [throw-err strs->keys keys->strs map-idcs-range map-over-keys
-             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
-             json-geo-args?->clj-keys]]
-    [geojson.index :refer [geoKeyMap]]))
+    [geojson.core :refer [geo+config->mkdirp->fsW!]]
+    [geojson.index :refer [geoKeyMap]]
+    [wmsAPI.core :as wms]
+    [utils.core :as ut]
+    [test.core :as ts]))
+
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 (comment
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
+
 
 (def base-url "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 
@@ -28,12 +25,12 @@
     (if-let [vins (get-in geoKeyMap [lev])]
       (-> (assoc e
             :guidance          "...:vintage {...:scope [...resolution]} sets available for this geography:"
-            :scopes_by_vintage (map-over-keys #(get-in % [:scopes]) vins))
-          js/Error.)
+            :scopes_by_vintage (ut/map-over-keys #(get-in % [:scopes]) vins))
+          ut/error)
       (-> (assoc e
             :guidance          (str "No sets available for " (name lev) ".")
             :all_geographies   (map key geoKeyMap))
-          js/Error.))))
+          ut/error))))
 
 (defn geo-url-builder
   "Composes a URL to call raw GeoJSON files hosted on Github"
@@ -58,8 +55,8 @@
        :else                           (geo-error res vin lev)))))
 
 (defn lg-warn->geo
-  ([res vin lev USr]        (lg-warn->geo res vin lev USr nil nil))
-  ([res vin lev USr STr]    (lg-warn->geo res vin lev USr STr nil))
+  ([res vin lev USr]     (lg-warn->geo res vin lev USr nil nil))
+  ([res vin lev USr STr] (lg-warn->geo res vin lev USr STr nil))
   ([res vin lev USr STr st]
    (let [strs
          ["Warning, you are about to make a large GeoJSON request."
@@ -85,70 +82,16 @@
   ([[res    vin st  [lev _  ]                    {:us USr :st STr }]] (geo-scoper res vin lev USr STr st))); try state
 
 (defn geo-pattern-maker
-  [{:keys [vintage geoResolution geoHierarchy]}]
-  (let [level (last geoHierarchy)
-        {:keys [state]} geoHierarchy
+  [{:keys [vintage geoResolution]
+    {:keys [state] :as geoHierarchy} :geoHierarchy}]
+  (let [level     (last geoHierarchy)
         geoScopes (get-in geoKeyMap [(key level) (keyword vintage) :scopes])
-        pattern [geoResolution vintage state level geoScopes]]
+        pattern   [geoResolution vintage state level geoScopes]]
     pattern))
 
 (defn geo-url-composer
   [args]
   (-> (geo-pattern-maker args) geo-pattern-matcher))
-
-;; Psedo
-; create a map/index for :sourcePath -> vintage manipulation (e.g., CBP: [20)
-
-;; Examples ====================================
-(comment
-  (geo-url-composer
-    {:vintage       "2000"
-     :sourcePath    ["acs" "acs5"]
-     :geoHierarchy  {:state "01"
-                     :county "*"}
-     :geoResolution "500k"
-     :values        ["B01001_001E"]})
-                    ; :statsKey      stats-key})
-  (geo-url-composer
-    {:vintage       "2016"
-     :sourcePath    ["acs" "acs5"]
-     :geoHierarchy  {:county "*"}
-     :geoResolution "500k"
-     :values        ["B01001_001E"]})
-
-  (geo-url-composer
-    {:vintage       "2016"
-     :sourcePath    ["acs" "acs5"]
-     :geoHierarchy  {:state "01"
-                     :county "001"
-                     :tract "*"}
-     :geoResolution "500k"
-     :values        ["B01001_001E"]})
-
-  (geo-url-composer
-    {:vintage       "2016"
-     :sourcePath    ["acs" "acs5"]
-     :geoHierarchy  {:state "01"
-                     :county "001"
-                     :someting-non-existant "*"}
-     :geoResolution "500k"
-     :values        ["B01001_001E"]})
-
-  (geo-url-composer
-    {:vintage       "2016"
-     :sourcePath    ["acs" "acs5"]
-     :geoHierarchy  {:state "*"
-                     :tract "*"}
-     :geoResolution "500k"
-     :values        ["B01001_001E"]})
-  (geo-url-composer
-    {:vintage       "2016"
-     :sourcePath    ["acs" "acs5"]
-     :geoHierarchy  {:state "*"
-                     :zip-code-tabulation-area "*"}
-     :geoResolution "500k"
-     :values        ["B01001_001E"]}))
-;; ===============================================
 
 (defn IO-pp->census-GeoJSON
   "
@@ -156,36 +99,26 @@
   stats returned as a clojure map.
   "
   [=I= =O=]
-  (go (let [I     (<! =I=)
-            args  (json-geo-args?->clj-keys I)
-            url   (geo-url-composer args)
-            =url= (chan 1)]
-        (prn url)
-        (>! =url= url)
-        ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 1 =O= (I=O<<=IO= IO-ajax-GET-json) =url=)
-        (close! =url=))))
+  (<|/go (let [args  (<|/<! =I=)
+               url   (geo-url-composer args)
+               =url= (<|/chan 1)]
+           (prn url)
+           (<|/>! =url= url)
+           ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
+           (<|/pipeline-async 1 =O= (ut/I=O<<=IO= ut/IO-ajax-GET-json) =url=)
+           (<|/close! =url=))))
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 
 ;; Examples ==============================
 
-#_(let [=I= (chan 1)
-        =O= (chan 1 (map throw-err))]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 ;:geoHierarchy {:county "*"} ;; @ 30 seconds
-                 ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
-                 :geoResolution "500k"
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}})
-        (IO-pp->census-GeoJSON =I= =O=)
-        ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (prn (<! =O=))
-        (close! =I=)
-        (close! =O=)))
+#_(let [=I= (<|/chan 1)
+        =O= (<|/chan 1 (map ut/throw-err))]
+    (<|/go (<|/>! =I= ts/test-args-6)
+           (IO-pp->census-GeoJSON =I= =O=)
+           (prn (<|/<! =O=))
+           (<|/close! =I=)
+           (<|/close! =O=)))
+
 ;; =======================================
 
 
@@ -197,27 +130,26 @@
   ([args cb] (getCensusGeoJSON args cb false))
   ([args cb url?]
    (if url?
-     ((Icb<<=IO= IO-pp->census-GeoJSON) args
-       #(cb #js {:url      url
+     ((wms/Icb<-args<<=IO= IO-pp->census-GeoJSON) args
+       #(cb #js {:url      (geo-url-composer args)
                  :response (js/JSON.stringify (clj->js %))}))
-     ((Icb<<=IO= IO-pp->census-GeoJSON) args
+     ((wms/Icb<-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb (js/JSON.stringify (clj->js %)))))))
 
 
 ;; Examples  ========================================
 
-#_(getCensusGeoJSON #js {"vintage"       "2016"
-                         "sourcePath"    #js ["acs" "acs5"]
-                         "geoHierarchy"  #js {"state" "12" "state legislative district (upper chamber)" "*"}
-                         ;"geoHierarchy"  #js {"county" "*"} ; @1 min
-                         ;"geoHierarchy"  #js {"zip code tabulation area" "*"} ; @1 min - @3 min with js/JSON.stringify
-                         "geoResolution" "500k"
-                         "values"        #js ["B01001_001E" "NAME"]
-                         "predicates"    #js {"B00001_001E" "0:30000"}}
-                    #(geo+config->mkdirp->fsW!
-                       {:directory "./src/json/"
-                        :filepath "./src/json/legislative-only.json"
-                        :json %}))
-                  ;#(js/console.log %))
-                  ;true)
+#_(getCensusGeoJSON
+    ;ts/test-js-args-1
+    ts/test-js-args-2
+    ;ts/test-args-2
+    #_#(geo+config->mkdirp->fsW!
+         {:directory "./src/json/"
+          :filepath "./src/json/legislative-only.json"
+          :json %})
+    ;#(prn %))
+    #(js/console.log %))
+  ;true)
 ;; ===================================================
+
+; TODO Fix Icb+args<<=IO= function. The test-args are working but not test-js-args

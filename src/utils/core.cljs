@@ -1,28 +1,32 @@
 (ns utils.core
   (:require
-    [cljs.core.async
-     :refer [chan put! take! >! <! close! promise-chan]
-     :refer-macros [go]]
+    [cljs.core.async :as <|]
     [cljs.test
      :refer-macros [deftest is run-tests async testing]]
     [ajax.core :refer [GET POST]]
     [cuerdas.core :as s]
-    [com.rpl.specter
-     :refer [multi-path if-path INDEXED-VALS MAP-KEYS MAP-VALS selected? setval
-             FIRST LAST ALL STAY continue-then-stay]
-     :refer-macros [recursive-path transform]]
+    [com.rpl.specter :as sp]
     [cljs.pprint :refer [pprint]]
     [linked.core :as linked]
     [clojure.walk :refer [postwalk]]
-    [oops.core :as obj]
-    [geojson.index :refer [geoKeyMap]]))
+    [oops.core :as ob]
+    [geojson.index :refer [geoKeyMap]]
+    [test.core :as ts]))
+
 
 (def vec-type cljs.core/PersistentVector)
+
 (def amap-type cljs.core/PersistentArrayMap)
+
+(def err-type js/Error)
+
+(defn error
+  [e]
+  (js/Error. (str e)))
 
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
-  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
+  (sp/recursive-path [] p (sp/if-path map? (sp/continue-then-stay sp/MAP-VALS p))))
 
 (defn deep-reverse-map
   "Recursively reverses the order of the key/value _pairs_ inside a map"
@@ -30,9 +34,9 @@
    #(is (= (deep-reverse-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
            {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
   [m]
-  (transform MAP-NODES
-             #(into {} (reverse %))
-             m))
+  (sp/transform MAP-NODES
+               #(into {} (reverse %))
+               m))
 
 ;(test deep-reverse-map)
 
@@ -43,9 +47,9 @@
   [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
   "
   [m]
-  (transform MAP-NODES
-             #(into (linked/map) (vec %))
-             m))
+  (sp/transform MAP-NODES
+               #(into (linked/map) (vec %))
+               m))
 
 ; Examples =============================================
 
@@ -74,7 +78,7 @@
   Applies a function over the keys in a provided map
   "
   [f m]
-  (transform MAP-KEYS f m))
+  (sp/transform sp/MAP-KEYS f m))
 
 ;(map-rename-keys name {:a "c" :b "d"})
 ;=> {"a" "c", "b" "d"}
@@ -84,7 +88,7 @@
   Applies a function to all values of a provided map
   "
   [f m]
-  (transform MAP-VALS f m))
+  (sp/transform sp/MAP-VALS f m))
 
 ;(map-over-keys inc {:a 1 :b 2 :c 3})
 ;=> {:a 2, :b 3, :c 4}
@@ -129,10 +133,10 @@
   "
   [=URL= =RES=]
   (let [args {:response-format :json
-              :handler         (fn [r] (go (>! =RES= r) (close! =RES=)))
-              :error-handler   (fn [e] (go (>! =RES= (js/Error. (get-in e [:parse-error :original-text]))) (close! =RES=)))
-              :keywords? true}]
-    (go (GET (<! =URL=) args))))
+              :handler         (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
+              :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
+              :keywords?       true}]
+    (<|/go (GET (<|/<! =URL=) args))))
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
 
@@ -161,34 +165,26 @@
 
 
 
-(defn json-geo-args?->clj-keys
+(defn args-digester
   [args]
-  (let [js-selector "geoHierarchy"]
-    (if (= (type args) cljs.core/PersistentArrayMap)
-      args
-      (let [geoJS   (obj/oget args js-selector)
-            geoCljs (js->clj geoJS)
-            geoKeys (map-rename-keys strs->keys geoCljs)]
-        (do (obj/oset! args js-selector (clj->js geoKeys))
-            (js->clj args :keywordize-keys true))))))
+  (if (= (type args) amap-type)
+    (let [{:keys [vintage]} args]
+      (sp/setval :vintage (str vintage) args))
+    (let [geoCljs (js->clj (ob/oget args "geoHierarchy"))
+          vintage (ob/oget args "vintage")
+          geoKeys (map-rename-keys strs->keys geoCljs)]
+      (do (ob/oset! args "vintage"      (clj->js (str vintage)))
+          (ob/oset! args "geoHierarchy" (clj->js geoKeys))
+          ;(prn (str "args from args-digester: " (js->clj args :keywordize-keys true)))
+          (js->clj args :keywordize-keys true)))))
 
 ;; Examples ==============================
+(comment
+  (args-digester ts/test-js-args-1)
+  (args-digester ts/test-js-args-2)
+  (args-digester ts/test-args-6))
 
-#_(json-geo-args?->clj-keys
-    #js {"vintage"      "2016"
-         "sourcePath"   #js ["acs" "acs5"]
-         "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
-         "values"       #js ["B01001_001E" "NAME"]
-         "predicates"   #js {"B00001_001E" "0:30000"}
-         "statsKey"     "stats-key"})
-
-#_(json-geo-args?->clj-keys
-    {:vintage "2016",
-     :sourcePath ["acs" "acs5"],
-     :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
-     :values ["B01001_001E" "NAME"],
-     :predicates {:B00001_001E "0:30000"},
-     :statsKey "stats-key"})
+#_(args-digester test.core/test-js-args-2)
 ;; =>
 ;;{:vintage "2016",
 ;; :sourcePath ["acs" "acs5"],
@@ -204,7 +200,7 @@
   transducer or as `(map u/throw-error)`.
   "
   [x]
-  (if (instance? js/Error x)
+  (if (instance? err-type x)
     (throw x)
     x))
 
@@ -218,10 +214,10 @@
   "
   [f]                       ; takes an async I/O function
   (fn [I =O=]               ; returns a function with a sync input / `chan` output
-    (let [=I= (chan 1)]     ; create internal `chan`
-      (go (>! =I= I)        ; put sync `I` into `=I=`
-          (f =I= =O=)       ; call the wrapped function with the newly created `=I=`
-          (close! =I=)))))  ; close the port to flush out values
+    (let [=I= (<|/chan 1)]     ; create internal `chan`
+      (<|/go (<|/>! =I= I)        ; put sync `I` into `=I=`
+             (f =I= =O=)       ; call the wrapped function with the newly created `=I=`
+             (<|/close! =I=)))))  ; close the port to flush out values
 ;; Tested 1: working
 
 (defn Icb<<=IO=
@@ -236,16 +232,16 @@
   'enduring relationships' or concerted application between other async
   functions (e.g., exposing asynchronous functions as a library).
   "
-  [f]                                       ; takes an async I/O function
-  (fn [I cb]                                ; returns a function with sync input  / callback for output
-    (let [=I= (chan 1)                      ; create two internal `chan`s for i/o
-          =O= (chan 1 (map throw-err))
-          args I]                           ; preserves any `array-map`s input
-      (do (go (>! =I= args)
-              (f =I= =O=))                  ; apply the async I/O function with the internal `chan`s
-          (take! =O= #(do (cb %)            ; use async `take!` to allow lambdas/closures
-                          (close! =I=)      ; close the ports to flush the values
-                          (close! =O=)))))))
+  [f]                                           ; takes an async I/O function
+  (fn [I cb]                                    ; returns a function with sync input  / callback for output
+    (let [=I=  (<|/chan 1)                      ; create two internal `chan`s for i/o
+          =O=  (<|/chan 1 (map throw-err))
+          args (args-digester I)]               ; converts any #js types to cljs with proper keys
+      (<|/go (<|/>! =I= args)
+             (f =I= =O=)                        ; apply the async I/O function with the internal `chan`s
+             (<|/take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
+                                (<|/close! =I=) ; close the ports to flush the values
+                                (<|/close! =O=)))))))
 
 ;; Tested 1: working
 
@@ -354,7 +350,7 @@
   collection.
   "
   [f targets coll]
-  (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
+  (sp/transform [sp/INDEXED-VALS (sp/selected? sp/FIRST (set targets)) sp/LAST] f coll))
 
 ; Example ===============================
 
@@ -362,7 +358,7 @@
 ; => [2 3 4 4 5]
 
 ; Also works:
-;(transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
+;(sp/transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
 ; => [0 2 2 4 4 6 6]
 ; =======================================
 
@@ -372,11 +368,11 @@
   to end) of a provided collection.
   "
   [f [r-start r-end] coll]
-  (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
+  (sp/transform [sp/INDEXED-VALS (sp/selected? sp/FIRST (set (range r-start r-end))) sp/LAST] f coll))
 
 ; Example ===============================
 
-;; also works: (transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
+;; also works: (sp/transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
 ;=> [0 2 2 4 4 6 6]
 
 

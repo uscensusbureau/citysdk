@@ -1,53 +1,17 @@
 (ns wmsAPI.core
   (:require
-    [cljs.core.async
-     :refer [chan put! take! >! <! pipe timeout close! alts! pipeline
-             pipeline-async promise-chan]
-     :as async
-     :refer-macros [go go-loop alt!]]
+    [cljs.core.async :as <|]
     [clojure.set :refer [map-invert]]
-    [ajax.core :refer [GET POST]]
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
     [cuerdas.core :as s]
-    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
     [geojson.index :refer [geoKeyMap]]
     [linked.core :as linked]
-    [statsAPI.core
-     :refer [IO-pp->census-stats stats-key]]
-    [geojson.core
-     :refer [geo+config->mkdirp->fsW!]]
-    [com.rpl.specter
-     :refer [FIRST LAST ALL INDEXED-VALS MAP-KEYS MAP-VALS STAY AFTER-ELEM END
-             selected? multi-path if-path setval putval continue-then-stay]
-     :refer-macros [select transform traverse]]
-    [utils.core
-     :refer [throw-err strs->keys keys->strs map-idcs-range MAP-NODES
-             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
-             json-geo-args?->clj-keys vec-type amap-type deep-linked-map]]))
+    [com.rpl.specter :as sp]
+    [utils.core :as ut]
+    [test.core :as ts]))
 
 (def base-url "https://tigerweb.geo.census.gov/arcgis/rest/services")
-
-"https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2016/MapServer/10/query?geometry=-87.240372%2C30.433283&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=pjson"
-
-
-(defn wms-engage?
-  "
-  Engages the wms-service workflow if the first element in the geoHierarchy
-  contains a map argument, which implies that the user doesn't have a GEOID handy.
-  "
-  {:test #(assert
-            (and (= (wms-engage? {:geoHierarchy {:county {:lat 1 :lng -7} :tract "*"}})
-                    true)
-                 (= (wms-engage? {:geoHierarchy {:county "01" :tract "*"}})
-                    false)))}
-  [{:keys [geoHierarchy]}]
-  (let [[_ v] (first geoHierarchy)]
-    (if (instance? amap-type v)
-      true
-      false)))
-
-(test wms-engage?)
 
 (defn geoKey->wms-config
   "
@@ -77,7 +41,7 @@
               :lat           lat
               :lng           lng
               :sub-level     sub-level}]
-     (if (instance? vec-type lookup)
+     (if (instance? ut/vec-type lookup)
        (merge-with assoc res
                    {:geo          lookup
                     :looked-up-in (keyword vintage)})
@@ -85,7 +49,7 @@
                    {:geo          (get-in geoKeyMap [scope lookup :id<-json])
                     :lookup-up-in lookup})))))
 
-(test geoKey->wms-config)
+;(test geoKey->wms-config)
 
 (defn lookup-id->match?
   "
@@ -93,13 +57,12 @@
   `some`ing through each of its vintages for a match with a provided GEO-Key.
   "
   [GEO-KEY [geo-val geo-key]]
-  (let [set- (map (fn [[_ {:keys            [id<-json]
-                           {:keys [lookup]} :wms}]]
-                    (if (instance? vec-type lookup)
+  (let [vins (map (fn [[_ {:keys [id<-json] {:keys [lookup]} :wms}]]
+                    (if (instance? ut/vec-type lookup)
                       (last lookup)
                       (last id<-json)))
                   (vec geo-val))]
-    (if (some #(= GEO-KEY %) set-)
+    (if (some #(= GEO-KEY %) vins)
       geo-key
       nil)))
 
@@ -120,7 +83,7 @@
     (remove nil? (map #(lookup-id->match? GEO-KEY %)
                       inverted-geoKeyMap))))
 
-(test search-id->match?)
+;(test search-id->match?)
 
 
 (defn wms-url-builder
@@ -161,7 +124,7 @@
                         ["f" "pjson"]
                         ["outFields" (s/join "," (map name geo))]]))))))
 
-(test wms-url-builder)
+;(test wms-url-builder)
 
 
 (defn configed-map
@@ -169,8 +132,8 @@
             (= (configed-map {:STATE "51", :COUNTY "013"})
                {:STATE {:state "51"}, :COUNTY {:county "013"}}))}
   [attrs]
-  (let [wms-keys (select MAP-KEYS attrs)
-        wms-vals (select MAP-VALS attrs)
+  (let [wms-keys (sp/select sp/MAP-KEYS attrs)
+        wms-vals (sp/select sp/MAP-VALS attrs)
         geo-keys (map #(search-id->match? %) wms-keys)]
     ;(prn wms-keys wms-vals geo-keys)
     (loop [idx 0
@@ -180,11 +143,10 @@
         (recur (inc idx)
                (assoc result
                  (get wms-keys idx)
-                 {(get (select [ALL ALL] geo-keys) idx)
+                 {(get (sp/select [sp/ALL sp/ALL] geo-keys) idx)
                   (get wms-vals idx)}))))))
 
-(test configed-map)
-
+;(test configed-map)
 
 (comment
   {:displayFieldName "BASENAME",
@@ -201,64 +163,90 @@
    :features         [{:attributes {:STATE "51", :COUNTY "013"}}]})
 
 
+(defn try-census-wms
+  [args server-idx =res=]
+  (<|/go (let [=args= (<|/chan 1 (map #(configed-map (get-in % [:features 0 :attributes]))))
+               url (wms-url-builder args server-idx)]
+           ((ut/I=O<<=IO= ut/IO-ajax-GET-json) url =args=)
+           (<|/>! =res= (<|/<! =args=))
+           (<|/close! =args=))))
+
+(defn wms-engage?
+  "
+  Engages the wms-service workflow if the first element in the geoHierarchy
+  contains a map argument, which implies that the user doesn't have a GEOID handy.
+  "
+  {:test #(assert
+            (and (= (wms-engage? {:geoHierarchy {:county {:lat 1 :lng -7} :tract "*"}})
+                    true)
+                 (= (wms-engage? {:geoHierarchy {:county "01" :tract "*"}})
+                    false)))}
+  [{:keys [geoHierarchy]}]
+  (let [[_ v] (first geoHierarchy)]
+    (if (instance? ut/amap-type v)
+      true
+      false)))
+
+;(test wms-engage?)
+
+
+(defn IO-census-wms
+  [=args-in= =args-out=]
+  (<|/go (let [args- (<|/<! =args-in=)
+               =res= (<|/chan 1)]
+           (if (wms-engage? args-)
+               (loop [args args-
+                      idx 0]
+                 (try-census-wms args idx =res=)
+                 (let [{:keys [layers sub-level]} (geoKey->wms-config args)
+                       result (<|/<! =res=)]
+                      (cond
+                        (not (empty? result))
+                        (do (<|/>! =args-out=
+                                   (sp/transform :geoHierarchy #(into {} %)
+                                     (sp/setval :geoHierarchy
+                                       (conj (linked/map)
+                                         (into (linked/map) (sp/traverse sp/MAP-VALS result))
+                                         (into (linked/map) [sub-level]))
+                                       args)))
+                            (<|/close! =res=))
+                        (and (empty? result) (not (nil? (get layers (inc idx)))))
+                        (recur args (inc idx))
+                        :else (do (<|/>! =args-out= (str "No Geography found for this lat/lng pair"))
+                                  (<|/close! =res=)))))
+               (do (<|/>! =args-out= args-)
+                   (<|/close! =res=))))))
+
+
+(let [args ts/test-args-3
+      =args-in=  (<|/chan 1)
+      =args-out= (<|/chan 1)]
+  (<|/go (<|/>! =args-in= args)
+         (IO-census-wms =args-in= =args-out=)
+         (prn (<|/<! =args-out=))
+         (<|/close! =args-in=)
+         (<|/close! =args-out=)))
+
+
+(defn Icb<-args<<=IO=
+  "
+  Version of ut/Icb<<=IO=, which checks for args which require conversion from WMS.
+  "
+  [f]                                     ; takes an async I/O function
+  (fn [I cb]                              ; returns a function with sync input  / callback for output
+    (let [=O=    (<|/chan 1 (map ut/throw-err))
+          =args= (<|/chan 1)              ; this is an add-on to engage wms if needed
+          args   (ut/args-digester I)]    ; converts any #js types to cljs with proper keys
+      (<|/go ((ut/I=O<<=IO= IO-census-wms) args =args=)
+             (f =args= =O=)               ; apply the async I/O function with the internal `chan`s
+             (<|/take! =O= #(do (cb %)    ; use async `take!` to allow lambdas/closures
+                                (<|/close! =O=)
+                                (<|/close! =args=)))))))
+
+
 ;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
 ;       888     d888   \  888   \   d888   \
 ;       888    88888    | 888    | 88888    |
 ;       888    88888    | 888    | 88888    |
 ;       888     Y888   /  888   /   Y888   /
 ;       888      `88_-~   888_-~     `88_-~
-
-
-(def test-args {:vintage      2016
-                ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                ;:geoHierarchy {:county {:lat 38.8816 :lng -77.0910} :tract "*"}
-                ;:geoHierarchy {:place {:lat 38.8816 :lng -77.0910} :tract "*"}
-                :geoHierarchy {:zip-code-tabulation-area {:lat 38.8816 :lng -77.0910}}
-                ;:geoHierarchy {:place {:lat 38.8816 :lng -77.0910}}
-                :sourcePath   ["acs" "acs5"]
-                :values       ["B01001_001E" "NAME"]
-                :predicates   {:B00001_001E "0:30000"}
-                :statsKey     "stats-key"})
-
-(wms-url-builder test-args)
-
-(defn try-census-wms
-  [args server-idx =res=]
-  (go (let [=args= (chan 1 (map #(configed-map (get-in % [:features 0 :attributes]))))
-            url (wms-url-builder args server-idx)]
-        ((I=O<<=IO= IO-ajax-GET-json) url =args=)
-        (>! =res= (<! =args=))
-        (close! =args=))))
-
-
-(defn IO-census-wms
-  [=I= =O=]
-  (go (let [args- (<! =I=)
-            =res= (chan 1)]
-           (loop [args args-
-                  idx 0]
-             (try-census-wms args idx =res=)
-             (let [{:keys [layers sub-level]} (geoKey->wms-config args)
-                   result (<! =res=)]
-                  (cond
-                    (not (empty? result))
-                    (>! =O= (transform
-                                :geoHierarchy #(into {} %)
-                                (setval
-                                  :geoHierarchy
-                                  (conj (linked/map)
-                                        (into (linked/map) (traverse MAP-VALS result))
-                                        (into (linked/map) [sub-level]))
-                                  args)))
-                    (not (nil? (get layers (inc idx)))) (recur args (inc idx))
-                    :else (>! =O= (str "No Geography found for this lat/lng pair"))))))))
-
-
-(let [args test-args
-      =I= (chan 1)
-      =O= (chan 1)]
-  (go (>! =I= args)
-      (IO-census-wms =I= =O=)
-      (prn (<! =O=))
-      (close! =I=)
-      (close! =O=)))
