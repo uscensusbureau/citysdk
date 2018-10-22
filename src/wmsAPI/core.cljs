@@ -218,14 +218,14 @@
                    (<|/close! =res=))))))
 
 
-(let [args ts/test-args-1
-      =args-in=  (<|/chan 1)
-      =args-out= (<|/chan 1)]
-  (<|/go (<|/>! =args-in= args)
-         (IO-census-wms =args-in= =args-out=)
-         (prn (<|/<! =args-out=))
-         (<|/close! =args-in=)
-         (<|/close! =args-out=)))
+#_(let [args ts/test-args-1
+        =args-in=  (<|/chan 1)
+        =args-out= (<|/chan 1)]
+    (<|/go (<|/>! =args-in= args)
+           (IO-census-wms =args-in= =args-out=)
+           (prn (<|/<! =args-out=))
+           (<|/close! =args-in=)
+           (<|/close! =args-out=)))
 
 
 (defn Icb<-args<<=IO=

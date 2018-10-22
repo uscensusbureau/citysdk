@@ -22,7 +22,7 @@
 
 (defn error
   [e]
-  (js/Error. (str e)))
+  (js/Error. (clj->js e)))
 
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
