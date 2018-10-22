@@ -1,23 +1,16 @@
 (ns merger.core
   (:require
-    [cljs.core.async
-     :refer [chan put! take! >! <! pipe timeout close! alts! pipeline
-             pipeline-async promise-chan]
-     :as async
-     :refer-macros [go go-loop alt!]]
+    [cljs.core.async :as <|]
     [ajax.core :refer [GET POST]]
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
-    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
     [geojson.index :refer [geoKeyMap]]
-    [statsAPI.core
-     :refer [IO-pp->census-stats stats-key]]
-    [geojson.core
-     :refer [geo+config->mkdirp->fsW!]]
-    [utils.core
-     :refer [throw-err strs->keys keys->strs map-idcs-range
-             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
-             json-geo-args?->clj-keys]]))
+    [test.core :as ts :refer [stats-key]]
+    [wmsAPI.core :as wms]
+    [utils.core :as ut]
+    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
+    [statsAPI.core :refer [IO-pp->census-stats]]
+    [geojson.core :refer [geo+config->mkdirp->fsW!]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -32,9 +25,9 @@
   the stats with a GeoJSON `feature`s `:properties` map.
   "
   [vars#]
-  (xf<< (fn [rf result input]
-          (rf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
-                      {:properties input}}))))
+  (ut/xf<< (fn [rf result input]
+             (rf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
+                         {:properties input}}))))
 
 ;; Examples ==============================
 
@@ -107,7 +100,7 @@
   hierarchy that will enable deep-merging of the stats with a stat map.
   "
   [ids]
-  (xf<<
+  (ut/xf<<
     (fn [rf result input]
       (rf result {(geoid<-feature ids input) input})))) ;
 
@@ -174,7 +167,7 @@
   between the two, i.e., excluding non-merged maps.
   "
   [s-key1 s-key2 g-key]
-  (xf<<
+  (ut/xf<<
     (fn [rf result item]
      (let [[_ v] (first item)]
        (if (or (and (nil? (get-in v [:properties s-key1]))
@@ -253,15 +246,15 @@
 (defn xfxf-e?->features+geoids
   [ids]
   (comp
-    (map throw-err)
+    (map ut/throw-err)
     (map #(get % :features))
-    (xfxf<< (xf<-features+geoids ids) conj)))
+    (ut/xfxf<< (xf<-features+geoids ids) conj)))
 
 (defn xfxf-e?->stats+geoids
   [vars#]
   (comp
-    (map throw-err)
-    (xfxf<< (xf<-stats+geoids vars#) conj)))
+    (map ut/throw-err)
+    (ut/xfxf<< (xf<-stats+geoids vars#) conj)))
 
 (defn IO-geo+stats
   "
@@ -277,52 +270,44 @@
   operation on the collection in the local `chan`.
   "
   [=I= =O=]
-  (go (let [I          (<! =I=)
-            args       (json-geo-args?->clj-keys I)
-            ids        (get-geoid?s args)
-            vars#      (+ (count (get args :values))
-                          (count (get args :predicates)))
-            s-key1     (keyword (first (get args :values)))
-            s-key2     (first (keys (get args :predicates)))
-            g-key      (first ids)
-            =args=     (promise-chan)
-            =stats=    (chan 1 (xfxf-e?->stats+geoids vars#))
-            =features= (chan 1 (xfxf-e?->features+geoids ids))
-            =merged=   (async/map
-                         (merge-geo+stats s-key1 s-key2 g-key)
-                         [=stats= =features=])]                 ; Notes (1)
-        ;(prn args)
-        (>! =args= args)
-        (IO-pp->census-stats =args= =stats=)                    ; Notes (2)
-        (IO-pp->census-GeoJSON =args= =features=)               ; Notes (2)
-        (>! =O= (<! =merged=))                                  ; Notes (3)
-        (close! =args=)                                         ; Notes (4)
-        (prn "working on it...."))))
+  (<|/go (let [I          (<|/<! =I=)
+               args       (ut/args-digester I)
+               ids        (get-geoid?s args)
+               vars#      (+ (count (get args :values))
+                             (count (get args :predicates)))
+               s-key1     (keyword (first (get args :values)))
+               s-key2     (first (keys (get args :predicates)))
+               g-key      (first ids)
+               =args=     (<|/promise-chan)
+               =stats=    (<|/chan 1 (xfxf-e?->stats+geoids vars#))
+               =features= (<|/chan 1 (xfxf-e?->features+geoids ids))
+               =merged=   (<|/map  (merge-geo+stats s-key1 s-key2 g-key)
+                                   [=stats= =features=]
+                                   1)]                     ; Notes (1)
+           ;(prn args)
+           (<|/>! =args= args)
+           (IO-pp->census-stats =args= =stats=)           ; Notes (2)
+           (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
+           (<|/>! =O= {:type "FeatureCollection"
+                       :features (<|/<! =merged=)})                   ; Notes (3)
+           (<|/close! =args=)                             ; Notes (4)
+           (prn "working on it...."))))
 
 ;; Example =========================================
 
-(let [args {:vintage       "2016"
-            :sourcePath    ["acs" "acs5"]
-            ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-            :geoHierarchy  {:county "*"} ;; @ 1 minute
-            ;:geoHierarchy  { :state "12" :county "*"}
-            ;:geoHierarchy {:zip-code-tabulation-area "*"} ; @ 2 minutes for completion
-            :geoResolution "500k"
-            :values        ["B01001_001E" "NAME"]
-            :predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
-            :statsKey      stats-key}]
-  (go (let [=I= (chan 1)
-            =O= (chan 1)]
-        (>! =I= args)
-        (IO-geo+stats =I= =O=)
-        (js/console.log
-          (js/JSON.stringify
-            (js-obj "type" "FeatureCollection"
-                    "features" (clj->js (<! =O=)))))
-        ;(pprint (<! =O=))
-        (js/console.log "Done!")
-        (close! =I=)
-        (close! =O=))))
+#_(let [args ts/test-args-6]
+    (<|/go (let [=I= (<|/chan 1)
+                 =O= (<|/chan 1)]
+             (<|/>! =I= args)
+             (IO-geo+stats =I= =O=)
+             (js/console.log
+               (js/JSON.stringify
+                 (js-obj "type" "FeatureCollection"
+                         "features" (clj->js (<|/<! =O=)))))
+             ;(pprint (<! =O=))
+             (js/console.log "Done!")
+             (<|/close! =I=)
+             (<|/close! =O=))))
 
 ;; ==================================================
 
@@ -330,29 +315,22 @@
   ([args cb] (getCensusStatsWithGeoJSON args cb false))
   ([args cb clojure?]
    (if clojure?
-     ((Icb<<=IO= IO-geo+stats) args cb)
-     ((Icb<<=IO= IO-geo+stats) args
-      #(cb (js/JSON.stringify #js { "type" "FeatureCollection"
-                                    "features" (clj->js %)}))))))
+     ((wms/Icb<-args<<=IO= IO-geo+stats) args cb)
+     ((wms/Icb<-args<<=IO= IO-geo+stats) args
+      #_#(cb (js/JSON.stringify #js {"type" "FeatureCollection"
+                                     "features" (clj->js %)}))
+      #(cb (js/JSON.stringify (clj->js %)))))))
 
 ;; Example =========================================
 
-#_(let [args {:vintage       "2016"
-              :sourcePath    ["acs" "acs5"]
-              ;:geoHierarchy  {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-              :geoHierarchy  {:county "*"} ;; @ 1 minute
-              ;:geoHierarchy  { :state "12" :county "*"}
-              ;:geoHierarchy {:zip-code-tabulation-area "*"} ; @ 17 minutes for completion
-              :geoResolution "500k"
-              :values        ["B01001_001E" "NAME"]
-              ;:predicates    {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
-              :statsKey      stats-key}]
-    (getCensusStatsWithGeoJSON args
-                               #_#(geo+config->mkdirp->fsW!
-                                   {:directory "./src/json/"
-                                    :filepath "./src/json/county-test.json"
-                                    :json %})
-                               js/console.log))
+
+#_(getCensusStatsWithGeoJSON
+    ts/test-js-args-1
+    #_#(geo+config->mkdirp->fsW!
+        {:directory "./src/json/"
+         :filepath "./src/json/county-test.json"
+         :json %})
+    js/console.log)
 
 ;   888b    |            d8
 ;   |Y88b   |  e88~-_  _d88__  e88~~8e   d88~\
@@ -404,11 +382,11 @@
                  :NAME "State Senate District 40 (2016), Florida",
                  :B00001_001E 29661,
                  :state "12",
-                 :state-legislative-district-_upper-chamber_ "040"
-                 {:B01001_001E 492259,
-                  :NAME "State Senate District 36 (2016), Florida",
-                  :B00001_001E 29475,
-                  :state "12",
-                  :state-legislative-district-_upper-chamber_ "036"}})))
+                 :state-legislative-district-_upper-chamber_ "040"}
+                {:B01001_001E 492259,
+                 :NAME "State Senate District 36 (2016), Florida",
+                 :B00001_001E 29475,
+                 :state "12",
+                 :state-legislative-district-_upper-chamber_ "036"})))
 
 ;; =======================================

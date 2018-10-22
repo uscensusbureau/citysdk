@@ -1,19 +1,11 @@
 (ns statsAPI.core
   (:require
-    [cljs.core.async
-     :refer [chan take! >! <! close! pipeline-async]
-     :refer-macros [go]]
-    [ajax.core :refer [GET POST]]
-    [oops.core :as obj]
     [cuerdas.core :as s]
-    [cljs.pprint :refer [pprint]]
-    ["dotenv" :as env]
-    [utils.core
-     :refer [throw-err strs->keys keys->strs map-idcs-range
-             I=O<<=IO= Icb<<=IO= IO-ajax-GET-json xfxf<< xf!<< xf<<
-             json-geo-args?->clj-keys]]))
+    [cljs.core.async :as <|]
+    [utils.core :as ut]
+    [test.core :as ts :refer [stats-key]]
+    [wmsAPI.core :as wms]))
 
-(def stats-key (obj/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
 (defn kv-pair->str [[k v] separator]
   (s/join separator [(name k) (str v)]))
@@ -31,7 +23,7 @@
        (if (some? predicates)
            (str "&" (str (s/join "&" (map #(kv-pair->str % "=") predicates))))
            "")
-       (keys->strs
+       (ut/keys->strs
          (if (= 1 (count geoHierarchy))
              (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
              (str "&in="  (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
@@ -102,23 +94,24 @@
   ([{:keys [values predicates]}] (xf!-csv-response->JSON [{:keys [values predicates]} nil]))
   ([{:keys [values predicates]} keywords?]
    (let [parse-range [0 (+ (count values) (count predicates))]]
-     (xf!<< (fn [state rf result input]
-              (let [prev @state]
-                (if (nil? prev)
-                    (if (= keywords? :keywords)
-                        (do (vreset! state (mapv strs->keys input)) nil)
-                        (do (vreset! state input) nil))
-                    (if (= keywords? :keywords)
-                        (rf result
-                            (zipmap (vec (map keyword @state))
-                                    (map-idcs-range parse-if-number
-                                                    parse-range
-                                                    input)))
-                        (rf result
-                            (zipmap @state
-                                    (map-idcs-range parse-if-number
-                                                    parse-range
-                                                    input)))))))))))
+     (ut/xf!<<
+       (fn [state rf result input]
+         (let [prev @state]
+           (if (nil? prev)
+               (if (= keywords? :keywords)
+                   (do (vreset! state (mapv ut/strs->keys input)) nil)
+                   (do (vreset! state input) nil))
+               (if (= keywords? :keywords)
+                   (rf result
+                       (zipmap (vec (map keyword @state))
+                               (ut/map-idcs-range parse-if-number
+                                               parse-range
+                                               input)))
+                   (rf result
+                       (zipmap @state
+                               (ut/map-idcs-range parse-if-number
+                                               parse-range
+                                               input)))))))))))
 
 ;; Examples ==============================
 
@@ -175,8 +168,8 @@
 (defn xfxf!-e?->csv->JSON
   [args keywords?]
   (comp
-    (map throw-err)
-    (xfxf<< (xf!-csv-response->JSON args keywords?) conj)))
+    (map ut/throw-err)
+    (ut/xfxf<< (xf!-csv-response->JSON args keywords?) conj)))
 
 
 (defn IO-pp->census-stats
@@ -189,40 +182,30 @@
   within a shared `go` context.
   "
   [=I= =O=]
-  (go (let [I     (<! =I=)
-            args  (json-geo-args?->clj-keys I)
-            url   (stats-url-builder args)
-            =url= (chan 1)
-            =res= (chan 1 (xfxf!-e?->csv->JSON args :keywords))]
-        (prn url)
-        (>! =url= url)
-        ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 1 =res= (I=O<<=IO= IO-ajax-GET-json) =url=)
-        ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
-        (>! =O= (<! =res=))
-        (close! =url=)
-        (close! =res=))))
+  (<|/go (let [args  (<|/<! =I=)
+               url   (stats-url-builder args)
+               =url= (<|/chan 1)
+               =res= (<|/chan 1 (xfxf!-e?->csv->JSON args :keywords))]
+           (prn url)
+           (<|/>! =url= url)
+           ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
+           (<|/pipeline-async 1 =res= (ut/I=O<<=IO= ut/IO-ajax-GET-json) =url=)
+           ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
+           (<|/>! =O= (<|/<! =res=))
+           (<|/close! =url=)
+           (<|/close! =res=))))
 
 
 ;; Examples ==============================
+#_(let [=I= (<|/chan 1)
+        =O= (<|/chan 1)
+        args ts/test-args-6]
+    (<|/go (<|/>! =I= args)
+           (IO-pp->census-stats =I= =O=)
+           (prn (<|/<! =O=))
+           (<|/close! =I=)
+           (<|/close! =O=)))
 
-#_(let [=I= (chan 1)
-        =O= (chan 1)
-        args {:vintage      "2016"
-              :sourcePath   ["acs" "acs5"]
-              ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-              :geoHierarchy {:state "12" :county "*"} ;
-              :values       ["B01001_001E" "NAME"]
-              :predicates   {:B00001_001E "0:30000"}
-              :statsKey     stats-key}]
-    (go (>! =I= args)
-        (IO-pp->census-stats =I= =O=)
-        ;(if (= (type (<! =O=)) cljs.core/List) ;; TODO: use this kind of functionality in merger/core to dispatch the geoJSON request only if response valid from stats API...
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
 ;; =======================================
 
 (defn getCensusStats
@@ -234,29 +217,16 @@
   ([args cb] (getCensusStats args cb nil))
   ([args cb keywords?]
    (if (= keywords? :keywords)
-     ((Icb<<=IO= IO-pp->census-stats) args cb)
-     ((Icb<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
+     ((wms/Icb<-args<<=IO= IO-pp->census-stats) args cb)
+     ((wms/Icb<-args<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
 
 ;; Examples ==============================
 
 #_(getCensusStats
-    #js {"vintage"     "2016"
-         "sourcePath"   #js ["acs" "acs5"]
-         "geoHierarchy" #js {"state" "12" "state legislative district (upper chamber)" "*"}
-         "values"       #js ["B01001_001E" "NAME"]
-         "predicates"   #js {"B00001_001E" "0:30000"}
-         "statsKey"     stats-key}
-    (fn [r] (js/console.log r)))
-  ;pprint
-  ;:keywords)
-
-#_(getCensusStats
-    {:vintage "2016",
-     :sourcePath ["acs" "acs5"],
-     :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
-     :values ["B01001_001E" "NAME"],
-     :predicates {:B00001_001E "0:30000"},
-     :statsKey stats-key}
+    ;ts/test-args-1 ; no such endpoint
+    ;ts/test-args-5 ; unallowed geoHeiarchy
+    ;ts/test-js-args-1
+    ts/test-js-args-2
     (fn [r] (js/console.log r)))
   ;pprint
   ;:keywords)
