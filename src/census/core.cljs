@@ -71,10 +71,12 @@
                :json (js/JSON.stringify (clj->js %))})))
       ((Icb<-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %))))))
 
+
+
 (type (clj->js "string"))
 (type (clj->js (js/console.log "test")))
 (comment
-  (census ts/args-ok-wms-only js/console.log)
+  (census ts/args-ok-wms-only prn)
   (census (ts/test-args 9 3 3 0) js/console.log)
   (census ts/args-ok-geo-only js/console.log)
   (census ts/args-ok-s+g-v+ps "./json/s-g.json")
