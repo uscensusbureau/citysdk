@@ -7,7 +7,8 @@
                 [defun "0.3.0-RC1"]
                 [jamesmacaulay/cljs-promises "0.1.0"]
                 [com.rpl/specter "1.1.1"]
-                [frankiesardo/linked "1.3.0"]]
+                [frankiesardo/linked "1.3.0"]
+                [datascript "0.16.6"]]
  :nrepl        {:port 3333}
  :builds       {:lib {:target           :node-library
                       :output-dir       "public/node"

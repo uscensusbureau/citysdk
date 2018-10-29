@@ -43,4 +43,33 @@ Then inside the "hrefs.txt" file, need to do some cleanup:
   - regex for certain AIAN areas SLDS [replace with `A&in=`, etc..] requires Sublime Regex + Casesensitive selection: 
     - `A( )`, `B( )`, `C( )`, `R( )`, `T( )`, `U( )`  
     
-Saved as hrefs.edn
+## DataScript
+
+### Resources:
+- Preserving Order in [Tips and Tricks] section DataScript Docs
+- Using the reader to [read serialized data] as string 
+- Using [lookup refs] to identify refs based on `[:attribute value]` [instead of tempid]:
+  - "The specified attribute must be defined as either `:db.unique/value` or `:db.unique/identity`."
+  - "Lookup refs can also be used to refer to existing entities in transaction data.  This allows updating transactions to specify :db/id directly instead of using a dummy upsert, as shown below:
+     ```clojure
+     ;; edn transaction data, using lookup ref
+          [{:db/id [:org/email "info@datomic.com"],
+            :org/favoriteColor :blue}]
+     ```
+     Similarly, they can be used in transactions to build ref relationships."
+  - Lookup Ref examples from [DataScript Repo]
+  - `:db/ident` doesn't exist in DataScript, but there's a [simple workaround] if you need them.
+- DataScript [schema documentation]
+
+
+
+
+
+
+[Tips and Tricks]: https://github.com/tonsky/datascript/wiki/Tips-&-tricks#preserving-order
+[read serialized data]: https://github.com/tonsky/datascript/wiki/Tips-&-tricks#edn-serialization
+[lookup refs]: https://github.com/kristianmandrup/datascript-tutorial/blob/master/entity-identity.md#lookup-refs
+[instead of tempid]: http://blog.datomic.com/2014/02/datomic-lookup-refs.html
+[DataScript Repo]: https://github.com/tonsky/datascript/blob/1661c524b544fa0c212bc2db65ef7ad22cecb319/test/datascript/test/lookup_refs.cljc#L30
+[schema documentation]: https://github.com/kristianmandrup/datascript-tutorial/blob/master/create_schema.md
+[simple workaround]: https://github.com/tonsky/datascript/wiki/Tips-&-tricks#referencing-entities-via-ident-codes
