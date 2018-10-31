@@ -5,7 +5,6 @@
     [clojure.set :refer [map-invert]]
     [defun.core :refer-macros [defun]]
     [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
-    [geojson.index :as index]
     [utils.core :as ut]
     [geojson.filepaths :as geos]
     [geojson.filepaths_abv :as geos_abv]
@@ -13,6 +12,8 @@
     ["path" :as path]
     ["shpjs" :as shpjs]
     ["mkdirp" :as mkdirp]))
+
+(def geoKeyMap (ut/read-edn "./src/geojson/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -89,7 +90,7 @@
   "
   [vintage level]
   (apply str (remove nil? (map #(vin+lev=?key vintage level %)
-                               (seq (map-invert index/geoKeyMap))))))
+                               (seq (map-invert geoKeyMap))))))
 
 (defn config-geoPath
   "

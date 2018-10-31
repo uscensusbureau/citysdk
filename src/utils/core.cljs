@@ -11,13 +11,17 @@
     [clojure.walk :refer [postwalk]]
     [oops.core :as ob]
     [cljs.reader :as r]
-    [test.core :as ts]))
+    [test.core :as ts]
+    ["fs" :as fs]))
 
 (def base-url-stats "https://api.census.gov/data/")
 (def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 (def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.edn")
 (def base-url-database "...")
+
+(defn read-edn [path]
+  (r/read-string (str (fs/readFileSync path))))
 
 (def vec-type cljs.core/PersistentVector)
 
@@ -110,7 +114,7 @@
     {"-_" " (" "_" ")" "!" "/" "-" " "}))
 
 
-(keys->strs (name :state))
+#_(keys->strs (name :state))
 
 (defn strs->keys
   {:test #(assert
@@ -123,7 +127,7 @@
     #" \(|\)|/| "
     {" (" "-_" ")" "_" "/" "!" " " "-"}))
 
-(name "string")
+#_(name "string")
 ;; Examples ==============================
 ;
 ;(keys->strs "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"

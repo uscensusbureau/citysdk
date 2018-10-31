@@ -7,14 +7,17 @@
     [test.core :as ts :refer [stats-key]]
     [datascript.core :as d]
     [datascript.db :as db]
-    [discovery.index :as di]))
+    [geoAPI.core :refer [geo-pattern-maker]]))
 
+(def geoKeyMap     (ut/read-edn "./src/geojson/index.edn"))
+(def examples      (ut/read-edn "./src/discovery/example-urls.edn"))
+(def examples-abv  (ut/read-edn "./src/discovery/example-urls-abv.edn"))
 
 (def test-index-str
   "https://api.census.gov/data/2013/pep/subcty?get=NAME,STNAME,CTYNAME,POP&for=place:08000&in=state:09&in=county:001&in=county subdivision:08070&DATE=6")
 
 
-(defn digest-one-index
+(defn digest-one-example-url
   "
   splits a full URL into five parts and returns it as a working `args` example:
   1) vintage
@@ -31,7 +34,7 @@
                                      :county "001",
                                      :county-subdivision "08070"},
                       :predicates {:DATE "6"}}
-                     (digest-one-index test-index-str)))}
+                     (digest-one-example-url test-index-str)))}
   [url-str]
   (let [todo                   (s/strip-prefix url-str "https://api.census.gov/data/")
         [pI pII]               (s/split todo #"\?get=")
@@ -52,16 +55,47 @@
                 (recur (merge-with into args {:geoHierarchy {key- val-}}) (rest geos))
                 (recur (merge-with into args {:predicates {(keyword i) ii}}) (rest geos))))))))
 
-(test digest-one-index)
+(test digest-one-example-url)
 
-(digest-one-index test-index-str)
+(digest-one-example-url test-index-str)
+
+;  888~-_               d8             ,d88~~\                ,e,             d8
+;  888   \    /~~~8e  _d88__   /~~~8e  8888     e88~~\ 888-~\  "  888-~88e  _d88__
+;  888    |       88b  888         88b `Y88b   d888    888    888 888  888b  888
+;  888    |  e88~-888  888    e88~-888  `Y88b, 8888    888    888 888  8888  888
+;  888   /  C888  888  888   C888  888    8888 Y888    888    888 888  888P  888
+;  888_-~    "88_-888  "88_/  "88_-888 \__88P'  "88__/ 888    888 888-_88"   '88_/
+;                                                                 888
+
+
+(def ds-schema {:geo        {:db/unique      :db.unique/identity}
+                :source     {:db/unique      :db.unique/identity}
+                :sources    {:db/valueType   :db.type/ref
+                             :db/cardinality :db.cardinality/many}
+                :geos       {:db/valueType   :db.type/ref
+                             :db/cardinality :db.cardinality/many}
+                :reso       {:db/unique      :db.unique/identity}
+                :resos      {:db/valueType   :db.type/ref
+                             :db/cardinality :db.cardinality/many}})
+
+
+(geo-pattern-maker geoKeyMap {:vintage "2016",
+                              :values ["H001001" "NAME"],
+                              :sourcePath ["dec" "cd113"],
+                              :geoHierarchy {:state "*"
+                                             :county "*"}
+                              :geoResolution "500k"})
+
+(defn datomize-one-examples-uniques
+  [{:keys [sourcePath geoHierarchy] :as args}])
+
 
 (def xf-translate-examples
      (comp
-       (map digest-one-index)
+       (map digest-one-example-url)
        (map ut/js->args)))
 
-(sequence xf-translate-examples di/index-abv)
+(into [] xf-translate-examples di/index-abv)
 
 (comment
   ; 1) For transducer: https://github.com/loganpowell/census-geojson/issues/12
@@ -164,7 +198,7 @@
   [string]
   ())
 
-(let [[vin+srcPath vals+for+ins] (digest-one-index test-index-str)]
+(let [[vin+srcPath vals+for+ins] (digest-one-example-url test-index-str)]
   (let [[& vin+srcPath-parts] (s/split  vin+srcPath "/")
         [& vals+for+ins-parts] (s/split vals+for+ins "&")
         [vals & rest] (map #(s/split % #"=|,") vals+for+ins-parts)

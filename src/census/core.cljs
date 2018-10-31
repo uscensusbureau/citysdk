@@ -28,18 +28,18 @@
   ([{:vintage _ :geoHierarchy _                                                                   }] :geocodes)
   ([& anything-else] nil))
 
-(deploy-census-function
-  ;ts/args-ok-wms-only
-  ;ts/args-ok-geo-only
-  ;ts/args-ok-s+g-v+ps
-  ;ts/args-ok-s+g-vals
-  ;ts/args-ok-sts-pred
-  ;ts/args-ok-sts-v+ps
-  ;ts/args-ok-sts-vals
-  ts/args-na-geo-only)
+#_(deploy-census-function
+    ;ts/args-ok-wms-only
+    ;ts/args-ok-geo-only
+    ;ts/args-ok-s+g-v+ps
+    ;ts/args-ok-s+g-vals
+    ;ts/args-ok-sts-pred
+    ;ts/args-ok-sts-v+ps
+    ;ts/args-ok-sts-vals
+    ts/args-na-geo-only)
 
 
-(prn ts/args-ok-wms-only)
+#_(prn ts/args-ok-wms-only)
 
 (defn IO-census
   [=I= =O=]
@@ -76,8 +76,8 @@
 
 
 
-(type (clj->js "string"))
-(type (clj->js (js/console.log "test")))
+#_(type (clj->js "string"))
+#_(type (clj->js (js/console.log "test")))
 (comment
   (census ts/args-ok-wms-only prn)
   (census (ts/test-args 9 3 3 0) js/console.log)
