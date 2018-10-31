@@ -4,7 +4,6 @@
     [ajax.core :refer [GET POST]]
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
-    [geojson.index :refer [geoKeyMap]]
     [test.core :as ts :refer [stats-key]]
     [wmsAPI.core :as wms]
     [utils.core :as ut]
@@ -54,8 +53,8 @@
   from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
   in deep-merging with statistics.
   "
-  [{:keys [geoHierarchy vintage]}]
-  (let [[& ids] (get-in geoKeyMap [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
+  [geoK {:keys [geoHierarchy vintage]}]
+  (let [[& ids] (get-in geoK [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
     ids))
 
 (defn geoid<-feature
@@ -256,6 +255,10 @@
     (map ut/throw-err)
     (ut/xfxf<< (xf<-stats+geoids vars#) conj)))
 
+
+
+
+
 (defn IO-geo+stats
   "
   Takes an arg map to configure a call the Census' statistics API as well as a
@@ -270,28 +273,31 @@
   operation on the collection in the local `chan`.
   "
   [=I= =O=]
-  (<|/go (let [I          (<|/<! =I=)
-               args       (ut/js->args I)
-               ids        (get-geoid?s args)
-               vars#      (+ (count (get args :values))
-                             (count (get args :predicates)))
-               s-key1     (keyword (first (get args :values)))
-               s-key2     (first (keys (get args :predicates)))
-               g-key      (first ids)
-               =args=     (<|/promise-chan)
-               =stats=    (<|/chan 1 (xfxf-e?->stats+geoids vars#))
-               =features= (<|/chan 1 (xfxf-e?->features+geoids ids))
-               =merged=   (<|/map  (merge-geo+stats s-key1 s-key2 g-key)
-                                   [=stats= =features=]
-                                   1)]                     ; Notes (1)
-           ;(prn args)
-           (<|/>! =args= args)
-           (IO-pp->census-stats =args= =stats=)           ; Notes (2)
-           (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
-           (<|/>! =O= {:type "FeatureCollection"
-                       :features (<|/<! =merged=)})                   ; Notes (3)
-           (<|/close! =args=)                             ; Notes (4)
-           (prn "working on it...."))))
+  (let [=geo= (<|/chan 1)]
+    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    (<|/go (let [I          (<|/<! =I=)
+                 geoK       (<|/<! =geo=)
+                 args       (ut/js->args I)
+                 ids        (get-geoid?s geoK args)
+                 vars#      (+ (count (get args :values))
+                               (count (get args :predicates)))
+                 s-key1     (keyword (first (get args :values)))
+                 s-key2     (first (keys (get args :predicates)))
+                 g-key      (first ids)
+                 =args=     (<|/promise-chan)
+                 =stats=    (<|/chan 1 (xfxf-e?->stats+geoids vars#))
+                 =features= (<|/chan 1 (xfxf-e?->features+geoids ids))
+                 =merged=   (<|/map  (merge-geo+stats s-key1 s-key2 g-key)
+                                     [=stats= =features=]
+                                     1)]                     ; Notes (1)
+             ;(prn args)
+             (<|/>! =args= args)
+             (IO-pp->census-stats =args= =stats=)           ; Notes (2)
+             (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
+             (<|/>! =O= {:type "FeatureCollection"
+                         :features (<|/<! =merged=)})                   ; Notes (3)
+             (<|/close! =args=)                             ; Notes (4)
+             (prn "working on it....")))))
 
 ;; Example =========================================
 
@@ -311,26 +317,6 @@
 
 ;; ==================================================
 
-(defn getCensusStatsWithGeoJSON
-  ([args cb] (getCensusStatsWithGeoJSON args cb false))
-  ([args cb clojure?]
-   (if clojure?
-     ((wms/Icb<-args<<=IO= IO-geo+stats) args cb)
-     ((wms/Icb<-args<<=IO= IO-geo+stats) args
-      #_#(cb (js/JSON.stringify #js {"type" "FeatureCollection"
-                                     "features" (clj->js %)}))
-      #(cb (js/JSON.stringify (clj->js %)))))))
-
-;; Example =========================================
-
-
-#_(getCensusStatsWithGeoJSON
-    ts/test-js-args-1
-    #_#(geo+config->mkdirp->fsW!
-        {:directory "./src/json/"
-         :filepath "./src/json/county-test.json"
-         :json %})
-    js/console.log)
 
 ;   888b    |            d8
 ;   |Y88b   |  e88~-_  _d88__  e88~~8e   d88~\
