@@ -10,7 +10,6 @@
     [linked.core :as linked]
     [clojure.walk :refer [postwalk]]
     [oops.core :as ob]
-    [geojson.index :refer [geoKeyMap]]
     [test.core :as ts]))
 
 
@@ -94,19 +93,31 @@
 ;=> {:a 2, :b 3, :c 4}
 
 (defn keys->strs
+  {:test #(assert
+            (= (keys->strs
+                 (name :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))
+               "american indian area/alaska native area (reservation or statistical entity only) (or part)"))}
   [s]
   (s/replace
     s
     #"-_|_|!|-"
     {"-_" " (" "_" ")" "!" "/" "-" " "}))
 
+
+(keys->strs (name :state))
+
 (defn strs->keys
+  {:test #(assert
+            (= (keyword
+                 (strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)"))
+               :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))}
   [s]
   (s/replace
     s
     #" \(|\)|/| "
     {" (" "-_" ")" "_" "/" "!" " " "-"}))
 
+(name "string")
 ;; Examples ==============================
 ;
 ;(keys->strs "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
@@ -165,7 +176,7 @@
 
 
 
-(defn args-digester
+(defn js->args
   [args]
   (if (= (type args) amap-type)
     (let [{:keys [vintage]} args]
@@ -180,11 +191,11 @@
 
 ;; Examples ==============================
 (comment
-  (args-digester ts/test-js-args-1)
-  (args-digester ts/test-js-args-2)
-  (args-digester ts/test-args-6))
+  (js->args ts/test-js-args-1)
+  (js->args ts/test-js-args-2)
+  (js->args ts/test-args-6))
 
-#_(args-digester test.core/test-js-args-2)
+#_(js->args test.core/test-js-args-2)
 ;; =>
 ;;{:vintage "2016",
 ;; :sourcePath ["acs" "acs5"],
@@ -193,6 +204,22 @@
 ;; :predicates {:B00001_001E "0:30000"},
 ;; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 ;; =======================================
+
+
+(defn args->js
+  [{:keys [geoHierarchy] :as args}]
+  (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
+    (prn (clj->js geoKeys))
+    (clj->js (sp/setval :geoHierarchy geoKeys args))))
+
+#_(args->js  {:vintage "2010",
+              :values ["H001001" "NAME"],
+              :sourcePath ["dec" "cd113"],
+              :geoHierarchy {:american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_ "R",
+                             :state "01",
+                             :county-subdivision "93"
+                             :congressional-district "01",
+                             :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}})
 
 (defn throw-err
   "
@@ -236,7 +263,7 @@
   (fn [I cb]                                    ; returns a function with sync input  / callback for output
     (let [=I=  (<|/chan 1)                      ; create two internal `chan`s for i/o
           =O=  (<|/chan 1 (map throw-err))
-          args (args-digester I)]               ; converts any #js types to cljs with proper keys
+          args (js->args I)]               ; converts any #js types to cljs with proper keys
       (<|/go (<|/>! =I= args)
              (f =I= =O=)                        ; apply the async I/O function with the internal `chan`s
              (<|/take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures

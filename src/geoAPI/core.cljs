@@ -18,7 +18,7 @@
 (def base-url "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 
 (defn geo-error
-  [res vin lev]
+  [res vin lev] ; FIXME add geoKeyMap as argument --------------------------------------------------------------------------
   (let [e {:level         (str "No GeoJSON found for " (name lev) " at this scope")
            :in_vintage    vin
            :at_resolution res}]
@@ -43,7 +43,7 @@
 (defn geo-scoper
   ([res vin lev USr]     (geo-scoper res vin lev USr nil nil))
   ([res vin lev USr STr] (geo-scoper res vin lev USr STr nil))
-  ([res vin lev USr STr st]
+  ([res vin lev USr STr st] ; FIXME add geoKeyMap as argument --------------------------------------------------------------------------
    (let [STr? (not (nil? (some #(= res %) STr)))
          USr? (not (nil? (some #(= res %) USr)))
          st?  (not (nil? st))
@@ -52,7 +52,7 @@
        (and st? STr?)                  (geo-url-builder res vin lev st) ;asks for state, state available
        (and us? USr?)                  (geo-url-builder res vin lev)    ;asks for us, us available
        (and (and st? USr?) (not STr?)) (geo-url-builder res vin lev)    ;asks for state, state unavailable, us available
-       :else                           (geo-error res vin lev)))))
+       :else                           (geo-error res vin lev))))) ; FIXME add geoKeyMap as argument --------
 
 (defn lg-warn->geo
   ([res vin lev USr]     (lg-warn->geo res vin lev USr nil nil))
@@ -64,12 +64,12 @@
           "The response may also cause VM heap capacity overflow."
           "Node heap may be increased via `--max-old-space-size=`"]]
      (do (doseq [s strs] (prn s))
-         (geo-scoper res vin lev USr STr st)))))
+         (geo-scoper res vin lev USr STr st))))) ; FIXME add geoKeyMap as argument ------------------
 
 (defun geo-pattern-matcher
   "
   Takes a pattern of maps and triggers the URL builder accordingly
-  "
+  " ; FIXME add geoKeyMap as argument --------------------------------------------------------------------------
   ([[nil    _   _   _                            _]]                  "") ; no request for GeoJSON
   ([["500k" vin _   [:zip-code-tabulation-area _]{:us USr :st nil }]] (lg-warn->geo "500k" vin :zip-code-tabulation-area USr)) ; big!
   ([["500k" vin _   [:county _]                  {:us USr :st nil }]] (lg-warn->geo "500k" vin :county USr)) ; big!
@@ -83,14 +83,14 @@
 
 (defn geo-pattern-maker
   [{:keys [vintage geoResolution]
-    {:keys [state] :as geoHierarchy} :geoHierarchy}]
+    {:keys [state] :as geoHierarchy} :geoHierarchy}] ; FIXME add geoKeyMap as argument -----------------
   (let [level     (last geoHierarchy)
         geoScopes (get-in geoKeyMap [(key level) (keyword vintage) :scopes])
         pattern   [geoResolution vintage state level geoScopes]]
     pattern))
 
 (defn geo-url-composer
-  [args]
+  [args] ; FIXME add geoKeyMap as argument --------------------------------------------------------------------------
   (-> (geo-pattern-maker args) geo-pattern-matcher))
 
 (defn IO-pp->census-GeoJSON

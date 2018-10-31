@@ -56,15 +56,106 @@
 
 (digest-one-index test-index-str)
 
+(def xf-translate-examples
+     (comp
+       (map digest-one-index)
+       (map ut/js->args)))
+
+(sequence xf-translate-examples di/index-abv)
+
 (comment
-  {:vintage 2013,
-   :values ["NAME" "STNAME" "CTYNAME" "POP"],
-   :sourcePath ["pep" "subcty"],
-   :geoHierarchy {:place "08000",
-                  :state "09",
-                  :county "001",
-                  :county-subdivision "08070"},
-   :predicates {:DATE "6"}})
+  ; 1) For transducer: https://github.com/loganpowell/census-geojson/issues/12
+  (def test-array [["for" "geo1"]
+                   ["in"  "geo2"]
+                   ["in"  "geo3"]
+                   ["DATE" "6"]])
+
+  (let [rearranged (conj (vec (rest test-array))
+                         (vec (first test-array)))]
+
+    ;;=> [["in" "geo2"] ["in" "geo3"] ["DATE" "6"] ["for" "geo1"]]
+
+
+    ; 1a) Transducer, which looks-up the (last :geoHierarchy) value in the geoKeyMap
+    ;     and appends available resolutions (look through the geoAPI code for something
+    ;     reusable or easily made reusable): See: https://github.com/loganpowell/census-geojson/blob/augmentation/src/geoAPI/core.cljs#L84
+
+
+
+
+    ; 2) Transducer that collects all the (specter) MAP-KEYS for every arg example produced by (1)
+    (let [args [:county
+                :tract
+                :block
+                :state
+                :state
+                :tract
+                :block
+                :county-subdivision
+                :aian
+                :county
+                :zip-code-tabulation-areas]]
+         (loop [todo args
+                set #{}]
+           (if (empty? todo)
+               set
+               (recur (rest todo)
+                      (conj set (first todo)))))) ;; -> Pull out each MAP-VAL with Specter here <-
+
+    ;; => #{:block :tract :zip-code-tabulation-areas :county :state :county-subdivision :aian}
+
+    ; 3) Transducer that turns all the items in the set returned from (2) into DataScript entities
+
+    ;; see: https://github.com/tonsky/datascript/wiki/API-overview
+    ;; and: https://github.com/tonsky/datascript/wiki/Tips-&-tricks#edn-serialization
+    ;; and: https://github.com/tonsky/datascript/blob/master/test/datascript/test/lookup_refs.cljc#L96
+    ;; and:
+
+    (defn create-db
+      [arg-list]
+      (let [db (d/db-with (d/empty-db {:geo        {:db/unique      :db.unique/identity}
+                                       :source     {:db/unique      :db.unique/identity}
+                                       :sources    {:db/valueType   :db.type/ref
+                                                    :db/cardinality :db.cardinality/many}
+                                       :geos       {:db/valueType   :db.type/ref
+                                                    :db/cardinality :db.cardinality/many}
+                                       :reso       {:db/unique      :db.unique/identity}
+                                       :resos      {:db/valueType   :db.type/ref
+                                                    :db/cardinality :db.cardinality/many}})
+                          [{:db/id 1  :geo :county}
+                           {:db/id 2  :geo :state}
+                           ...
+                           {:db/id 31 :source "acs"}
+                           {:db/id 32 :source "sf1"}
+                           ...
+                           {:db/id 41 :reso "500k"}
+                           {:db/id 42 :reso "20m"}
+                           {:db/id 43 :reso "5m"}
+
+                           ;; The beginning of an example entity:
+
+                           [:db/add 44 :geos [:geo :state]]
+                           [:db/add 44 :geos [:geo :county]]
+                           [:db/add 44 :resos [:reso "500k"]]
+                           [:db/add 44 :resos [:reso "20m"]]
+                           [:db/add 44 :sources [:source "acs"]]
+                           [:db/add 44 :sources [:source "acs5"]]
+                           [:db/add 44 :geoHierarchy {:state "01" :county "001"}]
+                           [:db/add 44 :vintage 2016]
+                           [:db/add 44 :sourcePath ["acs" "acs5"]]
+                           [:db/add 44 :values ["NAME" "OTHER"]]
+                           [:db/add 44 :predicates {:Key "val"}]])])
+
+
+
+      {:vintage 2013,
+       :values ["NAME" "STNAME" "CTYNAME" "POP"],
+       :sourcePath ["pep" "subcty"],
+       :geoHierarchy {:place "08000",
+                      :state "09",
+                      :county "001",
+                      :county-subdivision "08070"},
+       :predicates {:DATE "6"}})))
 
 (defn pull-geos
   "
