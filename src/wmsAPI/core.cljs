@@ -236,7 +236,7 @@
   (fn [I cb]                              ; returns a function with sync input  / callback for output
     (let [=O=    (<|/chan 1 (map ut/throw-err))
           =args= (<|/chan 1)              ; this is an add-on to engage wms if needed
-          args   (ut/args-digester I)]    ; converts any #js types to cljs with proper keys
+          args   (ut/js->args I)]    ; converts any #js types to cljs with proper keys
       (<|/go ((ut/I=O<<=IO= IO-census-wms) args =args=)
              (f =args= =O=)               ; apply the async I/O function with the internal `chan`s
              (<|/take! =O= #(do (cb %)    ; use async `take!` to allow lambdas/closures

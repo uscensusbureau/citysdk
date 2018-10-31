@@ -11,17 +11,19 @@
     [merger.core   :refer [IO-geo+stats]]
     [geojson.core  :refer [geo+config->mkdirp->fsW!]]))
 
+(def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
+
 (defun deploy-census-function
   "
   takes a pattern of args and deploys one of the various underlying functions
   of this library.
   "
   ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
-  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
   ([{:vintage _ :geoHierarchy _               :values _ :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
   ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :statsKey _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _                 }] :stats-only)
   ([{:vintage _ :geoHierarchy _               :values _ :statsKey _ :sourcePath _                 }] :stats-only)
+  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _ :geoResolution _}] :no-values)
+  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _                 }] :no-values)
   ([{:vintage _ :geoHierarchy _                                                   :geoResolution _}] :geos-only)
   ([{:vintage _ :geoHierarchy _                                                                   }] :geocodes)
   ([& anything-else] nil))
@@ -49,6 +51,7 @@
              (= deploy :stats-only) ((ut/I=O<<=IO= IO-pp->census-stats)   args =O=)
              (= deploy :geos-only)  ((ut/I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
              (= deploy :geocodes)   ((ut/I=O<<=IO= IO-census-wms)         args =O=)
+             (= deploy :no-values)  (<|/>! =O= err-no-values)
              :else (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
 
 
@@ -71,10 +74,12 @@
                :json (js/JSON.stringify (clj->js %))})))
       ((Icb<-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %))))))
 
+
+
 (type (clj->js "string"))
 (type (clj->js (js/console.log "test")))
 (comment
-  (census ts/args-ok-wms-only js/console.log)
+  (census ts/args-ok-wms-only prn)
   (census (ts/test-args 9 3 3 0) js/console.log)
   (census ts/args-ok-geo-only js/console.log)
   (census ts/args-ok-s+g-v+ps "./json/s-g.json")
@@ -82,4 +87,48 @@
   (census ts/args-ok-s+g-vals "./json/s_1.json")
   (census ts/args-na-sts-pred "./json/sts-pred.json")
   (census ts/args-ok-sts-v+ps js/console.log)
-  (census ts/args-ok-sts-vals js/console.log))
+  (census ts/args-ok-sts-vals js/console.log)
+  (census {:vintage 2016
+           :sourcePath ["acs" "acs5"]
+           :values ["B25001_001E"]
+           :geoHierarchy {:state "42"
+                          :county "003"
+                          :county-subdivision "*"}
+           :geoResolution "500k"
+           :statsKey stats-key}
+          "./json/Census_County-and-Subdivisions_.json")
+  (census {:vintage 2016
+           :sourcePath ["acs" "acs5"]
+           :values ["B25001_001E"]
+           :geoHierarchy {:state "42"
+                          :county "003"
+                          :tract "*"}
+           :geoResolution "500k"
+           :statsKey stats-key}
+          "./json/Census_County-and-Tracts_.json")
+  (census {:vintage 2016
+           :sourcePath ["acs" "acs5"]
+           :values ["B25001_001E"]
+           :geoHierarchy {:state "42"
+                          :county "003"
+                          :block-group "*"}
+           :geoResolution "500k"
+           :statsKey stats-key}
+          "./json/Census_County-and-Block-Groups_.json")
+  (census {:vintage 2016
+           :sourcePath ["acs" "acs5"]
+           :values ["B01001_001E"]
+           :geoHierarchy {:state "50"
+                          :school-district-_elementary_ "*"}
+           :geoResolution "500k"
+           :statsKey stats-key}
+          "./json/Census_State-and-School-Districts_.json")
+  (census {:vintage 2016
+           :sourcePath ["acs" "acs5"]
+           :values ["B25001_001E"]
+           :geoHierarchy {:zip-code-tabulation-area "*"}
+           :geoResolution "500k"
+           :statsKey stats-key}
+          "./json/Census_ZCTAs_.json"))
+
+

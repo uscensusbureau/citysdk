@@ -271,7 +271,7 @@
   "
   [=I= =O=]
   (<|/go (let [I          (<|/<! =I=)
-               args       (ut/args-digester I)
+               args       (ut/js->args I)
                ids        (get-geoid?s args)
                vars#      (+ (count (get args :values))
                              (count (get args :predicates)))
