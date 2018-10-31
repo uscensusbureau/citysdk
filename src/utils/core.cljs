@@ -10,12 +10,14 @@
     [linked.core :as linked]
     [clojure.walk :refer [postwalk]]
     [oops.core :as ob]
+    [cljs.reader :as r]
     [test.core :as ts]))
 
 (def base-url-stats "https://api.census.gov/data/")
-(def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services")
+(def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 (def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.edn")
+(def base-url-database "...")
 
 (def vec-type cljs.core/PersistentVector)
 
@@ -25,7 +27,7 @@
 
 (defn error
   [e]
-  (js/Error. (clj->js e)))
+  (js/Error. e))
 
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
@@ -155,28 +157,16 @@
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
 
-; Example ===============================
-
-#_(let [=URL= (chan 1)
-        =RES= (chan 1)]
-    (go (>! =URL= "https://api.census.gov/data/2016/acs/acs5/geography.json")
-        (IO-ajax-GET-json =URL= =RES=)
-        (pprint (<! =RES=))))
-; =>
-;{:fips
-; [{:name "us", :geoLevelDisplay "010", :referenceDate "2015-01-01"}
-;  {:name "region", :geoLevelDisplay "020", :referenceDate "2015-01-01"}
-;  {:name "division",
-;   :geoLevelDisplay "030",
-;   :referenceDate "2015-01-01"}
-;  {:name "state", :geoLevelDisplay "040", :referenceDate "2015-01-01"}
-;  {:name "county",
-;   :geoLevelDisplay "050",
-;   :referenceDate "2015-01-01",
-;   :requires ["state"],
-;   :wildcard ["state"],
-;   :optionalWithWCFor "state"}...]}
-; =======================================
+(defn IO-ajax-GET-edn
+  "
+  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
+  GET request to the provided URL and puts the response in the output (=O=) port.
+  "
+  [=URL= =RES=]
+  (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= (r/read-string r)) (<|/close! =RES=)))
+              :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
+              :keywords?       true}]
+    (<|/go (GET (<|/<! =URL=) args))))
 
 
 

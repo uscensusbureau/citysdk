@@ -5,7 +5,6 @@
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
     [cuerdas.core :as s]
-    [geojson.index :refer [geoKeyMap]]
     [linked.core :as linked]
     [com.rpl.specter :as sp]
     [utils.core :as ut]
@@ -15,37 +14,23 @@
   "
   Creates a configuration map for the WMS url-builder from the geoHierarchy map.
   "
-  {:test #(assert
-            (= (geoKey->wms-config
-                 {:vintage      "2016"
-                  :geoHierarchy {:county {:lat 3 :lng -7} :tract "*"}})
-               {:vintage       "2016"
-                :layers        ["84"]
-                :cur-layer-idx 0
-                :lat           3
-                :lng           -7
-                :sub-level     [:tract "*"]
-                :geo           [:STATE :COUNTY]
-                :lookup-up-in  :2010}))}
-  ([args] (geoKey->wms-config args 0))
-  ([{:keys [geoHierarchy vintage]} server-index]
+  ([geoK args] (geoKey->wms-config geoK args 0))
+  ([geoK {:keys [geoHierarchy vintage]} server-index]
    (let [[[scope {:keys [lat lng]}] sub-level] (vec geoHierarchy)
-         {:keys [lookup layers]} (get-in geoKeyMap
-                                         [scope (keyword (str vintage))
-                                          :wms])
-         res {:vintage       vintage
-              :layers        layers
-              :cur-layer-idx server-index
-              :lat           lat
-              :lng           lng
-              :sub-level     sub-level}]
+         {:keys [lookup layers]}               (get-in geoK [scope (keyword (str vintage)) :wms])
+         res                                   {:vintage       vintage
+                                                :layers        layers
+                                                :cur-layer-idx server-index
+                                                :lat           lat
+                                                :lng           lng
+                                                :sub-level     sub-level}]
      (if (instance? ut/vec-type lookup)
-       (merge-with assoc res
-                   {:geo          lookup
-                    :looked-up-in (keyword vintage)})
-       (merge-with assoc res
-                   {:geo          (get-in geoKeyMap [scope lookup :id<-json])
-                    :lookup-up-in lookup})))))
+         (merge-with assoc res
+                     {:geo          lookup
+                      :looked-up-in (keyword vintage)})
+         (merge-with assoc res
+                     {:geo          (get-in geoK [scope lookup :id<-json])
+                      :lookup-up-in lookup})))))
 
 ;(test geoKey->wms-config)
 
@@ -69,15 +54,8 @@
   Searches the entire geoKeyMap (inverted) for a geo key match provided a given
   WMS GEO-KEY.
   "
-  {:test #(assert
-            (and (= (search-id->match? :CONCITY)
-                    '(:consolidated-cities))
-                 (= (search-id->match? :COUNTY)
-                    '(:county))
-                 (= (search-id->match? :ZCTA5)
-                    '(:zip-code-tabulation-area))))}
-  [GEO-KEY]
-  (let [inverted-geoKeyMap (seq (map-invert geoKeyMap))]
+  [geoK GEO-KEY]
+  (let [inverted-geoKeyMap (seq (map-invert geoK))]
     (remove nil? (map #(lookup-id->match? GEO-KEY %)
                       inverted-geoKeyMap))))
 
@@ -85,30 +63,15 @@
 
 
 (defn wms-url-builder
-  {:test #(assert
-            (= (wms-url-builder
-                 {:vintage      2010
-                  :geoHierarchy {:county {:lat 38.8816 :lng -77.091}
-                                 :tract "*"}})
-               (str "https://tigerweb.geo.census.gov/arcgis/rest/services"
-                     "/TIGERweb/tigerWMS_Census2010/Mapserver/100/query?"
-                     "geometry=-77.091,38.8816"
-                     "&geometryType=esriGeometryPoint"
-                     "&inSR=4269"
-                     "&spatialRel=esriSpatialRelIntersects"
-                     "&returnGeometry=false"
-                     "&f=pjson"
-                     "&outFields=STATE,COUNTY")))}
-
-  ([args] (wms-url-builder args 0))
-  ([args server-index]
+  ([geoK args] (wms-url-builder geoK args 0))
+  ([geoK args server-index]
    (let [{:keys [vintage layers cur-layer-idx lat lng geo]}
-         (geoKey->wms-config args server-index)]
+         (geoKey->wms-config geoK args server-index)]
      (str ut/base-url-wms
           (cond
-            (= "2010" (str vintage)) (str "/TIGERweb/tigerWMS_Census2010")
-            (= "2000" (str vintage)) (str "/Census2010/tigerWMS_Census2000")
-            :else                    (str "/TIGERweb/tigerWMS_ACS" vintage))
+            (= "2010" (str vintage)) (str "TIGERweb/tigerWMS_Census2010")
+            (= "2000" (str vintage)) (str "Census2010/tigerWMS_Census2000")
+            :else                    (str "TIGERweb/tigerWMS_ACS" vintage))
           "/Mapserver/"
           (get layers cur-layer-idx)
           "/query?"
@@ -126,13 +89,10 @@
 
 
 (defn configed-map
-  {:test #(assert
-            (= (configed-map {:STATE "51", :COUNTY "013"})
-               {:STATE {:state "51"}, :COUNTY {:county "013"}}))}
-  [attrs]
+  [geoK attrs]
   (let [wms-keys (sp/select sp/MAP-KEYS attrs)
         wms-vals (sp/select sp/MAP-VALS attrs)
-        geo-keys (map #(search-id->match? %) wms-keys)]
+        geo-keys (map #(search-id->match? geoK %) wms-keys)]
     ;(prn wms-keys wms-vals geo-keys)
     (loop [idx 0
            result {}]
@@ -162,9 +122,9 @@
 
 
 (defn try-census-wms
-  [args server-idx =res=]
-  (<|/go (let [=args= (<|/chan 1 (map #(configed-map (get-in % [:features 0 :attributes]))))
-               url (wms-url-builder args server-idx)]
+  [geoK args server-idx =res=]
+  (<|/go (let [=args= (<|/chan 1 (map #(configed-map geoK (get-in % [:features 0 :attributes]))))
+               url (wms-url-builder geoK args server-idx)]
            ((ut/I=O<<=IO= ut/IO-ajax-GET-json) url =args=)
            (<|/>! =res= (<|/<! =args=))
            (<|/close! =args=))))
@@ -187,33 +147,36 @@
 
 ;(test wms-engage?)
 
-
 (defn IO-census-wms
   [=args-in= =args-out=]
-  (<|/go (let [args- (<|/<! =args-in=)
-               =res= (<|/chan 1)]
-           (if (wms-engage? args-)
-               (loop [args args-
-                      idx 0]
-                 (try-census-wms args idx =res=)
-                 (let [{:keys [layers sub-level]} (geoKey->wms-config args)
-                       result (<|/<! =res=)]
-                      (cond
-                        (not (empty? result))
-                        (do (<|/>! =args-out=
-                                   (sp/transform :geoHierarchy #(into {} %)
-                                     (sp/setval :geoHierarchy
-                                       (conj (linked/map)
-                                         (into (linked/map) (sp/traverse sp/MAP-VALS result))
-                                         (into (linked/map) [sub-level]))
-                                       args)))
-                            (<|/close! =res=))
-                        (and (empty? result) (not (nil? (get layers (inc idx)))))
-                        (recur args (inc idx))
-                        :else (do (<|/>! =args-out= (str "No Geography found for this lat/lng pair"))
-                                  (<|/close! =res=)))))
-               (do (<|/>! =args-out= args-)
-                   (<|/close! =res=))))))
+  (let [=geo= (<|/chan 1)]
+    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    (<|/go (let [args- (<|/<! =args-in=)
+                 geoK  (<|/<! =geo=)
+                 =res= (<|/chan 1)]
+             (if (wms-engage? args-)
+                 (loop [args args-
+                        idx 0]
+                   (try-census-wms geoK args idx =res=)
+                   (let [{:keys [layers sub-level]} (geoKey->wms-config geoK args)
+                         result (<|/<! =res=)]
+                        (cond
+                          (not (empty? result))
+                          (do (<|/>! =args-out=
+                                     (sp/transform :geoHierarchy #(into {} %)
+                                       (sp/setval :geoHierarchy
+                                         (conj (linked/map)
+                                           (into (linked/map) (sp/traverse sp/MAP-VALS result))
+                                           (into (linked/map) [sub-level]))
+                                         args)))
+                              (<|/close! =res=))
+                          (and (empty? result) (not (nil? (get layers (inc idx)))))
+                          (recur args (inc idx))
+                          :else (do (<|/>! =args-out= (str "No Geography found for this lat/lng pair"))
+                                    (<|/close! =res=)))))
+                 (do (<|/>! =args-out= args-)
+                     (<|/close! =res=)
+                     (<|/close! =geo=)))))))
 
 
 #_(let [args ts/test-args-1
