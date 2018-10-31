@@ -109,6 +109,11 @@
            (<|/close! =url=))))
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 
+(let [I (<|/chan 1)
+      O (<|/chan 1)]
+  (<|/go (<|/>! I "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.cljs")
+         (ut/IO-ajax-GET-json I O)
+         (prn (<|/<! O))))
 ;; Examples ==============================
 
 #_(let [=I= (<|/chan 1)
