@@ -13,7 +13,7 @@
 (defn stats-url-builder
   "Composes a URL to call Census' statistics API"
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
-  (str "https://api.census.gov/data/"
+  (str ut/base-url-stats
        (str vintage)
        (s/join (map #(str "/" %) sourcePath))
        "?get="

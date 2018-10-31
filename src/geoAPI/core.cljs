@@ -7,15 +7,15 @@
     [geojson.index :refer [geoKeyMap]]
     [wmsAPI.core :as wms]
     [utils.core :as ut]
-    [test.core :as ts]))
+    [test.core :as ts]
+    [cljs.reader :as r]
+    [ajax.core :refer [GET POST]]))
 
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 (comment
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
 
-
-(def base-url "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 
 (defn geo-error
   [res vin lev] ; FIXME add geoKeyMap as argument --------------------------------------------------------------------------
@@ -37,8 +37,8 @@
   ([res vin lev] (geo-url-builder res vin lev nil))
   ([res vin lev st]
    (if (nil? st)
-     (str (s/join "/" [base-url res vin (name lev)]) ".json")
-     (str (s/join "/" [base-url res vin st (name lev)]) ".json"))))
+     (str (s/join "/" [ut/base-url-geojson res vin (name lev)]) ".json")
+     (str (s/join "/" [ut/base-url-geojson res vin st (name lev)]) ".json"))))
 
 (defn geo-scoper
   ([res vin lev USr]     (geo-scoper res vin lev USr nil nil))
@@ -109,11 +109,23 @@
            (<|/close! =url=))))
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 
+(defn IO-ajax-GET-edn
+  "
+  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
+  GET request to the provided URL and puts the response in the output (=O=) port.
+  "
+  [=URL= =RES=]
+  (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
+              :error-handler   (fn [e] (<|/go (<|/>! =RES= (ut/error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
+              :keywords?       true}]
+    (<|/go (GET (<|/<! =URL=) args))))
+
+
 (let [I (<|/chan 1)
       O (<|/chan 1)]
-  (<|/go (<|/>! I "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.cljs")
-         (ut/IO-ajax-GET-json I O)
-         (prn (<|/<! O))))
+  (<|/go (<|/>! I "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.edn")
+         (IO-ajax-GET-edn I O)
+         (prn (get-in (r/read-string (<|/<! O)) [:county]))))
 ;; Examples ==============================
 
 #_(let [=I= (<|/chan 1)
