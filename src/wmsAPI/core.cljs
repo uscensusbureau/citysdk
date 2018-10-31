@@ -11,8 +11,6 @@
     [utils.core :as ut]
     [test.core :as ts]))
 
-(def base-url "https://tigerweb.geo.census.gov/arcgis/rest/services")
-
 (defn geoKey->wms-config
   "
   Creates a configuration map for the WMS url-builder from the geoHierarchy map.
@@ -106,7 +104,7 @@
   ([args server-index]
    (let [{:keys [vintage layers cur-layer-idx lat lng geo]}
          (geoKey->wms-config args server-index)]
-     (str base-url
+     (str ut/base-url-wms
           (cond
             (= "2010" (str vintage)) (str "/TIGERweb/tigerWMS_Census2010")
             (= "2000" (str vintage)) (str "/Census2010/tigerWMS_Census2000")

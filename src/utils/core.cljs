@@ -12,6 +12,10 @@
     [oops.core :as ob]
     [test.core :as ts]))
 
+(def base-url-stats "https://api.census.gov/data/")
+(def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services")
+(def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
+(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.edn")
 
 (def vec-type cljs.core/PersistentVector)
 
