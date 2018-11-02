@@ -7,7 +7,7 @@
     [cuerdas.core :as s]
     [linked.core :as linked]
     [com.rpl.specter :as sp]
-    [utils.core :as ut]
+    [utils.core :as ut :refer [$geoKeyMap$]]
     [test.core :as ts]))
 
 (defn geoKey->wms-config
@@ -150,7 +150,7 @@
 (defn IO-census-wms
   [=args-in= =args-out=]
   (let [=geo= (<|/chan 1)]
-    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= ut/IO-cache-GET-edn) ut/base-url-geoKeyMap =geo= $geoKeyMap$)
     (<|/go (let [args- (<|/<! =args-in=)
                  geoK  (<|/<! =geo=)
                  =res= (<|/chan 1)]
@@ -204,10 +204,3 @@
                                 (<|/close! =O=)
                                 (<|/close! =args=)))))))
 
-
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~

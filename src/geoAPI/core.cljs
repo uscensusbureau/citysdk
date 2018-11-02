@@ -5,7 +5,7 @@
     [defun.core :refer-macros [defun]]
     [geojson.core :refer [geo+config->mkdirp->fsW!]]
     [wmsAPI.core :as wms]
-    [utils.core :as ut]
+    [utils.core :as ut :refer [$geoKeyMap$]]
     [test.core :as ts]))
 
 
@@ -102,7 +102,7 @@
   [=I= =O=]
   (let [=geo= (<|/chan 1)
         =url= (<|/chan 1)]
-    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= ut/IO-cache-GET-edn) ut/base-url-geoKeyMap =geo= $geoKeyMap$)
     (<|/go (let [args  (<|/<! =I=)
                  geoK  (<|/<! =geo=)
                  url   (geo-url-composer geoK args)]
@@ -119,17 +119,15 @@
 
 ;; Examples ==============================
 
-#_(let [=geo= (<|/chan 1)]
-    (<|/go ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
-           (prn (get-in (<|/<! =geo=) [:county]))))
+
 
 #_(prn ts/test-args-5)
 
 #_(let [=I= (<|/chan 1)
         =O= (<|/chan 1 (map ut/throw-err))]
-    (<|/go (<|/>! =I= ts/test-args-4)
+    (<|/go (<|/>! =I= ts/test-args-6)
            (IO-pp->census-GeoJSON =I= =O=)
-           (js/console.log (<|/<! =O=))
+           (prn (<|/<! =O=))
            (<|/close! =I=)
            (<|/close! =O=)))
 

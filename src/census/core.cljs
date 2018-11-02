@@ -11,6 +11,7 @@
     [merger.core   :refer [IO-geo+stats]]
     [geojson.core  :refer [geo+config->mkdirp->fsW!]]))
 
+
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
 
 (defun deploy-census-function

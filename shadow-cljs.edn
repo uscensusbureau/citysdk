@@ -8,7 +8,8 @@
                 [jamesmacaulay/cljs-promises "0.1.0"]
                 [com.rpl/specter "1.1.1"]
                 [frankiesardo/linked "1.3.0"]
-                [datascript "0.16.6"]]
+                [datascript "0.16.6"]
+                [org.clojars.mmb90/cljs-cache "0.1.4"]]
  :nrepl        {:port 3333}
  :builds       {:lib {:target           :node-library
                       :output-dir       "public/node"

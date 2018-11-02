@@ -8,11 +8,12 @@
     [com.rpl.specter :as sp]
     [cljs.pprint :refer [pprint]]
     [linked.core :as linked]
-    [clojure.walk :refer [postwalk]]
     [oops.core :as ob]
     [cljs.reader :as r]
     [test.core :as ts]
     ["fs" :as fs]))
+
+(def $geoKeyMap$ (atom {}))
 
 (def base-url-stats "https://api.census.gov/data/")
 (def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
@@ -167,10 +168,44 @@
   GET request to the provided URL and puts the response in the output (=O=) port.
   "
   [=URL= =RES=]
-  (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= (r/read-string r)) (<|/close! =RES=)))
-              :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
-              :keywords?       true}]
+  (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
+                                              (<|/close! =RES=)))
+              :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
+                                              (<|/close! =RES=)))}]
     (<|/go (GET (<|/<! =URL=) args))))
+
+
+(defn IO-cache-GET-edn
+  "
+  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
+  GET request to the provided URL and puts the response in the output (=O=) port.
+  "
+  [=URL= =RES= cache]
+  (if (= @cache {})
+      (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
+                                                  (reset! cache (r/read-string r))
+                                                  (<|/close! =RES=)))
+                  :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
+                                                  (<|/close! =RES=)))}]
+           (<|/go (GET (<|/<! =URL=) args)))
+      (<|/go (<|/>! =RES= @cache)
+             (<|/close! =RES=))))
+
+;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
+;       888     d888   \  888   \   d888   \
+;       888    88888    | 888    | 88888    |
+;       888    88888    | 888    | 88888    |
+;       888     Y888   /  888   /   Y888   /
+;       888      `88_-~   888_-~     `88_-~
+
+
+#_(let [=O= (<|/chan 1)
+        =I= (<|/chan 1)]
+    (<|/go (<|/>! =I= base-url-geoKeyMap)
+           (IO-cache-GET-edn =I= =O= $geoKeyMap$)
+           (prn (<|/<! =O=))
+           (<|/close! =I=)
+           (<|/close! =O=)))
 
 
 
@@ -237,38 +272,39 @@
   This is good for kicking off async functions, but also is the required
   signature/contract for `pipeline-async`.
   "
-  [f]                       ; takes an async I/O function
-  (fn [I =O=]               ; returns a function with a sync input / `chan` output
-    (let [=I= (<|/chan 1)]     ; create internal `chan`
-      (<|/go (<|/>! =I= I)        ; put sync `I` into `=I=`
-             (f =I= =O=)       ; call the wrapped function with the newly created `=I=`
-             (<|/close! =I=)))))  ; close the port to flush out values
-;; Tested 1: working
+  [f]                            ; takes an async I/O function
+  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
+    (let [=I= (<|/chan 1)]       ; create internal `chan`
+      (<|/go (<|/>! =I= I)       ; put sync `I` into `=I=`
+             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
+             (<|/close! =I=))))) ; close the port to flush out values
+
+;; Tested: working
+
 
 (defn Icb<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
-  input and expose the output to a callback. Note the async `take!` operation on
-  the `=O=` port, which will stall if >1024 are pending (not enough puts to the
-  chan). This is necessary as `go` blocks will not correctly evaluate a callback
-  with an internal anonymous function/closure (`(fn ...)`).
+  input and expose the output to a callback and converts any #js args to proper
+  cljs syntax (with keyword translation)
 
   This is good for touch & go asynchronous functions, which do not require
   'enduring relationships' or concerted application between other async
   functions (e.g., exposing asynchronous functions as a library).
   "
   [f]                                           ; takes an async I/O function
-  (fn [I cb]                                    ; returns a function with sync input  / callback for output
+  (fn [I cb ?state]                             ; returns a function with sync input  / callback for output
     (let [=I=  (<|/chan 1)                      ; create two internal `chan`s for i/o
           =O=  (<|/chan 1 (map throw-err))
-          args (js->args I)]               ; converts any #js types to cljs with proper keys
+          args (js->args I)]                    ; converts any #js types to cljs with proper keys
       (<|/go (<|/>! =I= args)
-             (f =I= =O=)                        ; apply the async I/O function with the internal `chan`s
+             (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
              (<|/take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
                                 (<|/close! =I=) ; close the ports to flush the values
                                 (<|/close! =O=)))))))
 
-;; Tested 1: working
+;; Tested: working
+
 
 (defn xf<<
   "
@@ -288,7 +324,8 @@
       ([] (rf))
       ([result] (rf result))
       ([result input] (f rf result input)))))
-;; Tested 1: working
+
+;; Tested: working
 
 (defn xf!<<
   "
@@ -315,6 +352,7 @@
         ([] (rf))
         ([result] (rf result))
         ([result input] (f state rf result input))))))
+
 ;; Tested 1: working
 
 

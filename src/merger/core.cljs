@@ -6,7 +6,7 @@
     [clojure.repl :refer [source]]
     [test.core :as ts :refer [stats-key]]
     [wmsAPI.core :as wms]
-    [utils.core :as ut]
+    [utils.core :as ut :refer [$geoKeyMap$]]
     [geoAPI.core :refer [IO-pp->census-GeoJSON]]
     [statsAPI.core :refer [IO-pp->census-stats]]
     [geojson.core :refer [geo+config->mkdirp->fsW!]]))
@@ -274,7 +274,7 @@
   "
   [=I= =O=]
   (let [=geo= (<|/chan 1)]
-    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= ut/IO-cache-GET-edn) ut/base-url-geoKeyMap =geo= $geoKeyMap$)
     (<|/go (let [I          (<|/<! =I=)
                  geoK       (<|/<! =geo=)
                  args       (ut/js->args I)
@@ -331,48 +331,3 @@
    :3 "`async/map closes =merged= automatically when either input chan (=stats= or =features=) is closed"
    :4 "pipline-async (used internally by `IO-...` functions) closes the to (=O=) channels (=stats= & =features=) upon closing this"})
 
-
-
-
-
-
-
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~
-
-
-;; Examples ==============================
-
-#_(let [=I= (chan 1)
-        =O= (chan 1)]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}
-                 :statsKey     stats-key})
-        (IO-pp->census-stats =I= =O=)
-        ;; TODO handle bad requests...
-        ;(if (= (type (<! =O=)) cljs.core/List) ;
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
-
-#_(type (quote ({:B01001_001E 494981,
-                 :NAME "State Senate District 40 (2016), Florida",
-                 :B00001_001E 29661,
-                 :state "12",
-                 :state-legislative-district-_upper-chamber_ "040"}
-                {:B01001_001E 492259,
-                 :NAME "State Senate District 36 (2016), Florida",
-                 :B00001_001E 29475,
-                 :state "12",
-                 :state-legislative-district-_upper-chamber_ "036"})))
-
-;; =======================================
