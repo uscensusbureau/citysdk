@@ -1,6 +1,6 @@
 {
-  "name": "census-geojson",
-  "version": "0.0.1",
+  "name": "census-sdk",
+  "version": "0.2.2",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,6 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
-    "shadow-cljs": "^2.6.10"
+    "shadow-cljs": "^2.7.0"
   }
 }

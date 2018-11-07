@@ -3,13 +3,13 @@
     [cljs.core.async :as <|]
     [defun.core :refer-macros [defun]]
     [cuerdas.core :as s]
-    [utils.core :as ut]
-    [test.core :as ts :refer [stats-key]]
-    [wmsAPI.core   :refer [IO-census-wms Icb<-args<<=IO=]]
-    [geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [statsAPI.core :refer [IO-pp->census-stats]]
-    [merger.core   :refer [IO-geo+stats]]
-    [geojson.core  :refer [geo+config->mkdirp->fsW!]]))
+    [census.utils.core :as ut]
+    [census.test.core :as ts :refer [stats-key]]
+    [census.wmsAPI.core   :refer [IO-census-wms Icb<-args<<=IO=]]
+    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
+    [census.statsAPI.core :refer [IO-pp->census-stats]]
+    [census.merger.core   :refer [IO-geo+stats]]
+    [census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -44,7 +44,7 @@
 
 (defn IO-census
   [=I= =O=]
-  (<|/go (let [args (<|/<! =I=)
+  (<|/go (let [args   (<|/<! =I=)
                deploy (deploy-census-function args)]
            (prn deploy)
            (cond
@@ -64,7 +64,7 @@
            (<|/close! =I=)
            (<|/close! =O=)))
 
-(defn census
+(defn ^:export census
   [I cb?]
   (if (= (type cb?) js/String)
       (let [directory (str (s/join "/" (butlast (s/split cb? "/"))) "/")]

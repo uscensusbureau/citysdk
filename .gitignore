@@ -3,5 +3,5 @@ node_modules
 .shadow-cljs
 .env
 projectFilesBackup
-test
+census/test
 .gitattributes

@@ -1,0 +1,1 @@
+{"version":3,"sources":["shadow/umd_helper.cljs"],"sourcesContent":["[(ns shadow.umd-helper (:require [main.core])) (clojure.core/defn get-exports [] (cljs.core/js-obj \"main\" main.core/node))]"],"mappings":"","names":[]}

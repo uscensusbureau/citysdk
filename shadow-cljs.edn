@@ -6,14 +6,18 @@
                 [binaryage/oops "0.6.2"]
                 [defun "0.3.0-RC1"]
                 [jamesmacaulay/cljs-promises "0.1.0"]
-                [com.rpl/specter "1.1.1"]
+                [com.rpl/specter "1.1.2"]
                 [frankiesardo/linked "1.3.0"]
-                [datascript "0.16.6"]
-                [org.clojars.mmb90/cljs-cache "0.1.4"]]
+                [datascript "0.16.6"]]
  :nrepl        {:port 3333}
- :builds       {:lib {:target           :node-library
-                      :output-dir       "node_modules/aa_logan"
-                      ;:output-to        "src/dist/test.js"
-                      ;:entries          [test.core]
-                      :compiler-options {:pretty-print true}
-                      :exports  {:add-logan test.core/logan-add}}}}
+ :builds       {:lib    {:target           :node-library
+                         :output-dir       "public/node"
+                         :output-to        "public/node/main.js"
+                         :compiler-options {:pretty-print true}
+                         :exports          {:main main.core/node}}}}
+                ;:census {:target           :node-library
+                ;         :output-to        "out/census.js"
+                ;         ;:entries          [census.test.core]
+                ;         :compiler-options {:optimizations :advanced}
+                ;         ;:pretty-print true}
+                ;         :exports-var      census.core/census}}}
