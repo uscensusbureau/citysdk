@@ -1,9 +1,11 @@
 (ns utils.core
+  (:refer-clojure :exclude [resolve])
   (:require
     [cljs.core.async :as <|]
     [cljs.test
      :refer-macros [deftest is run-tests async testing]]
     [ajax.core :refer [GET POST]]
+    [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
     [cuerdas.core :as s]
     [com.rpl.specter :as sp]
     [cljs.pprint :refer [pprint]]
@@ -12,6 +14,8 @@
     [cljs.reader :as r]
     [test.core :as ts]
     ["fs" :as fs]))
+
+
 
 (def $geoKeyMap$ (atom {}))
 
@@ -157,22 +161,11 @@
   (let [args {:response-format :json
               :handler         (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
               :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
-              :keywords?       true}]
+              :keywords?       true
+              :api             (js/XMLHttpRequest.)}] ; for WebWorker compatibility
     (<|/go (GET (<|/<! =URL=) args))))
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
-
-(defn IO-ajax-GET-edn
-  "
-  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
-  GET request to the provided URL and puts the response in the output (=O=) port.
-  "
-  [=URL= =RES=]
-  (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
-                                              (<|/close! =RES=)))
-              :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
-                                              (<|/close! =RES=)))}]
-    (<|/go (GET (<|/<! =URL=) args))))
 
 
 (defn IO-cache-GET-edn
@@ -181,12 +174,12 @@
   GET request to the provided URL and puts the response in the output (=O=) port.
   "
   [=URL= =RES= cache]
-  (if (= @cache {})
-      (let [args {:handler         (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
-                                                  (reset! cache (r/read-string r))
-                                                  (<|/close! =RES=)))
-                  :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
-                                                  (<|/close! =RES=)))}]
+  (if (empty? @cache)
+      (let [args {:handler       (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
+                                                (reset! cache (r/read-string r))
+                                                (<|/close! =RES=)))
+                  :error-handler (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
+                                                (<|/close! =RES=)))}]
            (<|/go (GET (<|/<! =URL=) args)))
       (<|/go (<|/>! =RES= @cache)
              (<|/close! =RES=))))
@@ -282,7 +275,7 @@
 ;; Tested: working
 
 
-(defn Icb<<=IO=
+(defn args+cb<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
   input and expose the output to a callback and converts any #js args to proper
@@ -305,6 +298,54 @@
 
 ;; Tested: working
 
+(defn js-I=O<<=IO=
+  "
+  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
+  input, which converts values from =I= channel to js arguments. Created
+  initially for async js library (e.g., `workerpool`) interop.
+  "
+  [f]                            ; takes an async I/O function
+  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
+    (let [=I= (<|/chan 1)
+          js-args (clj->js I)]       ; create internal `chan`
+      (<|/go (<|/>! =I= js-args)       ; put sync `I` into `=I=`
+             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
+             (<|/close! =I=))))) ; close the port to flush out values
+
+(defn =IO<-js-<3-fn
+  [<3-fn]
+  (fn [=I= =O=]
+    (<|/go (let [[val err] (<|/<! (cpa/pair-port (<3-fn (<|/<! =I=))))]
+                (if (= val nil)
+                    (<|/>! =O= err)
+                    (<|/>! =O= (js->clj val)))))))
+
+; Examples =======================================
+
+#_(defn test-promise
+    [?happy?]
+    (js/Promise. (fn [resolve reject]
+                     (let [answer "This promise was "]
+                          (if (= ?happy? "happy")
+                              (resolve (str answer "resolved!"))
+                              (reject  (js/Error. (str answer "rejected :("))))))))
+
+
+#_(-> (test-promise "happy")
+      (.then (fn [fulfilled] (prn fulfilled))))
+
+#_(-> (test-promise "poop")
+      (.then (fn [fulfilled] (js/console.log fulfilled)))
+      (.catch (fn [error]    (js/console.log error))))
+
+
+
+#_(let [=O= (<|/chan 1 (map throw-err))]
+    (<|/go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
+           (prn (<|/<! =O=))
+           (<|/close! =O=)))
+
+; ==================================================
 
 (defn xf<<
   "

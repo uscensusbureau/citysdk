@@ -30,7 +30,7 @@ Notes:
 
 `*`  : `predicates` are optional 
 
-`**` : `statsKey` is optional for > 500 requests daily
+`**` : `statsKey` is optional for < 500 requests daily
 
 ## Census Geocoding
 

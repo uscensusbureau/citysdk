@@ -41,7 +41,8 @@ Then inside the "hrefs.txt" file, need to do some cleanup:
   - regex for all examples that don't qualify `&in=`s fully [replace with `0&in=`, `1&in=`, etc..]: 
     -`0( )`, `1( )`, ... `9( )`
   - regex for certain AIAN areas SLDS [replace with `A&in=`, etc..] requires Sublime Regex + Casesensitive selection: 
-    - `A( )`, `B( )`, `C( )`, `R( )`, `T( )`, `U( )`  
+    - `A( )`, `B( )`, `C( )`, `R( )`, `T( )`, `U( )` 
+  - TODO: Next time try a negative lookbehind for lowercase letters: `(?<![a-z])( )`  
     
 ## DataScript
 

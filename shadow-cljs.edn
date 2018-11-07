@@ -12,7 +12,8 @@
                 [org.clojars.mmb90/cljs-cache "0.1.4"]]
  :nrepl        {:port 3333}
  :builds       {:lib {:target           :node-library
-                      :output-dir       "public/node"
-                      :output-to        "public/node/main.js"
+                      :output-dir       "node_modules/aa_logan"
+                      ;:output-to        "src/dist/test.js"
+                      ;:entries          [test.core]
                       :compiler-options {:pretty-print true}
-                      :exports          {:main main.core/node}}}}
+                      :exports  {:add-logan test.core/logan-add}}}}

@@ -323,9 +323,9 @@
   [val =port=]
   (prn (str "zip->json'ing..."))
   (<|/take! (cpa/value-port (shpjs val))
-         (fn [res] (<|/put! =port=
-                            (js/JSON.stringify res)
-                            #(<|/close! =port=)))))
+            (fn [res] (<|/put! =port=
+                               (js/JSON.stringify res)
+                               #(<|/close! =port=)))))
 
 ;; Examples ========================================
 

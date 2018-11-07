@@ -1,7 +1,7 @@
 {
   "name": "census-geojson",
   "version": "0.0.1",
-  "description": "Functions and assets for Census TigerLine Boundary files conversion from shapefile to GeoJSON format",
+  "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,6 +29,7 @@
     "dotenv": "^5.0.1",
     "mkdirp": "^0.5.1",
     "shpjs": "^3.4.2",
+    "workerpool": "^2.3.3",
     "xmlhttprequest": "^1.8.0",
     "xregexp": "^4.2.0"
   },

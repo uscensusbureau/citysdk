@@ -213,66 +213,66 @@
     ;[(vec vin+srcPath-parts)
     ; (vec vals+for+ins-parts)]))
 
-(comment
-  An example of a string input
-  "https://api.census.gov/data/2013/pep/subcty?get=NAME,STNAME,CTYNAME,POP&for=place:08000&in=state:09&in=county:001&in=county subdivision:08070&DATE=6"
-  Step one:
-  Run through each example string and pull out each of the geography components, `conj`ing them into a set as
-  - Schema
-    - geography = `:db.unique/value` or `:db.unique/identity`
-    {:geography      {:db/unique :db.unique/identity}
-     :geographies    {:db/valueType :db.type/ref
-                      :db/cardinality :db.cardinality/many}
-     :resolution     {:db/unique :db.unique/identity}
-     :geoResolution  {:db/valueType :db.type/ref
-                      :db/cardinality :db.cardinality/many}
-     :vintage        {:db/valueType :db.type/long}
+;(comment
+;  An example of a string input
+;  "https://api.census.gov/data/2013/pep/subcty?get=NAME,STNAME,CTYNAME,POP&for=place:08000&in=state:09&in=county:001&in=county subdivision:08070&DATE=6"
+;  Step one:
+;  Run through each example string and pull out each of the geography components, `conj`ing them into a set as
+;  - Schema
+;    - geography = `:db.unique/value` or `:db.unique/identity`
+;    {:geography      {:db/unique :db.unique/identity}
+;     :geographies    {:db/valueType :db.type/ref
+;                      :db/cardinality :db.cardinality/many}
+;     :resolution     {:db/unique :db.unique/identity}
+;     :geoResolution  {:db/valueType :db.type/ref
+;                      :db/cardinality :db.cardinality/many}
+;     :vintage        {:db/valueType :db.type/long}
+;
+;     :db/unique :db.unique/identity}
+;    {:db/id -1
+;     :example/geography :county}
+;  - Database
+;  {:db/id -1
+;   :example/geoHierarchy [:example/geography :county]
+;   :example/variables}
+;  The import data shape I need
+;  [{:db/id -1                                      ; each unique geography is id'ed
+;    :geo :first}
+;   {:db/id -2
+;    :geo :second}
+;   {:db/id -3                                      ; each resolution is id'ed
+;    :resolution "500k"}
+;   {:db/id -6                                      ; each example is an entity
+;    :vintage 2016
+;    :geoHierarchy {:first "first" :second "second"}
+;    :geos [-1 -2]                                  ; queryable geos by :key "?"
+;    :values ["first" "second"]                     ; not queryable
+;    :predicates {:key "val"}                       ; not queryable
+;    :geoResolutions [-3]                           ; queryable by :geoResolution "?"
+;    :sourcePath ["acs" "acs5"]}])                  ; exact match required
 
-     :db/unique :db.unique/identity}
-    {:db/id -1
-     :example/geography :county}
-  - Database
-  {:db/id -1
-   :example/geoHierarchy [:example/geography :county]
-   :example/variables}
-  The import data shape I need
-  [{:db/id -1                                      ; each unique geography is id'ed
-    :geo :first}
-   {:db/id -2
-    :geo :second}
-   {:db/id -3                                      ; each resolution is id'ed
-    :resolution "500k"}
-   {:db/id -6                                      ; each example is an entity
-    :vintage 2016
-    :geoHierarchy {:first "first" :second "second"}
-    :geos [-1 -2]                                  ; queryable geos by :key "?"
-    :values ["first" "second"]                     ; not queryable
-    :predicates {:key "val"}                       ; not queryable
-    :geoResolutions [-3]                           ; queryable by :geoResolution "?"
-    :sourcePath ["acs" "acs5"]}])                  ; exact match required
-
-(comment
-  Pseudo:
-  1 create a defun that deploys this function on "?" args to one or more parameters
-  2 like the wmsAPI, all this does is take args and return args - filled in with examples
-  3 Create a map for this use (batch process ?)
-  example inputs and outputs
-
-  {:vintage "?",
-   :sourcePath "?",
-   :geoHierachy "?",
-   :geoResolution "?",
-   :predicates "?",
-   :values "?"}
-  => search space
-  [{:vintage 1998,
-    :geoHierachy {:state "01", :county "001"},
-    :sourcePath ["acs" "acs5"],
-    :geoResolution "500k",
-    :predicates {:B00001_001E "0:1000000"},
-    :values ["NAME"]}
-   {...}
-   ...] vector of maps sourced from "api.census.gov/data.json")
+;(comment
+;  Pseudo:
+;  1 create a defun that deploys this function on "?" args to one or more parameters
+;  2 like the wmsAPI, all this does is take args and return args - filled in with examples
+;  3 Create a map for this use (batch process ?)
+;  example inputs and outputs
+;
+;  {:vintage "?",
+;   :sourcePath "?",
+;   :geoHierachy "?",
+;   :geoResolution "?",
+;   :predicates "?",
+;   :values "?"}
+;  => search space
+;  [{:vintage 1998,
+;    :geoHierachy {:state "01", :county "001"},
+;    :sourcePath ["acs" "acs5"],
+;    :geoResolution "500k",
+;    :predicates {:B00001_001E "0:1000000"},
+;    :values ["NAME"]}
+;   {...}
+;   ...] vector of maps sourced from "api.census.gov/data.json")
 
 ; Searchable vector of maps: how to store all the results so that any part can be queried the same way?
 
@@ -286,30 +286,30 @@
 ;                                                                888
 
 
-[{:vintage 2016,
-  :geoHierachy {:state "01", :county "001"},
-  :sourcePath ["acs" "acs5"],
-  :geoResolution "500k",
-  :predicates {:B00001_001E "0:1000000"},
-  :values ["NAME"]}
- {:vintage 2016,
-  :geoHierachy {:state "01", :county "001"},
-  :sourcePath ["acs" "acs5"],
-  :geoResolution "500k",
-  :predicates {:B00001_001E "0:1000000"},
-  :values ["NAME"]}
- {:vintage 2016,
-  :geoHierachy {:state "01", :county "001"},
-  :sourcePath ["acs" "acs5"],
-  :geoResolution "500k",
-  :predicates {:B00001_001E "0:1000000"},
-  :values ["NAME"]}
- {:vintage 2016,
-  :geoHierachy {:state "01", :county "001"},
-  :sourcePath ["acs" "acs5"],
-  :geoResolution "500k",
-  :predicates {:B00001_001E "0:1000000"},
-  :values ["NAME"]}]
+;[{:vintage 2016,
+;  :geoHierachy {:state "01", :county "001"},
+;  :sourcePath ["acs" "acs5"],
+;  :geoResolution "500k",
+;  :predicates {:B00001_001E "0:1000000"},
+;  :values ["NAME"]}
+; {:vintage 2016,
+;  :geoHierachy {:state "01", :county "001"},
+;  :sourcePath ["acs" "acs5"],
+;  :geoResolution "500k",
+;  :predicates {:B00001_001E "0:1000000"},
+;  :values ["NAME"]}
+; {:vintage 2016,
+;  :geoHierachy {:state "01", :county "001"},
+;  :sourcePath ["acs" "acs5"],
+;  :geoResolution "500k",
+;  :predicates {:B00001_001E "0:1000000"},
+;  :values ["NAME"]}
+; {:vintage 2016,
+;  :geoHierachy {:state "01", :county "001"},
+;  :sourcePath ["acs" "acs5"],
+;  :geoResolution "500k",
+;  :predicates {:B00001_001E "0:1000000"},
+;  :values ["NAME"]}]
 
 
 
