@@ -3,13 +3,14 @@
     [cljs.core.async :as <|]
     [defun.core :refer-macros [defun]]
     [cuerdas.core :as s]
-    [utils.core :as ut]
-    [test.core :as ts :refer [stats-key]]
-    [wmsAPI.core   :refer [IO-census-wms Icb<-args<<=IO=]]
-    [geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [statsAPI.core :refer [IO-pp->census-stats]]
-    [merger.core   :refer [IO-geo+stats]]
-    [geojson.core  :refer [geo+config->mkdirp->fsW!]]))
+    [census.utils.core :as ut :refer [stats-key]]
+    [census.test.core :as ts]
+    [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
+    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
+    [census.statsAPI.core :refer [IO-pp->census-stats]]
+    [census.merger.core   :refer [IO-geo+stats]]
+    [census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
+
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
 
@@ -39,45 +40,45 @@
   ts/args-na-geo-only)
 
 
-(prn ts/args-ok-wms-only)
+#_(prn ts/args-ok-wms-only)
 
 (defn IO-census
   [=I= =O=]
-  (<|/go (let [args (<|/<! =I=)
+  (<|/go (let [args   (<|/<! =I=)
                deploy (deploy-census-function args)]
            (prn deploy)
-           (cond
-             (= deploy :stats+geos) ((ut/I=O<<=IO= IO-geo+stats)          args =O=)
-             (= deploy :stats-only) ((ut/I=O<<=IO= IO-pp->census-stats)   args =O=)
-             (= deploy :geos-only)  ((ut/I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
-             (= deploy :geocodes)   ((ut/I=O<<=IO= IO-census-wms)         args =O=)
-             (= deploy :no-values)  (<|/>! =O= err-no-values)
-             :else (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
+           (case deploy
+                 :stats+geos ((ut/I=O<<=IO= IO-geo+stats)          args =O=)
+                 :stats-only ((ut/I=O<<=IO= IO-pp->census-stats)   args =O=)
+                 :geos-only  ((ut/I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
+                 :geocodes   ((ut/I=O<<=IO= IO-census-wms)         args =O=)
+                 :no-values  (<|/>! =O= err-no-values)
+                 (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
 
 
-#_(<|/go (let [=I= (<|/chan 1)
-               =O= (<|/chan 1)]
-           (<|/>! =I= ts/test-args-6)
-           (IO-census =I= =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =I=)
-           (<|/close! =O=)))
+(<|/go (let [=I= (<|/chan 1)
+             =O= (<|/chan 1 (map ut/throw-err))]
+         (<|/>! =I= ts/args-ok-sts-vals)
+         (IO-census =I= =O=)
+         (prn (<|/<! =O=))
+         (<|/close! =I=)
+         (<|/close! =O=)))
 
 (defn census
   [I cb?]
   (if (= (type cb?) js/String)
-      (let [directory (str (s/join "/" (butlast (s/split cb? "/"))) "/")]
-        ((Icb<-args<<=IO= IO-census) I
-           #(geo+config->mkdirp->fsW!
-              {:filepath cb?
-               :directory directory
-               :json (js/JSON.stringify (clj->js %))})))
-      ((Icb<-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %))))))
+    (let [directory (str (s/join "/" (butlast (s/split cb? "/"))) "/")]
+      ((Icb<-wms-args<<=IO= IO-census) I
+         #(geo+config->mkdirp->fsW!
+            {:filepath cb?
+             :directory directory
+             :json (js/JSON.stringify (clj->js %))})))
+    ((Icb<-wms-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %))))))
 
 
 
-(type (clj->js "string"))
-(type (clj->js (js/console.log "test")))
+#_(type (clj->js "string"))
+#_(type (clj->js (js/console.log "test")))
 (comment
   (census ts/args-ok-wms-only prn)
   (census (ts/test-args 9 3 3 0) js/console.log)

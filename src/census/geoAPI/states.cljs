@@ -1,4 +1,4 @@
-(ns geoAPI.states)
+(ns census.geoAPI.states)
 
 (def FIPS
   [

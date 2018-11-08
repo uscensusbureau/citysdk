@@ -1,4 +1,4 @@
-(ns discovery.index)
+(ns census.discovery.index)
 
 (def index-abv [
                 "https://api.census.gov/data/2010/cbp?get=EMP,ESTAB,GEO_TTL,NAICS2007_TTL&for=us:*"

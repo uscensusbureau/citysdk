@@ -1,18 +1,19 @@
-(ns geojson.core
+(ns census.geojson.core
   (:require
     [cljs.core.async :as <|]
     [clojure.string :as s]
     [clojure.set :refer [map-invert]]
     [defun.core :refer-macros [defun]]
     [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
-    [geojson.index :as index]
-    [utils.core :as ut]
-    [geojson.filepaths :as geos]
-    [geojson.filepaths_abv :as geos_abv]
     ["fs" :as fs]
     ["path" :as path]
     ["shpjs" :as shpjs]
-    ["mkdirp" :as mkdirp]))
+    ["mkdirp" :as mkdirp]
+    [census.utils.core :as ut]
+    [census.geojson.filepaths :as geos]
+    [census.geojson.filepaths_abv :as geos_abv]))
+
+(def geoKeyMap (ut/read-edn "./src/census/geojson/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -59,7 +60,7 @@
 #_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
 
 ; TODO: If geoKeyMap requires additional config to enable pattern matching for
-; TODO: API + GeoJSON merger, update this:
+; TODO: API + GeoJSON census.merger, update this:
 
 (defn vin+lev=?key
   "
@@ -89,7 +90,7 @@
   "
   [vintage level]
   (apply str (remove nil? (map #(vin+lev=?key vintage level %)
-                               (seq (map-invert index/geoKeyMap))))))
+                               (seq (map-invert geoKeyMap))))))
 
 (defn config-geoPath
   "
@@ -322,9 +323,9 @@
   [val =port=]
   (prn (str "zip->json'ing..."))
   (<|/take! (cpa/value-port (shpjs val))
-         (fn [res] (<|/put! =port=
-                            (js/JSON.stringify res)
-                            #(<|/close! =port=)))))
+            (fn [res] (<|/put! =port=
+                               (js/JSON.stringify res)
+                               #(<|/close! =port=)))))
 
 ;; Examples ========================================
 
@@ -377,7 +378,7 @@
 
 (defn x-geojson-config
   "
-  Turns the geojson-config function into a transducer.
+  Turns the census.geojson-config function into a transducer.
   "
   [directory filepath]
   (transducified (partial geojson-config directory filepath)))
@@ -385,27 +386,27 @@
 ;; Examples ========================================
 
 #_(def geotest
-    ["test directory 1"
-     "test json 1",
-     "test directory 2"
-     "test json 2",
-     "test directory 3"
-     "test json 3"])
+    ["census.test directory 1"
+     "census.test json 1",
+     "census.test directory 2"
+     "census.test json 2",
+     "census.test directory 3"
+     "census.test json 3"])
 
-;(into [] (x-geojson-config "geotest directory" "filepath") geotest)
+;(into [] (x-census.geojson-config "geotest directory" "filepath") geotest)
 ;; =>
-;[{:directory "geotest directory", :json "test directory 1"}
-; {:directory "geotest directory", :json "test json 1"}
-; {:directory "geotest directory", :json "test directory 2"}
-; {:directory "geotest directory", :json "test json 2"}
-; {:directory "geotest directory", :json "test directory 3"}
-; {:directory "geotest directory", :json "test json 3"}]
+;[{:directory "geotest directory", :json "census.test directory 1"}
+; {:directory "geotest directory", :json "census.test json 1"}
+; {:directory "geotest directory", :json "census.test directory 2"}
+; {:directory "geotest directory", :json "census.test json 2"}
+; {:directory "geotest directory", :json "census.test directory 3"}
+; {:directory "geotest directory", :json "census.test json 3"}]
 ;; ==================================================
 
 (defn geo+config->mkdirp->fsW!
   "
-  Takes some geojson and a directory and - internally - calls Node `fs/writeFile`
-  to store the geojson into the directory, creating the directory first if needed.
+  Takes some census.geojson and a directory and - internally - calls Node `fs/writeFile`
+  to store the census.geojson into the directory, creating the directory first if needed.
   "
   [{:keys [directory filepath json]}]
   (prn (str "Ensuring Directory: " directory))
@@ -431,7 +432,7 @@
   2) if there is a match, but the translated file already exists, recur
   3) if there is a match and the translated file doesn't exists:
   3.1) translate the zip file to GeoJSON
-  3.2) Store the GeoJSON with the appropriate name `(ns geojson.index)`
+  3.2) Store the GeoJSON with the appropriate name `(ns census.geojson.index)`
   "
   [=path=]
   (<|/go-loop []
@@ -479,7 +480,7 @@
   "
   Takes a path to a list (vector) of paths to some zipfiles and - for each item
   in the list - based on the filename (if present) translates the zipfile to
-  geojson, creates a directory structure (if needed) to store them and stores
+  census.geojson, creates a directory structure (if needed) to store them and stores
   them in there.
 
   Uses a single `chan` as a control point between the internal `go-loop` of

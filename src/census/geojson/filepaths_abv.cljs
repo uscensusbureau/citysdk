@@ -1,4 +1,4 @@
-(ns geojson.filepaths_abv)
+(ns census.geojson.filepaths_abv)
 
 (def paths
   ["C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\Directory_Contents_ReadMe.pdf",

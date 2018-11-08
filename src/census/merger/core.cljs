@@ -1,19 +1,44 @@
-(ns merger.core
+(ns census.merger.core
   (:require
     [cljs.core.async :as <|]
     [ajax.core :refer [GET POST]]
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
-    [test.core :as ts :refer [stats-key]]
-    [wmsAPI.core :as wms]
-    [utils.core :as ut]
-    [geoAPI.core :refer [IO-pp->census-GeoJSON]]
-    [statsAPI.core :refer [IO-pp->census-stats]]
-    [geojson.core :refer [geo+config->mkdirp->fsW!]]))
+    [census.test.core :as ts]
+    [census.utils.core :as ut :refer [stats-key $geoKeyMap$]]
+    [census.geoAPI.core :refer [IO-pp->census-GeoJSON]]
+    [census.statsAPI.core :refer [IO-pp->census-stats]]
+    [census.geojson.core :refer [geo+config->mkdirp->fsW!]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
+  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+
+  (lookup-id->match? :CONCITY [{:2017 {:lev<-file "concity",
+                                       :scopes {:us nil, :st ["500k"]},
+                                       :wms {:layers ["24"], :lookup [:STATE :CONCITY]},
+                                       :id<-json [:GEOID]},
+                                :2016 {:lev<-file "concity",
+                                       :scopes {:us nil, :st ["500k"]},
+                                       :wms {:layers ["24"], :lookup [:STATE :CONCITY]},
+                                       :id<-json [:GEOID]}}
+                               :consolidated-cities
+                               {:2014 {:wms {:layers ["24"], :lookup [:BLOOP]},
+                                       :id<-json [:GEOID]},
+                                :2016 {:wms {:layers ["24"], :lookup [:BLOOP]},
+                                       :id<-json [:GEOID]}}
+                               :something-else])
+
+  (seq (map-invert {:consolidated-cities
+                    {
+                     :2017 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2016 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2015 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2014 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2013 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2010 {:lev<-file "170"      :scopes {:us nil                 :st ["500k"] } :wms {:layers ["32"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCIT]} ; "47", "52004"
+                     :2000 {:lev<-file "cc"       :scopes {:us [           "500k"] :st nil      } :wms {:layers ["22"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCITFP]}}}))) ; "30", "11390")
+
 
 (defn xf<-stats+geoids
   "
@@ -265,7 +290,7 @@
   matching GeoJSON file. The match is based on `vintage` and `geoHierarchy` of
   the arg map. The calls are spun up (simultaneously) into parallel `core.async`
   processes for speed. Both calls return their results via a `core.async`
-  channel (`chan`) - for later merger - via `put!`. The results from the Census
+  channel (`chan`) - for later census.merger - via `put!`. The results from the Census
   stats `chan` are passed into a local `chan` to store the state.  A
   `deep-merge` into the local `chan` combines the stats results with the GeoJSON
   values. Note that the GeoJSON results can be a superset of the Census stats'
@@ -274,7 +299,7 @@
   "
   [=I= =O=]
   (let [=geo= (<|/chan 1)]
-    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
     (<|/go (let [I          (<|/<! =I=)
                  geoK       (<|/<! =geo=)
                  args       (ut/js->args I)
@@ -331,48 +356,3 @@
    :3 "`async/map closes =merged= automatically when either input chan (=stats= or =features=) is closed"
    :4 "pipline-async (used internally by `IO-...` functions) closes the to (=O=) channels (=stats= & =features=) upon closing this"})
 
-
-
-
-
-
-
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~
-
-
-;; Examples ==============================
-
-#_(let [=I= (chan 1)
-        =O= (chan 1)]
-    (go (>! =I= {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                 :values       ["B01001_001E" "NAME"]
-                 :predicates   {:B00001_001E "0:30000"}
-                 :statsKey     stats-key})
-        (IO-pp->census-stats =I= =O=)
-        ;; TODO handle bad requests...
-        ;(if (= (type (<! =O=)) cljs.core/List) ;
-        ;  (pprint "GOOD TO GO")
-        ;  (pprint "brrrr.... "))
-        (pprint (<! =O=))
-        (close! =I=)
-        (close! =O=)))
-
-#_(type (quote ({:B01001_001E 494981,
-                 :NAME "State Senate District 40 (2016), Florida",
-                 :B00001_001E 29661,
-                 :state "12",
-                 :state-legislative-district-_upper-chamber_ "040"}
-                {:B01001_001E 492259,
-                 :NAME "State Senate District 36 (2016), Florida",
-                 :B00001_001E 29475,
-                 :state "12",
-                 :state-legislative-district-_upper-chamber_ "036"})))
-
-;; =======================================

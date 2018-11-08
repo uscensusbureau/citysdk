@@ -1,10 +1,10 @@
-(ns statsAPI.core
+(ns census.statsAPI.core
   (:require
     [cuerdas.core :as s]
     [cljs.core.async :as <|]
-    [utils.core :as ut]
-    [test.core :as ts :refer [stats-key]]
-    [wmsAPI.core :as wms]))
+    [census.utils.core :as ut :refer [stats-key]]
+    [census.test.core :as ts]
+    [census.wmsAPI.core :as wms]))
 
 
 (defn kv-pair->str [[k v] separator]
@@ -29,6 +29,7 @@
              (str "&in="  (s/join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
                   "&for=" (kv-pair->str (last geoHierarchy) ":"))))
        "&key=" statsKey))
+
 
 ;; Examples ==============================
 
@@ -217,15 +218,15 @@
   ([args cb] (getCensusStats args cb nil))
   ([args cb keywords?]
    (if (= keywords? :keywords)
-     ((wms/Icb<-args<<=IO= IO-pp->census-stats) args cb)
-     ((wms/Icb<-args<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-stats) args cb)
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
 
 ;; Examples ==============================
 
 #_(getCensusStats
-    ;ts/test-args-1 ; no such endpoint
-    ;ts/test-args-5 ; unallowed geoHeiarchy
-    ;ts/test-js-args-1
+    ;ts/census.test-args-1 ; no such endpoint
+    ;ts/census.test-args-5 ; unallowed geoHeiarchy
+    ;ts/census.test-js-args-1
     ts/test-js-args-2
     (fn [r] (js/console.log r)))
   ;pprint

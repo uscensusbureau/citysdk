@@ -1,12 +1,12 @@
-(ns geoAPI.core
+(ns census.geoAPI.core
   (:require
     [cljs.core.async :as <|]
     [clojure.string :as s]
     [defun.core :refer-macros [defun]]
-    [geojson.core :refer [geo+config->mkdirp->fsW!]]
-    [wmsAPI.core :as wms]
-    [utils.core :as ut]
-    [test.core :as ts]))
+    [census.geojson.core :refer [geo+config->mkdirp->fsW!]]
+    [census.wmsAPI.core :as wms]
+    [census.utils.core :as ut :refer [$geoKeyMap$]]
+    [census.test.core :as ts]))
 
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -102,7 +102,7 @@
   [=I= =O=]
   (let [=geo= (<|/chan 1)
         =url= (<|/chan 1)]
-    ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
     (<|/go (let [args  (<|/<! =I=)
                  geoK  (<|/<! =geo=)
                  url   (geo-url-composer geoK args)]
@@ -119,17 +119,15 @@
 
 ;; Examples ==============================
 
-#_(let [=geo= (<|/chan 1)]
-    (<|/go ((ut/I=O<<=IO= ut/IO-ajax-GET-edn) ut/base-url-geoKeyMap =geo=)
-           (prn (get-in (<|/<! =geo=) [:county]))))
+
 
 #_(prn ts/test-args-5)
 
 #_(let [=I= (<|/chan 1)
         =O= (<|/chan 1 (map ut/throw-err))]
-    (<|/go (<|/>! =I= ts/test-args-4)
+    (<|/go (<|/>! =I= ts/test-args-6)
            (IO-pp->census-GeoJSON =I= =O=)
-           (js/console.log (<|/<! =O=))
+           (prn (<|/<! =O=))
            (<|/close! =I=)
            (<|/close! =O=)))
 
@@ -144,19 +142,19 @@
   ([args cb] (getCensusGeoJSON args cb false))
   ([args cb url?]
    (if url?
-     ((wms/Icb<-args<<=IO= IO-pp->census-GeoJSON) args
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb #js {:url      (geo-url-composer {} args)
                  :response (js/JSON.stringify (clj->js %))}))
-     ((wms/Icb<-args<<=IO= IO-pp->census-GeoJSON) args
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb (js/JSON.stringify (clj->js %)))))))
 
 
 ;; Examples  ========================================
 
 #_(getCensusGeoJSON
-    ;ts/test-js-args-1
+    ;ts/census.test-js-args-1
     ts/test-js-args-2
-    ;ts/test-args-2
+    ;ts/census.test-args-2
     #_#(geo+config->mkdirp->fsW!
          {:directory "./src/json/"
           :filepath "./src/json/legislative-only.json"
@@ -166,4 +164,4 @@
   ;true)
 ;; ===================================================
 
-; TODO Fix Icb+args<<=IO= function. The test-args are working but not test-js-args
+; TODO Fix Icb+args<<=IO= function. The census.test-args are working but not census.test-js-args
