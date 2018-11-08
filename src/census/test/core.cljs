@@ -1,10 +1,19 @@
 (ns census.test.core
   (:require
+    [cljs.core.async :as <|]
+    [cljs.test :refer-macros [deftest is testing run-tests async]]
     [com.rpl.specter :as sp]
-    [oops.core :as ob]
-    ["dotenv" :as env]))
+    [census.utils.core :as ut :refer [stats-key]]))
 
-(def stats-key (ob/oget (env/load) ["parsed" "Census_Key_Pro"]))
+(def *g* (ut/read-edn "./src/census/geojson/index.edn"))
+
+(defn test-async
+  "Asynchronous test awaiting ch to produce a value or close."
+  [=test=]
+  (async done
+    (<|/take! =test= (fn [_] (done)))))
+
+; WMS TESTS
 
 (def test-args-1 {:vintage       "2000"
                   :geoHierarchy  {:state {:lat 28.2639 :lng -80.7214} :state-legislative-district-_upper-chamber_ "*"}

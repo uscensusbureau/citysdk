@@ -1,8 +1,6 @@
 (ns census.utils.core
   (:require
     [cljs.core.async :as <|]
-    [cljs.test
-     :refer-macros [deftest is run-tests async testing]]
     [ajax.core :refer [GET POST]]
     [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
     [cuerdas.core :as s]
@@ -11,17 +9,20 @@
     [linked.core :as linked]
     [oops.core :as ob]
     [cljs.reader :as r]
-    [census.test.core :as ts]
-    ["fs" :as fs]))
+    ["fs" :as fs]
+    ["dotenv" :as env]))
 
 
+(def stats-key (ob/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
 (def $geoKeyMap$ (atom {}))
 
 (def base-url-stats "https://api.census.gov/data/")
 (def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
-(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
+;(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
+(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.edn")
+
 (def base-url-database "...")
 
 (defn read-edn [path]
@@ -107,29 +108,34 @@
 ;=> {:a 2, :b 3, :c 4}
 
 (defn keys->strs
+  "
+  Translates Clojure (edn) key-forms of geographic identifyers into strings,
+  which are valid as parameters of a Census Data API URL construction.
+  "
   {:test #(assert
             (= (keys->strs
                  (name :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))
                "american indian area/alaska native area (reservation or statistical entity only) (or part)"))}
   [s]
-  (s/replace
-    s
-    #"-_|_|!|-"
-    {"-_" " (" "_" ")" "!" "/" "-" " "}))
+  (s/replace s #"-_|_|!|-"
+             {"-_" " (" "_" ")" "!" "/" "-" " "}))
 
 
 #_(keys->strs (name :state))
 
 (defn strs->keys
+  "
+  Translates strings valid as parameters of a Census Data API URL construction
+  to Clojure (edn) key-forms of geographic identifyers. Also valid URL components
+  of the raw.github directory structure.
+  "
   {:test #(assert
             (= (keyword
                  (strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)"))
                :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))}
   [s]
-  (s/replace
-    s
-    #" \(|\)|/| "
-    {" (" "-_" ")" "_" "/" "!" " " "-"}))
+  (s/replace s #" \(|\)|/| "
+             {" (" "-_" ")" "_" "/" "!" " " "-"}))
 
 #_(name "string")
 ;; Examples ==============================
@@ -158,10 +164,11 @@
   "
   [=URL= =RES=]
   (let [args {:response-format :json
-              :handler         (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
-              :error-handler   (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
-              :keywords?       true
-              :api             (js/XMLHttpRequest.)}] ; for WebWorker compatibility
+              :handler
+              (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
+              :error-handler
+              (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
+              :keywords?       true}]
     (<|/go (GET (<|/<! =URL=) args))))
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
@@ -169,19 +176,24 @@
 
 (defn IO-cache-GET-edn
   "
-  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
-  GET request to the provided URL and puts the response in the output (=O=) port.
+  Takes an atom as a one-time cachable value and returns a function that accepts
+  I/O ports as with IO-ajax-GET.  On first remote GET, the atom is hydrated via
+  an actual HTTP request. On following calls, the atom is dereferenced to provide
+  the response. Only useful for a single value that doesn't need to change during
+  a runtime.
   "
-  [=URL= =RES= cache]
-  (if (empty? @cache)
-      (let [args {:handler       (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
-                                                (reset! cache (r/read-string r))
-                                                (<|/close! =RES=)))
-                  :error-handler (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
-                                                (<|/close! =RES=)))}]
-           (<|/go (GET (<|/<! =URL=) args)))
-      (<|/go (<|/>! =RES= @cache)
-             (<|/close! =RES=))))
+  [cache]
+  (fn [=URL= =RES=]
+      (if (empty? @cache)
+          (let [args {:handler
+                      (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
+                                     (reset! cache (r/read-string r))
+                                     (<|/close! =RES=)))
+                      :error-handler
+                      (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
+                                     (<|/close! =RES=)))}]
+               (<|/go (GET (<|/<! =URL=) args)))
+          (<|/go (<|/>! =RES= @cache) (<|/close! =RES=)))))
 
 ;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
 ;       888     d888   \  888   \   d888   \
@@ -194,7 +206,7 @@
 #_(let [=O= (<|/chan 1)
         =I= (<|/chan 1)]
     (<|/go (<|/>! =I= base-url-geoKeyMap)
-           (IO-cache-GET-edn =I= =O= $geoKeyMap$)
+           ((IO-cache-GET-edn $geoKeyMap$) =I= =O=)
            (prn (<|/<! =O=))
            (<|/close! =I=)
            (<|/close! =O=)))
@@ -273,21 +285,6 @@
 
 ;; Tested: working
 
-(defn I=!O<<=IO=
-  "
-  Adapter, which wraps asynchronous I/O ports as well as an atom (for state)
-  input to provide a synchronous input
-
-  This is good for kicking off async functions, but also is the required
-  signature/contract for `pipeline-async`.
-  "
-  [f]                            ; takes an async I/O function
-  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
-    (let [=I= (<|/chan 1)]       ; create internal `chan`
-      (<|/go (<|/>! =I= I)       ; put sync `I` into `=I=`
-             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
-             (<|/close! =I=))))) ; close the port to flush out values
-
 (defn args+cb<<=IO=
   "
   Adapter, which wraps asynchronous I/O ports input to provide a synchronous
@@ -310,28 +307,28 @@
                                 (<|/close! =O=)))))))
 
 ;; Tested: working
-
-(defn js-I=O<<=IO=
-  "
-  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
-  input, which converts values from =I= channel to js arguments. Created
-  initially for async js library (e.g., `workerpool`) interop.
-  "
-  [f]                            ; takes an async I/O function
-  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
-    (let [=I= (<|/chan 1)
-          js-args (clj->js I)]       ; create internal `chan`
-      (<|/go (<|/>! =I= js-args)       ; put sync `I` into `=I=`
-             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
-             (<|/close! =I=))))) ; close the port to flush out values
-
-(defn =IO<-js-<3-fn
-  [<3-fn]
-  (fn [=I= =O=]
-    (<|/go (let [[val err] (<|/<! (cpa/pair-port (<3-fn (<|/<! =I=))))]
-                (if (= val nil)
-                    (<|/>! =O= err)
-                    (<|/>! =O= (js->clj val)))))))
+;
+;(defn js-I=O<<=IO=
+;  "
+;  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
+;  input, which converts values from =I= channel to js arguments. Created
+;  initially for async js library (e.g., `workerpool`) interop.
+;  "
+;  [f]                            ; takes an async I/O function
+;  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
+;    (let [=I= (<|/chan 1)
+;          js-args (clj->js I)]       ; create internal `chan`
+;      (<|/go (<|/>! =I= js-args)       ; put sync `I` into `=I=`
+;             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
+;             (<|/close! =I=))))) ; close the port to flush out values
+;
+;(defn =IO<-js-<3-fn
+;  [<3-fn]
+;  (fn [=I= =O=]
+;    (<|/go (let [[val err] (<|/<! (cpa/pair-port (<3-fn (<|/<! =I=))))]
+;                (if (= val nil)
+;                    (<|/>! =O= err)
+;                    (<|/>! =O= (js->clj val)))))))
 
 ; Examples =======================================
 

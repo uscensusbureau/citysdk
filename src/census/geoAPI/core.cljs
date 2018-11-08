@@ -102,7 +102,7 @@
   [=I= =O=]
   (let [=geo= (<|/chan 1)
         =url= (<|/chan 1)]
-    ((ut/I=!O<<=IO= ut/IO-cache-GET-edn) ut/base-url-geoKeyMap =geo= $geoKeyMap$)
+    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
     (<|/go (let [args  (<|/<! =I=)
                  geoK  (<|/<! =geo=)
                  url   (geo-url-composer geoK args)]
@@ -142,10 +142,10 @@
   ([args cb] (getCensusGeoJSON args cb false))
   ([args cb url?]
    (if url?
-     ((wms/Icb<-args<<=IO= IO-pp->census-GeoJSON) args
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb #js {:url      (geo-url-composer {} args)
                  :response (js/JSON.stringify (clj->js %))}))
-     ((wms/Icb<-args<<=IO= IO-pp->census-GeoJSON) args
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb (js/JSON.stringify (clj->js %)))))))
 
 

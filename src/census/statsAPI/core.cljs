@@ -2,8 +2,8 @@
   (:require
     [cuerdas.core :as s]
     [cljs.core.async :as <|]
-    [census.utils.core :as ut]
-    [census.test.core :as ts :refer [stats-key]]
+    [census.utils.core :as ut :refer [stats-key]]
+    [census.test.core :as ts]
     [census.wmsAPI.core :as wms]))
 
 
@@ -30,7 +30,7 @@
                   "&for=" (kv-pair->str (last geoHierarchy) ":"))))
        "&key=" statsKey))
 
-(+ 1 1)
+
 ;; Examples ==============================
 
 #_(stats-url-builder {:vintage      "2016"
@@ -218,8 +218,8 @@
   ([args cb] (getCensusStats args cb nil))
   ([args cb keywords?]
    (if (= keywords? :keywords)
-     ((wms/Icb<-args<<=IO= IO-pp->census-stats) args cb)
-     ((wms/Icb<-args<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-stats) args cb)
+     ((wms/Icb<-wms-args<<=IO= IO-pp->census-stats) args #(cb (js/JSON.stringify (clj->js %)))))))
 
 ;; Examples ==============================
 

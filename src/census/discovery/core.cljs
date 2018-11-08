@@ -1,12 +1,12 @@
-(ns census.disovery.core
+(ns census.discovery.core
   (:require
     [cljs.core.async :as <|]
     [defun.core :refer-macros [defun]]
     [cuerdas.core :as s]
     [datascript.core :as d]
     [datascript.db :as db]
-    [census.utils.core :as ut]
-    [census.test.core :as ts :refer [stats-key]]
+    [census.utils.core :as ut :refer [stats-key]]
+    [census.test.core :as ts]
     [census.geoAPI.core :refer [geo-pattern-maker]]))
 
 (def geoKeyMap     (ut/read-edn "./src/census/geojson/index.edn"))

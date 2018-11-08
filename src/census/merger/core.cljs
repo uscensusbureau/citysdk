@@ -4,15 +4,41 @@
     [ajax.core :refer [GET POST]]
     [cljs.pprint :refer [pprint]]
     [clojure.repl :refer [source]]
-    [census.test.core :as ts :refer [stats-key]]
-    [census.utils.core :as ut :refer [$geoKeyMap$]]
+    [census.test.core :as ts]
+    [census.utils.core :as ut :refer [stats-key $geoKeyMap$]]
     [census.geoAPI.core :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
     [census.geojson.core :refer [geo+config->mkdirp->fsW!]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
+  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+
+  (lookup-id->match? :CONCITY [{:2017 {:lev<-file "concity",
+                                       :scopes {:us nil, :st ["500k"]},
+                                       :wms {:layers ["24"], :lookup [:STATE :CONCITY]},
+                                       :id<-json [:GEOID]},
+                                :2016 {:lev<-file "concity",
+                                       :scopes {:us nil, :st ["500k"]},
+                                       :wms {:layers ["24"], :lookup [:STATE :CONCITY]},
+                                       :id<-json [:GEOID]}}
+                               :consolidated-cities
+                               {:2014 {:wms {:layers ["24"], :lookup [:BLOOP]},
+                                       :id<-json [:GEOID]},
+                                :2016 {:wms {:layers ["24"], :lookup [:BLOOP]},
+                                       :id<-json [:GEOID]}}
+                               :something-else])
+
+  (seq (map-invert {:consolidated-cities
+                    {
+                     :2017 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2016 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2015 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2014 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2013 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+                     :2010 {:lev<-file "170"      :scopes {:us nil                 :st ["500k"] } :wms {:layers ["32"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCIT]} ; "47", "52004"
+                     :2000 {:lev<-file "cc"       :scopes {:us [           "500k"] :st nil      } :wms {:layers ["22"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCITFP]}}}))) ; "30", "11390")
+
 
 (defn xf<-stats+geoids
   "
@@ -273,7 +299,7 @@
   "
   [=I= =O=]
   (let [=geo= (<|/chan 1)]
-    ((ut/I=!O<<=IO= ut/IO-cache-GET-edn) ut/base-url-geoKeyMap =geo= $geoKeyMap$)
+    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
     (<|/go (let [I          (<|/<! =I=)
                  geoK       (<|/<! =geo=)
                  args       (ut/js->args I)
