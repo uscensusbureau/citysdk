@@ -1,6 +1,7 @@
-(ns census.test.core
+(ns test.fixtures.core
   (:require
-    [cljs.core.async :as <|]
+    [cljs.core.async :refer [take! pipeline chan promise-chan]
+                     :refer-macros [go]]
     [cljs.test :refer-macros [deftest is testing run-tests async]]
     [com.rpl.specter :as sp]
     [census.utils.core :as ut :refer [stats-key]]))
@@ -11,7 +12,12 @@
   "Asynchronous test awaiting ch to produce a value or close."
   [=test=]
   (async done
-    (<|/take! =test= (fn [_] (done)))))
+    (take! =test= (fn [_] (done)))))
+
+
+(defn Icb<==IO=fixture
+  [=I= =O=]
+  (pipeline 1 =O= (map identity) =I=))
 
 ; WMS TESTS
 

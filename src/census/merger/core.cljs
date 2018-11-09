@@ -299,7 +299,7 @@
   "
   [=I= =O=]
   (let [=geo= (<|/chan 1)]
-    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/URL-GEOKEYMAP =geo=)
     (<|/go (let [I          (<|/<! =I=)
                  geoK       (<|/<! =geo=)
                  args       (ut/js->args I)

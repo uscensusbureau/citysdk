@@ -1,12 +1,11 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async :as <|]
+    [cljs.core.async :refer [go chan >! <! take! close!]]
     [ajax.core :refer [GET POST]]
-    [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
+    [cljs-promises.async :refer [pair-port]]
     [cuerdas.core :as s]
     [com.rpl.specter :as sp]
-    [cljs.pprint :refer [pprint]]
-    [linked.core :as linked]
+    [linked.core :as -=-]
     [oops.core :as ob]
     [cljs.reader :as r]
     ["fs" :as fs]
@@ -18,10 +17,9 @@
 (def $geoKeyMap$ (atom {}))
 
 (def base-url-stats "https://api.census.gov/data/")
-(def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
+(def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
-;(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
-(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
+(def URL-GEOKEYMAP "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
 
 (def base-url-database "...")
 
@@ -56,7 +54,7 @@
   [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
   "
   [m]
-  (sp/transform MAP-NODES #(into (linked/map) (vec %)) m))
+  (sp/transform MAP-NODES #(into (-=-/map) (vec %)) m))
 
 ; Examples =============================================
 
@@ -158,11 +156,11 @@
   [=URL= =RES=]
   (let [args {:response-format :json
               :handler
-              (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
+              (fn [r] (go (>! =RES= r) (close! =RES=)))
               :error-handler
-              (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
+              (fn [e] (go (>! =RES= (error (get-in e [:parse-error :original-text]))) (close! =RES=)))
               :keywords?       true}]
-    (<|/go (GET (<|/<! =URL=) args))))
+    (go (GET (<! =URL=) args))))
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
 
@@ -179,14 +177,14 @@
   (fn [=URL= =RES=]
       (if (empty? @cache)
           (let [args {:handler
-                      (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
-                                     (reset! cache (r/read-string r))
-                                     (<|/close! =RES=)))
+                      (fn [r] (go (>! =RES= (r/read-string r))
+                                  (reset! cache (r/read-string r))
+                                  (close! =RES=)))
                       :error-handler
-                      (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
-                                     (<|/close! =RES=)))}]
-               (<|/go (GET (<|/<! =URL=) args)))
-          (<|/go (<|/>! =RES= @cache) (<|/close! =RES=)))))
+                      (fn [e] (go (>! =RES= (error (get-in e [:parse-error :original-text])))
+                                  (close! =RES=)))}]
+               (go (GET (<! =URL=) args)))
+          (go (>! =RES= @cache) (close! =RES=)))))
 
 ;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
 ;       888     d888   \  888   \   d888   \
@@ -196,13 +194,13 @@
 ;       888      `88_-~   888_-~     `88_-~
 
 
-#_(let [=O= (<|/chan 1)
-        =I= (<|/chan 1)]
-    (<|/go (<|/>! =I= base-url-geoKeyMap)
-           ((IO-cache-GET-edn $geoKeyMap$) =I= =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =I=)
-           (<|/close! =O=)))
+#_(let [=O= (chan 1)
+        =I= (chan 1)]
+    (go (>! =I= URL-GEOKEYMAP)
+        ((IO-cache-GET-edn $geoKeyMap$) =I= =O=)
+        (prn (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 
 
@@ -271,10 +269,10 @@
   "
   [f]                            ; takes an async I/O function
   (fn [I =O=]             ; returns a function with a sync input / `chan` output
-    (let [=I= (<|/chan 1)]       ; create internal `chan`
-      (<|/go (<|/>! =I= I)       ; put sync `I` into `=I=`
-             (f =I= =O=)  ; call the wrapped function with the newly created `=I=`
-             (<|/close! =I=))))) ; close the port to flush out values
+    (let [=I= (chan 1)]       ; create internal `chan`
+      (go (>! =I= I)       ; put sync `I` into `=I=`
+          (f =I= =O=)  ; call the wrapped function with the newly created `=I=`
+          (close! =I=))))) ; close the port to flush out values
 
 ;; Tested: working
 
@@ -290,14 +288,14 @@
   "
   [f]                                           ; takes an async I/O function
   (fn [I cb ?state]                             ; returns a function with sync input  / callback for output
-    (let [=I=  (<|/chan 1)                      ; create two internal `chan`s for i/o
-          =O=  (<|/chan 1 (map throw-err))
+    (let [=I=  (chan 1)                      ; create two internal `chan`s for i/o
+          =O=  (chan 1 (map throw-err))
           args (js->args I)]                    ; converts any #js types to cljs with proper keys
-      (<|/go (<|/>! =I= args)
-             (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
-             (<|/take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
-                                (<|/close! =I=) ; close the ports to flush the values
-                                (<|/close! =O=)))))))
+      (go (>! =I= args)
+          (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
+          (take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
+                          (close! =I=) ; close the ports to flush the values
+                          (close! =O=)))))))
 
 ;; Tested: working
 ;
@@ -309,19 +307,19 @@
 ;  "
 ;  [f]                            ; takes an async I/O function
 ;  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
-;    (let [=I= (<|/chan 1)
+;    (let [=I= (chan 1)
 ;          js-args (clj->js I)]       ; create internal `chan`
-;      (<|/go (<|/>! =I= js-args)       ; put sync `I` into `=I=`
+;      (go (>! =I= js-args)       ; put sync `I` into `=I=`
 ;             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
-;             (<|/close! =I=))))) ; close the port to flush out values
+;             (close! =I=))))) ; close the port to flush out values
 ;
 ;(defn =IO<-js-<3-fn
 ;  [<3-fn]
 ;  (fn [=I= =O=]
-;    (<|/go (let [[val err] (<|/<! (cpa/pair-port (<3-fn (<|/<! =I=))))]
+;    (go (let [[val err] (<! (cpa/pair-port (<3-fn (<! =I=))))]
 ;                (if (= val nil)
-;                    (<|/>! =O= err)
-;                    (<|/>! =O= (js->clj val)))))))
+;                    (>! =O= err)
+;                    (>! =O= (js->clj val)))))))
 
 ; Examples =======================================
 
@@ -343,10 +341,10 @@
 
 
 
-#_(let [=O= (<|/chan 1 (map throw-err))]
-    (<|/go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =O=)))
+#_(let [=O= (chan 1 (map throw-err))]
+    (go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
+        (prn (<! =O=))
+        (close! =O=)))
 
 ; ==================================================
 

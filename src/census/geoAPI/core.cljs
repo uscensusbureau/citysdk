@@ -5,8 +5,7 @@
     [defun.core :refer-macros [defun]]
     [census.geojson.core :refer [geo+config->mkdirp->fsW!]]
     [census.wmsAPI.core :as wms]
-    [census.utils.core :as ut :refer [$geoKeyMap$]]
-    [census.test.core :as ts]))
+    [census.utils.core :as ut :refer [$geoKeyMap$]]))
 
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -102,7 +101,7 @@
   [=I= =O=]
   (let [=geo= (<|/chan 1)
         =url= (<|/chan 1)]
-    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
+    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/URL-GEOKEYMAP =geo=)
     (<|/go (let [args  (<|/<! =I=)
                  geoK  (<|/<! =geo=)
                  url   (geo-url-composer geoK args)]

@@ -3,7 +3,6 @@
     [cuerdas.core :as s]
     [cljs.core.async :as <|]
     [census.utils.core :as ut :refer [stats-key]]
-    [census.test.core :as ts]
     [census.wmsAPI.core :as wms]))
 
 
