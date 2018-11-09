@@ -25,8 +25,7 @@
 
 (def base-url-database "...")
 
-(defn read-edn [path]
-  (r/read-string (str (fs/readFileSync path))))
+(defn read-edn [path] (r/read-string (str (fs/readFileSync path))))
 
 (def vec-type cljs.core/PersistentVector)
 
@@ -34,9 +33,7 @@
 
 (def err-type js/Error)
 
-(defn error
-  [e]
-  (js/Error. e))
+(defn error [e] (js/Error. e))
 
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
@@ -45,12 +42,10 @@
 (defn deep-reverse-map
   "Recursively reverses the order of the key/value _pairs_ inside a map"
   {:test
-   #(is (= (deep-reverse-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
-           {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
+   #(assert (= (deep-reverse-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+               {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
   [m]
-  (sp/transform MAP-NODES
-               #(into {} (reverse %))
-               m))
+  (sp/transform MAP-NODES #(into {} (reverse %)) m))
 
 ;(test deep-reverse-map)
 
@@ -61,9 +56,7 @@
   [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
   "
   [m]
-  (sp/transform MAP-NODES
-               #(into (linked/map) (vec %))
-               m))
+  (sp/transform MAP-NODES #(into (linked/map) (vec %)) m))
 
 ; Examples =============================================
 
