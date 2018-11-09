@@ -21,7 +21,7 @@
 (def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 ;(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
-(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/geojson/index.edn")
+(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
 
 (def base-url-database "...")
 
