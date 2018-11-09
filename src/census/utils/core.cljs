@@ -16,7 +16,7 @@
 
 (def $geoKeyMap$ (atom {}))
 
-(def base-url-stats "https://api.census.gov/data/")
+(def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")

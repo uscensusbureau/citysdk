@@ -48,7 +48,7 @@
   (is (= (configed-map *g* {:STATE "51", :COUNTY "013"})
          {:STATE {:state "51"}, :COUNTY {:county "013"}})))
 
-(comment "Got by getting in response from api (below converted to edn from json)"
+(comment "Got by getting in response from WMS api (below converted to edn from json)"
   (configed-map
     *g*
     (get-in
