@@ -8,7 +8,6 @@
     [census.statsAPI.core :refer [IO-pp->census-stats]]
     [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< xfxf<< throw-err
                                   js->args I=O<<=IO= IO-cache-GET-edn]]))
-    ;[census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:

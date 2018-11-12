@@ -8,8 +8,8 @@
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.merger.core   :refer [IO-geo+stats]]
-    [test.fixtures.core   :as ts]))
+    [census.merger.core   :refer [IO-geo+stats]]))
+    ;[test.fixtures.core   :as ts]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")

@@ -138,6 +138,8 @@
    :values ["NAME"],
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
+(js/console.log (clj->js args-ok-s+g-v+ps))
+
 (def args-na-sts-pred (test-args 8 1 3 1))
 #_{:vintage 2017,
    :geoHierachy {:state "01", :county "001"},
