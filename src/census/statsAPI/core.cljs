@@ -112,16 +112,16 @@
 
 
 ;; Examples ==============================
-(let [=I= (chan 1)
-      =O= (chan 1)
-      args {:vintage      "2016"
-            :sourcePath   ["acs" "acs5"]
-            :geoHierarchy {:state "01" :county "073" :tract "000100"}
-            :values       ["B01001_001E" "B01001_001M"]}]
-  (go (>! =I= args)
-      (IO-pp->census-stats =I= =O=)
-      (prn (<! =O=))
-      (close! =I=)
-      (close! =O=)))
+#_(let [=I= (chan 1)
+        =O= (chan 1)
+        args {:vintage      "2016"
+              :sourcePath   ["acs" "acs5"]
+              :geoHierarchy {:state "01" :county "073" :tract "000100"}
+              :values       ["B01001_001E" "B01001_001M"]}]
+    (go (>! =I= args)
+        (IO-pp->census-stats =I= =O=)
+        (prn (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 ;; =======================================

@@ -4,8 +4,14 @@
                      :refer-macros [go]]
     [cljs.test :refer-macros [deftest is testing run-tests async]]
     [com.rpl.specter :as sp]
-    [census.utils.core :as ut :refer [stats-key]]))
+    [census.utils.core :as ut :refer [stats-key]]
+    ["fs" :as fs]
+    ["dotenv" :as env]))
 
+(defn read-edn [path] (read-string (str (fs/readFileSync path))))
+
+(def stats-key (oget (env/load) ["parsed" "Census_Key_Pro"]))
+(prn (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
 (def *g* (ut/read-edn "./src/census/geojson/index.edn"))
 
 (defn test-async

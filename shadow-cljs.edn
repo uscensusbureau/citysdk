@@ -3,7 +3,7 @@
                 [cljs-ajax "0.7.4"]
                 [funcool/cuerdas "2.0.5"]
                 [com.cognitect/transit-cljs "0.8.256"]
-                [binaryage/oops "0.6.2"]
+                [binaryage/oops "0.6.3"]
                 [defun "0.3.0-RC1"]
                 [jamesmacaulay/cljs-promises "0.1.0"]
                 [com.rpl/specter "1.1.2"]

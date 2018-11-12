@@ -1,14 +1,15 @@
 (ns census.merger.core
   (:require
-    [cljs.core.async :as <|]
-    [ajax.core :refer [GET POST]]
-    [cljs.pprint :refer [pprint]]
-    [clojure.repl :refer [source]]
-    [census.test.core :as ts]
-    [census.utils.core :as ut :refer [stats-key $geoKeyMap$]]
-    [census.geoAPI.core :refer [IO-pp->census-GeoJSON]]
-    [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.geojson.core :refer [geo+config->mkdirp->fsW!]]))
+    [cljs.core.async      :refer [>! <! chan promise-chan close!]
+                          :refer-macros [go]
+                          :as <|]
+    [ajax.core            :refer [GET POST]]
+    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$
+                                  xf<< xfxf<< throw-err
+                                  js->args I=O<<=IO= IO-cache-GET-edn]]
+    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
+    [census.statsAPI.core :refer [IO-pp->census-stats]]))
+    ;[census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -49,9 +50,9 @@
   the stats with a GeoJSON `feature`s `:properties` map.
   "
   [vars#]
-  (ut/xf<< (fn [rf result input]
-             (rf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
-                         {:properties input}}))))
+  (xf<< (fn [rf result input]
+          (rf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
+                      {:properties input}}))))
 
 ;; Examples ==============================
 
@@ -78,8 +79,8 @@
   from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
   in deep-merging with statistics.
   "
-  [geoK {:keys [geoHierarchy vintage]}]
-  (let [[& ids] (get-in geoK [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
+  [$g$ {:keys [geoHierarchy vintage]}]
+  (let [[& ids] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
     ids))
 
 (defn geoid<-feature
@@ -124,7 +125,7 @@
   hierarchy that will enable deep-merging of the stats with a stat map.
   "
   [ids]
-  (ut/xf<<
+  (xf<<
     (fn [rf result input]
       (rf result {(geoid<-feature ids input) input})))) ;
 
@@ -191,7 +192,7 @@
   between the two, i.e., excluding non-merged maps.
   "
   [s-key1 s-key2 g-key]
-  (ut/xf<<
+  (xf<<
     (fn [rf result item]
      (let [[_ v] (first item)]
        (if (or (and (nil? (get-in v [:properties s-key1]))
@@ -270,15 +271,15 @@
 (defn xfxf-e?->features+geoids
   [ids]
   (comp
-    (map ut/throw-err)
+    (map throw-err)
     (map #(get % :features))
-    (ut/xfxf<< (xf<-features+geoids ids) conj)))
+    (xfxf<< (xf<-features+geoids ids) conj)))
 
 (defn xfxf-e?->stats+geoids
   [vars#]
   (comp
-    (map ut/throw-err)
-    (ut/xfxf<< (xf<-stats+geoids vars#) conj)))
+    (map throw-err)
+    (xfxf<< (xf<-stats+geoids vars#) conj)))
 
 
 
@@ -298,47 +299,50 @@
   operation on the collection in the local `chan`.
   "
   [=I= =O=]
-  (let [=geo= (<|/chan 1)]
-    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/URL-GEOKEYMAP =geo=)
-    (<|/go (let [I          (<|/<! =I=)
-                 geoK       (<|/<! =geo=)
-                 args       (ut/js->args I)
-                 ids        (get-geoid?s geoK args)
-                 vars#      (+ (count (get args :values))
-                               (count (get args :predicates)))
-                 s-key1     (keyword (first (get args :values)))
-                 s-key2     (first (keys (get args :predicates)))
-                 g-key      (first ids)
-                 =args=     (<|/promise-chan)
-                 =stats=    (<|/chan 1 (xfxf-e?->stats+geoids vars#))
-                 =features= (<|/chan 1 (xfxf-e?->features+geoids ids))
-                 =merged=   (<|/map  (merge-geo+stats s-key1 s-key2 g-key)
-                                     [=stats= =features=]
-                                     1)]                     ; Notes (1)
-             ;(prn args)
-             (<|/>! =args= args)
-             (IO-pp->census-stats =args= =stats=)           ; Notes (2)
-             (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
-             (<|/>! =O= {:type "FeatureCollection"
-                         :features (<|/<! =merged=)})                   ; Notes (3)
-             (<|/close! =args=)                             ; Notes (4)
-             (prn "working on it....")))))
+  (let [=geo= (chan 1)]
+    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
+    (go (let [I          (<! =I=)
+              $g$        (<! =geo=)
+              args       (js->args I)
+              ids        (get-geoid?s $g$ args)
+              vars#      (+ (count (get args :values))
+                            (count (get args :predicates)))
+              s-key1     (keyword (first (get args :values)))
+              s-key2     (first (keys (get args :predicates)))
+              g-key      (first ids)
+              =args=     (promise-chan)
+              =stats=    (chan 1 (xfxf-e?->stats+geoids vars#))
+              =features= (chan 1 (xfxf-e?->features+geoids ids))
+              =merged=   (<|/map  (merge-geo+stats s-key1 s-key2 g-key) ; core.async version of `map`
+                                  [=stats= =features=]
+                                  1)]                    ; Notes (1)
+          (>! =args= args)
+          (IO-pp->census-stats =args= =stats=)           ; Notes (2)
+          (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
+          (>! =O= {:type "FeatureCollection"
+                   :features (<! =merged=)})             ; Notes (3)
+          (close! =args=)                                ; Notes (4)
+          (prn "working on it....")))))
 
 ;; Example =========================================
 
-#_(let [args ts/test-args-6]
-    (<|/go (let [=I= (<|/chan 1)
-                 =O= (<|/chan 1)]
-             (<|/>! =I= args)
-             (IO-geo+stats =I= =O=)
-             (js/console.log
-               (js/JSON.stringify
-                 (js-obj "type" "FeatureCollection"
-                         "features" (clj->js (<|/<! =O=)))))
-             ;(pprint (<! =O=))
-             (js/console.log "Done!")
-             (<|/close! =I=)
-             (<|/close! =O=))))
+#_(let [args {:vintage       "2016"
+              :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+              :sourcePath    ["acs" "acs5"]
+              :geoResolution "500k"
+              :values        ["B01001_001E"]}]
+    (go (let [=I= (chan 1)
+              =O= (chan 1)]
+          (>! =I= args)
+          (IO-geo+stats =I= =O=)
+          (js/console.log
+            (js/JSON.stringify
+              (js-obj "type" "FeatureCollection"
+                      "features" (clj->js (<! =O=)))))
+          ;(pprint (<! =O=))
+          (js/console.log "Done!")
+          (close! =I=)
+          (close! =O=))))
 
 ;; ==================================================
 
