@@ -1,4 +1,4 @@
-(ns census.geojson.filepaths)
+(ns configs.geojson.filepaths)
 
 (def paths
   [

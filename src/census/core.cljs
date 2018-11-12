@@ -1,15 +1,14 @@
 (ns census.core
   (:require
-    [cljs.core.async :as <|]
-    [defun.core :refer-macros [defun]]
-    [cuerdas.core :as s]
-    [census.utils.core :as ut :refer [stats-key]]
-    [census.test.core :as ts]
+    [cljs.core.async      :refer-macros [go]
+                          :refer [chan >! <! close!]]
+    [defun.core           :refer-macros [defun]]
+    [cuerdas.core         :refer [join split]]
+    [census.utils.core    :refer [throw-err I=O<<=IO= config->mkdirp->fsW!]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.merger.core   :refer [IO-geo+stats]]
-    [census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
+    [census.merger.core   :refer [IO-geo+stats]]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -29,47 +28,51 @@
   ([{:vintage _ :geoHierarchy _                                                                   }] :geocodes)
   ([& anything-else] nil))
 
-(deploy-census-function
-  ;ts/args-ok-wms-only
-  ;ts/args-ok-geo-only
-  ;ts/args-ok-s+g-v+ps
-  ;ts/args-ok-s+g-vals
-  ;ts/args-ok-sts-pred
-  ;ts/args-ok-sts-v+ps
-  ;ts/args-ok-sts-vals
-  ts/args-na-geo-only)
+#_(deploy-census-function)
+    ;ts/args-ok-wms-only
+    ;ts/args-ok-geo-only
+    ;ts/args-ok-s+g-v+ps
+    ;ts/args-ok-s+g-vals
+    ;ts/args-ok-sts-pred
+    ;ts/args-ok-sts-v+ps
+    ;ts/args-ok-sts-vals
+    ;ts/args-na-geo-only)
 
 
 #_(prn ts/args-ok-wms-only)
 
 (defn IO-census
   [=I= =O=]
-  (<|/go (let [args   (<|/<! =I=)
-               deploy (deploy-census-function args)]
-           (prn deploy)
-           (case deploy
-                 :stats+geos ((ut/I=O<<=IO= IO-geo+stats)          args =O=)
-                 :stats-only ((ut/I=O<<=IO= IO-pp->census-stats)   args =O=)
-                 :geos-only  ((ut/I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
-                 :geocodes   ((ut/I=O<<=IO= IO-census-wms)         args =O=)
-                 :no-values  (<|/>! =O= err-no-values)
-                 (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
+  (go (let [args   (<! =I=)
+            deploy (deploy-census-function args)]
+        (prn deploy)
+        (case deploy
+              :stats+geos ((I=O<<=IO= IO-geo+stats)          args =O=)
+              :stats-only ((I=O<<=IO= IO-pp->census-stats)   args =O=)
+              :geos-only  ((I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
+              :geocodes   ((I=O<<=IO= IO-census-wms)         args =O=)
+              :no-values  (>! =O= err-no-values)
+              (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
 
 
-(<|/go (let [=I= (<|/chan 1)
-             =O= (<|/chan 1 (map ut/throw-err))]
-         (<|/>! =I= ts/args-ok-sts-vals)
-         (IO-census =I= =O=)
-         (prn (<|/<! =O=))
-         (<|/close! =I=)
-         (<|/close! =O=)))
+(go (let [=I= (chan 1)
+          =O= (chan 1 (map throw-err))]
+      (>! =I= {:vintage       "2000"
+               :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+               :sourcePath    ["acs" "acs5"]
+               :geoResolution "500k"
+               :values        ["B01001_001E"]})
+      (IO-census =I= =O=)
+      (prn (<! =O=))
+      (close! =I=)
+      (close! =O=)))
 
 (defn census
   [I cb?]
   (if (= (type cb?) js/String)
-    (let [directory (str (s/join "/" (butlast (s/split cb? "/"))) "/")]
+    (let [directory (str (join "/" (butlast (split cb? "/"))) "/")]
       ((Icb<-wms-args<<=IO= IO-census) I
-         #(geo+config->mkdirp->fsW!
+         #(config->mkdirp->fsW!
             {:filepath cb?
              :directory directory
              :json (js/JSON.stringify (clj->js %))})))

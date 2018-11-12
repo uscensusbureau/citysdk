@@ -1,32 +1,48 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async :as <|]
-    [ajax.core :refer [GET POST]]
-    [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
-    [cuerdas.core :as s]
-    [com.rpl.specter :as sp]
-    [cljs.pprint :refer [pprint]]
-    [linked.core :as linked]
-    [oops.core :as ob]
-    [cljs.reader :as r]
-    ["fs" :as fs]
-    ["dotenv" :as env]))
+    [cljs.core.async     :refer [chan >! <! take! close! promise-chan]
+                         :refer-macros [go]]
+    [ajax.core           :refer [GET POST]]
+    [cljs-promises.async :refer [pair-port]]
+    [cuerdas.core        :as s]
+    [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+                                 if-path continue-then-stay selected?]
+                         :refer-macros [select transform traverse setval recursive-path]]
+    [oops.core           :refer [oget oset!]]
+    [cljs.reader         :refer [read-string]]
+    [linked.core         :as -=-]))
 
-
-(def stats-key (ob/oget (env/load) ["parsed" "Census_Key_Pro"]))
 
 (def $geoKeyMap$ (atom {}))
 
-(def base-url-stats "https://api.census.gov/data/")
-(def base-url-wms "https://tigerweb.geo.census.gov/arcgis/rest/services/")
-(def base-url-geojson "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
-;(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
-(def base-url-geoKeyMap "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/census/geojson/index.edn")
+(def URL-STATS "https://api.census.gov/data/")
+(def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
+(def URL-GEOJSON "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 
-(def base-url-database "...")
+;FIXME === !!! ===
+(def URL-GEOKEYMAP "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/configs/geojson/index.edn")
 
-(defn read-edn [path]
-  (r/read-string (str (fs/readFileSync path))))
+(def base-url-database "TODO?")
+
+
+(defn config->mkdirp->fsW!
+  "
+  Takes some configs.geojson and a directory and - internally - calls Node `fs/writeFile`
+  to store the configs.geojson into the directory, creating the directory first if needed.
+  "
+  [{:keys [directory filepath json]}]
+  (prn (str "Ensuring Directory: " directory))
+  (mkdirp directory
+          (fn [err]
+            (if (= (type err) ut/err-type)
+              (prn (str "Error creating directory: " filepath))
+              (fs/writeFile
+                filepath
+                json
+                (fn [err]
+                  (if (= (type err) ut/err-type)
+                    (prn (str "Error writing file: " filepath))
+                    (prn (str "Wrote file to: " filepath)))))))))
 
 (def vec-type cljs.core/PersistentVector)
 
@@ -34,25 +50,21 @@
 
 (def err-type js/Error)
 
-(defn error
-  [e]
-  (js/Error. e))
+(defn error [e] (js/Error. e))
 
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
-  (sp/recursive-path [] p (sp/if-path map? (sp/continue-then-stay sp/MAP-VALS p))))
+  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
 
-(defn deep-reverse-map
+(defn deep-reverse-MAP-NODES
   "Recursively reverses the order of the key/value _pairs_ inside a map"
   {:test
-   #(is (= (deep-reverse-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
-           {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
+   #(assert (= (deep-reverse-MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+               {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
   [m]
-  (sp/transform MAP-NODES
-               #(into {} (reverse %))
-               m))
+  (transform MAP-NODES #(into {} (reverse %)) m))
 
-;(test deep-reverse-map)
+;(test deep-reverse-MAP-NODES)
 
 (defn deep-linked-map
   "
@@ -61,9 +73,7 @@
   [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
   "
   [m]
-  (sp/transform MAP-NODES
-               #(into (linked/map) (vec %))
-               m))
+  (transform MAP-NODES #(into (-=-/map) (vec %)) m))
 
 ; Examples =============================================
 
@@ -92,7 +102,7 @@
   Applies a function over the keys in a provided map
   "
   [f m]
-  (sp/transform sp/MAP-KEYS f m))
+  (transform MAP-KEYS f m))
 
 ;(map-rename-keys name {:a "c" :b "d"})
 ;=> {"a" "c", "b" "d"}
@@ -102,7 +112,7 @@
   Applies a function to all values of a provided map
   "
   [f m]
-  (sp/transform sp/MAP-VALS f m))
+  (transform MAP-VALS f m))
 
 ;(map-over-keys inc {:a 1 :b 2 :c 3})
 ;=> {:a 2, :b 3, :c 4}
@@ -165,11 +175,11 @@
   [=URL= =RES=]
   (let [args {:response-format :json
               :handler
-              (fn [r] (<|/go (<|/>! =RES= r) (<|/close! =RES=)))
+              (fn [r] (go (>! =RES= r) (close! =RES=)))
               :error-handler
-              (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text]))) (<|/close! =RES=)))
+              (fn [e] (go (>! =RES= (error (get-in e [:parse-error :original-text]))) (close! =RES=)))
               :keywords?       true}]
-    (<|/go (GET (<|/<! =URL=) args))))
+    (go (GET (<! =URL=) args))))
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
 
@@ -186,14 +196,14 @@
   (fn [=URL= =RES=]
       (if (empty? @cache)
           (let [args {:handler
-                      (fn [r] (<|/go (<|/>! =RES= (r/read-string r))
-                                     (reset! cache (r/read-string r))
-                                     (<|/close! =RES=)))
+                      (fn [r] (go (>! =RES= (read-string r))
+                                  (reset! cache (read-string r))
+                                  (close! =RES=)))
                       :error-handler
-                      (fn [e] (<|/go (<|/>! =RES= (error (get-in e [:parse-error :original-text])))
-                                     (<|/close! =RES=)))}]
-               (<|/go (GET (<|/<! =URL=) args)))
-          (<|/go (<|/>! =RES= @cache) (<|/close! =RES=)))))
+                      (fn [e] (go (>! =RES= (error (get-in e [:parse-error :original-text])))
+                                  (close! =RES=)))}]
+               (go (GET (<! =URL=) args)))
+          (go (>! =RES= @cache) (close! =RES=)))))
 
 ;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
 ;       888     d888   \  888   \   d888   \
@@ -203,13 +213,13 @@
 ;       888      `88_-~   888_-~     `88_-~
 
 
-#_(let [=O= (<|/chan 1)
-        =I= (<|/chan 1)]
-    (<|/go (<|/>! =I= base-url-geoKeyMap)
-           ((IO-cache-GET-edn $geoKeyMap$) =I= =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =I=)
-           (<|/close! =O=)))
+#_(let [=O= (chan 1)
+        =I= (chan 1)]
+    (go (>! =I= URL-GEOKEYMAP)
+        ((IO-cache-GET-edn $geoKeyMap$) =I= =O=)
+        (prn (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 
 
@@ -217,12 +227,12 @@
   [args]
   (if (= (type args) amap-type)
     (let [{:keys [vintage]} args]
-      (sp/setval :vintage (str vintage) args))
-    (let [geoCljs (js->clj (ob/oget args "geoHierarchy"))
-          vintage (ob/oget args "vintage")
+      (setval :vintage (str vintage) args))
+    (let [geoCljs (js->clj (oget args "geoHierarchy"))
+          vintage (oget args "vintage")
           geoKeys (map-rename-keys strs->keys geoCljs)]
-      (do (ob/oset! args "vintage"      (clj->js (str vintage)))
-          (ob/oset! args "geoHierarchy" (clj->js geoKeys))
+      (do (oset! args "vintage"      (clj->js (str vintage)))
+          (oset! args "geoHierarchy" (clj->js geoKeys))
           ;(prn (str "args from args-digester: " (js->clj args :keywordize-keys true)))
           (js->clj args :keywordize-keys true)))))
 
@@ -247,7 +257,7 @@
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
     (prn (clj->js geoKeys))
-    (clj->js (sp/setval :geoHierarchy geoKeys args))))
+    (clj->js (setval :geoHierarchy geoKeys args))))
 
 #_(args->js  {:vintage "2010",
               :values ["H001001" "NAME"],
@@ -278,10 +288,10 @@
   "
   [f]                            ; takes an async I/O function
   (fn [I =O=]             ; returns a function with a sync input / `chan` output
-    (let [=I= (<|/chan 1)]       ; create internal `chan`
-      (<|/go (<|/>! =I= I)       ; put sync `I` into `=I=`
-             (f =I= =O=)  ; call the wrapped function with the newly created `=I=`
-             (<|/close! =I=))))) ; close the port to flush out values
+    (let [=I= (chan 1)]       ; create internal `chan`
+      (go (>! =I= I)       ; put sync `I` into `=I=`
+          (f =I= =O=)  ; call the wrapped function with the newly created `=I=`
+          (close! =I=))))) ; close the port to flush out values
 
 ;; Tested: working
 
@@ -297,14 +307,14 @@
   "
   [f]                                           ; takes an async I/O function
   (fn [I cb ?state]                             ; returns a function with sync input  / callback for output
-    (let [=I=  (<|/chan 1)                      ; create two internal `chan`s for i/o
-          =O=  (<|/chan 1 (map throw-err))
+    (let [=I=  (chan 1)                      ; create two internal `chan`s for i/o
+          =O=  (chan 1 (map throw-err))
           args (js->args I)]                    ; converts any #js types to cljs with proper keys
-      (<|/go (<|/>! =I= args)
-             (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
-             (<|/take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
-                                (<|/close! =I=) ; close the ports to flush the values
-                                (<|/close! =O=)))))))
+      (go (>! =I= args)
+          (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
+          (take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
+                          (close! =I=) ; close the ports to flush the values
+                          (close! =O=)))))))
 
 ;; Tested: working
 ;
@@ -316,19 +326,19 @@
 ;  "
 ;  [f]                            ; takes an async I/O function
 ;  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
-;    (let [=I= (<|/chan 1)
+;    (let [=I= (chan 1)
 ;          js-args (clj->js I)]       ; create internal `chan`
-;      (<|/go (<|/>! =I= js-args)       ; put sync `I` into `=I=`
+;      (go (>! =I= js-args)       ; put sync `I` into `=I=`
 ;             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
-;             (<|/close! =I=))))) ; close the port to flush out values
+;             (close! =I=))))) ; close the port to flush out values
 ;
 ;(defn =IO<-js-<3-fn
 ;  [<3-fn]
 ;  (fn [=I= =O=]
-;    (<|/go (let [[val err] (<|/<! (cpa/pair-port (<3-fn (<|/<! =I=))))]
+;    (go (let [[val err] (<! (cpa/pair-port (<3-fn (<! =I=))))]
 ;                (if (= val nil)
-;                    (<|/>! =O= err)
-;                    (<|/>! =O= (js->clj val)))))))
+;                    (>! =O= err)
+;                    (>! =O= (js->clj val)))))))
 
 ; Examples =======================================
 
@@ -350,10 +360,10 @@
 
 
 
-#_(let [=O= (<|/chan 1 (map throw-err))]
-    (<|/go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =O=)))
+#_(let [=O= (chan 1 (map throw-err))]
+    (go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
+        (prn (<! =O=))
+        (close! =O=)))
 
 ; ==================================================
 
@@ -464,7 +474,7 @@
   collection.
   "
   [f targets coll]
-  (sp/transform [sp/INDEXED-VALS (sp/selected? sp/FIRST (set targets)) sp/LAST] f coll))
+  (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
 
 ; Example ===============================
 
@@ -472,7 +482,7 @@
 ; => [2 3 4 4 5]
 
 ; Also works:
-;(sp/transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
+;(transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
 ; => [0 2 2 4 4 6 6]
 ; =======================================
 
@@ -482,11 +492,11 @@
   to end) of a provided collection.
   "
   [f [r-start r-end] coll]
-  (sp/transform [sp/INDEXED-VALS (sp/selected? sp/FIRST (set (range r-start r-end))) sp/LAST] f coll))
+  (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
 
 ; Example ===============================
 
-;; also works: (sp/transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
+;; also works: (transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
 ;=> [0 2 2 4 4 6 6]
 
 

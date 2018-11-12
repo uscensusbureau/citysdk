@@ -6,7 +6,6 @@
     [datascript.core :as d]
     [datascript.db :as db]
     [census.utils.core :as ut :refer [stats-key]]
-    [census.test.core :as ts]
     [census.geoAPI.core :refer [geo-pattern-maker]]))
 
 (def geoKeyMap     (ut/read-edn "./src/census/geojson/index.edn"))

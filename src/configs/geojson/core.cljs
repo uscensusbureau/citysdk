@@ -1,19 +1,23 @@
-(ns census.geojson.core
+(ns configs.geojson.core
   (:require
-    [cljs.core.async :as <|]
-    [clojure.string :as s]
-    [clojure.set :refer [map-invert]]
-    [defun.core :refer-macros [defun]]
-    [cljs-promises.async :as cpa :refer [pair-port] :refer-macros [<?]]
+    [cljs.core.async           :refer [>! <! chan promise-chan close! take! put!
+                                       pipeline-async]
+                               :refer-macros [go go-loop]]
+    [cuerdas.core              :refer [join]
+                               :as s]
+    [clojure.set               :refer [map-invert]]
+    [defun.core                :refer-macros [defun]]
+    [cljs-promises.async       :refer [pair-port value-port]]
+    [census.utils.core         :refer [config->mkdirp->fsW! map-target error err-type]]
+    [configs.utils.fixtures    :refer [read-edn]]
+    [configs.geojson.filepaths :as geos]
+    [configs.geojson.filepaths_abv :as geos_abv]
     ["fs" :as fs]
     ["path" :as path]
     ["shpjs" :as shpjs]
-    ["mkdirp" :as mkdirp]
-    [census.utils.core :as ut]
-    [census.geojson.filepaths :as geos]
-    [census.geojson.filepaths_abv :as geos_abv]))
+    ["mkdirp" :as mkdirp]))
 
-(def geoKeyMap (ut/read-edn "./src/census/geojson/index.edn"))
+(def geoKeyMap (read-edn "./src/census/configs/geojson/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -54,7 +58,7 @@
   (->> (s/split string #"_|\.")
        (map #(re-seq #"[a-z]+|[0-9]+" %))
        (map (fn [y] (remove #(= "d" %) y)))
-       (ut/map-target map-xx->vin 2)
+       (map-target map-xx->vin 2)
        (map #(vec %))))
 
 #_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
@@ -273,8 +277,8 @@
   (fs/access val
              fs/constants.F_OK
              (fn [err] (if (nil? err)
-                         (do (<|/put! =port= (str "there")) (<|/close! =port=))
-                         (do (<|/put! =port= val) (<|/close! =port=))))))
+                         (do (put! =port= (str "there")) (close! =port=))
+                         (do (put! =port= val) (close! =port=))))))
 
 (defn fsR-file->put!
   "
@@ -285,9 +289,9 @@
   (prn (str "fsRead'ing: " val))
   (fs/readFile val
                (fn [err, file]
-                 (if (= (type err) ut/err-type)
-                   (throw (ut/error err))
-                   (<|/put! =port= file #(<|/close! =port=))))))
+                 (if (= (type err) err-type)
+                   (throw (error err))
+                   (put! =port= file #(close! =port=))))))
 
 ;; Examples =========================================
 
@@ -322,21 +326,21 @@
   "
   [val =port=]
   (prn (str "zip->json'ing..."))
-  (<|/take! (cpa/value-port (shpjs val))
-            (fn [res] (<|/put! =port=
-                               (js/JSON.stringify res)
-                               #(<|/close! =port=)))))
+  (take! (value-port (shpjs val))
+         (fn [res] (put! =port=
+                            (js/JSON.stringify res)
+                            #(close! =port=)))))
 
 ;; Examples ========================================
 
-#_(let [=zip= (<|/chan 1)
-        =json= (<|/chan 1)]
-    (<|/go (fsR-file->put!
-             ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-             "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
-             =zip=)
-        (<|/pipeline-async 1 =json= zip->geojson->put! =zip=)
-        (js/console.log (<|/<! =json=))))
+#_(let [=zip= (chan 1)
+        =json= (chan 1)]
+    (go (fsR-file->put!
+          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+          =zip=)
+        (pipeline-async 1 =json= zip->geojson->put! =zip=)
+        (js/console.log (<! =json=))))
 ;; NOTE: pprint overflows the HEAP. Must use native js/console.log :(
 
 ;; "fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -378,7 +382,7 @@
 
 (defn x-geojson-config
   "
-  Turns the census.geojson-config function into a transducer.
+  Turns the configs.geojson-config function into a transducer.
   "
   [directory filepath]
   (transducified (partial geojson-config directory filepath)))
@@ -393,7 +397,7 @@
      "census.test directory 3"
      "census.test json 3"])
 
-;(into [] (x-census.geojson-config "geotest directory" "filepath") geotest)
+;(into [] (x-configs.geojson-config "geotest directory" "filepath") geotest)
 ;; =>
 ;[{:directory "geotest directory", :json "census.test directory 1"}
 ; {:directory "geotest directory", :json "census.test json 1"}
@@ -402,25 +406,6 @@
 ; {:directory "geotest directory", :json "census.test directory 3"}
 ; {:directory "geotest directory", :json "census.test json 3"}]
 ;; ==================================================
-
-(defn geo+config->mkdirp->fsW!
-  "
-  Takes some census.geojson and a directory and - internally - calls Node `fs/writeFile`
-  to store the census.geojson into the directory, creating the directory first if needed.
-  "
-  [{:keys [directory filepath json]}]
-  (prn (str "Ensuring Directory: " directory))
-  (mkdirp directory
-          (fn [err]
-            (if (= (type err) ut/err-type)
-              (prn (str "Error creating directory: " filepath))
-              (fs/writeFile
-                filepath
-                json
-                (fn [err]
-                  (if (= (type err) ut/err-type)
-                    (prn (str "Error writing file: " filepath))
-                    (prn (str "Wrote GeoJSON to: " filepath)))))))))
 
 
 (defn =>read=>convert=>write=>loop
@@ -432,20 +417,20 @@
   2) if there is a match, but the translated file already exists, recur
   3) if there is a match and the translated file doesn't exists:
   3.1) translate the zip file to GeoJSON
-  3.2) Store the GeoJSON with the appropriate name `(ns census.geojson.index)`
+  3.2) Store the GeoJSON with the appropriate name `(ns configs.geojson.index)`
   "
   [=path=]
-  (<|/go-loop []
-    (let [path (<|/<! =path=)]
+  (go-loop []
+    (let [path (<! =path=)]
       (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-        (let [=test-path= (<|/chan 1)]
+        (let [=test-path= (chan 1)]
           (do (fsCheck->put! filepath =test-path=)
-              (if (not= "there" (<|/<! =test-path=))
-                  (let [=zip= (<|/chan 1)
-                        =json= (<|/chan 1 (x-geojson-config directory filepath))]
+              (if (not= "there" (<! =test-path=))
+                  (let [=zip=  (chan 1)
+                        =json= (chan 1 (x-geojson-config directory filepath))]
                     (do (fsR-file->put! path =zip=)
-                        (<|/pipeline-async 1 =json= zip->geojson->put! =zip=)
-                        (geo+config->mkdirp->fsW! (<|/<! =json=))
+                        (pipeline-async 1 =json= zip->geojson->put! =zip=)
+                        (config->mkdirp->fsW! (<! =json=))
                         (recur)))
                   (do (prn (str "File already exists: " path))
                       (recur)))))
@@ -455,8 +440,8 @@
 #_(let [path "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"]
     (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
       (prn (str "Already existing directory: " directory " Filepath: " filepath))
-      (let [=test-path= (<|/chan 1)
-            open-path (<|/<! (fsCheck->put! filepath =test-path=))]
+      (let [=test-path= (chan 1)
+            open-path (<! (fsCheck->put! filepath =test-path=))]
         (if (not= "there" open-path)
           (prn (str "Not there"))
           (prn (str "There"))))))
@@ -480,7 +465,7 @@
   "
   Takes a path to a list (vector) of paths to some zipfiles and - for each item
   in the list - based on the filename (if present) translates the zipfile to
-  census.geojson, creates a directory structure (if needed) to store them and stores
+  configs.geojson, creates a directory structure (if needed) to store them and stores
   them in there.
 
   Uses a single `chan` as a control point between the internal `go-loop` of
@@ -488,10 +473,10 @@
   through each step of the process before moving onto the next in the file list.
   "
   [paths-vec]
-  (let [=path= (<|/chan 1)]
+  (let [=path= (chan 1)]
     (=>read=>convert=>write=>loop =path=)
-    (<|/go (if (= nil (doseq [path paths-vec] (<|/>! =path= path)))
-               (js/console.log "\n ======================== \n
+    (go (if (= nil (doseq [path paths-vec] (>! =path= path)))
+            (js/console.log "\n ======================== \n
                                 \n === FINISHED PARSING === \n
                                 \n === Wrapping up .... === \n
                                 \n ======================== \n")))))

@@ -1,12 +1,14 @@
 (ns census.geoAPI.core
   (:require
-    [cljs.core.async :as <|]
-    [clojure.string :as s]
-    [defun.core :refer-macros [defun]]
-    [census.geojson.core :refer [geo+config->mkdirp->fsW!]]
-    [census.wmsAPI.core :as wms]
-    [census.utils.core :as ut :refer [$geoKeyMap$]]
-    [census.test.core :as ts]))
+    [cljs.core.async    :refer [>! <! chan close! pipeline-async]
+                        :refer-macros [go]]
+    [cuerdas.core       :refer [join]]
+    [defun.core         :refer-macros [defun]]
+    [census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
+    [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
+                                map-over-keys keys->strs error throw-err
+                                IO-cache-GET-edn I=O<<=IO= IO-ajax-GET-json]]))
+    ;[census.geojson.core :refer [geo+config->mkdirp->fsW!]] ; TODO <- Move into utils
 
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -23,21 +25,21 @@
       (-> (conj e
             "Note: You may be getting this error due to trying to make a nation-wide (`:us`) call a geography that's only available at the `:st` (state) level"
             (str "For " (str lev) " try one of the following `{:<vintage> {:<scopes> ...`")
-            [(ut/map-over-keys #(get-in % [:scopes]) vins)])
-          ut/error)
+            [(map-over-keys #(get-in % [:scopes]) vins)])
+          error)
       (-> (conj e
             (str "Sorry, there is no GeoJSON for " (name lev) " available.")
             "Try one of these instead: "
-            (vec (map #(ut/keys->strs (name (key %))) geoK)))
-          ut/error))))
+            (vec (map #(keys->strs (name (key %))) geoK)))
+          error))))
 
 (defn geo-url-builder
   "Composes a URL to call raw GeoJSON files hosted on Github"
   ([res vin lev] (geo-url-builder res vin lev nil))
   ([res vin lev st]
    (if (nil? st)
-     (str (s/join "/" [ut/base-url-geojson res vin (name lev)]) ".json")
-     (str (s/join "/" [ut/base-url-geojson res vin st (name lev)]) ".json"))))
+     (str (join "/" [URL-GEOJSON res vin (name lev)]) ".json")
+     (str (join "/" [URL-GEOJSON res vin st (name lev)]) ".json"))))
 
 (defn geo-scoper
   ([geoK res vin lev USr]     (geo-scoper geoK res vin lev USr nil nil))
@@ -100,19 +102,19 @@
   stats returned as a clojure map.
   "
   [=I= =O=]
-  (let [=geo= (<|/chan 1)
-        =url= (<|/chan 1)]
-    ((ut/I=O<<=IO= (ut/IO-cache-GET-edn $geoKeyMap$)) ut/base-url-geoKeyMap =geo=)
-    (<|/go (let [args  (<|/<! =I=)
-                 geoK  (<|/<! =geo=)
-                 url   (geo-url-composer geoK args)]
-             (prn url)
-             ;(prn geoK)
-             (<|/>! =url= url)
-             ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-             (<|/pipeline-async 1 =O= (ut/I=O<<=IO= ut/IO-ajax-GET-json) =url=)
-             (<|/close! =geo=)
-             (<|/close! =url=)))))
+  (let [=geo= (chan 1)
+        =url= (chan 1)]
+    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
+    (go (let [args  (<! =I=)
+              geoK  (<! =geo=)
+              url   (geo-url-composer geoK args)]
+          (prn url)
+          ;(prn geoK)
+          (>! =url= url)
+          ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
+          (pipeline-async 1 =O= (I=O<<=IO= IO-ajax-GET-json) =url=)
+          (close! =geo=)
+          (close! =url=)))))
                ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 
 
@@ -123,13 +125,17 @@
 
 #_(prn ts/test-args-5)
 
-#_(let [=I= (<|/chan 1)
-        =O= (<|/chan 1 (map ut/throw-err))]
-    (<|/go (<|/>! =I= ts/test-args-6)
-           (IO-pp->census-GeoJSON =I= =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =I=)
-           (<|/close! =O=)))
+#_(let [=I= (chan 1)
+        =O= (chan 1 (map throw-err))]
+    (go (>! =I= {:vintage       "2000"
+                 :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+                 :sourcePath    ["acs" "acs5"]
+                 :geoResolution "500k"
+                 :values        ["B01001_001E"]})
+        (IO-pp->census-GeoJSON =I= =O=)
+        (prn (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 ;; =======================================
 
@@ -142,10 +148,10 @@
   ([args cb] (getCensusGeoJSON args cb false))
   ([args cb url?]
    (if url?
-     ((wms/Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
+     ((Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb #js {:url      (geo-url-composer {} args)
                  :response (js/JSON.stringify (clj->js %))}))
-     ((wms/Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
+     ((Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
        #(cb (js/JSON.stringify (clj->js %)))))))
 
 
@@ -155,7 +161,7 @@
     ;ts/census.test-js-args-1
     ts/test-js-args-2
     ;ts/census.test-args-2
-    #_#(geo+config->mkdirp->fsW!
+    #_#(geo+config->mkdirp->fsW! ; TODO <- Move into utils
          {:directory "./src/json/"
           :filepath "./src/json/legislative-only.json"
           :json %})
