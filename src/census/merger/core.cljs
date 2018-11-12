@@ -4,11 +4,10 @@
                           :refer-macros [go]
                           :as <|]
     [ajax.core            :refer [GET POST]]
-    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$
-                                  xf<< xfxf<< throw-err
-                                  js->args I=O<<=IO= IO-cache-GET-edn]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [census.statsAPI.core :refer [IO-pp->census-stats]]))
+    [census.statsAPI.core :refer [IO-pp->census-stats]]
+    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< xfxf<< throw-err
+                                  js->args I=O<<=IO= IO-cache-GET-edn]]))
     ;[census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
 
 (comment

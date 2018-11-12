@@ -8,7 +8,6 @@
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
                                 map-over-keys keys->strs error throw-err
                                 IO-cache-GET-edn I=O<<=IO= IO-ajax-GET-json]]))
-    ;[census.geojson.core :refer [geo+config->mkdirp->fsW!]] ; TODO <- Move into utils
 
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -161,7 +160,7 @@
     ;ts/census.test-js-args-1
     ts/test-js-args-2
     ;ts/census.test-args-2
-    #_#(geo+config->mkdirp->fsW! ; TODO <- Move into utils
+    #_#(configs.utils.fixtures/config->mkdirp->fsW!
          {:directory "./src/json/"
           :filepath "./src/json/legislative-only.json"
           :json %})

@@ -5,12 +5,12 @@
     [ajax.core           :refer [GET POST]]
     [cljs-promises.async :refer [pair-port]]
     [cuerdas.core        :as s]
-    [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-                                 if-path continue-then-stay selected?]
-                         :refer-macros [select transform traverse setval recursive-path]]
     [oops.core           :refer [oget oset!]]
     [cljs.reader         :refer [read-string]]
-    [linked.core         :as -=-]))
+    [linked.core         :as -=-]
+    [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+                                 if-path continue-then-stay selected?]
+                         :refer-macros [select transform traverse setval recursive-path]]))
 
 
 (def $geoKeyMap$ (atom {}))
@@ -23,26 +23,6 @@
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/configs/geojson/index.edn")
 
 (def base-url-database "TODO?")
-
-
-(defn config->mkdirp->fsW!
-  "
-  Takes some configs.geojson and a directory and - internally - calls Node `fs/writeFile`
-  to store the configs.geojson into the directory, creating the directory first if needed.
-  "
-  [{:keys [directory filepath json]}]
-  (prn (str "Ensuring Directory: " directory))
-  (mkdirp directory
-          (fn [err]
-            (if (= (type err) ut/err-type)
-              (prn (str "Error creating directory: " filepath))
-              (fs/writeFile
-                filepath
-                json
-                (fn [err]
-                  (if (= (type err) ut/err-type)
-                    (prn (str "Error writing file: " filepath))
-                    (prn (str "Wrote file to: " filepath)))))))))
 
 (def vec-type cljs.core/PersistentVector)
 

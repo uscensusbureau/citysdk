@@ -2,17 +2,19 @@
   (:require
     [cljs.core.async :refer [take! pipeline chan promise-chan]
                      :refer-macros [go]]
-    [cljs.test :refer-macros [deftest is testing run-tests async]]
-    [com.rpl.specter :as sp]
-    [census.utils.core :as ut :refer [stats-key]]
-    ["fs" :as fs]
-    ["dotenv" :as env]))
+    [cljs.test       :refer-macros [deftest is testing run-tests async]]
+    [com.rpl.specter :refer [MAP-VALS]
+                     :refer-macros [select setval]]
+    [cljs.reader     :refer [read-string]]
+    [oops.core       :refer [oget]]
+    ["fs"            :as fs]
+    ["dotenv"        :as env]))
 
 (defn read-edn [path] (read-string (str (fs/readFileSync path))))
 
 (def stats-key (oget (env/load) ["parsed" "Census_Key_Pro"]))
-(prn (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
-(def *g* (ut/read-edn "./src/census/geojson/index.edn"))
+;(prn (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
+(def *g* (read-edn "./src/configs/geojson/index.edn"))
 
 (defn test-async
   "Asynchronous test awaiting ch to produce a value or close."
@@ -109,13 +111,13 @@
         srcs {:sourcePath    (get-path :srcP vkey)}
         prds {:predicates    (get-path :pred vkey)}
         vals {:values        (get-path :vals vkey)}
-        ge1s (if (= [:coords] (sp/select sp/MAP-VALS (get-path :geo1 geo)))
-               (sp/setval sp/MAP-VALS (get-path :crds 0) (get-path :geo1 geo))
+        ge1s (if (= [:coords] (select MAP-VALS (get-path :geo1 geo)))
+               (setval MAP-VALS (get-path :crds 0) (get-path :geo1 geo))
                (get-path :geo1 geo))
         ge2s (get-path :geo2 geo)
         geoH {:geoHierarchy  (conj {} ge1s ge2s)}
         ress {:geoResolution (get-path :geoR res)}]
-    (into {} (map (fn [val] (if (= [nil] (sp/select sp/MAP-VALS val)) nil val))
+    (into {} (map (fn [val] (if (= [nil] (select MAP-VALS val)) nil val))
                   [vins geoH srcs ress prds vals (if (= 1 s-key) {:statsKey stats-key} {:statsKey nil})]))))
 
 
