@@ -10,6 +10,7 @@
                                 IO-cache-GET-edn I=O<<=IO= IO-ajax-GET-json]]))
 
 
+
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 (comment
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
@@ -71,15 +72,15 @@
   Takes a pattern of maps and triggers the URL builder accordingly
   "
   ([_    [nil    _   _   _                            _]]                  "") ; no request for GeoJSON
-  ([geoK ["500k" vin _   [:zip-code-tabulation-area _]{:us USr :st nil }]] (lg-warn->geo geoK "500k" vin :zip-code-tabulation-area USr)) ; big!
-  ([geoK ["500k" vin _   [:county _]                  {:us USr :st nil }]] (lg-warn->geo geoK "500k" vin :county USr)) ; big!
-  ([geoK [res    vin _   [lev _  ]                    nil               ]] (geo-error    geoK res    vin lev))     ; no valid geography
-  ([geoK [res    vin nil [lev _  ]                    {:us nil :st _   }]] (geo-error    geoK res    vin lev))     ; tries US, only states
-  ([geoK [res    vin "*" [lev _  ]                    {:us nil :st _   }]] (geo-error    geoK res    vin lev))     ; tries US, only states
-  ([geoK [res    vin nil [lev _  ]                    {:us USr :st _   }]] (geo-scoper   geoK res    vin lev USr)) ; tries to get all US
-  ([geoK [res    vin "*" [lev _  ]                    {:us USr :st _   }]] (geo-scoper   geoK res    vin lev USr)) ; tries to get all US
-  ([geoK [res    vin _   [lev _  ]                    {:us USr :st nil }]] (geo-scoper   geoK res    vin lev USr)) ; no states, try :us
-  ([geoK [res    vin st  [lev _  ]                    {:us USr :st STr }]] (geo-scoper   geoK res    vin lev USr STr st))) ; try state
+  ([geoK [res vin _   [:zip-code-tabulation-area _]{:us USr :st nil }]] (lg-warn->geo geoK res vin :zip-code-tabulation-area USr)) ; big!
+  ([geoK [res vin _   [:county _]                  {:us USr :st nil }]] (lg-warn->geo geoK res vin :county USr)) ; big!
+  ([geoK [res vin _   [lev _  ]                    nil               ]] (geo-error    geoK res    vin lev))     ; no valid geography
+  ([geoK [res vin nil [lev _  ]                    {:us nil :st _   }]] (geo-error    geoK res    vin lev))     ; tries US, only states
+  ([geoK [res vin "*" [lev _  ]                    {:us nil :st _   }]] (geo-error    geoK res    vin lev))     ; tries US, only states
+  ([geoK [res vin nil [lev _  ]                    {:us USr :st _   }]] (geo-scoper   geoK res    vin lev USr)) ; tries to get all US
+  ([geoK [res vin "*" [lev _  ]                    {:us USr :st _   }]] (geo-scoper   geoK res    vin lev USr)) ; tries to get all US
+  ([geoK [res vin _   [lev _  ]                    {:us USr :st nil }]] (geo-scoper   geoK res    vin lev USr)) ; no states, try :us
+  ([geoK [res vin st  [lev _  ]                    {:us USr :st STr }]] (geo-scoper   geoK res    vin lev USr STr st))) ; try state
 
 (defn geo-pattern-maker
   [geoK

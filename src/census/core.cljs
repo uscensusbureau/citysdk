@@ -1,15 +1,15 @@
 (ns census.core
   (:require
     [cljs.core.async      :refer-macros [go]
-                          :refer [chan >! <! close!]]
+                          :refer [chan >! <! close! pipeline-async]]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err I=O<<=IO=]]
+    [census.utils.core    :refer [throw-err I=O<<=IO= I=O=stringify js->args]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.merger.core   :refer [IO-geo+stats]]))
-    ;[test.fixtures.core   :as ts]))
+    [census.merger.core   :refer [IO-geo+stats]]
+    [test.fixtures.core   :as ts]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -44,7 +44,7 @@
 
 (defn IO-census
   [=I= =O=]
-  (go (let [args   (<! =I=)
+  (go (let [args   (js->args (<! =I=))
             deploy (deploy-census-function args)]
         (prn deploy)
         (case deploy
@@ -69,15 +69,17 @@
         (close! =O=)))
 
 (defn census
-  [I cb?]
-  (comment (if (= (type cb?) js/String)
-             (let [directory (str (join "/" (butlast (split cb? "/"))) "/")]
-               ((Icb<-wms-args<<=IO= IO-census) I
-                  #(config->mkdirp->fsW!
-                     {:filepath cb?
-                      :directory directory
-                      :json (js/JSON.stringify (clj->js %))})))))
-  ((Icb<-wms-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %)))))
+  [I cb]
+  (let [=arg-in= (chan 1)
+        =args=   (chan 1)
+        =cljson= (chan 1 (map clj->js))
+        =json=   (chan 1)]
+    (go (>! =arg-in= I)
+        (pipeline-async 1 =args= (I=O<<=IO= IO-census-wms) =arg-in=)
+        (pipeline-async 1 =cljson= (I=O<<=IO= IO-census) =args=)
+        (pipeline-async 1 =json= I=O=stringify =cljson=)
+        (cb (<! =json=)))))
+      ;((Icb<-wms-args<<=IO= IO-census) I (fn [cljson] (bfj-stringify (clj->js cljson) #(cb %)))))))
 
 
 

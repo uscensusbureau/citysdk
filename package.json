@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/loganpowell/census-geojson#readme",
   "dependencies": {
+    "bfj": "^6.1.1",
     "dotenv": "^5.0.1",
     "mkdirp": "^0.5.1",
     "shpjs": "^3.4.2",

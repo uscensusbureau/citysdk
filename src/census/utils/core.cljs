@@ -1,17 +1,17 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async     :refer [chan >! <! take! close! promise-chan]
+    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan]
                          :refer-macros [go]]
     [ajax.core           :refer [GET POST]]
-    [cljs-promises.async :refer [pair-port]]
+    [cljs-promises.async :refer [pair-port value-port]]
     [cuerdas.core        :as s]
     [oops.core           :refer [oget oset!]]
     [cljs.reader         :refer [read-string]]
     [linked.core         :as -=-]
     [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
                                  if-path continue-then-stay selected?]
-                         :refer-macros [select transform traverse setval recursive-path]]))
-
+                         :refer-macros [select transform traverse setval recursive-path]]
+    ["bfj" :as bfj]))
 
 (def $geoKeyMap$ (atom {}))
 
@@ -145,6 +145,69 @@
 ;
 ;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
 ;; =======================================
+
+
+(defn I=O=stringify
+  [I =O=]
+  (let [options #js{:bufferLength 25600}]
+       (take! (value-port (bfj/stringify I options))
+              (fn [res] (put! =O= res)))))
+
+#_(let [I (clj->js {:testing "one two"})
+        =O= (chan 1)]
+    (go (I=O=stringify I =O=)
+        (prn (<! =O=))))
+
+;
+;(defn zip->geojson->put!
+;  "
+;  Uses `shpjs` NPM library to convert zipfile into GeoJSON format.
+;  Uses `cljs-promises` to convert the promise returned from `shpjs` to a
+;  promise-cum-core.async `chan` (`value-port`). Once the promise is resolved,
+;  the GeoJSON is `take!`en out of the `value-port` and `put!` into a passed `chan`.
+;  "
+;  [val =port=]
+;  (prn (str "zip->json'ing..."))
+;  (take! (value-port (shpjs val))
+;         (fn [res] (put! =port=
+;                         (js/JSON.stringify res)
+;                         #(close! =port=)))))
+
+; Examples =======================================
+
+;(defn =IO<-js-<3-fn
+;  [<3-fn]
+;  (fn [=I= =O=]
+;    (go (let [[val err] (<! (cpa/pair-port (<3-fn (<! =I=))))]
+;                (if (= val nil)
+;                    (>! =O= err)
+;                    (>! =O= (js->clj val)))))))
+
+
+#_(defn test-promise
+    [?happy?]
+    (js/Promise. (fn [resolve reject]
+                   (let [answer "This promise was "]
+                   (if (= ?happy? "happy")
+                       (resolve (str answer "resolved!"))
+                       (reject  (js/Error. (str answer "rejected :("))))))))
+
+
+#_(-> (test-promise "happy")
+      (.then (fn [fulfilled] (prn fulfilled))))
+
+#_(-> (test-promise "poop")
+      (.then (fn [fulfilled] (js/console.log fulfilled)))
+      (.catch (fn [error]    (js/console.log error))))
+
+
+
+#_(let [=O= (chan 1 (map throw-err))]
+    (go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
+        (prn (<! =O=))
+        (close! =O=)))
+
+; ==================================================
 
 
 (defn IO-ajax-GET-json
@@ -312,38 +375,6 @@
 ;             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
 ;             (close! =I=))))) ; close the port to flush out values
 ;
-;(defn =IO<-js-<3-fn
-;  [<3-fn]
-;  (fn [=I= =O=]
-;    (go (let [[val err] (<! (cpa/pair-port (<3-fn (<! =I=))))]
-;                (if (= val nil)
-;                    (>! =O= err)
-;                    (>! =O= (js->clj val)))))))
-
-; Examples =======================================
-
-#_(defn test-promise
-    [?happy?]
-    (js/Promise. (fn [resolve reject]
-                     (let [answer "This promise was "]
-                          (if (= ?happy? "happy")
-                              (resolve (str answer "resolved!"))
-                              (reject  (js/Error. (str answer "rejected :("))))))))
-
-
-#_(-> (test-promise "happy")
-      (.then (fn [fulfilled] (prn fulfilled))))
-
-#_(-> (test-promise "poop")
-      (.then (fn [fulfilled] (js/console.log fulfilled)))
-      (.catch (fn [error]    (js/console.log error))))
-
-
-
-#_(let [=O= (chan 1 (map throw-err))]
-    (go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
-        (prn (<! =O=))
-        (close! =O=)))
 
 ; ==================================================
 

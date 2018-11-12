@@ -299,9 +299,8 @@
   [=I= =O=]
   (let [=geo= (chan 1)]
     ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
-    (go (let [I          (<! =I=)
+    (go (let [args       (<! =I=)
               $g$        (<! =geo=)
-              args       (js->args I)
               ids        (get-geoid?s $g$ args)
               vars#      (+ (count (get args :values))
                             (count (get args :predicates)))
