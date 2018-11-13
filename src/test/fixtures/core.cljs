@@ -142,7 +142,7 @@
    :values ["NAME"],
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
-(js/console.log (clj->js args-ok-s+g-v+ps))
+;(js/console.log (clj->js args-ok-s+g-v+ps))
 
 (def args-na-sts-pred (test-args 8 1 3 1))
 #_{:vintage 2017,
@@ -208,6 +208,12 @@
    :values ["ESTAB"],
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
+#_(js/console.log (clj->js {:vintage 2016
+                            :sourcePath ["acs" "acs5"]
+                            :values ["B25001_001E"]
+                            :geoHierarchy {:zip-code-tabulation-area "*"}
+                            :geoResolution "500k"
+                            :statsKey stats-key}))
 
 #_(map #(js/console.log (clj->js %))
        [args-ok-wms-only
@@ -215,6 +221,33 @@
         args-ok-sts-vals
         args-ok-s+g-vals
         args-ok-geo-only])
+
+(comment
+  { vintage: 2014,
+    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*'}}
+  { vintage: 2016,
+    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+    sourcePath: [ 'acs', 'acs5' ],
+    geoResolution: '5m',
+    predicates: { B00001_001E: '0:1000000' },
+    values: [ 'B01001_001E']}
+  { vintage: '2015',
+    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+    sourcePath: [ 'cbp' ],
+    values: [ 'ESTAB']}
+  { vintage: '2015',
+     geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+     sourcePath: [ 'cbp' ],
+     geoResolution: '20m',
+     values: [ 'ESTAB']}
+  { vintage: 2014,
+    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*' },
+    geoResolution: '500k'}
+  { vintage: 2016,
+   sourcePath: [ 'acs', 'acs5' ],
+   values: [ 'B25001_001E' ],
+   geoHierarchy: { 'zip-code-tabulation-area': '*' },
+   geoResolution: '500k',})
 
 
 

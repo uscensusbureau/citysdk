@@ -13,7 +13,7 @@
     [configs.geojson.filepaths :as geos]
     [configs.geojson.filepaths_abv :as geos_abv]
     ["fs" :as fs]
-    ["path" :as path]
+    ;["path" :as path]
     ["shpjs" :as shpjs]
     ["mkdirp" :as mkdirp]))
 

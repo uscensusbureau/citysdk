@@ -10,8 +10,8 @@
     [linked.core         :as -=-]
     [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
                                  if-path continue-then-stay selected?]
-                         :refer-macros [select transform traverse setval recursive-path]]
-    ["bfj" :as bfj]))
+                         :refer-macros [select transform traverse setval recursive-path]]))
+    ;["bfj" :as bfj]))
 
 (def $geoKeyMap$ (atom {}))
 
@@ -147,11 +147,11 @@
 ;; =======================================
 
 
-(defn I=O=stringify
-  [I =O=]
-  (let [options #js{:bufferLength 25600}]
-       (take! (value-port (bfj/stringify I options))
-              (fn [res] (put! =O= res)))))
+#_(defn I=O=stringify
+    [I =O=]
+    (let [options #js{:bufferLength 25600}]
+         (take! (value-port (bfj/stringify I options))
+                (fn [res] (put! =O= res)))))
 
 #_(let [I (clj->js {:testing "one two"})
         =O= (chan 1)]
@@ -337,27 +337,27 @@
           (close! =I=))))) ; close the port to flush out values
 
 ;; Tested: working
-
-(defn args+cb<<=IO=
-  "
-  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
-  input and expose the output to a callback and converts any #js args to proper
-  cljs syntax (with keyword translation)
-
-  This is good for touch & go asynchronous functions, which do not require
-  'enduring relationships' or concerted application between other async
-  functions (e.g., exposing asynchronous functions as a library).
-  "
-  [f]                                           ; takes an async I/O function
-  (fn [I cb ?state]                             ; returns a function with sync input  / callback for output
-    (let [=I=  (chan 1)                      ; create two internal `chan`s for i/o
-          =O=  (chan 1 (map throw-err))
-          args (js->args I)]                    ; converts any #js types to cljs with proper keys
-      (go (>! =I= args)
-          (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
-          (take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
-                          (close! =I=) ; close the ports to flush the values
-                          (close! =O=)))))))
+;
+;(defn args+cb<<=IO=
+;  "
+;  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
+;  input and expose the output to a callback and converts any #js args to proper
+;  cljs syntax (with keyword translation)
+;
+;  This is good for touch & go asynchronous functions, which do not require
+;  'enduring relationships' or concerted application between other async
+;  functions (e.g., exposing asynchronous functions as a library).
+;  "
+;  [f]                                           ; takes an async I/O function
+;  (fn [I cb ?state]                             ; returns a function with sync input  / callback for output
+;    (let [=I=  (chan 1)                      ; create two internal `chan`s for i/o
+;          =O=  (chan 1 (map throw-err))
+;          args (js->args I)]                    ; converts any #js types to cljs with proper keys
+;      (go (>! =I= args)
+;          (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
+;          (take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
+;                          (close! =I=) ; close the ports to flush the values
+;                          (close! =O=)))))))
 
 ;; Tested: working
 ;

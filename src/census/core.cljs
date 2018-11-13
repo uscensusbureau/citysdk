@@ -4,12 +4,12 @@
                           :refer [chan >! <! close! pipeline-async]]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err I=O<<=IO= I=O=stringify js->args]]
+    [census.utils.core    :refer [throw-err I=O<<=IO= js->args]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.merger.core   :refer [IO-geo+stats]]
-    [test.fixtures.core   :as ts]))
+    [census.merger.core   :refer [IO-geo+stats]]))
+    ;[test.fixtures.core   :as ts]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -44,7 +44,7 @@
 
 (defn IO-census
   [=I= =O=]
-  (go (let [args   (js->args (<! =I=))
+  (go (let [args   (<! =I=)
             deploy (deploy-census-function args)]
         (prn deploy)
         (case deploy
@@ -70,15 +70,15 @@
 
 (defn census
   [I cb]
-  (let [=arg-in= (chan 1)
-        =args=   (chan 1)
+  ((Icb<-wms-args<<=IO= IO-census) I #(cb (js/JSON.stringify (clj->js %)))))
+#_(let [=args=   (chan 1)
         =cljson= (chan 1 (map clj->js))
         =json=   (chan 1)]
-    (go (>! =arg-in= I)
-        (pipeline-async 1 =args= (I=O<<=IO= IO-census-wms) =arg-in=)
+    (go ((I=O<<=IO= IO-census-wms) (js->args I) =args=)
+        ;(pipeline-async 1 =args= (I=O<<=IO= IO-census-wms) =arg-in=)
         (pipeline-async 1 =cljson= (I=O<<=IO= IO-census) =args=)
         (pipeline-async 1 =json= I=O=stringify =cljson=)
-        (cb (<! =json=)))))
+        (cb (<! =json=))))
       ;((Icb<-wms-args<<=IO= IO-census) I (fn [cljson] (bfj-stringify (clj->js cljson) #(cb %)))))))
 
 

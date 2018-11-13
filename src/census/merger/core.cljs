@@ -12,6 +12,7 @@
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+;; or in Node: node --max-old-space-size=4096
 
   (lookup-id->match? :CONCITY [{:2017 {:lev<-file "concity",
                                        :scopes {:us nil, :st ["500k"]},

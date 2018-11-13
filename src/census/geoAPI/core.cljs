@@ -140,19 +140,19 @@
 ;; =======================================
 
 
-(defn getCensusGeoJSON
-  "
-  Library function, which takes a JSON object as input, constructs a call to get
-  Github raw file and returns GeoJSON.
-  "
-  ([args cb] (getCensusGeoJSON args cb false))
-  ([args cb url?]
-   (if url?
-     ((Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
-       #(cb #js {:url      (geo-url-composer {} args)
-                 :response (js/JSON.stringify (clj->js %))}))
-     ((Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
-       #(cb (js/JSON.stringify (clj->js %)))))))
+(comment (defn getCensusGeoJSON
+           "
+           Library function, which takes a JSON object as input, constructs a call to get
+           Github raw file and returns GeoJSON.
+           "
+           ([args cb] (getCensusGeoJSON args cb false))
+           ([args cb url?]
+            (if url?
+              ((Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
+                #(cb #js {:url      (geo-url-composer {} args)
+                          :response (js/JSON.stringify (clj->js %))}))
+              ((Icb<-wms-args<<=IO= IO-pp->census-GeoJSON) args
+                #(cb (js/JSON.stringify (clj->js %))))))))
 
 
 ;; Examples  ========================================
