@@ -2,17 +2,19 @@
   (:require
     [cljs.core.async :refer [take! pipeline chan promise-chan]
                      :refer-macros [go]]
-    [cljs.test :refer-macros [deftest is testing run-tests async]]
-    [com.rpl.specter :as sp]
-    [census.utils.core :as ut :refer [stats-key]]
-    ["fs" :as fs]
-    ["dotenv" :as env]))
+    [cljs.test       :refer-macros [deftest is testing run-tests async]]
+    [com.rpl.specter :refer [MAP-VALS]
+                     :refer-macros [select setval]]
+    [cljs.reader     :refer [read-string]]
+    ;[oops.core       :refer [oget]]
+    ["fs"            :as fs]
+    ["dotenv"        :as env]))
 
 (defn read-edn [path] (read-string (str (fs/readFileSync path))))
 
-(def stats-key (oget (env/load) ["parsed" "Census_Key_Pro"]))
-(prn (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
-(def *g* (ut/read-edn "./src/census/geojson/index.edn"))
+(def stats-key (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
+(prn stats-key)
+(def *g* (read-edn "./src/configs/geojson/index.edn"))
 
 (defn test-async
   "Asynchronous test awaiting ch to produce a value or close."
@@ -109,53 +111,59 @@
         srcs {:sourcePath    (get-path :srcP vkey)}
         prds {:predicates    (get-path :pred vkey)}
         vals {:values        (get-path :vals vkey)}
-        ge1s (if (= [:coords] (sp/select sp/MAP-VALS (get-path :geo1 geo)))
-               (sp/setval sp/MAP-VALS (get-path :crds 0) (get-path :geo1 geo))
+        ge1s (if (= [:coords] (select MAP-VALS (get-path :geo1 geo)))
+               (setval MAP-VALS (get-path :crds 0) (get-path :geo1 geo))
                (get-path :geo1 geo))
         ge2s (get-path :geo2 geo)
         geoH {:geoHierarchy  (conj {} ge1s ge2s)}
         ress {:geoResolution (get-path :geoR res)}]
-    (into {} (map (fn [val] (if (= [nil] (sp/select sp/MAP-VALS val)) nil val))
-                  [vins geoH srcs ress prds vals (if (= 1 s-key) {:statsKey stats-key} {:statsKey nil})]))))
+    (into {} (map (fn [val] (if (= [nil] (select MAP-VALS val)) nil val))
+                  [vins geoH srcs ress prds vals (if (= 1 s-key)
+                                                     {:statsKey stats-key}
+                                                     {:statsKey nil})]))))
 
 
 (def args-ok-wms-only (test-args 9 2 4 0))
 #_{:vintage     "2016",
-   :geoHierachy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}}
+   :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}}
+
 
 (def args-na-wms-only (test-args 9 0 4 0))
 #_{:vintage "2016",
-   :geoHierachy {:invalid "*"}}
+   :geoHierarchy {:invalid "*"}}
+
 
 (def args-ok-s+g-v+ps (test-args 6 1 2 1))
 #_{:vintage 2016,
-   :geoHierachy {:state "01", :county "001"},
+   :geoHierarchy {:state "01", :county "001"},
    :sourcePath ["acs" "acs5"],
    :geoResolution "500k",
    :predicates {:B00001_001E "0:1000000"},
    :values ["NAME"],
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
+;(js/console.log (clj->js args-ok-s+g-v+ps))
+
 (def args-na-sts-pred (test-args 8 1 3 1))
 #_{:vintage 2017,
-   :geoHierachy {:state "01", :county "001"},
+   :geoHierarchy {:state "01", :county "001"},
    :sourcePath ["acs" "acs1"],
    :predicates {:B00001_001E "0:1000000"},
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
 (def args-ok-geo-only (test-args 9 2 2 0))
 #_{:vintage 2014,
-   :geoHierachy {:state {:lat 28.2639, :lng -80.7214}, :county "*"},
+   :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"},
    :geoResolution "500k"}
 
 (def args-na-geo-only (test-args 9 4 1 0))
 #_{:vintage 2014,
-   :geoHierachy {:state "01", :zip-code-tabulation-area "*"},
+   :geoHierarchy {:state "01", :zip-code-tabulation-area "*"},
    :geoResolution "5m"}
 
 (def args-ok-s+g-vals (test-args 5 3 0 1))
 #_{:vintage "2015",
-   :geoHierachy {:county {:lat 28.2639, :lng -80.7214}},
+   :geoHierarchy {:county {:lat 28.2639, :lng -80.7214}},
    :sourcePath ["cbp"],
    :geoResolution "20m",
    :values ["ESTAB"],
@@ -163,14 +171,14 @@
 
 (def args-ok-sts-vals (test-args 5 3 3 1))
 #_{:vintage "2015",
-   :geoHierachy {:county {:lat 28.2639, :lng -80.7214}},
+   :geoHierarchy {:county {:lat 28.2639, :lng -80.7214}},
    :sourcePath ["cbp"],
    :values ["ESTAB"],
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
 (def args-ok-s+g-v+ps (test-args 6 3 1 1))
 #_{:vintage 2016,
-   :geoHierachy {:county {:lat 28.2639, :lng -80.7214}},
+   :geoHierarchy {:county {:lat 28.2639, :lng -80.7214}},
    :sourcePath ["acs" "acs5"],
    :geoResolution "5m",
    :predicates {:B00001_001E "0:1000000"},
@@ -179,7 +187,7 @@
 
 (def args-ok-sts-v+ps (test-args 6 3 3 1))
 #_{:vintage 2016,
-   :geoHierachy {:county {:lat 28.2639, :lng -80.7214}},
+   :geoHierarchy {:county {:lat 28.2639, :lng -80.7214}},
    :sourcePath ["acs" "acs5"],
    :predicates {:B00001_001E "0:1000000"},
    :values ["NAME"],
@@ -187,7 +195,7 @@
 
 (def args-na-s+g-vals (test-args 5 0 0 1))
 #_{:vintage "2015",
-   :geoHierachy {:invalid "*"},
+   :geoHierarchy {:invalid "*"},
    :sourcePath ["cbp"],
    :geoResolution "20m",
    :values ["ESTAB"],
@@ -195,13 +203,51 @@
 
 (def args-na-sts-vals (test-args 5 0 3 1))
 #_{:vintage "2015",
-   :geoHierachy {:invalid "*"},
+   :geoHierarchy {:invalid "*"},
    :sourcePath ["cbp"],
    :values ["ESTAB"],
    :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
 
+#_(js/console.log (clj->js {:vintage 2016
+                            :sourcePath ["acs" "acs5"]
+                            :values ["B25001_001E"]
+                            :geoHierarchy {:zip-code-tabulation-area "*"}
+                            :geoResolution "500k"
+                            :statsKey stats-key}))
 
+#_(map #(js/console.log (clj->js %))
+       [args-ok-wms-only
+        args-ok-s+g-v+ps
+        args-ok-sts-vals
+        args-ok-s+g-vals
+        args-ok-geo-only])
 
+(comment
+  { vintage: 2014,
+    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*'}}
+  { vintage: 2016,
+    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+    sourcePath: [ 'acs', 'acs5' ],
+    geoResolution: '5m',
+    predicates: { B00001_001E: '0:1000000' },
+    values: [ 'B01001_001E']}
+  { vintage: '2015',
+    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+    sourcePath: [ 'cbp' ],
+    values: [ 'ESTAB']}
+  { vintage: '2015',
+     geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+     sourcePath: [ 'cbp' ],
+     geoResolution: '20m',
+     values: [ 'ESTAB']}
+  { vintage: 2014,
+    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*' },
+    geoResolution: '500k'}
+  { vintage: 2016,
+   sourcePath: [ 'acs', 'acs5' ],
+   values: [ 'B25001_001E' ],
+   geoHierarchy: { 'zip-code-tabulation-area': '*' },
+   geoResolution: '500k',})
 
 
 

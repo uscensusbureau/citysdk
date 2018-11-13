@@ -1,14 +1,15 @@
 (ns census.core
   (:require
     [cljs.core.async      :refer-macros [go]
-                          :refer [chan >! <! close!]]
+                          :refer [chan >! <! close! pipeline-async]]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err I=O<<=IO= config->mkdirp->fsW!]]
+    [census.utils.core    :refer [throw-err I=O<<=IO= js->args]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
     [census.merger.core   :refer [IO-geo+stats]]))
+    ;[test.fixtures.core   :as ts]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -28,8 +29,8 @@
   ([{:vintage _ :geoHierarchy _                                                                   }] :geocodes)
   ([& anything-else] nil))
 
-#_(deploy-census-function)
-    ;ts/args-ok-wms-only
+#_(deploy-census-function
+    ts/args-ok-wms-only)
     ;ts/args-ok-geo-only
     ;ts/args-ok-s+g-v+ps
     ;ts/args-ok-s+g-vals
@@ -55,28 +56,30 @@
               (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
 
 
-(go (let [=I= (chan 1)
-          =O= (chan 1 (map throw-err))]
-      (>! =I= {:vintage       "2000"
-               :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
-               :sourcePath    ["acs" "acs5"]
-               :geoResolution "500k"
-               :values        ["B01001_001E"]})
-      (IO-census =I= =O=)
-      (prn (<! =O=))
-      (close! =I=)
-      (close! =O=)))
+#_(go (let [=I= (chan 1)
+            =O= (chan 1 (map throw-err))]
+        (>! =I= {:vintage       "2016"
+                 :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+                 :sourcePath    ["acs" "acs5"]
+                 :geoResolution "500k"
+                 :values        ["B01001_001E"]})
+        (IO-census =I= =O=)
+        (prn (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 (defn census
-  [I cb?]
-  (if (= (type cb?) js/String)
-    (let [directory (str (join "/" (butlast (split cb? "/"))) "/")]
-      ((Icb<-wms-args<<=IO= IO-census) I
-         #(config->mkdirp->fsW!
-            {:filepath cb?
-             :directory directory
-             :json (js/JSON.stringify (clj->js %))})))
-    ((Icb<-wms-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %))))))
+  [I cb]
+  ((Icb<-wms-args<<=IO= IO-census) I #(cb (js/JSON.stringify (clj->js %)))))
+#_(let [=args=   (chan 1)
+        =cljson= (chan 1 (map clj->js))
+        =json=   (chan 1)]
+    (go ((I=O<<=IO= IO-census-wms) (js->args I) =args=)
+        ;(pipeline-async 1 =args= (I=O<<=IO= IO-census-wms) =arg-in=)
+        (pipeline-async 1 =cljson= (I=O<<=IO= IO-census) =args=)
+        (pipeline-async 1 =json= I=O=stringify =cljson=)
+        (cb (<! =json=))))
+      ;((Icb<-wms-args<<=IO= IO-census) I (fn [cljson] (bfj-stringify (clj->js cljson) #(cb %)))))))
 
 
 
@@ -86,10 +89,10 @@
   (census ts/args-ok-wms-only prn)
   (census (ts/test-args 9 3 3 0) js/console.log)
   (census ts/args-ok-geo-only js/console.log)
-  (census ts/args-ok-s+g-v+ps "./json/s-g.json")
   (census ts/args-ok-s+g-v+ps js/console.log)
-  (census ts/args-ok-s+g-vals "./json/s_1.json")
-  (census ts/args-na-sts-pred "./json/sts-pred.json")
+  (census ts/args-ok-s+g-v+ps js/console.log)
+  (census ts/args-ok-s+g-vals js/console.log)
+  (census ts/args-na-sts-pred js/console.log)
   (census ts/args-ok-sts-v+ps js/console.log)
   (census ts/args-ok-sts-vals js/console.log)
   (census {:vintage 2016
@@ -100,7 +103,7 @@
                           :county-subdivision "*"}
            :geoResolution "500k"
            :statsKey stats-key}
-          "./json/Census_County-and-Subdivisions_.json")
+          js/console.log)
   (census {:vintage 2016
            :sourcePath ["acs" "acs5"]
            :values ["B25001_001E"]
@@ -109,7 +112,7 @@
                           :tract "*"}
            :geoResolution "500k"
            :statsKey stats-key}
-          "./json/Census_County-and-Tracts_.json")
+          js/console.log)
   (census {:vintage 2016
            :sourcePath ["acs" "acs5"]
            :values ["B25001_001E"]
@@ -118,7 +121,7 @@
                           :block-group "*"}
            :geoResolution "500k"
            :statsKey stats-key}
-          "./json/Census_County-and-Block-Groups_.json")
+          js/console.log)
   (census {:vintage 2016
            :sourcePath ["acs" "acs5"]
            :values ["B01001_001E"]
@@ -126,13 +129,13 @@
                           :school-district-_elementary_ "*"}
            :geoResolution "500k"
            :statsKey stats-key}
-          "./json/Census_State-and-School-Districts_.json")
+          js/console.log)
   (census {:vintage 2016
            :sourcePath ["acs" "acs5"]
            :values ["B25001_001E"]
            :geoHierarchy {:zip-code-tabulation-area "*"}
            :geoResolution "500k"
            :statsKey stats-key}
-          "./json/Census_ZCTAs_.json"))
+          js/console.log))
 
 

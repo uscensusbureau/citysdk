@@ -7,13 +7,13 @@
                                :as s]
     [clojure.set               :refer [map-invert]]
     [defun.core                :refer-macros [defun]]
-    [cljs-promises.async       :refer [pair-port value-port]]
-    [census.utils.core         :refer [config->mkdirp->fsW! map-target error err-type]]
-    [configs.utils.fixtures    :refer [read-edn]]
+    [cljs-promises.async       :refer [value-port]]
+    [census.utils.core         :refer [map-target error err-type]]
+    [configs.utils.fixtures    :refer [read-edn config->mkdirp->fsW!]]
     [configs.geojson.filepaths :as geos]
     [configs.geojson.filepaths_abv :as geos_abv]
     ["fs" :as fs]
-    ["path" :as path]
+    ;["path" :as path]
     ["shpjs" :as shpjs]
     ["mkdirp" :as mkdirp]))
 

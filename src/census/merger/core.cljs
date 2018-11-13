@@ -4,16 +4,15 @@
                           :refer-macros [go]
                           :as <|]
     [ajax.core            :refer [GET POST]]
-    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$
-                                  xf<< xfxf<< throw-err
-                                  js->args I=O<<=IO= IO-cache-GET-edn]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [census.statsAPI.core :refer [IO-pp->census-stats]]))
-    ;[census.geojson.core  :refer [geo+config->mkdirp->fsW!]]))
+    [census.statsAPI.core :refer [IO-pp->census-stats]]
+    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< xfxf<< throw-err
+                                  js->args I=O<<=IO= IO-cache-GET-edn]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+;; or in Node: node --max-old-space-size=4096
 
   (lookup-id->match? :CONCITY [{:2017 {:lev<-file "concity",
                                        :scopes {:us nil, :st ["500k"]},
@@ -301,9 +300,8 @@
   [=I= =O=]
   (let [=geo= (chan 1)]
     ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
-    (go (let [I          (<! =I=)
+    (go (let [args       (<! =I=)
               $g$        (<! =geo=)
-              args       (js->args I)
               ids        (get-geoid?s $g$ args)
               vars#      (+ (count (get args :values))
                             (count (get args :predicates)))
