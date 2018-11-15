@@ -1,14 +1,14 @@
 (ns census.merger.core
   (:require
     [cljs.core.async      :refer [>! <! chan promise-chan close!]
-                          :refer-macros [go]
-                          :as <|]
+                          :refer-macros [go]]
     [ajax.core            :refer [GET POST]]
     [net.cgrand.xforms    :as x]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
     [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< xfxf<< throw-err err-type
                                   js->args I=O<<=IO= IO-cache-GET-edn map-over-keys]]))
+    ;[test.fixtures.core   :refer [*g*]]))
 
 (comment
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
@@ -41,112 +41,124 @@
                      :2000 {:lev<-file "cc"       :scopes {:us [           "500k"] :st nil      } :wms {:layers ["22"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCITFP]}}}))) ; "30", "11390")
 
 
-(defn xf<-stats+geoids
+(defn geoid<-stat
   "
-  Higher-order transducer (to enable transduction of a list conveyed via `chan`).
   Takes an integer argument denoting the number of stat vars the user requested.
-  The transducer is used to transform each item from the Census API response
-  collection into a new map with a hierarchy that will enable deep-merging of
+  Returns a function of one item (from the Census API response
+  collection) to a new map with a hierarchy that will enable deep-merging of
   the stats with a GeoJSON `feature`s `:properties` map.
   "
   [vars#]
-  (xf<<
-    (fn [rf result input]
-      (prn "Inside xf<-stats+geoids:")
-      (js/console.log (js/process.memoryUsage))
-      (rf result {(keyword (reduce str (vals (take-last (- (count input) vars#) input))))
-                  {:properties input}}))))
-
-; heapTotal: 193249280, <- start
-; heapUsed: 153434184, -
-; heapUsed: 153447496, = @ 13kb per pass
-; ...
-; heapTotal: 193249280, <- end
-; heapUsed: 158103104, === @ 4756kb total for all tracts in a single county
+  (fn [input]
+    {(apply str (vals (take-last (- (count input) vars#) input))) {:properties input}}))
 
 ;; Examples ==============================
 
-#_(transduce (xf<-stats+geoids 3) conj [{:B01001_001E                                494981,
-                                         :NAME                                       "State Senate District 40 (2016), Florida",
-                                         :B00001_001E                                29661,
-                                         :state                                      "12",
-                                         :state-legislative-district-_upper-chamber_ "040"}
-                                        {:B01001_001E                                492259,
-                                         :NAME                                       "State Senate District 36 (2016), Florida",
-                                         :B00001_001E                                29475,
-                                         :state                                      "12",
-                                         :state-legislative-district-_upper-chamber_ "036"}
-                                        {:B01001_001E                                493899,
-                                         :NAME                                       "State Senate District 35 (2016), Florida",
-                                         :B00001_001E                                25615,
-                                         :state                                      "12",
-                                         :state-legislative-district-_upper-chamber_ "035"}])
+#_(transduce (map (geoid<-stat 3))
+             conj [{:B01001_001E                                494981,
+                    :NAME                                       "State Senate District 40 (2016), Florida",
+                    :B00001_001E                                29661,
+                    :state                                      "12",
+                    :state-legislative-district-_upper-chamber_ "040"}
+                   {:B01001_001E                                492259,
+                    :NAME                                       "State Senate District 36 (2016), Florida",
+                    :B00001_001E                                29475,
+                    :state                                      "12",
+                    :state-legislative-district-_upper-chamber_ "036"}
+                   {:B01001_001E                                493899,
+                    :NAME                                       "State Senate District 35 (2016), Florida",
+                    :B00001_001E                                25615,
+                    :state                                      "12",
+                    :state-legislative-district-_upper-chamber_ "035"}])
+
+; =>
+; [{"12040" {:properties {:B01001_001E 494981,
+;                        :NAME "State Senate District 40 (2016), Florida",
+;                        :B00001_001E 29661,
+;                        :state "12",
+;                        :state-legislative-district-_upper-chamber_ "040"}}}
+; {"12036" {:properties {:B01001_001E 492259,
+;                        :NAME "State Senate District 36 (2016), Florida",
+;                        :B00001_001E 29475,
+;                        :state "12",
+;                        :state-legislative-district-_upper-chamber_ "036"}}}
+; {"12035" {:properties {:B01001_001E 493899,
+;                        :NAME "State Senate District 35 (2016), Florida",
+;                        :B00001_001E 25615,
+;                        :state "12",
+;                        :state-legislative-district-_upper-chamber_ "035"}}}]
 ;; =======================================
 
+(defn get-geoid?s
+  "
+  Takes the request argument and pulls out a vector of the component identifiers
+  from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
+  in deep-merging with statistics.
+  "
+  [$g$]
+  (fn [{:keys [geoHierarchy vintage]}]
+    (let [[& ids] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
+      ids)))
+
+;; Examples ==============================
+
+#_((get-geoid?s *g*) {:vintage      "2010"
+                      :sourcePath   ["acs" "acs5"]
+                      ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                      :geoHierarchy {:county "*"} ;; @ 30 seconds
+                      ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
+                      :geoResolution "500k"
+                      :values       ["B01001_001E" "NAME"]
+                      :predicates   {:B00001_001E "0:30000"}})
+
+; =>
+; (:STATE :COUNTY)
+;; =======================================
 
 (defn geoid<-feature
   "
   Takes the component ids from with the GeoJSON and a single feature to
   generate a :GEOID if not available within the GeoJSON.
   "
-  [ids m]
-  (keyword (reduce str (map #(get-in m [:properties %]) ids))))) ;  uses @ 1kb per
-
-;; Examples ==============================
-
-#_(-> (get-geoid?s {:vintage      "2010"
-                    :sourcePath   ["acs" "acs5"]
-                    ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                    :geoHierarchy {:county "*"} ;; @ 30 seconds
-                    ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
-                    :geoResolution "500k"
-                    :values       ["B01001_001E" "NAME"]
-                    :predicates   {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
-                    :statsKey     stats-key})
-      (geoid<-feature {:type "Feature",
-                       :properties
-                             {:STATEFP  "01",
-                              :GEOID    "01005",
-                              :STATE "123"
-                              :COUNTY "456"}
-                       :geometry
-                             {:type "Polygon",
-                              :coordinates
-                                    [[[-85.748032 31.619181]
-                                      [-85.729832 31.632373]]]}}))
-
-; => :123456
-;; =======================================
-
-(defn xf<-features+geoids
-  "
-  A function, which returns a transducer after being passed a. The transducer is used to
-  transform each item withing a GeoJSON FeatureCollection into a new map with a
-  hierarchy that will enable deep-merging of the stats with a stat map.
-  "
   [ids]
-  (xf<<
-    (fn [rf result input]
-      (prn "Inside xf<-features+geoids:")
-      (js/console.log (js/process.memoryUsage))
-      (rf result {(geoid<-feature ids input) input}))))
-
-; heapUsed: 140181760, -
-; heapUsed: 140199904, = @ 18kb per each composed transduction pass (aggregative)
-
+  (fn [input]
+    {(apply str (map (:properties input) ids)) input})) ;  from @cgrand
+    ;{(reduce str (map #(get-in m [:properties %]) ids)) m}) ;  uses @ 1kb per
 
 ;; Examples ==============================
 
-#_(transduce (xf<-features+geoids
-               (get-geoid?s {:vintage      "2010"
-                             :sourcePath   ["acs" "acs5"]
-                             ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
-                             :geoHierarchy {:county "*"} ;; @ 30 seconds
-                             ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
-                             :geoResolution "500k"
-                             :values       ["B01001_001E" "NAME"]
-                             :predicates   {:B00001_001E "0:30000"} ;; add `:predicates` and count them for `vars#`
-                             :statsKey     stats-key}))
+#_((geoid<-feature '(:STATE :COUNTY))
+   {:type "Feature",
+    :properties
+          {:STATEFP  "01",
+           :GEOID    "01005",
+           :STATE "123"
+           :COUNTY "456"}
+    :geometry
+          {:type "Polygon",
+           :coordinates
+                 [[[-85.748032 31.619181]
+                   [-85.729832 31.632373]]]}})
+
+; => {"123456" {:type "Feature",
+;           :properties {:STATEFP "01",
+;                        :GEOID "01005",
+;                        :STATE "123",
+;                        :COUNTY "456"},
+;           :geometry {:type "Polygon",
+;                      :coordinates [[[-85.748032 31.619181]
+;                                     [-85.729832 31.632373]]]}}}
+
+#_(transduce (map (geoid<-feature
+                    ((get-geoid?s *g*)
+                     {:vintage      "2010"
+                      :sourcePath   ["acs" "acs5"]
+                      ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
+                      :geoHierarchy {:county "*"} ;; @ 30 seconds
+                      ;:geoHierarchy {:zip-code-tabulation-area "*"} ; # 1 min - 3 min for completion
+                      :geoResolution "500k"
+                      :values       ["B01001_001E" "NAME"]
+                      :predicates   {:B00001_001E "0:30000"}}))) ;; add `:predicates` and count them for `vars#`
              conj
              [{:type "Feature",
                :properties
@@ -170,39 +182,316 @@
                       :coordinates
                             [[[-85.748032 31.619181]
                               [-85.729832 31.632373]]]}}])
+
+; =>
+; [{"123456" {:type "Feature",
+;            :properties {:STATEFP "01",
+;                         :GEOID "01005",
+;                         :STATE "123",
+;                         :COUNTY "456"},
+;            :geometry {:type "Polygon",
+;                       :coordinates [[[-85.748032 31.619181]
+;                                      [-85.729832 31.632373]]]}}}
+; {"7891011" {:type "Feature",
+;             :properties {:STATEFP "01",
+;                          :GEOID "01005",
+;                          :STATE "789",
+;                          :COUNTY "1011"},
+;             :geometry {:type "Polygon",
+;                        :coordinates [[[-85.748032 31.619181]
+;                                       [-85.729832 31.632373]]]}}}]
+
+
 ;==========================================
 
-(defn deep-merge-with
-  "
-  Recursively merges two maps together along matching key paths. Implements
-  `clojure/core.merge-with`.
 
-  [stolen](https://gist.github.com/danielpcox/c70a8aa2c36766200a95#gistcomment-2711849)
-  "
-  [& maps]
-  (apply merge-with
-         (fn [& args]
-           (prn "Inside deep-merge-with:")
-           (js/console.log (js/process.memoryUsage))
-           (if (every? map? args)
-             (apply deep-merge-with args)
-             (last args)))
-         maps))
+(defn xf-e?->features+geoids
+  [ids]
+  (comp
+    (map throw-err)
+    (mapcat :features)
+    (map (geoid<-feature ids))
+    (x/into [])))
+
+;; Examples =================================
+
+#_(transduce (xf-e?->features+geoids `(:STATE :COUNTY))
+             conj
+             [{:type "FeatureCollection"
+               :features [{:type "Feature",
+                           :properties
+                                 {:STATEFP  "01",
+                                  :GEOID    "01005",
+                                  :STATE "123"
+                                  :COUNTY "456"}
+                           :geometry
+                                 {:type "Polygon",
+                                  :coordinates
+                                        [[[-85.748032 31.619181]
+                                          [-85.729832 31.632373]]]}}
+                          {:type "Feature",
+                           :properties
+                                 {:STATEFP  "01",
+                                  :GEOID    "01005",
+                                  :STATE "789"
+                                  :COUNTY "1011"}
+                           :geometry
+                                 {:type "Polygon",
+                                  :coordinates
+                                        [[[-85.748032 31.619181]
+                                          [-85.729832 31.632373]]]}}]}])
+
+; =>
+; [[{"123456" {:type "Feature",
+;             :properties {:STATEFP "01",
+;                          :GEOID "01005",
+;                          :STATE "123",
+;                          :COUNTY "456"},
+;             :geometry {:type "Polygon",
+;                        :coordinates [[[-85.748032 31.619181]
+;                                       [-85.729832 31.632373]]]}}}
+;  {"7891011" {:type "Feature",
+;              :properties {:STATEFP "01",
+;                           :GEOID "01005",
+;                           :STATE "789",
+;                           :COUNTY "1011"},
+;              :geometry {:type "Polygon",
+;                         :coordinates [[[-85.748032 31.619181]
+;                                        [-85.729832 31.632373]]]}}}]]
+
+;==========================================
+
+
+(defn xf-e?->stats+geoids
+  [vars#]
+  (comp
+    (map throw-err)
+    (map (geoid<-stat vars#))
+    (x/into [])))
+
+; Examples
+
+#_(transduce (xf-e?->stats+geoids 3)
+             conj
+             [{:B01001_001E                                494981,
+               :NAME                                       "State Senate District 40 (2016), Florida",
+               :B00001_001E                                29661,
+               :state                                      "12",
+               :state-legislative-district-_upper-chamber_ "040"}
+              {:B01001_001E                                492259,
+               :NAME                                       "State Senate District 36 (2016), Florida",
+               :B00001_001E                                29475,
+               :state                                      "12",
+               :state-legislative-district-_upper-chamber_ "036"}
+              {:B01001_001E                                493899,
+               :NAME                                       "State Senate District 35 (2016), Florida",
+               :B00001_001E                                25615,
+               :state                                      "12",
+               :state-legislative-district-_upper-chamber_ "035"}])
+
+; =>
+; [[{"12040" {:properties {:B01001_001E 494981,
+;                         :NAME "State Senate District 40 (2016), Florida",
+;                         :B00001_001E 29661,
+;                         :state "12",
+;                         :state-legislative-district-_upper-chamber_ "040"}}}
+;  {"12036" {:properties {:B01001_001E 492259,
+;                         :NAME "State Senate District 36 (2016), Florida",
+;                         :B00001_001E 29475,
+;                         :state "12",
+;                         :state-legislative-district-_upper-chamber_ "036"}}}
+;  {"12035" {:properties {:B01001_001E 493899,
+;                         :NAME "State Senate District 35 (2016), Florida",
+;                         :B00001_001E 25615,
+;                         :state "12",
+;                         :state-legislative-district-_upper-chamber_ "035"}}}]]
+;==========================================
+
+
+#_(defn deep-merge-with
+    "
+    Recursively merges two maps together along matching key paths. Implements
+    `clojure/core.merge-with`.
+
+    [stolen](https://gist.github.com/danielpcox/c70a8aa2c36766200a95#gistcomment-2711849)
+    "
+    [& maps]
+    (apply merge-with
+           (fn [& args]
+             (prn "Inside deep-merge-with:")
+             (js/console.log (js/process.memoryUsage))
+             (if (every? map? args)
+               (apply deep-merge-with args)
+               (last args)))
+           maps))
 
 ; heapUsed: 162236048, -
 ; heapUsed: 162244864, = @ 8kb per pass
 
 
-#_(defn deep-merge-with
-    "
+(defn group-by-keys
+  "
+  Implementation of `group-by` (produces a map) via @cgrand's `xforms`
+  See 'Usage': https://github.com/cgrand/xforms#usage
+  "
+  [coll]
+  (x/into {} (x/by-key keys (x/into [])) coll))
+
+
+; Examples ================================================
+#_(group-by-keys
+    (concat
+      [{"12040" {:type "Feature",
+                 :properties {:STATEFP "01",
+                              :GEOID "01005",
+                              :STATE "123",
+                              :COUNTY "456"},
+                 :geometry {:type "Polygon",
+                            :coordinates [[[-85.748032 31.619181]
+                                           [-85.729832 31.632373]]]}}}
+       {"12035" {:type "Feature",
+                 :properties {:STATEFP "01",
+                              :GEOID "01005",
+                              :STATE "789",
+                              :COUNTY "1011"},
+                 :geometry {:type "Polygon",
+                            :coordinates [[[-85.748032 31.619181]
+                                           [-85.729832 31.632373]]]}}}]
+
+      [{"12040" {:properties {:B01001_001E 494981,
+                              :NAME "State Senate District 40 (2016), Florida",
+                              :B00001_001E 29661,
+                              :state "12",
+                              :state-legislative-district-_upper-chamber_ "040"}}}
+       {"12036" {:properties {:B01001_001E 492259,
+                              :NAME "State Senate District 36 (2016), Florida",
+                              :B00001_001E 29475,
+                              :state "12",
+                              :state-legislative-district-_upper-chamber_ "036"}}}
+       {"12035" {:properties {:B01001_001E 493899,
+                              :NAME "State Senate District 35 (2016), Florida",
+                              :B00001_001E 25615,
+                              :state "12",
+                              :state-legislative-district-_upper-chamber_ "035"}}}]))
+
+; =>
+; {("12040") [{"12040" {:type "Feature",
+;                      :properties {:STATEFP "01",
+;                                   :GEOID "01005",
+;                                   :STATE "123",
+;                                   :COUNTY "456"},
+;                      :geometry {:type "Polygon",
+;                                 :coordinates [[[-85.748032 31.619181]
+;                                                [-85.729832 31.632373]]]}}}
+;            {"12040" {:properties {:B01001_001E 494981,
+;                                   :NAME "State Senate District 40 (2016), Florida",
+;                                   :B00001_001E 29661,
+;                                   :state "12",
+;                                   :state-legislative-district-_upper-chamber_ "040"}}}],
+; ("12035") [{"12035" {:type "Feature",
+;                      :properties {:STATEFP "01",
+;                                   :GEOID "01005",
+;                                   :STATE "789",
+;                                   :COUNTY "1011"},
+;                      :geometry {:type "Polygon",
+;                                 :coordinates [[[-85.748032 31.619181]
+;                                                [-85.729832 31.632373]]]}}}
+;            {"12035" {:properties {:B01001_001E 493899,
+;                                   :NAME "State Senate District 35 (2016), Florida",
+;                                   :B00001_001E 25615,
+;                                   :state "12",
+;                                   :state-legislative-district-_upper-chamber_ "035"}}}],
+; ("12036") [{"12036" {:properties {:B01001_001E 492259,
+;                                   :NAME "State Senate District 36 (2016), Florida",
+;                                   :B00001_001E 29475,
+;                                   :state "12",
+;                                   :state-legislative-district-_upper-chamber_ "036"}}}]}
+
+
+; =========================================================
+
+
+(defn deep-merge-with
+  "
   From @cgrand: Recursively merges two maps together along matching key paths.
   "
-    [a b]
-    (if (map? a)
-      (into a (for [[k v] b] [k (deep-merge-with (a k) v)]))
-      b))
+  [a b]
+  (if (map? a)
+    (into a (x/for [[k v] b] [k (deep-merge-with (a k) v)]))
+    b))
 
-(defn xf<-merged->filter
+; Examples ================================================
+#_(x/for [[_ pairs]
+          {'("12040") [{"12040" {:type "Feature",
+                                 :properties {:STATEFP "01",
+                                              :GEOID "01005",
+                                              :STATE "123",
+                                              :COUNTY "456"},
+                                 :geometry {:type "Polygon",
+                                            :coordinates [[[-85.748032 31.619181]
+                                                           [-85.729832 31.632373]]]}}}
+                       {"12040" {:properties {:B01001_001E 494981,
+                                              :NAME "State Senate District 40 (2016), Florida",
+                                              :B00001_001E 29661,
+                                              :state "12",
+                                              :state-legislative-district-_upper-chamber_ "040"}}}],
+           '("12035") [{"12035" {:type "Feature",
+                                 :properties {:STATEFP "01",
+                                              :GEOID "01005",
+                                              :STATE "789",
+                                              :COUNTY "1011"},
+                                 :geometry {:type "Polygon",
+                                            :coordinates [[[-85.748032 31.619181]
+                                                           [-85.729832 31.632373]]]}}}
+                       {"12035" {:properties {:B01001_001E 493899,
+                                              :NAME "State Senate District 35 (2016), Florida",
+                                              :B00001_001E 25615,
+                                              :state "12",
+                                              :state-legislative-district-_upper-chamber_ "035"}}}],
+           '("12036") [{"12036" {:properties {:B01001_001E 492259,
+                                              :NAME "State Senate District 36 (2016), Florida",
+                                              :B00001_001E 29475,
+                                              :state "12",
+                                              :state-legislative-district-_upper-chamber_ "036"}}}]}]
+         (apply deep-merge-with pairs))
+
+
+; =>
+; ({"12040" {:type "Feature",
+;           :properties {:STATEFP "01",
+;                        :COUNTY "456",
+;                        :STATE "123",
+;                        :state "12",
+;                        :GEOID "01005",
+;                        :B01001_001E 494981,
+;                        :state-legislative-district-_upper-chamber_ "040",
+;                        :B00001_001E 29661,
+;                        :NAME "State Senate District 40 (2016), Florida"},
+;           :geometry {:type "Polygon",
+;                      :coordinates [[[-85.748032 31.619181]
+;                                     [-85.729832 31.632373]]]}}}
+; {"12035" {:type "Feature",
+;           :properties {:STATEFP "01",
+;                        :COUNTY "1011",
+;                        :STATE "789",
+;                        :state "12",
+;                        :GEOID "01005",
+;                        :B01001_001E 493899,
+;                        :state-legislative-district-_upper-chamber_ "035",
+;                        :B00001_001E 25615,
+;                        :NAME "State Senate District 35 (2016), Florida"},
+;           :geometry {:type "Polygon",
+;                      :coordinates [[[-85.748032 31.619181]
+;                                     [-85.729832 31.632373]]]}}}
+; {"12036" {:properties {:B01001_001E 492259,
+;                        :NAME "State Senate District 36 (2016), Florida",
+;                        :B00001_001E 29475,
+;                        :state "12",
+;                        :state-legislative-district-_upper-chamber_ "036"}}})
+; =========================================================
+
+
+(defn xf-merged-filter
   "
   Transducer, which takes 2->3 keys that serve to filter a merged list of two
   maps to return a function, which returns a list of only those maps which have
@@ -210,17 +499,85 @@
   the maps have merged. This ensures the returned list contains only the overlap
   between the two, i.e., excluding non-merged maps.
   "
-  [s-key1 s-key2 g-key]
+  [s-key g-key]
   (xf<<
     (fn [rf result item]
-      (prn "Inside xf<-merged->filter:")
-      (js/console.log (js/process.memoryUsage))
+      ;(prn "Inside xf<-merged->filter:")
+      ;(js/console.log (js/process.memoryUsage))
       (let [[_ v] (first item)]
-        (if (or (and (nil? (get-in v [:properties s-key1]))
-                     (nil? (get-in v [:properties s-key2])))
+        (if (or (nil? (get-in v [:properties s-key]))
                 (nil? (get-in v [:properties g-key])))
           (rf result)
           (rf result v))))))
+;(completing
+;  (fn [item]
+;    (let [[_ v] (first item)]
+;      (if (or (nil? (get-in v [:properties s-key]))
+;              (nil? (get-in v [:properties g-key])))
+;        nil
+;        v)))))
+
+
+; Examples ================================================
+
+#_(transduce (xf-merged-filter :GEOID :B00001_001E)
+             conj
+             [{"12040" {:type "Feature",
+                        :properties {:STATEFP "01",
+                                     :COUNTY "456",
+                                     :STATE "123",
+                                     :state "12",
+                                     :GEOID "01005",
+                                     :B01001_001E 494981,
+                                     :state-legislative-district-_upper-chamber_ "040",
+                                     :B00001_001E 29661,
+                                     :NAME "State Senate District 40 (2016), Florida"},
+                        :geometry {:type "Polygon",
+                                   :coordinates [[[-85.748032 31.619181]
+                                                  [-85.729832 31.632373]]]}}}
+              {"12035" {:type "Feature",
+                        :properties {:STATEFP "01",
+                                     :COUNTY "1011",
+                                     :STATE "789",
+                                     :state "12",
+                                     :GEOID "01005",
+                                     :B01001_001E 493899,
+                                     :state-legislative-district-_upper-chamber_ "035",
+                                     :B00001_001E 25615,
+                                     :NAME "State Senate District 35 (2016), Florida"},
+                        :geometry {:type "Polygon",
+                                   :coordinates [[[-85.748032 31.619181]
+                                                  [-85.729832 31.632373]]]}}}
+              {"12036" {:properties {:B01001_001E 492259,
+                                     :NAME "State Senate District 36 (2016), Florida",
+                                     :B00001_001E 29475,
+                                     :state "12",
+                                     :state-legislative-district-_upper-chamber_ "036"}}}])
+
+; [{:type "Feature",
+;  :properties {:STATEFP "01",
+;               :COUNTY "456",
+;               :STATE "123",
+;               :state "12",
+;               :GEOID "01005",
+;               :B01001_001E 494981,
+;               :state-legislative-district-_upper-chamber_ "040",
+;               :B00001_001E 29661,
+;               :NAME "State Senate District 40 (2016), Florida"},
+;  :geometry {:type "Polygon",
+;             :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}
+; {:type "Feature",
+;  :properties {:STATEFP "01",
+;               :COUNTY "1011",
+;               :STATE "789",
+;               :state "12",
+;               :GEOID "01005",
+;               :B01001_001E 493899,
+;               :state-legislative-district-_upper-chamber_ "035",
+;               :B00001_001E 25615,
+;               :NAME "State Senate District 35 (2016), Florida"},
+;  :geometry {:type "Polygon",
+;             :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}]
 
 ; "Inside xf<-merged->filter:" <- starts within `merge-geo+stats`
 ;  heapTotal: 193249280,
@@ -228,45 +585,7 @@
 ;  heapTotal: 193249280,
 ;  heapUsed: 162196776, = @ 13kb per pass
 
-
-; ===============================
-; TODO: combine merge-xfilter clj->js and js/JSON.stringify into a single transducer (comp)
-; ===============================
-
-
-
-#_(->vec {(:12040) [{:12040 {:type "Feature",
-                             :properties {:STATEFP "01",
-                                          :GEOID "01005",
-                                          :STATE "123",
-                                          :COUNTY "456"},
-                             :geometry {:type "Polygon",
-                                        :coordinates [[[-85.748032 31.619181]
-                                                       [-85.729832 31.632373]]]}}}
-                    {:12040 {:properties {:B01001_001E 494981,
-                                          :NAME "State Senate District 40 (2016), Florida",
-                                          :B00001_001E 29661,
-                                          :state "12",
-                                          :state-legislative-district-_upper-chamber_ "040"}}}],
-          (:12035) [{:12035 {:type "Feature",
-                             :properties {:STATEFP "01",
-                                          :GEOID "01005",
-                                          :STATE "789",
-                                          :COUNTY "1011"},
-                             :geometry {:type "Polygon",
-                                        :coordinates [[[-85.748032 31.619181]
-                                                       [-85.729832 31.632373]]]}}}
-                    {:12035 {:properties {:B01001_001E 493899,
-                                          :NAME "State Senate District 35 (2016), Florida",
-                                          :B00001_001E 25615,
-                                          :state "12",
-                                          :state-legislative-district-_upper-chamber_ "035"}}}],
-          (:12036) [{:12036 {:properties {:B01001_001E 492259,
-                                          :NAME "State Senate District 36 (2016), Florida",
-                                          :B00001_001E 29475,
-                                          :state "12",
-                                          :state-legislative-district-_upper-chamber_ "036"}}}]})
-
+; =========================================================
 
 ;; from CGrand
 
@@ -298,45 +617,152 @@
 ;            (map' f (Transfer.
 ;                      (rest s)))))))
 
-(def xf-merge
+(def xf-deep-merge-with
   (xf<<
     (fn [rf result [_ [v1 v2]]]
       (rf result (deep-merge-with v1 v2)))))
 
+; Examples ================================================
 
-(defn xf-merge-n-filter
-  [s-key1 s-key2 g-key]
-  (comp xf-merge (xf<-merged->filter s-key1 s-key2 g-key)))
+#_(transduce xf-deep-merge-with
+             conj
+             {'("12040") [{"12040" {:type "Feature",
+                                    :properties {:STATEFP "01",
+                                                 :GEOID "01005",
+                                                 :STATE "123",
+                                                 :COUNTY "456"},
+                                    :geometry {:type "Polygon",
+                                               :coordinates [[[-85.748032 31.619181]
+                                                              [-85.729832 31.632373]]]}}}
+                          {"12040" {:properties {:B01001_001E 494981,
+                                                 :NAME "State Senate District 40 (2016), Florida",
+                                                 :B00001_001E 29661,
+                                                 :state "12",
+                                                 :state-legislative-district-_upper-chamber_ "040"}}}],
+              '("12035") [{"12035" {:type "Feature",
+                                    :properties {:STATEFP "01",
+                                                 :GEOID "01005",
+                                                 :STATE "789",
+                                                 :COUNTY "1011"},
+                                    :geometry {:type "Polygon",
+                                               :coordinates [[[-85.748032 31.619181]
+                                                              [-85.729832 31.632373]]]}}}
+                          {"12035" {:properties {:B01001_001E 493899,
+                                                 :NAME "State Senate District 35 (2016), Florida",
+                                                 :B00001_001E 25615,
+                                                 :state "12",
+                                                 :state-legislative-district-_upper-chamber_ "035"}}}],
+              '("12036") [{"12036" {:properties {:B01001_001E 492259,
+                                                 :NAME "State Senate District 36 (2016), Florida",
+                                                 :B00001_001E 29475,
+                                                 :state "12",
+                                                 :state-legislative-district-_upper-chamber_ "036"}}}]})
 
-#_(defn xf!-merge-n-filter
-  "
-  Stateful transducer, which stores the first item as a list of a keys to apply
-  (via `zipmap`) to the rest of the items in a collection. Serves to turn the
-  Census API response into a more conventional JSON format.
+; =>
+; [{"12040" {:type "Feature",
+;           :properties {:STATEFP "01",
+;                        :COUNTY "456",
+;                        :STATE "123",
+;                        :state "12",
+;                        :GEOID "01005",
+;                        :B01001_001E 494981,
+;                        :state-legislative-district-_upper-chamber_ "040",
+;                        :B00001_001E 29661,
+;                        :NAME "State Senate District 40 (2016), Florida"},
+;           :geometry {:type "Polygon",
+;                      :coordinates [[[-85.748032 31.619181]
+;                                     [-85.729832 31.632373]]]}}}
+; {"12035" {:type "Feature",
+;           :properties {:STATEFP "01",
+;                        :COUNTY "1011",
+;                        :STATE "789",
+;                        :state "12",
+;                        :GEOID "01005",
+;                        :B01001_001E 493899,
+;                        :state-legislative-district-_upper-chamber_ "035",
+;                        :B00001_001E 25615,
+;                        :NAME "State Senate District 35 (2016), Florida"},
+;           :geometry {:type "Polygon",
+;                      :coordinates [[[-85.748032 31.619181]
+;                                     [-85.729832 31.632373]]]}}}
+; {"12036" {:properties {:B01001_001E 492259,
+;                        :NAME "State Senate District 36 (2016), Florida",
+;                        :B00001_001E 29475,
+;                        :state "12",
+;                        :state-legislative-district-_upper-chamber_ "036"}}}]
+; =========================================================
 
-  If provided `:keywords` as an argument, will return a map with Clojure keys.
-  Otherwise, will return map keys as strings.
-  "
-  [s-key1 s-key2 g-key]
-  (fn [coll]
-      (xf!<<
-          (fn [state rf result [_ [v1 v2] :as input]]
-            (let [prev @state]
-              (if (nil? prev)
-                (if (= ?keywords :keywords)
-                    (do (vreset! state (mapv strs->keys input)) nil
-                      (do (vreset! state input) nil)))
-                (if (= ?keywords :keywords)
-                (rf result
-                (zipmap (vec (map keyword @state))
-                    (map-idcs-range parse-if-number
-                                parse-range
-                                input)
-                  (rf result
-                      (zipmap @state
-                              (map-idcs-range parse-if-number
-                                              parse-range
-                                              input))))))))))))
+
+(defn xf-merge-filter
+  [s-key g-key]
+  (comp xf-deep-merge-with
+        (xf-merged-filter s-key g-key)))
+
+
+; Examples ================================================
+
+#_(transduce (xf-merge-filter :B00001_001E :GEOID)
+             conj
+             {'("12040") [{"12040" {:type "Feature",
+                                    :properties {:STATEFP "01",
+                                                 :GEOID "01005",
+                                                 :STATE "123",
+                                                 :COUNTY "456"},
+                                    :geometry {:type "Polygon",
+                                               :coordinates [[[-85.748032 31.619181]
+                                                              [-85.729832 31.632373]]]}}}
+                          {"12040" {:properties {:B01001_001E 494981,
+                                                 :NAME "State Senate District 40 (2016), Florida",
+                                                 :B00001_001E 29661,
+                                                 :state "12",
+                                                 :state-legislative-district-_upper-chamber_ "040"}}}],
+              '("12035") [{"12035" {:type "Feature",
+                                    :properties {:STATEFP "01",
+                                                 :GEOID "01005",
+                                                 :STATE "789",
+                                                 :COUNTY "1011"},
+                                    :geometry {:type "Polygon",
+                                               :coordinates [[[-85.748032 31.619181]
+                                                              [-85.729832 31.632373]]]}}}
+                          {"12035" {:properties {:B01001_001E 493899,
+                                                 :NAME "State Senate District 35 (2016), Florida",
+                                                 :B00001_001E 25615,
+                                                 :state "12",
+                                                 :state-legislative-district-_upper-chamber_ "035"}}}],
+              '("12036") [{"12036" {:properties {:B01001_001E 492259,
+                                                 :NAME "State Senate District 36 (2016), Florida",
+                                                 :B00001_001E 29475,
+                                                 :state "12",
+                                                 :state-legislative-district-_upper-chamber_ "036"}}}]})
+
+; =>
+; [{:type "Feature",
+;  :properties {:STATEFP "01",
+;               :COUNTY "456",
+;               :STATE "123",
+;               :state "12",
+;               :GEOID "01005",
+;               :B01001_001E 494981,
+;               :state-legislative-district-_upper-chamber_ "040",
+;               :B00001_001E 29661,
+;               :NAME "State Senate District 40 (2016), Florida"},
+;  :geometry {:type "Polygon",
+;             :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}
+; {:type "Feature",
+;  :properties {:STATEFP "01",
+;               :COUNTY "1011",
+;               :STATE "789",
+;               :state "12",
+;               :GEOID "01005",
+;               :B01001_001E 493899,
+;               :state-legislative-district-_upper-chamber_ "035",
+;               :B00001_001E 25615,
+;               :NAME "State Senate District 35 (2016), Florida"},
+;  :geometry {:type "Polygon",
+;             :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}]
+; =========================================================
+
+
 (defn merge-geo+stats
   "
   Higher Order Function to be used in concert with `core.async/map`, which takes
@@ -345,16 +771,32 @@
   and then filters them to return only those map-items that contain an
   identifying key from each source map. Used to remove unmerged items.
   "
-  [s-key1 s-key2 g-key]
+  [s-key g-key]
   (fn [stats-coll geo-coll]
-      (prn "Inside merge-geo+stats:")
-      (js/console.log (js/process.memoryUsage))
-      (->>
-        (group-by keys (concat stats-coll geo-coll))
-        ;(Transfer.)
-        ;(map' (fn [[_ [v1 v2]]] (comp (xf<-merged->filter s-key1 s-key2 g-key) (deep-merge-with v1 v2))))
-        ;(transduce (xf<-merged->filter s-key1 s-key2 g-key) conj))))
-        (transduce (xf-merge-n-filter s-key1 s-key2 g-key) conj))))
+    (prn "Inside merge-geo+stats:")
+    (js/console.log (js/process.memoryUsage))
+    ((xf-merge-filter s-key g-key) stats-coll geo-coll)))
+
+;(x/into []))))
+
+;(defn merge-geo+stats
+;  "
+;  Higher Order Function to be used in concert with `core.async/map`, which takes
+;  three Clojure keywords and returns a function, which takes two
+;  input maps and deep-merges them into one based on common keys,
+;  and then filters them to return only those map-items that contain an
+;  identifying key from each source map. Used to remove unmerged items.
+;  "
+;  [s-key  g-key]
+;  (fn [stats-coll geo-coll]
+;      (prn "Inside merge-geo+stats:")
+;      (js/console.log (js/process.memoryUsage))
+;      (->>
+;        ;(group-by keys (concat stats-coll geo-coll))
+;        (into {} (x/by-key keys (x/into [])) (concat stats-coll geo-coll))
+;        ;(Transfer.)
+;        ;(map' (fn [[_ [v1 v2]]] (comp (xf<-merged->filter s-key  g-key) (deep-merge-with v1 v2))))
+;        (transduce (xf-merge-n-filter s-key  g-key) conj))))
 
 ; "Inside xf<-stats+geoids:"
 ;  heapTotal: 193249280,
@@ -372,83 +814,61 @@
   and then filters them to return only those map-items that contain an
   identifying key from each source map. Used to remove unmerged items.
   "
-    [s-key1 s-key2 g-key]
+    [s-key  g-key]
     (fn [stats-coll geo-coll]
       (->>
         (group-and-merge stats-coll geo-coll)
         ;(for [[_ pairs] (group-by keys (concat stats-coll geo-coll))]
         ;  (apply deep-merge-with pairs))
-        (transduce (xf<-merged->filter s-key1 s-key2 g-key) conj))))
+        (transduce (xf-merged-filter s-key  g-key) conj))))
 
 
 
 ;; Examples =================================
 
-#_((merge-geo+stats :NAME nil :GEOID)
- [{:12040 {:type "Feature",
-           :properties
-                 {:STATEFP "01",
-                  :GEOID "01005",
-                  :STATE "123",
-                  :COUNTY "456"},
-           :geometry
-                 {:type "Polygon",
-                  :coordinates [[[-85.748032 31.619181]
-                                 [-85.729832 31.632373]]]}}}
-  {:12035 {:type "Feature",
-           :properties
-                 {:STATEFP "01",
-                  :GEOID "01005",
-                  :STATE "789",
-                  :COUNTY "1011"},
-           :geometry
-                 {:type "Polygon",
-                  :coordinates [[[-85.748032 31.619181]
-                                 [-85.729832 31.632373]]]}}}]
- [{:12040 {:properties
-                 {:B01001_001E 494981,
-                  :NAME "State Senate District 40 (2016), Florida",
-                  :B00001_001E 29661,
-                  :state "12",
-                  :state-legislative-district-_upper-chamber_ "040"}}}
-  {:12036 {:properties
-                 {:B01001_001E 492259,
-                  :NAME "State Senate District 36 (2016), Florida",
-                  :B00001_001E 29475,
-                  :state "12",
-                  :state-legislative-district-_upper-chamber_ "036"}}}
-  {:12035 {:properties
-                 {:B01001_001E 493899,
-                  :NAME "State Senate District 35 (2016), Florida",
-                  :B00001_001E 25615,
-                  :state "12",
-                  :state-legislative-district-_upper-chamber_ "035"}}}])
+#_(transduce (merge-geo+stats :NAME :GEOID)
+             conj
+             (group-by-keys
+               (concat
+                 [{:12040 {:type "Feature",
+                           :properties
+                                 {:STATEFP "01",
+                                  :GEOID "01005",
+                                  :STATE "123",
+                                  :COUNTY "456"},
+                           :geometry
+                                 {:type "Polygon",
+                                  :coordinates [[[-85.748032 31.619181]
+                                                 [-85.729832 31.632373]]]}}}
+                  {:12035 {:type "Feature",
+                           :properties
+                                 {:STATEFP "01",
+                                  :GEOID "01005",
+                                  :STATE "789",
+                                  :COUNTY "1011"},
+                           :geometry
+                                 {:type "Polygon",
+                                  :coordinates [[[-85.748032 31.619181]
+                                                 [-85.729832 31.632373]]]}}}]
+                 [{:12040 {:properties
+                           {:B01001_001E 494981,
+                            :NAME "State Senate District 40 (2016), Florida",
+                            :B00001_001E 29661,
+                            :state "12",
+                            :state-legislative-district-_upper-chamber_ "040"}}}
+                  {:12036 {:properties
+                           {:B01001_001E 492259,
+                            :NAME "State Senate District 36 (2016), Florida",
+                            :B00001_001E 29475,
+                            :state "12",
+                            :state-legislative-district-_upper-chamber_ "036"}}}
+                  {:12035 {:properties
+                           {:B01001_001E 493899,
+                            :NAME "State Senate District 35 (2016), Florida",
+                            :B00001_001E 25615,
+                            :state "12",
+                            :state-legislative-district-_upper-chamber_ "035"}}}])))
 ;==========================================
-
-
-(defn xfxf-e?->features+geoids
-  [ids]
-  (comp
-    (map throw-err)
-    (map #(get % :features))
-    (xfxf<< (xf<-features+geoids ids) conj)))
-
-(defn xfxf-e?->stats+geoids
-  [vars#]
-  (comp
-    (map throw-err)
-    (xfxf<< (xf<-stats+geoids vars#) conj)))
-
-
-(defn get-geoid?s
-  "
-  Takes the request argument and pulls out a vector of the component identifiers
-  from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
-  in deep-merging with statistics.
-  "
-  [$g$ {:keys [geoHierarchy vintage]}]
-  (let [[& ids] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
-    ids))
 
 
 (defn IO-geo+stats
@@ -469,39 +889,40 @@
     ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
     (go (let [args       (<! =I=)
               $g$        (<! =GKM=)
-              ids        (get-geoid?s $g$ args)
+              ids        ((get-geoid?s $g$) args)
               vars#      (+ (count (get args :values))
                             (count (get args :predicates)))
-              s-key1     (keyword (first (get args :values)))
-              s-key2     (first (keys (get args :predicates)))
+              s-key      (keyword (first (get args :values)))
               g-key      (first ids)
               =args=     (promise-chan)
-              =features= (promise-chan (xfxf-e?->features+geoids ids))
-              =stats=    (chan 1 (xfxf-e?->stats+geoids vars#))
+              =features= (chan 1 (xf-e?->features+geoids ids))
+              =stats=    (chan 1 (xf-e?->stats+geoids vars#))]
               ; changed due to: https://github.com/clojure/core.async/blob/master/src/main/clojure/cljs/core/async.cljs#L700
-              =merged=   (go ((merge-geo+stats s-key1 s-key2 g-key) ; core.async version of `map`
-                              (<! =features=)
-                              (<! =stats=)))]
+
                                                ; Notes (1)
           (>! =args= args)
           (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
-          (if (nil? (<! =features=))
-              (go (close! =args=)
-                  (close! =stats=)
-                  (close! =GKM=))
-              (go (prn "Inside IO-geo+stats:")
+          (if-let [features (<! =features=)]
+            (go (let [merged ((merge-geo+stats s-key  g-key) ; core.async version of `map`
+                              features
+                              (<! =stats=))]
+                  (prn "Inside IO-geo+stats:")
                   (js/console.log (js/process.memoryUsage))
                   (IO-pp->census-stats =args= =stats=)
                   ; Notes (2)
                   (>! =O= {:type "FeatureCollection"
-                           :features (<! =merged=)})
+                           :features merged})
                   (prn "Done with merger in IO-geo+stats:")
                   (js/console.log (js/process.memoryUsage))
                   (close! =features=)
                   (close! =stats=); Notes (3)
-                  (close! =merged=)
                   (close! =args=)                                ; Notes (4)
-                  (prn "working on it....")))))))
+                  (prn "working on it....")))
+            (go (close! =features=)
+                (close! =args=)
+                (close! =stats=)
+                (close! =GKM=)))))))
+
 
 ; "Inside IO-geo+stats:"
 ;  heapTotal: 184336384,
@@ -534,23 +955,23 @@
 
 ;; Example =========================================
 
-#_(let [args {:vintage       "2016"
-              :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
-              :sourcePath    ["acs" "acs5"]
-              :geoResolution "500k"
-              :values        ["B01001_001E"]}]
-    (go (let [=I= (chan 1)
-              =O= (chan 1)]
-          (>! =I= args)
-          (IO-geo+stats =I= =O=)
-          (js/console.log
-            (js/JSON.stringify
-              (js-obj "type" "FeatureCollection"
-                      "features" (clj->js (<! =O=)))))
-          ;(pprint (<! =O=))
-          (js/console.log "Done!")
-          (close! =I=)
-          (close! =O=))))
+(let [args {:vintage       "2016"
+            :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+            :sourcePath    ["acs" "acs5"]
+            :geoResolution "500k"
+            :values        ["B01001_001E"]}]
+  (go (let [=I= (chan 1)
+            =O= (chan 1)]
+        (>! =I= args)
+        (IO-geo+stats =I= =O=)
+        (js/console.log
+          (js/JSON.stringify
+            (js-obj "type" "FeatureCollection"
+                    "features" (clj->js (<! =O=)))))
+        ;(pprint (<! =O=))
+        (js/console.log "Done!")
+        (close! =I=)
+        (close! =O=))))
 
 ;; ==================================================
 
@@ -565,6 +986,6 @@
 (comment
   {:1   "GD: how long it took to realize I didn't have to explicitly pipe the channels in here! `async/map` does that. Initially used `pipeline-async`"
    :2 "Initially, used `pipeline-async` here as well - MOAR pipline-async! - however, internally, the `IO-...` functions use `pipeline-async` and wrapping a pipeline inside another creates an infinite loop :("
-   :3 "`async/map closes =merged= automatically when either input chan (=stats= or =features=) is closed"
+   :3 "`async/map closes merged automatically when either input chan (=stats= or =features=) is closed"
    :4 "pipline-async (used internally by `IO-...` functions) closes the to (=O=) channels (=stats= & =features=) upon closing this"})
 
