@@ -8,8 +8,12 @@
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.merger.core   :refer [IO-geo+stats]]))
-    ;[test.fixtures.core   :as ts]))
+    [census.merger.core   :refer [IO-geo+stats]]
+    [test.fixtures.core   :as ts]))
+    ;[clojure.test         :as test
+    ;                      :refer-macros [async deftest is testing run-tests]]
+    ;[taoensso.tufte       :refer-macros [defnp p profiled profile]
+    ;                      :as tufte]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -19,14 +23,14 @@
   takes a pattern of args and deploys one of the various underlying functions
   of this library.
   "
-  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
-  ([{:vintage _ :geoHierarchy _               :values _ :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
-  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :statsKey _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _ :geoHierarchy _               :values _ :statsKey _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _ :geoResolution _}] :no-values)
-  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _                 }] :no-values)
-  ([{:vintage _ :geoHierarchy _                                                   :geoResolution _}] :geos-only)
-  ([{:vintage _ :geoHierarchy _                                                                   }] :geocodes)
+  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :sourcePath _ :geoResolution _}] :stats+geos)
+  ([{:vintage _ :geoHierarchy _               :values _ :sourcePath _ :geoResolution _}] :stats+geos)
+  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :sourcePath _                 }] :stats-only)
+  ([{:vintage _ :geoHierarchy _               :values _ :sourcePath _                 }] :stats-only)
+  ([{:vintage _ :geoHierarchy _ :predicates _           :sourcePath _ :geoResolution _}] :no-values)
+  ([{:vintage _ :geoHierarchy _ :predicates _           :sourcePath _                 }] :no-values)
+  ([{:vintage _ :geoHierarchy _                                       :geoResolution _}] :geos-only)
+  ([{:vintage _ :geoHierarchy _                                                       }] :geocodes)
   ([& anything-else] nil))
 
 #_(deploy-census-function
@@ -82,60 +86,89 @@
       ;((Icb<-wms-args<<=IO= IO-census) I (fn [cljson] (bfj-stringify (clj->js cljson) #(cb %)))))))
 
 
-
+()
 #_(type (clj->js "string"))
 #_(type (clj->js (js/console.log "test")))
+
+
+(defn test-async-time
+  [args f]
+  (let [time-in (js/Date.)]
+     (census args
+             #(do (prn (str "Elapsed ms: "(- (js/Date.) time-in)))
+                  (f %)))))
+
+(prn ts/args-ok-s+g-vals)
 (comment
-  (census ts/args-ok-wms-only prn)
-  (census (ts/test-args 9 3 3 0) js/console.log)
-  (census ts/args-ok-geo-only js/console.log)
-  (census ts/args-ok-s+g-v+ps js/console.log)
-  (census ts/args-ok-s+g-v+ps js/console.log)
-  (census ts/args-ok-s+g-vals js/console.log)
-  (census ts/args-na-sts-pred js/console.log)
-  (census ts/args-ok-sts-v+ps js/console.log)
-  (census ts/args-ok-sts-vals js/console.log)
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:state "42"
-                          :county "003"
-                          :county-subdivision "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          js/console.log)
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:state "42"
-                          :county "003"
-                          :tract "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          js/console.log)
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:state "42"
-                          :county "003"
-                          :block-group "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          js/console.log)
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B01001_001E"]
-           :geoHierarchy {:state "50"
-                          :school-district-_elementary_ "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          js/console.log)
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:zip-code-tabulation-area "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          js/console.log))
+  (test-async-time ts/args-ok-wms-only prn)
+  (test-async-time (ts/test-args 9 3 3 0) js/console.log)
+  (test-async-time ts/args-ok-geo-only js/console.log) ; 1st = "Elapsed ms: 22589" 2nd = "Elapsed ms: 18298"
+  (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; "Elapsed ms: 2444"
+  (test-async-time ts/args-ok-s+g-v+ps js/console.log)
+  ; { rss: 267894784,
+  ;   heapTotal: 243630080,
+  ;   heapUsed: 194502992,
+  ;   external: 112275
+  (test-async-time ts/args-ok-s+g-vals js/console.log)
+  (test-async-time ts/args-na-sts-pred js/console.log)
+  (test-async-time ts/args-ok-sts-v+ps js/console.log)
+  (test-async-time ts/args-ok-sts-vals js/console.log)
+  (test-async-time {:vintage 2016
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B25001_001E"]
+                    :geoHierarchy {:state "42"
+                                   :county "003"
+                                   :county-subdivision "*"}
+                    :geoResolution "4k"
+                    :statsKey ts/stats-key}
+                   js/console.log)
+
+  (test-async-time {:vintage 2016
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B25001_001E"]
+                    :geoHierarchy {:county "*"}
+                    :geoResolution "500k"
+                    :statsKey ts/stats-key}
+                   js/console.log)
+  ;tests:
+  ; original = "Elapsed ms: 11365"
+  ; changed group = "Elapsed ms: 11857"
+  ; changed deep-merge= "Elapsed ms: 11974"
+  ; returning a seq: "Elapsed ms: 13317"
+  ; 4: "Elapsed ms: 11447"
+
+  (test-async-time {:vintage 2016
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B25001_001E"]
+                    :geoHierarchy {:state "42"
+                                   :county "003"
+                                   :tract "*"}
+                    :geoResolution "500k"
+                    :statsKey ts/stats-key}
+                   js/console.log)
+  (test-async-time {:vintage 2016
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B25001_001E"]
+                    :geoHierarchy {:state "42"
+                                   :county "003"
+                                   :block-group "*"}
+                    :geoResolution "500k"
+                    :statsKey ts/stats-key}
+                   js/console.log)
+  (test-async-time {:vintage 2016
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B01001_001E"]
+                    :geoHierarchy {:state "50"
+                                   :school-district-_elementary_ "*"}
+                    :geoResolution "500k"
+                    :statsKey ts/stats-key}
+                   js/console.log)
+  (test-async-time {:vintage 2016
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B25001_001E"]
+                    :geoHierarchy {:zip-code-tabulation-area "*"}
+                    :geoResolution "500k"
+                    :statsKey ts/stats-key}
+                   js/console.log))
 
 

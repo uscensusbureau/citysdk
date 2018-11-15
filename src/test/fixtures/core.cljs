@@ -222,32 +222,32 @@
         args-ok-s+g-vals
         args-ok-geo-only])
 
-(comment
-  { vintage: 2014,
-    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*'}}
-  { vintage: 2016,
-    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
-    sourcePath: [ 'acs', 'acs5' ],
-    geoResolution: '5m',
-    predicates: { B00001_001E: '0:1000000' },
-    values: [ 'B01001_001E']}
-  { vintage: '2015',
-    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
-    sourcePath: [ 'cbp' ],
-    values: [ 'ESTAB']}
-  { vintage: '2015',
-     geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
-     sourcePath: [ 'cbp' ],
-     geoResolution: '20m',
-     values: [ 'ESTAB']}
-  { vintage: 2014,
-    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*' },
-    geoResolution: '500k'}
-  { vintage: 2016,
-   sourcePath: [ 'acs', 'acs5' ],
-   values: [ 'B25001_001E' ],
-   geoHierarchy: { 'zip-code-tabulation-area': '*' },
-   geoResolution: '500k',})
+;(comment
+;  { vintage: 2014,
+;    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*'}}
+;  { vintage: 2016,
+;    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+;    sourcePath: [ 'acs', 'acs5' ],
+;    geoResolution: '5m',
+;    predicates: { B00001_001E: '0:1000000' },
+;    values: [ 'B01001_001E']}
+;  { vintage: '2015',
+;    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+;    sourcePath: [ 'cbp' ],
+;    values: [ 'ESTAB']}
+;  { vintage: '2015',
+;     geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+;     sourcePath: [ 'cbp' ],
+;     geoResolution: '20m',
+;     values: [ 'ESTAB']}
+;  { vintage: 2014,
+;    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*' },
+;    geoResolution: '500k'}
+;  { vintage: 2016,
+;   sourcePath: [ 'acs', 'acs5' ],
+;   values: [ 'B25001_001E' ],
+;   geoHierarchy: { 'zip-code-tabulation-area': '*' },
+;   geoResolution: '500k',})
 
 
 

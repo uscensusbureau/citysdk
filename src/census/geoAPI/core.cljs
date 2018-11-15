@@ -6,7 +6,7 @@
     [defun.core         :refer-macros [defun]]
     [census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
-                                map-over-keys keys->strs error throw-err
+                                map-over-keys keys->strs error throw-err err-type
                                 IO-cache-GET-edn I=O<<=IO= IO-ajax-GET-json]]))
 
 
@@ -17,20 +17,19 @@
 
 
 (defn geo-error
-  [geoK res vin lev]
+  [$g$ res vin lev]
   (let [e [(str "No GeoJSON found for " (name lev) " at this scope")
            (str "in vintage: " vin)
            (str "at resolution: " res)]]
-    (if-let [vins (get-in geoK [lev])]
+    (if-let [vins (get-in $g$ [lev])]
       (-> (conj e
-            "Note: You may be getting this error due to trying to make a nation-wide (`:us`) call a geography that's only available at the `:st` (state) level"
             (str "For " (str lev) " try one of the following `{:<vintage> {:<scopes> ...`")
             [(map-over-keys #(get-in % [:scopes]) vins)])
           error)
       (-> (conj e
             (str "Sorry, there is no GeoJSON for " (name lev) " available.")
             "Try one of these instead: "
-            (vec (map #(keys->strs (name (key %))) geoK)))
+            (vec (map #(keys->strs (name (key %))) $g$)))
           error))))
 
 (defn geo-url-builder
@@ -42,9 +41,9 @@
      (str (join "/" [URL-GEOJSON res vin st (name lev)]) ".json"))))
 
 (defn geo-scoper
-  ([geoK res vin lev USr]     (geo-scoper geoK res vin lev USr nil nil))
-  ([geoK res vin lev USr STr] (geo-scoper geoK res vin lev USr STr nil))
-  ([geoK res vin lev USr STr st]
+  ([$g$ res vin lev USr]     (geo-scoper $g$ res vin lev USr nil nil))
+  ([$g$ res vin lev USr STr] (geo-scoper $g$ res vin lev USr STr nil))
+  ([$g$ res vin lev USr STr st]
    (let [STr? (not (nil? (some #(= res %) STr)))
          USr? (not (nil? (some #(= res %) USr)))
          st?  (not (nil? st))
@@ -53,48 +52,47 @@
        (and st? STr?)                  (geo-url-builder res vin lev st) ;asks for state, state available
        (and us? USr?)                  (geo-url-builder res vin lev)    ;asks for us, us available
        (and (and st? USr?) (not STr?)) (geo-url-builder res vin lev)    ;asks for state, state unavailable, us available
-       :else                           (geo-error geoK res vin lev)))))
+       :else                           (geo-error $g$ res vin lev)))))
 
 (defn lg-warn->geo
-  ([geoK res vin lev USr]     (lg-warn->geo geoK res vin lev USr nil nil))
-  ([geoK res vin lev USr STr] (lg-warn->geo geoK res vin lev USr STr nil))
-  ([geoK res vin lev USr STr st]
+  ([$g$ res vin lev USr]     (lg-warn->geo $g$ res vin lev USr nil nil))
+  ([$g$ res vin lev USr STr] (lg-warn->geo $g$ res vin lev USr STr nil))
+  ([$g$ res vin lev USr STr st]
    (let [strs
          ["Warning, you are about to make a large GeoJSON request."
           "This may take some time -> consider local data caching."
           "The response may also cause VM heap capacity overflow."
           "Node heap may be increased via `--max-old-space-size=`"]]
      (do (doseq [s strs] (prn s))
-         (geo-scoper geoK res vin lev USr STr st)))))
+         (geo-scoper $g$ res vin lev USr STr st)))))
 
 (defun geo-pattern-matcher
   "
   Takes a pattern of maps and triggers the URL builder accordingly
   "
-  ([_    [nil    _   _   _                            _]]                  "") ; no request for GeoJSON
-  ([geoK [res vin _   [:zip-code-tabulation-area _]{:us USr :st nil }]] (lg-warn->geo geoK res vin :zip-code-tabulation-area USr)) ; big!
-  ([geoK [res vin _   [:county _]                  {:us USr :st nil }]] (lg-warn->geo geoK res vin :county USr)) ; big!
-  ([geoK [res vin _   [lev _  ]                    nil               ]] (geo-error    geoK res    vin lev))     ; no valid geography
-  ([geoK [res vin nil [lev _  ]                    {:us nil :st _   }]] (geo-error    geoK res    vin lev))     ; tries US, only states
-  ([geoK [res vin "*" [lev _  ]                    {:us nil :st _   }]] (geo-error    geoK res    vin lev))     ; tries US, only states
-  ([geoK [res vin nil [lev _  ]                    {:us USr :st _   }]] (geo-scoper   geoK res    vin lev USr)) ; tries to get all US
-  ([geoK [res vin "*" [lev _  ]                    {:us USr :st _   }]] (geo-scoper   geoK res    vin lev USr)) ; tries to get all US
-  ([geoK [res vin _   [lev _  ]                    {:us USr :st nil }]] (geo-scoper   geoK res    vin lev USr)) ; no states, try :us
-  ([geoK [res vin st  [lev _  ]                    {:us USr :st STr }]] (geo-scoper   geoK res    vin lev USr STr st))) ; try state
+  ([$g$ ["500k" vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]]         (lg-warn->geo $g$ "500k" vin :zip-code-tabulation-area USr)) ; big!
+  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (geo-error $g$ res vin :zip-code-tabulation-area)) ; no other than 500k
+  ([$g$ [res    vin _   [:county _]                   {:us USr :st nil }]]         (lg-warn->geo $g$ res vin :county USr)) ; big!
+  ([$g$ [res    vin _   [lev _  ]                     nil               ]]         (geo-error    $g$ res vin lev))     ; no valid geography
+  ([$g$ [res    vin nil [lev _  ]                     {:us nil :st _   }]]         (geo-error    $g$ res vin lev))     ; tries US, only states
+  ([$g$ [res    vin "*" [lev _  ]                     {:us nil :st _   }]]         (geo-error    $g$ res vin lev))     ; tries US, only states
+  ([$g$ [res    vin nil [lev _  ]                     {:us USr :st _   }]]         (geo-scoper   $g$ res vin lev USr)) ; tries to get all US
+  ([$g$ [res    vin "*" [lev _  ]                     {:us USr :st _   }]]         (geo-scoper   $g$ res vin lev USr)) ; tries to get all US
+  ([$g$ [res    vin _   [lev _  ]                     {:us USr :st nil }]]         (geo-scoper   $g$ res vin lev USr)) ; no states, try :us
+  ([$g$ [res    vin st  [lev _  ]                     {:us USr :st STr }]]         (geo-scoper   $g$ res vin lev USr STr st)) ; try state
+  ([$g$ & anthing-else ]                                                           ""))
 
 (defn geo-pattern-maker
-  [geoK
-   {:keys [vintage geoResolution]
-    {:keys [state] :as geoHierarchy} :geoHierarchy}]
+  [$g$ {:keys [vintage geoResolution] {:keys [state] :as geoHierarchy} :geoHierarchy}]
   (let [level     (last geoHierarchy)
-        geoScopes (get-in geoK [(key level) (keyword vintage) :scopes])
+        geoScopes (get-in $g$ [(key level) (keyword vintage) :scopes])
         pattern   [geoResolution vintage state level geoScopes]]
     pattern))
 
 (defn geo-url-composer
-  [geoK args]
-  (->> (geo-pattern-maker geoK args)
-       (geo-pattern-matcher geoK)))
+  [$g$ args]
+  (->> (geo-pattern-maker $g$ args)
+       (geo-pattern-matcher $g$)))
 
 (defn IO-pp->census-GeoJSON
   "
@@ -102,20 +100,25 @@
   stats returned as a clojure map.
   "
   [=I= =O=]
-  (let [=geo= (chan 1)
+  (let [=GKM= (chan 1)
         =url= (chan 1)]
-    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
-    (go (let [args  (<! =I=)
-              geoK  (<! =geo=)
-              url   (geo-url-composer geoK args)]
+    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
+    (go (let [args (<! =I=)
+              $g$  (<! =GKM=)
+              url  (geo-url-composer $g$ args)]
           (prn url)
-          ;(prn geoK)
-          (>! =url= url)
-          ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-          (pipeline-async 1 =O= (I=O<<=IO= IO-ajax-GET-json) =url=)
-          (close! =geo=)
-          (close! =url=)))))
-               ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
+          (if (= "" url)
+              (do (>! =O= "Invalid GeoJSON request. Please check arguments against requirements.")
+                  (close! =GKM=)
+                  (close! =url=))
+              (do (prn "Inside IO-pp->census-GeoJSON:")
+                  (js/console.log (js/process.memoryUsage))
+                  (>! =url= url)
+                  ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
+                  (pipeline-async 1 =O= (I=O<<=IO= IO-ajax-GET-json) =url=)
+                  (close! =GKM=)
+                  (close! =url=)))))))
+                  ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 
 
 
