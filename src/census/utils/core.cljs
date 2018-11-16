@@ -388,7 +388,6 @@
 
   (defn xf-seed-form
     [rf acc this]
-    (rf acc {(keyword (get-in this [:properties :GEOID])) this}))
   "
   [f]
   (fn [rf]

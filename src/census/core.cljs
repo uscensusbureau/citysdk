@@ -4,11 +4,12 @@
                           :refer [chan >! <! close! pipeline-async]]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err I=O<<=IO= js->args]]
+    [census.utils.core    :refer [throw-err I=O<<=IO= js->args $geoKeyMap$
+                                  IO-cache-GET-edn URL-GEOKEYMAP]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
-    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [census.statsAPI.core :refer [IO-pp->census-stats]]
-    [census.merger.core   :refer [IO-geo+stats]]
+    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp->census-GeoJSON>-]]
+    [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp->census-stats>-]]
+    [census.merger.core   :refer [IO-merge]]
     [test.fixtures.core   :as ts]))
     ;[clojure.test         :as test
     ;                      :refer-macros [async deftest is testing run-tests]]
@@ -48,16 +49,23 @@
 
 (defn IO-census
   [=I= =O=]
-  (go (let [args   (<! =I=)
-            deploy (deploy-census-function args)]
-        (prn deploy)
-        (case deploy
-              :stats+geos ((I=O<<=IO= IO-geo+stats)          args =O=)
-              :stats-only ((I=O<<=IO= IO-pp->census-stats)   args =O=)
-              :geos-only  ((I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
-              :geocodes   ((I=O<<=IO= IO-census-wms)         args =O=)
-              :no-values  (>! =O= err-no-values)
-              (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
+  (let [=GKM= (chan 1)]
+    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
+    (go (let [args       (<! =I=)
+              deploy     (deploy-census-function args)
+              $g$        (<! =GKM=)]
+          (prn deploy)
+          (case deploy
+                :stats+geos
+                (go ((I=O<<=IO= (-<IO-pp->census-GeoJSON>- $g$)) args =features=)
+                    ((I=O<<=IO= -<IO-pp->census-stats>-)           args =stats=)
+                    (IO-merge [=features= =stats=])                =O=)
+                ;:stats+geos ((I=O<<=IO= IO-geo+stats)          args =O=)
+                :stats-only ((I=O<<=IO= IO-pp->census-stats)   args =O=)
+                :geos-only  ((I=O<<=IO= (IO-pp->census-GeoJSON =GKM=)) args =O=)
+                :geocodes   ((I=O<<=IO= IO-census-wms)         args =O=)
+                :no-values  (>! =O= err-no-values)
+                (prn "No matching clause for the arguments provided. Please check arguments against requirements"))))))
 
 
 #_(go (let [=I= (chan 1)

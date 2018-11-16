@@ -1,104 +1,15 @@
 (ns census.merger.core
   (:require
     [cljs.core.async      :refer [>! <! chan promise-chan close!]
-                          :refer-macros [go]]
+                          :refer-macros [go]
+                          :as <|]
     [ajax.core            :refer [GET POST]]
     [net.cgrand.xforms    :as x]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [census.statsAPI.core :refer [IO-pp->census-stats]]
+    [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp->census-stats>-]]
     [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< educt<< throw-err err-type
                                   js->args I=O<<=IO= IO-cache-GET-edn map-over-keys]]
     [test.fixtures.core   :refer [*g*]]))
-
-(comment
-;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
-;; or in Node: node --max-old-space-size=4096
-
-  (lookup-id->match? :CONCITY [{:2017 {:lev<-file "concity",
-                                       :scopes {:us nil, :st ["500k"]},
-                                       :wms {:layers ["24"], :lookup [:STATE :CONCITY]},
-                                       :id<-json [:GEOID]},
-                                :2016 {:lev<-file "concity",
-                                       :scopes {:us nil, :st ["500k"]},
-                                       :wms {:layers ["24"], :lookup [:STATE :CONCITY]},
-                                       :id<-json [:GEOID]}}
-                               :consolidated-cities
-                               {:2014 {:wms {:layers ["24"], :lookup [:BLOOP]},
-                                       :id<-json [:GEOID]},
-                                :2016 {:wms {:layers ["24"], :lookup [:BLOOP]},
-                                       :id<-json [:GEOID]}}
-                               :something-else])
-
-  (seq (map-invert {:consolidated-cities
-                    {
-                     :2017 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
-                     :2016 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
-                     :2015 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
-                     :2014 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
-                     :2013 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
-                     :2010 {:lev<-file "170"      :scopes {:us nil                 :st ["500k"] } :wms {:layers ["32"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCIT]} ; "47", "52004"
-                     :2000 {:lev<-file "cc"       :scopes {:us [           "500k"] :st nil      } :wms {:layers ["22"] :lookup [:STATE :CONCITY]} :id<-json [:STATE :CONCITFP]}}}))) ; "30", "11390")
-
-
-; ,d88~~\   d8               d8
-; 8888    _d88__   /~~~8e  _d88__  d88~\
-; `Y88b    888         88b  888   C888
-;  `Y88b,  888    e88~-888  888    Y88b
-;    8888  888   C888  888  888     888D
-; \__88P'  "88_/  "88_-888  "88_/ \_88P
-;
-;
-
-
-(defn geoid<-stat
-  "
-  Takes an integer argument denoting the number of stat vars the user requested.
-  Returns a function of one item (from the Census API response
-  collection) to a new map with a hierarchy that will enable deep-merging of
-  the stats with a GeoJSON `feature`s `:properties` map.
-  "
-  [vars#]
-  (fn [input]
-    {(apply str (vals (take-last (- (count input) vars#) input))) {:properties input}}))
-
-;; Examples ==============================
-
-(eduction  (map (geoid<-stat 3))
-           ;conj
-           [{:B01001_001E                                494981,
-             :NAME                                       "State Senate District 40 (2016), Florida",
-             :B00001_001E                                29661,
-             :state                                      "12",
-             :state-legislative-district-_upper-chamber_ "040"}
-            {:B01001_001E                                492259,
-             :NAME                                       "State Senate District 36 (2016), Florida",
-             :B00001_001E                                29475,
-             :state                                      "12",
-             :state-legislative-district-_upper-chamber_ "036"}
-            {:B01001_001E                                493899,
-             :NAME                                       "State Senate District 35 (2016), Florida",
-             :B00001_001E                                25615,
-             :state                                      "12",
-             :state-legislative-district-_upper-chamber_ "035"}])
-
-; =>
-; [{"12040" {:properties {:B01001_001E 494981,
-;                        :NAME "State Senate District 40 (2016), Florida",
-;                        :B00001_001E 29661,
-;                        :state "12",
-;                        :state-legislative-district-_upper-chamber_ "040"}}}
-; {"12036" {:properties {:B01001_001E 492259,
-;                        :NAME "State Senate District 36 (2016), Florida",
-;                        :B00001_001E 29475,
-;                        :state "12",
-;                        :state-legislative-district-_upper-chamber_ "036"}}}
-; {"12035" {:properties {:B01001_001E 493899,
-;                        :NAME "State Senate District 35 (2016), Florida",
-;                        :B00001_001E 25615,
-;                        :state "12",
-;                        :state-legislative-district-_upper-chamber_ "035"}}}]
-;; =======================================
 
 
 
@@ -531,33 +442,38 @@
   the maps have merged. This ensures the returned list contains only the overlap
   between the two, i.e., excluding non-merged maps.
   "
-  [s-key g-key]
-  (xf<<
-    (fn [rf result item]
-      ;(prn "Inside xf<-merged->filter:")
-      ;(js/console.log (js/process.memoryUsage))
-      (let [[_ v] (first item)]
-        (if (or (nil? (get-in v [:properties s-key]))
-                (nil? (get-in v [:properties g-key])))
-          (rf result)
-          (rf result v))))))
-;(completing
-;  (fn [item]
-;    (let [[_ v] (first item)]
-;      (if (or (nil? (get-in v [:properties s-key]))
-;              (nil? (get-in v [:properties g-key])))
-;        nil
-;        v)))))
+  ([[& filter-keys]]
+   (xf<<
+     (fn [rf acc this]
+       (let [[[_ v]] (x/into [] this)]
+         (if (not-any? nil? (eduction (map #(get-in v [:properties %]) filter-keys)))
+           (rf acc v)
+           (rf acc)))))))
 
 
+(x/into [] {"12040" {:type "Feature",
+                     :properties {:STATEFP "01",
+                                  :COUNTY "456",
+                                  :STATE "123",
+                                  :state "12",
+                                  :extra "key",
+                                  :GEOID "01005",
+                                  :B01001_001E 494981,
+                                  :state-legislative-district-_upper-chamber_ "040",
+                                  :B00001_001E 29661,
+                                  :NAME "State Senate District 40 (2016), Florida"},
+                     :geometry {:type "Polygon",
+                                :coordinates [[[-85.748032 31.619181]
+                                               [-85.729832 31.632373]]]}}})
 ; Examples ================================================
 
-(eduction (xf-remove-unmerged :GEOID :B00001_001E)
+(eduction (xf-remove-unmerged [:COUNTY :B00001_001E :extra])
           [{"12040" {:type "Feature",
                      :properties {:STATEFP "01",
                                   :COUNTY "456",
                                   :STATE "123",
                                   :state "12",
+                                  :extra "key",
                                   :GEOID "01005",
                                   :B01001_001E 494981,
                                   :state-legislative-district-_upper-chamber_ "040",
@@ -725,18 +641,19 @@
 
 
 (defn xf-merge-filter
-  [s-key g-key]
+  [[& filter-keys]]
   (comp xf-deep-merge-with
-        (xf-remove-unmerged s-key g-key)))
+        (xf-remove-unmerged filter-keys)))
 
 
 ; Examples ================================================
 
-(eduction  (xf-merge-filter :B00001_001E :GEOID)
+(eduction  (xf-merge-filter [:B00001_001E :GEOID :extra])
            ;conj
            {'("12040") [{"12040" {:type "Feature",
                                   :properties {:STATEFP "01",
                                                :GEOID "01005",
+                                               :extra "val"
                                                :STATE "123",
                                                :COUNTY "456"},
                                   :geometry {:type "Polygon",
@@ -793,20 +710,20 @@
 ;             :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}]
 ; =========================================================
 
-
-(defn HO<-xf-merge-filter
-  "
-  Higher Order Function to be used in concert with `core.async/map`, which takes
-  three Clojure keywords and returns a function, which takes two
-  input maps and deep-merges them into one based on common keys,
-  and then filters them to return only those map-items that contain an
-  identifying key from each source map. Used to remove unmerged items.
-  "
-  [s-key g-key]
-  (fn [stats-coll geo-coll]
-    (prn "Inside merge-geo+stats:")
-    (js/console.log (js/process.memoryUsage))
-    ((xf-merge-filter s-key g-key) stats-coll geo-coll)))
+;
+;(defn HO<-xf-merge-filter
+;  "
+;  Higher Order Function to be used in concert with `core.async/map`, which takes
+;  three Clojure keywords and returns a function, which takes two
+;  input maps and deep-merges them into one based on common keys,
+;  and then filters them to return only those map-items that contain an
+;  identifying key from each source map. Used to remove unmerged items.
+;  "
+;  [& filter-keys]
+;  (fn [stats-coll geo-coll]
+;    (prn "Inside merge-geo+stats:")
+;    (js/console.log (js/process.memoryUsage))
+;    ((xf-merge-filter s-key g-key) stats-coll geo-coll)))
 
 ;(x/into []))))
 
@@ -857,7 +774,7 @@
 
 ;; Examples =================================
 
-(eduction    (HO<-xf-merge-filter :NAME :GEOID)
+#_(eduction    (HO<-xf-merge-filter :NAME :GEOID)
              ;conj
              (group-by-keys
                (concat
@@ -902,7 +819,7 @@
 ;==========================================
 
 
-(defn IO-geo+stats
+(defn IO-merge
   "
   Takes an arg map to configure a call the Census' statistics API as well as a
   matching GeoJSON file. The match is based on `vintage` and `geoHierarchy` of
@@ -915,44 +832,48 @@
   results. Thus, superfluous GeoJSON values are filtered out via a `remove`
   operation on the collection in the local `chan`.
   "
-  [=I= =O=]
-  (let [=GKM= (chan 1)]
-    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
-    (go (let [args       (<! =I=)
-              $g$        (<! =GKM=)
-              ids        ((get-geoid?s $g$) args)
-              vars#      (+ (count (get args :values))
-                            (count (get args :predicates)))
-              s-key      (keyword (first (get args :values)))
-              g-key      (first ids)
-              =args=     (promise-chan)
-              =features= (chan 1 (xf-e?->features+geoids ids))
-              =stats=    (chan 1 (xf-e?->stats+geoids vars#))]
-              ; changed due to: https://github.com/clojure/core.async/blob/master/src/main/clojure/cljs/core/async.cljs#L700
+  [[& filter-keys]]
+  (fn [[& =Is=] =O=]
+    (go (let [=merged= (<|/merge =Is=)
 
-                                               ; Notes (1)
-          (>! =args= args)
-          (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
-          (if-let [features (<! =features=)]
-            (go (let [merged ((HO<-xf-merge-filter s-key g-key) ; core.async version of `map`
-                              features
-                              (<! =stats=))]
-                  (prn "Inside IO-geo+stats:")
-                  (js/console.log (js/process.memoryUsage))
-                  (IO-pp->census-stats =args= =stats=)
-                  ; Notes (2)
-                  (>! =O= {:type "FeatureCollection"
-                           :features merged})
-                  (prn "Done with merger in IO-geo+stats:")
-                  (js/console.log (js/process.memoryUsage))
-                  (close! =features=)
-                  (close! =stats=); Notes (3)
-                  (close! =args=)                                ; Notes (4)
-                  (prn "working on it....")))
-            (go (close! =features=)
-                (close! =args=)
-                (close! =stats=)
-                (close! =GKM=)))))))
+(comment
+    (let [=GKM= (chan 1)]
+      ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
+      (go (let [args       (<! =I=)
+                $g$        (<! =GKM=)
+                ids        ((get-geoid?s $g$) args)
+                vars#      (+ (count (get args :values))
+                              (count (get args :predicates)))
+                s-key      (keyword (first (get args :values)))
+                g-key      (first ids)
+                =args=     (promise-chan)
+                =features= (chan 1 (xf-e?->features+geoids ids))
+                =stats=    (chan 1 (xf-e?->stats+geoids vars#))]
+                ; changed due to: https://github.com/clojure/core.async/blob/master/src/main/clojure/cljs/core/async.cljs#L700
+
+                                                 ; Notes (1)
+            (>! =args= args)
+            (IO-pp->census-GeoJSON =args= =features=)      ; Notes (2)
+            (if-let [features (<! =features=)]
+              (go (let [merged ((HO<-xf-merge-filter (first filter-keys) (last filter-keys)); s-key g-key) ; core.async version of `map`
+                                features
+                                (<! =stats=))]
+                    (prn "Inside IO-geo+stats:")
+                    (js/console.log (js/process.memoryUsage))
+                    (IO-pp->census-stats =args= =stats=)
+                    ; Notes (2)
+                    (>! =O= {:type "FeatureCollection"
+                             :features merged})
+                    (prn "Done with merger in IO-geo+stats:")
+                    (js/console.log (js/process.memoryUsage))
+                    (close! =features=)
+                    (close! =stats=); Notes (3)
+                    (close! =args=)                                ; Notes (4)
+                    (prn "working on it....")))
+              (go (close! =features=)
+                  (close! =args=)
+                  (close! =stats=)
+                  (close! =GKM=)))))))
 
 
 ; "Inside IO-geo+stats:"
@@ -994,7 +915,7 @@
   (go (let [=I= (chan 1)
             =O= (chan 1)]
         (>! =I= args)
-        (IO-geo+stats =I= =O=)
+        (IO-merge =I= =O=)
         (js/console.log
           (js/JSON.stringify
             (js-obj "type" "FeatureCollection"
