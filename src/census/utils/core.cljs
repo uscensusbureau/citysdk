@@ -212,7 +212,7 @@
 
 (defn IO-ajax-GET-json
   "
-  I/O (chans) API which takes a URL from an input port (=I=), makes a `cljs-ajax`
+  I/O (chans) API which takes a URL from an this port (=I=), makes a `cljs-ajax`
   GET request to the provided URL and puts the response in the output (=O=) port.
   "
   [=URL= =RES=]
@@ -323,14 +323,14 @@
 
 (defn I=O<<=IO=
   "
-  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
-  input.
+  Adapter, which wraps asynchronous I/O ports next to provide a synchronous
+  next.
 
   This is good for kicking off async functions, but also is the required
   signature/contract for `pipeline-async`.
   "
   [f]                            ; takes an async I/O function
-  (fn [I =O=]             ; returns a function with a sync input / `chan` output
+  (fn [I =O=]             ; returns a function with a sync next / `chan` output
     (let [=I= (chan 1)]       ; create internal `chan`
       (go (>! =I= I)       ; put sync `I` into `=I=`
           (f =I= =O=)  ; call the wrapped function with the newly created `=I=`
@@ -340,8 +340,8 @@
 ;
 ;(defn args+cb<<=IO=
 ;  "
-;  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
-;  input and expose the output to a callback and converts any #js args to proper
+;  Adapter, which wraps asynchronous I/O ports next to provide a synchronous
+;  next and expose the output to a callback and converts any #js args to proper
 ;  cljs syntax (with keyword translation)
 ;
 ;  This is good for touch & go asynchronous functions, which do not require
@@ -349,7 +349,7 @@
 ;  functions (e.g., exposing asynchronous functions as a library).
 ;  "
 ;  [f]                                           ; takes an async I/O function
-;  (fn [I cb ?state]                             ; returns a function with sync input  / callback for output
+;  (fn [I cb ?state]                             ; returns a function with sync next  / callback for output
 ;    (let [=I=  (chan 1)                      ; create two internal `chan`s for i/o
 ;          =O=  (chan 1 (map throw-err))
 ;          args (js->args I)]                    ; converts any #js types to cljs with proper keys
@@ -363,12 +363,12 @@
 ;
 ;(defn js-I=O<<=IO=
 ;  "
-;  Adapter, which wraps asynchronous I/O ports input to provide a synchronous
-;  input, which converts values from =I= channel to js arguments. Created
+;  Adapter, which wraps asynchronous I/O ports next to provide a synchronous
+;  next, which converts values from =I= channel to js arguments. Created
 ;  initially for async js library (e.g., `workerpool`) interop.
 ;  "
 ;  [f]                            ; takes an async I/O function
-;  (fn [I =O= ?state]             ; returns a function with a sync input / `chan` output
+;  (fn [I =O= ?state]             ; returns a function with a sync next / `chan` output
 ;    (let [=I= (chan 1)
 ;          js-args (clj->js I)]       ; create internal `chan`
 ;      (go (>! =I= js-args)       ; put sync `I` into `=I=`
@@ -381,28 +381,28 @@
 (defn xf<<
   "
   Transducifier wrapper, which takes the seed of a transducer (essential
-  operation) with a standardized `xf result input` contract and wraps it in the
+  operation) with a standardized `xf acc this` contract and wraps it in the
   necessary boilerplate to correctly function as a stateless transducer.
 
   Example of tranducer seed with contract required for this wrapper:
 
   (defn xf-seed-form
-    [xf result input]
-    (xf result {(keyword (get-in input [:properties :GEOID])) input}))
+    [rf acc this]
+    (rf acc {(keyword (get-in this [:properties :GEOID])) this}))
   "
   [f]
   (fn [rf]
     (fn
       ([] (rf))
-      ([result] (rf result))
-      ([result input] (f rf result input)))))
+      ([acc] (rf acc))
+      ([acc this] (f rf acc this)))))
 
 ;; Tested: working
 
 (defn xf!<<
   "
   Stateful transducifier wrapper, which takes the seed of a transducer (essential
-  operation) with a standardized `xf result input` contract and wraps it in the
+  operation) with a standardized `xf acc this` contract and wraps it in the
   necessary boilerplate to correctly function as a _stateful_ transducer.
 
   Only avails a single state container: `state`
@@ -410,37 +410,37 @@
   Example of tranducer seed with contract required for this wrapper:
 
   (defn xf!-seed-form
-    [state xf result input]
+    [state xf acc this]
       (let [prev @state]
         (if (nil? prev)
             (do (vreset! state (vec (map keyword item)))
               nil)
-            (xf result (zipmap prev (vec item))))))
+            (xf acc (zipmap prev (vec item))))))
   "
   [f]
   (fn [rf]
     (let [state (volatile! nil)]
       (fn
         ([] (rf))
-        ([result] (rf result))
-        ([result input] (f state rf result input))))))
+        ([acc] (rf acc))
+        ([acc this] (f state rf acc this))))))
 
 ;; Tested 1: working
 
 
-(defn xfxf<<
+(defn educt<<
   "
   Transducer, which wraps a transducer to provide the right level of contract
   for a core.async chan through which data is not an item, but a collection.
   I.e., treating the collection as a single transducible item.
   "
-  [xfn rf-]
+  [xfn]
   (fn [rf]
     (fn
       ([] (rf))
-      ([result] (rf result))
-      ([result item]
-       (rf result (transduce xfn rf- item))))))
+      ([acc] (rf acc))
+      ([acc coll]
+       (rf acc (eduction xfn coll))))))
 ;; Tested 1: working
 
 ;; Examples ==============================
