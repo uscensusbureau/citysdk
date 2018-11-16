@@ -79,14 +79,14 @@
 
 ; Examples ===========================================
 
-(eduction (xf!-csv-response->JSON
-            {:values ["B01001_001E" "NAME" "B00001_001E"]})
-            ;:keywords)
-           ;conj
-          [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
-           ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
-           ["491350","State Senate District 6 (2016), Florida","29938","12","006"],
-           ["494981","State Senate District 40 (2016), Florida","29661","12","040"]])
+#_(eduction (xf!-csv-response->JSON
+              {:values ["B01001_001E" "NAME" "B00001_001E"]})
+              ;:keywords)
+             ;conj
+            [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
+             ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
+             ["491350","State Senate District 6 (2016), Florida","29938","12","006"],
+             ["494981","State Senate District 40 (2016), Florida","29661","12","040"]])
 
 ; =>
 
@@ -111,28 +111,16 @@
 
 ; ====================================================
 
-
-(defn educt-e?->csv->JSON
-  "
-  Stateful transducer composed of an error-throwing function with a xf wrapper,
-  which allows the xf!-csv-response->JSON transducer to operate on a collection
-  passed to a `chan`.
-  "
-  [args]
-  (comp
-    (map throw-err)
-    (educt<< (xf!-csv-response->JSON args))))
-
 ; Examples ===========================================
 
 
-(transduce (educt-e?->csv->JSON {:values ["B01001_001E" "NAME" "B00001_001E"]})
-           conj
-           ; (wrapped in an extra collection [] for testing)
-           [[["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
-             ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
-             ["491350","State Senate District 6 (2016), Florida","29938","12","006"],
-             ["494981","State Senate District 40 (2016), Florida","29661","12","040"]]])
+#_(transduce (educt<< (xf!-csv-response->JSON {:values ["B01001_001E" "NAME" "B00001_001E"]}))
+             conj
+             ; (wrapped in an extra collection [] for testing)
+             [[["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
+               ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
+               ["491350","State Senate District 6 (2016), Florida","29938","12","006"],
+               ["494981","State Senate District 40 (2016), Florida","29661","12","040"]]])
 
 ; =>
 ; [({:B01001_001E 486727,
@@ -166,7 +154,7 @@
   (go (let [args  (<! =I=)
             url   (stats-url-builder args)
             =url= (chan 1)
-            =res= (chan 1 (educt-e?->csv->JSON args))]
+            =res= (chan 1 (educt<< (xf!-csv-response->JSON args)))]
         (prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
@@ -200,13 +188,13 @@
 
 ;; Examples ==============================
 
-(eduction  (geoid<-stat 3)
-           ;conj
-           '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
-             {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
-             {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
-             {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
-             {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"}))
+#_(eduction  (geoid<-stat 3)
+             ;conj
+             '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
+               {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
+               {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
+               {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
+               {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"}))
 
 ; =>
 ; [{"12040" {:properties {:B01001_001E 494981,
@@ -246,13 +234,16 @@
       =O= (chan 1)
       args {:vintage      "2016"
             :sourcePath   ["acs" "acs5"]
-            :geoHierarchy {:state "01" :county "*"}
-            :values       ["B01001_001E" "B01001_001M"]}]
+            :geoHierarchy {:state "44" :school-district-_secondary_ "*"}
+            :values       ["B01001_001E" "NAME"]}]
   (go (>! =I= args)
-      (IO-pp->census-stats =I= =O=)
-      ;(-<IO-pp-census-stats>- =I= =O=)
+      ;(IO-pp->census-stats =I= =O=)
+      (-<IO-pp-census-stats>- =I= =O=)
       (cljs.pprint/pprint (<! =O=))
       (close! =I=)
       (close! =O=)))
+
+; =>
+; ({"4400420" {:properties {:B01001_001E 14611, :NAME "Foster-Glocester Regional School District, Rhode Island", :state "44", :school-district-_secondary_ "00420"}}} {"4499999" {:properties {:B01001_001E 1039880, :NAME "Remainder of Rhode Island, Rhode Island", :state "44", :school-district-_secondary_ "99999"}}})
 
 ;; =======================================

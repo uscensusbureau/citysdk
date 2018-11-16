@@ -7,8 +7,9 @@
     [census.utils.core    :refer [throw-err I=O<<=IO= js->args $geoKeyMap$
                                   IO-cache-GET-edn URL-GEOKEYMAP]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
-    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp->census-GeoJSON>-]]
-    [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp->census-stats>-]]
+    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp->census-GeoJSON>-
+                                  ids<-$g$<<args]]
+    [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp-census-stats>-]]
     [census.merger.core   :refer [IO-merge]]
     [test.fixtures.core   :as ts]))
     ;[clojure.test         :as test
@@ -44,6 +45,45 @@
     ;ts/args-ok-sts-vals
     ;ts/args-na-geo-only)
 
+; GEOAPI ====================================
+(let [=I= (chan 1)
+      =O= (chan 1 (map throw-err))
+      =GKM= (chan 1)]
+  ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
+  (go (let [$g$ (<! =GKM=)]
+        (>! =I= {:vintage       "2000"
+                 :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+                 :sourcePath    ["acs" "acs5"]
+                 :geoResolution "500k"
+                 :values        ["B01001_001E"]})
+        (close! =GKM=)
+        ;((IO-pp->census-GeoJSON $g$) =I= =O=)
+        ((-<IO-pp->census-GeoJSON>- $g$) =I= =O=)
+        (prn (<! =O=))
+        (prn "Done with -<IO-pp->census-GeoJSON>-:")
+        (js/console.log (js/process.memoryUsage))
+        (close! =I=)
+        (close! =O=))))
+; GEOAPI ====================================
+
+;; STATSAPI ==============================
+
+(let [=I= (chan 1)
+      =O= (chan 1)
+      args {:vintage      "2016"
+            :sourcePath   ["acs" "acs5"]
+            :geoHierarchy {:state "01" :county "*"}
+            :values       ["B01001_001E" "B01001_001M"]}]
+  (go (>! =I= args)
+      ;(IO-pp->census-stats =I= =O=)
+      (-<IO-pp-census-stats>- =I= =O=)
+      (cljs.pprint/pprint (<! =O=))
+      (close! =I=)
+      (close! =O=)))
+
+;; =======================================
+
+
 
 #_(prn ts/args-ok-wms-only)
 
@@ -51,15 +91,17 @@
   [=I= =O=]
   (let [=GKM= (chan 1)]
     ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
-    (go (let [args       (<! =I=)
-              deploy     (deploy-census-function args)
-              $g$        (<! =GKM=)]
+    (go (let [args      (<! =I=)
+              deploy    (deploy-census-function args)
+              $g$       (<! =GKM=)
+              key-geoJS (first ((ids<-$g$<<args $g$) args))
+              key-stats (keyword (first (get args :values)))]
           (prn deploy)
           (case deploy
                 :stats+geos
                 (go ((I=O<<=IO= (-<IO-pp->census-GeoJSON>- $g$)) args =features=)
-                    ((I=O<<=IO= -<IO-pp->census-stats>-)           args =stats=)
-                    (IO-merge [=features= =stats=])                =O=)
+                    ((I=O<<=IO= -<IO-pp-census-stats>-) args =stats=)
+                    ((IO-merge [key-geoJS key-stats]) [=features= =stats=] =O=))
                 ;:stats+geos ((I=O<<=IO= IO-geo+stats)          args =O=)
                 :stats-only ((I=O<<=IO= IO-pp->census-stats)   args =O=)
                 :geos-only  ((I=O<<=IO= (IO-pp->census-GeoJSON =GKM=)) args =O=)
