@@ -149,52 +149,53 @@
   instead of an actual FIPS code set. If FIPS are already provided, this step is
   skipped.
   "
-  [=args-in= =args-out=]
-  (let [=geo= (chan 1)]
-    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
-    (go
-      (let [args-in (<! =args-in=)
-            $g$     (<! =geo=)
-            =res=   (chan 1)]
-        (if (wms-engage? args-in)
-          (loop [args args-in
-                 idx 0]
-            (try-census-wms $g$ args idx =res=)
-            (let [{:keys [layers sub-level]} (geoKey->wms-config $g$ args)
-                  result (<! =res=)]
-              (cond
-                (not (empty? result))
-                (do (>! =args-out=
-                      (transform :geoHierarchy #(into {} %)
-                        (setval :geoHierarchy
-                          (conj (-=-/map)
-                            (into (-=-/map) (traverse MAP-VALS result))
-                            (into (-=-/map) [sub-level]))
-                          args)))
-                    (close! =res=)
-                    (close! =geo=))
-                (and (empty? result) (not (nil? (get layers (inc idx)))))
-                (recur args (inc idx))
-                :else
-                (do (>! =args-out= (str "No Geography found for this lat/lng pair"))
-                    (close! =res=)
-                    (close! =geo=)))))
-          (do (>! =args-out= args-in)
-              (close! =res=)
-              (close! =geo=)))))))
+  [$g$]
+  (fn [=args-in= =args-out=]
+    ;(let [=geo= (chan 1)]
+    ;  ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =geo=)
+      (go (let [args-in (<! =args-in=)
+                ;$g$     (<! =geo=)
+                =res=   (chan 1)]
+            (if (wms-engage? args-in)
+              (loop [args args-in
+                     idx 0]
+                (try-census-wms $g$ args idx =res=)
+                (let [{:keys [layers sub-level]} (geoKey->wms-config $g$ args)
+                      result (<! =res=)]
+                  (cond
+                    (not (empty? result))
+                    (do (>! =args-out=
+                          (transform :geoHierarchy #(into {} %)
+                            (setval :geoHierarchy
+                              (conj (-=-/map)
+                                (into (-=-/map) (traverse MAP-VALS result))
+                                (into (-=-/map) [sub-level]))
+                              args)))
+                        (close! =res=))
+                        ;(close! =geo=))
+                    (and (empty? result) (not (nil? (get layers (inc idx)))))
+                    (recur args (inc idx))
+                    :else
+                    (do (>! =args-out= (str "No Geography found for this lat/lng pair"))
+                        (close! =res=)))))
+                        ;(close! =geo=)))))
+              (do (>! =args-out= args-in)
+                  (close! =res=)))))))
+                  ;(close! =geo=)))))))
 
 (defn Icb<-wms-args<<=IO=
   "
   Version of ut/Icb<<=IO=, which checks for args which require conversion from WMS.
   "
-  [f]                                     ; takes an async I/O function
-  (fn [I cb]                              ; returns a function with sync input  / callback for output
-    (let [=O=    (chan 1 (map throw-err))
-          =args= (chan 1)              ; this is an add-on to engage wms if needed
-          args   (js->args I)]         ; converts any #js types to cljs with proper keys
-      (go ((I=O<<=IO= IO-census-wms) args =args=)
-          (f =args= =O=)               ; apply the async I/O function with the internal `chan`s
-          (take! =O= #(do (cb %)    ; use async `take!` to allow lambdas/closures
-                          (close! =O=)
-                          (close! =args=)))))))
+  [$g$]
+  (fn [f]                                     ; takes an async I/O function
+    (fn [I cb]                              ; returns a function with sync input  / callback for output
+      (let [=O=    (chan 1 (map throw-err))
+            =args= (chan 1)              ; this is an add-on to engage wms if needed
+            args   (js->args I)]         ; converts any #js types to cljs with proper keys
+        (go ((I=O<<=IO= (IO-census-wms $g$)) args =args=)
+            (f =args= =O=)               ; apply the async I/O function with the internal `chan`s
+            (take! =O= #(do (cb %)    ; use async `take!` to allow lambdas/closures
+                            (close! =O=)
+                            (close! =args=))))))))
 

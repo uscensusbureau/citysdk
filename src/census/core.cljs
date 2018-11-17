@@ -1,16 +1,19 @@
 (ns census.core
   (:require
     [cljs.core.async      :refer-macros [go]
-                          :refer [chan >! <! close! pipeline-async]]
+                          :refer [chan >! <! close! pipeline-async
+                                  promise-chan]
+                          :as <|]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err I=O<<=IO= js->args $geoKeyMap$
+    [census.utils.core    :refer [throw-err err-type I=O<<=IO= js->args $geoKeyMap$
                                   IO-cache-GET-edn URL-GEOKEYMAP]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
-    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp->census-GeoJSON>-
+    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp-census-geos>-
                                   ids<-$g$<<args]]
     [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp-census-stats>-]]
     [census.merger.core   :refer [IO-merge]]
+    [net.cgrand.xforms    :as x]
     [test.fixtures.core   :as ts]))
     ;[clojure.test         :as test
     ;                      :refer-macros [async deftest is testing run-tests]]
@@ -45,124 +48,84 @@
     ;ts/args-ok-sts-vals
     ;ts/args-na-geo-only)
 
-; GEOAPI ====================================
-(let [=I= (chan 1)
-      =O= (chan 1 (map throw-err))
-      =GKM= (chan 1)]
-  ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
-  (go (let [$g$ (<! =GKM=)]
-        (>! =I= {:vintage       "2000"
-                 :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
-                 :sourcePath    ["acs" "acs5"]
-                 :geoResolution "500k"
-                 :values        ["B01001_001E"]})
-        (close! =GKM=)
-        ;((IO-pp->census-GeoJSON $g$) =I= =O=)
-        ((-<IO-pp->census-GeoJSON>- $g$) =I= =O=)
-        (prn (<! =O=))
-        (prn "Done with -<IO-pp->census-GeoJSON>-:")
-        (js/console.log (js/process.memoryUsage))
-        (close! =I=)
-        (close! =O=))))
-; GEOAPI ====================================
-
-;; STATSAPI ==============================
-
-(let [=I= (chan 1)
-      =O= (chan 1)
-      args {:vintage      "2016"
-            :sourcePath   ["acs" "acs5"]
-            :geoHierarchy {:state "01" :county "*"}
-            :values       ["B01001_001E" "B01001_001M"]}]
-  (go (>! =I= args)
-      ;(IO-pp->census-stats =I= =O=)
-      (-<IO-pp-census-stats>- =I= =O=)
-      (cljs.pprint/pprint (<! =O=))
-      (close! =I=)
-      (close! =O=)))
-
-;; =======================================
-
-
-
 #_(prn ts/args-ok-wms-only)
 
 (defn IO-census
-  [=I= =O=]
-  (let [=GKM= (chan 1)]
-    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
-    (go (let [args      (<! =I=)
-              deploy    (deploy-census-function args)
-              $g$       (<! =GKM=)
-              key-geoJS (first ((ids<-$g$<<args $g$) args))
-              key-stats (keyword (first (get args :values)))]
+  [$g$]
+  (fn [=I= =O=]
+    (go (let [args    (<! =I=)
+              deploy  (deploy-census-function args)
+              key-g   (first ((ids<-$g$<<args $g$) args))
+              key-s   (keyword (first (get args :values)))
+              =geos?= (chan 1)]
           (prn deploy)
           (case deploy
                 :stats+geos
-                (go ((I=O<<=IO= (-<IO-pp->census-GeoJSON>- $g$)) args =features=)
-                    ((I=O<<=IO= -<IO-pp-census-stats>-) args =stats=)
-                    ((IO-merge [key-geoJS key-stats]) [=features= =stats=] =O=))
-                ;:stats+geos ((I=O<<=IO= IO-geo+stats)          args =O=)
-                :stats-only ((I=O<<=IO= IO-pp->census-stats)   args =O=)
-                :geos-only  ((I=O<<=IO= (IO-pp->census-GeoJSON =GKM=)) args =O=)
-                :geocodes   ((I=O<<=IO= IO-census-wms)         args =O=)
-                :no-values  (>! =O= err-no-values)
+                (go ((I=O<<=IO= (-<IO-pp-census-geos>- $g$)) args =geos?=)
+                    (if-let [geos (<! =geos?=)]
+                            (go (close! =geos?=)
+                                (let [=stats= (chan 1)]
+                                     ((I=O<<=IO= -<IO-pp-census-stats>-) args =stats=)
+                                     ;(<! (<|/timeout 500))
+                                     ((IO-merge [key-g key-s]) [geos (<! =stats=)] =O=)
+                                     ;(<! (<|/timeout 2000))
+                                     (close! =stats=)))
+                      (go (close! =geos?=))))
+                :stats-only (go ((I=O<<=IO= IO-pp->census-stats)         args =O=))
+                :geos-only  (go ((I=O<<=IO= (IO-pp->census-GeoJSON $g$)) args =O=))
+                :geocodes   (go ((I=O<<=IO= (IO-census-wms $g$))         args =O=))
+                :no-values  (go (>! =O= err-no-values))
                 (prn "No matching clause for the arguments provided. Please check arguments against requirements"))))))
 
 
-#_(go (let [=I= (chan 1)
-            =O= (chan 1 (map throw-err))]
-        (>! =I= {:vintage       "2016"
-                 :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
-                 :sourcePath    ["acs" "acs5"]
-                 :geoResolution "500k"
-                 :values        ["B01001_001E"]})
-        (IO-census =I= =O=)
-        (prn (<! =O=))
-        (close! =I=)
-        (close! =O=)))
+(let [args {:vintage       "2016"
+            :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
+            :sourcePath    ["acs" "acs5"]
+            :geoResolution "500k"
+            :values        ["B01001_001E"]}
+      =I= (chan 1)
+      =O= (chan 1 (map throw-err))]
+  (go (>! =I= args)
+      ;(prn args)
+      (IO-census =I= =O=)
+      (prn (<! =O=))
+      (close! =I=)))
+      ;(close! =O=)))
 
 (defn census
   [I cb]
-  ((Icb<-wms-args<<=IO= IO-census) I #(cb (js/JSON.stringify (clj->js %)))))
-#_(let [=args=   (chan 1)
-        =cljson= (chan 1 (map clj->js))
-        =json=   (chan 1)]
-    (go ((I=O<<=IO= IO-census-wms) (js->args I) =args=)
-        ;(pipeline-async 1 =args= (I=O<<=IO= IO-census-wms) =arg-in=)
-        (pipeline-async 1 =cljson= (I=O<<=IO= IO-census) =args=)
-        (pipeline-async 1 =json= I=O=stringify =cljson=)
-        (cb (<! =json=))))
-      ;((Icb<-wms-args<<=IO= IO-census) I (fn [cljson] (bfj-stringify (clj->js cljson) #(cb %)))))))
+  (let [=GKM= (chan 1)]
+    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
+    (go (let [$g$ (<! =GKM=)]
+          (close! =GKM=)
+          (((Icb<-wms-args<<=IO= $g$) (IO-census $g$))
+           I
+           (fn [res] (cb (js/JSON.stringify (clj->js res)))))))))
 
-
-()
-#_(type (clj->js "string"))
-#_(type (clj->js (js/console.log "test")))
 
 
 (defn test-async-time
   [args f]
   (let [time-in (js/Date.)]
      (census args
-             #(do (prn (str "Elapsed ms: "(- (js/Date.) time-in)))
-                  (f %)))))
+             (fn [res] (do (f res)
+                           (prn (str "Elapsed ms: "(- (js/Date.) time-in))))))))
 
 (prn ts/args-ok-s+g-vals)
 (comment
   (test-async-time ts/args-ok-wms-only prn)
-  (test-async-time (ts/test-args 9 3 3 0) js/console.log)
-  (test-async-time ts/args-ok-geo-only js/console.log) ; 1st = "Elapsed ms: 22589" 2nd = "Elapsed ms: 18298"
-  (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; "Elapsed ms: 2444"
-  (test-async-time ts/args-ok-s+g-v+ps js/console.log)
+  (test-async-time (ts/test-args 9 3 3 0) prn)
+  (test-async-time ts/args-ok-geo-only prn) ; 1st = "Elapsed ms: 22589" 2nd = "Elapsed ms: 18298" 3rd = "Elapsed ms: 37648"
+  (test-async-time ts/args-ok-s+g-v+ps prn) ; "Elapsed ms: 2444"
+  (test-async-time ts/args-ok-s+g-v+ps prn)
   ; { rss: 267894784,
   ;   heapTotal: 243630080,
   ;   heapUsed: 194502992,
   ;   external: 112275
-  (test-async-time ts/args-ok-s+g-vals js/console.log)
-  (test-async-time ts/args-na-sts-pred js/console.log)
-  (test-async-time ts/args-ok-sts-v+ps js/console.log)
-  (test-async-time ts/args-ok-sts-vals js/console.log)
+  (test-async-time ts/args-ok-s+g-vals prn)
+  (test-async-time ts/args-na-sts-pred prn)
+  (test-async-time ts/args-ok-sts-v+ps prn)
+  (test-async-time ts/args-ok-sts-vals prn)
   (test-async-time {:vintage 2016
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
@@ -171,7 +134,7 @@
                                    :county-subdivision "*"}
                     :geoResolution "4k"
                     :statsKey ts/stats-key}
-                   js/console.log)
+                   prn)
 
   (test-async-time {:vintage 2016
                     :sourcePath ["acs" "acs5"]
@@ -179,7 +142,7 @@
                     :geoHierarchy {:county "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
-                   js/console.log)
+                   prn)
   ;tests:
   ; original = "Elapsed ms: 11365"
   ; changed group = "Elapsed ms: 11857"
@@ -195,7 +158,7 @@
                                    :tract "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
-                   js/console.log)
+                   prn)
   (test-async-time {:vintage 2016
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
@@ -204,7 +167,7 @@
                                    :block-group "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
-                   js/console.log)
+                   prn)
   (test-async-time {:vintage 2016
                     :sourcePath ["acs" "acs5"]
                     :values ["B01001_001E"]
@@ -212,13 +175,13 @@
                                    :school-district-_elementary_ "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
-                   js/console.log)
+                   prn)
   (test-async-time {:vintage 2016
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:zip-code-tabulation-area "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
-                   js/console.log))
+                   prn))
 
 

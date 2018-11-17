@@ -55,26 +55,26 @@
   Otherwise, will return map keys as strings.
   "
   ;([args] (xf!-csv-response->JSON args nil))
-  ([{:keys [values predicates]}] ;?keywords]
-   (let [parse-range [0 (+ (count values) (count predicates))]]
-     (xf!<<
-       (fn [state rf result input]
-         (let [prev @state]
-           (if (nil? prev)
-             ;(if (= ?keywords :keywords)
-               (do (vreset! state (mapv strs->keys input)) nil)
-               ;(do (vreset! state input) nil)
-             ;(if (= ?keywords :keywords)
-               (rf result
-                   (zipmap (x/into [] (map keyword @state))
-                           (map-idcs-range parse-if-number
-                                           parse-range
-                                           input))))))))))
-               ;(rf result
-               ;    (zipmap @state
-               ;            (map-idcs-range parse-if-number
-               ;                            parse-range
-               ;                            input)))))))))))
+  [{:keys [values predicates]}] ;?keywords]
+  (let [parse-range [0 (+ (count values) (count predicates))]]
+    (xf!<<
+      (fn [state rf acc this]
+        (let [prev @state]
+          (if (nil? prev)
+            ;(if (= ?keywords :keywords)
+              (vreset! state (mapv strs->keys this))
+              ;(do (vreset! state this) nil)
+            ;(if (= ?keywords :keywords)
+              (rf acc
+                  (zipmap (x/into [] (map keyword @state))
+                          (map-idcs-range parse-if-number
+                                          parse-range
+                                          this)))))))))
+              ;(rf acc
+              ;    (zipmap @state
+              ;            (map-idcs-range parse-if-number
+              ;                            parse-range
+              ;                            this)))))))))))
 
 
 ; Examples ===========================================
@@ -158,10 +158,12 @@
         (prn url)
         (>! =url= url)
         ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 1 =res= (I=O<<=IO= IO-ajax-GET-json) =url=)
+        (pipeline-async 4 =res= (I=O<<=IO= IO-ajax-GET-json) =url= false)
+        ;(close! =url=)
         ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
-        (>! =O= (<! =res=))
+        ;(prn (<! =res=))
         (close! =url=)
+        (>! =O= (<! =res=))
         (close! =res=))))
 
 
@@ -222,26 +224,28 @@
             =args=  (chan 1)
             =stats= (chan 1 (educt<< (geoid<-stat vars#)))]
         (>! =args= args)
-        (IO-pp->census-stats =args= =stats=)
+        (pipeline-async 1 =stats= (I=O<<=IO= IO-pp->census-stats) =args= false)
+        ;(IO-pp->census-stats =args= =stats=)
         (>! =O= (<! =stats=))
         (close! =args=)
         (close! =stats=))))
 
 
+
 ;; Examples ==============================
 
-(let [=I= (chan 1)
-      =O= (chan 1)
-      args {:vintage      "2016"
-            :sourcePath   ["acs" "acs5"]
-            :geoHierarchy {:state "44" :school-district-_secondary_ "*"}
-            :values       ["B01001_001E" "NAME"]}]
-  (go (>! =I= args)
-      ;(IO-pp->census-stats =I= =O=)
-      (-<IO-pp-census-stats>- =I= =O=)
-      (cljs.pprint/pprint (<! =O=))
-      (close! =I=)
-      (close! =O=)))
+#_(let [=I= (chan 1)
+        =O= (chan 1)
+        args {:vintage      "2016"
+              :sourcePath   ["acs" "acs5"]
+              :geoHierarchy {:state "44" :school-district-_secondary_ "*"}
+              :values       ["B01001_001E" "NAME"]}]
+    (go (>! =I= args)
+        ;(IO-pp->census-stats =I= =O=)
+        (-<IO-pp-census-stats>- =I= =O=)
+        (cljs.pprint/pprint (<! =O=))
+        (close! =I=)
+        (close! =O=)))
 
 ; =>
 ; ({"4400420" {:properties {:B01001_001E 14611, :NAME "Foster-Glocester Regional School District, Rhode Island", :state "44", :school-district-_secondary_ "00420"}}} {"4499999" {:properties {:B01001_001E 1039880, :NAME "Remainder of Rhode Island, Rhode Island", :state "44", :school-district-_secondary_ "99999"}}})

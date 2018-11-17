@@ -329,12 +329,12 @@
   This is good for kicking off async functions, but also is the required
   signature/contract for `pipeline-async`.
   "
-  [f]                            ; takes an async I/O function
-  (fn [I =O=]             ; returns a function with a sync next / `chan` output
-    (let [=I= (chan 1)]       ; create internal `chan`
-      (go (>! =I= I)       ; put sync `I` into `=I=`
-          (f =I= =O=)  ; call the wrapped function with the newly created `=I=`
-          (close! =I=))))) ; close the port to flush out values
+  [f]                                   ; takes an async I/O function
+  (fn [I =O=]                           ; returns a function with a sync next / `chan` output
+    (let [=I= (chan 1 (map throw-err))] ; create internal `chan`
+      (go (>! =I= I)                    ; put sync `I` into `=I=`
+          (f =I= =O=)                   ; call the wrapped function with the newly created `=I=`
+          (close! =I=)))))              ; close the port to flush out values
 
 ;; Tested: working
 ;

@@ -13,7 +13,7 @@
 (defn read-edn [path] (read-string (str (fs/readFileSync path))))
 
 (def stats-key (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
-(prn stats-key)
+;(prn stats-key)
 (def *g* (read-edn "./src/configs/geojson/index.edn"))
 
 (defn test-async
@@ -126,7 +126,7 @@
 (def args-ok-wms-only (test-args 9 2 4 0))
 #_{:vintage     "2016",
    :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}}
-
+;(prn args-ok-wms-only)
 
 (def args-na-wms-only (test-args 9 0 4 0))
 #_{:vintage "2016",
