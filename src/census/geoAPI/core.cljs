@@ -115,7 +115,7 @@
                     (js/console.log (js/process.memoryUsage))
                     (>! =url= url)
                     ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-                    (pipeline-async 4 =O= (I=O<<=IO= IO-ajax-GET-json) =url= false)
+                    (pipeline-async 2 =O= (I=O<<=IO= IO-ajax-GET-json) =url= false)
                     (close! =url=)))))))
                     ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
 

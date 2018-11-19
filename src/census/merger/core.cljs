@@ -1,6 +1,6 @@
 (ns census.merger.core
   (:require
-    [cljs.core.async      :refer [>! <! chan promise-chan close! pipeline]
+    [cljs.core.async      :refer [>! <! chan promise-chan close! pipeline put!]
                           :refer-macros [go]
                           :as <|]
     [ajax.core            :refer [GET POST]]
@@ -32,7 +32,7 @@
   See 'Usage': https://github.com/cgrand/xforms#usage
   "
   [coll]
-  (x/into {} (x/by-key keys (x/into [])) coll))
+  (into {} (x/by-key keys (x/into [])) coll))
 
 
 ; Examples ================================================
@@ -406,7 +406,7 @@
 ; =========================================================
 
 
-(defn xf-merge-filter->FeatureCollection
+(defn xf-merge-filter
   [[& filter-keys]]
   (comp xf-deep-merge-with
         (xf-remove-unmerged filter-keys)))
@@ -452,7 +452,7 @@
      group-by-keys
      ;(group-by-keys)
      ;; group-by-keys needs access to the whole collection
-     (eduction (xf-merge-filter->FeatureCollection [:GEOID :NAME])))
+     (eduction (xf-merge-filter [:GEOID :NAME])))
      ;(eduction (xf<< (fn [rf acc [_ {:as this}]] (rf acc (apply deep-merge-with this))))))
      ;(eduction (xf-merge-filter->FeatureCollection [:GEOID :NAME])))
 
@@ -605,16 +605,15 @@
   results. Thus, superfluous GeoJSON values are filtered out via a `remove`
   "
   [[& filter-keys]]
-  (fn [[& =Is=] =O=]
-    (let [=merged= (chan 1)
-          =groupd= (chan 1)]
-      (prn "merging... ");            transient
-      (go (>! =merged= (<! (<|/reduce concat [] (<|/merge =Is= 2))))
-          (pipeline 4 =groupd= (xf<< (fn [rf acc this] (rf acc (group-by-keys this)))) =merged= false)
-          (pipeline 4 =O= (educt<< (xf-merge-filter->FeatureCollection filter-keys)) =groupd= false)))))
-          ;(x/into {})
-          ;(>! =O=)))))
-          ;(apply close! =Is=))))
+  (fn [[& inputs] =O=]
+    (->> (apply concat inputs)
+         (group-by-keys)
+         (into [] (xf-merge-filter filter-keys))
+         (assoc {:type "FeatureCollection"} :features))))
+         ;(put! =O=))))
+         ;(eduction (xf-merge-filter filter-keys))
+         ;(#(go (>! =O= {:type "FeatureCollection"
+         ;               :features %}))))))
 
 ;; FIXME
 
@@ -631,36 +630,31 @@
 
 ; Example ========================================
 
-#_(let [=features= (chan 1)
-        =stats=    (chan 1)
-        =O=        (chan 1)
-        features
-        '(
-           {"01005" {:type "Feature", :geometry {:bbox [-87.95181699999999 33.253484 -86.953616 34.211647], :type "Polygon", :coordinates [[[-87.951785 33.91993] [-87.926196 33.919618] [-87.921454 33.919542] [-87.94939699999999 33.769908] [-87.95181699999999 33.858906999999995] [-87.951785 33.91993]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "005", :AFFGEOID "610U500US01005", :GEOID "01005", :AWATER 145834431, :NAME "5", :ALAND 6840348927}}}
-          {"01024" {:type "Feature", :geometry {:bbox [-88.473227 31.697951902948795 -87.45707800000001 33.415568], :type "Polygon", :coordinates [[[-88.473227 31.893856] [-88.468879 31.930262]  [-88.471214 31.851384999999997] [-88.472642 31.875152999999997] [-88.473227 31.893856]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "024", :AFFGEOID "610U500US01024", :GEOID "01024", :AWATER 139823284, :NAME "24", :ALAND 9960246621}}}
-          {"01007" {:type "Feature", :geometry {:bbox [-86.65103099999999 34.62715800000001 -86.407681 34.9917405111499], :type "Polygon", :coordinates [[[-86.65103099999999 34.77151500000001] [-86.64435999999999 34.771505999999995] [-86.632905 34.771415999999995] [-86.631608 34.7714] [-86.621123 34.771324] [-86.65103099999999 34.77151500000001]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "007", :AFFGEOID "610U500US01007", :GEOID "01007", :AWATER 2763071, :NAME "7", :ALAND 508764837}}}
-          {"01018" {:type "Feature", :geometry {:bbox [-87.06575199999999 33.246007 -86.69438799999999 33.572006], :type "Polygon", :coordinates [[[-87.06575199999999 33.26763] [-87.064842 33.268857] [-87.063431]]]}}})
+(let [=O=        (chan 1)
+      features
+      '(
+         {"01005" {:type "Feature", :geometry {:bbox [-87.95181699999999 33.253484 -86.953616 34.211647], :type "Polygon", :coordinates [[[-87.951785 33.91993] [-87.926196 33.919618] [-87.921454 33.919542] [-87.94939699999999 33.769908] [-87.95181699999999 33.858906999999995] [-87.951785 33.91993]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "005", :AFFGEOID "610U500US01005", :GEOID "01005", :AWATER 145834431, :NAME "5", :ALAND 6840348927}}}
+        {"01024" {:type "Feature", :geometry {:bbox [-88.473227 31.697951902948795 -87.45707800000001 33.415568], :type "Polygon", :coordinates [[[-88.473227 31.893856] [-88.468879 31.930262]  [-88.471214 31.851384999999997] [-88.472642 31.875152999999997] [-88.473227 31.893856]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "024", :AFFGEOID "610U500US01024", :GEOID "01024", :AWATER 139823284, :NAME "24", :ALAND 9960246621}}}
+        {"01007" {:type "Feature", :geometry {:bbox [-86.65103099999999 34.62715800000001 -86.407681 34.9917405111499], :type "Polygon", :coordinates [[[-86.65103099999999 34.77151500000001] [-86.64435999999999 34.771505999999995] [-86.632905 34.771415999999995] [-86.631608 34.7714] [-86.621123 34.771324] [-86.65103099999999 34.77151500000001]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "007", :AFFGEOID "610U500US01007", :GEOID "01007", :AWATER 2763071, :NAME "7", :ALAND 508764837}}}
+        {"01018" {:type "Feature", :geometry {:bbox [-87.06575199999999 33.246007 -86.69438799999999 33.572006], :type "Polygon", :coordinates [[[-87.06575199999999 33.26763] [-87.064842 33.268857] [-87.063431]]]}}})
 
-
-        stats
-        '(
-           {"01001" {:properties {:B01001_001E 139179, :state "01", :state-legislative-district-_upper-chamber_ "001"}}}
-           {"01005" {:properties {:B01001_001E 133243, :state "01", :state-legislative-district-_upper-chamber_ "005"}}}
-           {"01006" {:properties {:B01001_001E 137291, :state "01", :state-legislative-district-_upper-chamber_ "006"}}}
-           {"01007" {:properties {:B01001_001E 141053, :state "01", :state-legislative-district-_upper-chamber_ "007"}}}
-           {"01008" {:properties {:B01001_001E 140026, :state "01", :state-legislative-district-_upper-chamber_ "008"}}}
-           {"01009" {:properties {:B01001_001E 139951, :state "01", :state-legislative-district-_upper-chamber_ "009"}}}
-           {"01024" {:properties {:B01001_001E 138832, :state "01", :state-legislative-district-_upper-chamber_ "024"}}}
-           {"01025" {:properties {:B01001_001E 137584, :state "01", :state-legislative-district-_upper-chamber_ "025"}}}
-           {"01026" {:properties {:B01001_001E 132574, :state "01", :state-legislative-district-_upper-chamber_ "026"}}}
-           {"01034" {:properties {:B01001_001E 135926, :state "01", :state-legislative-district-_upper-chamber_ "034"}}}
-           {"01035" {:properties {:B01001_001E 136856, :state "01", :state-legislative-district-_upper-chamber_ "035"}}})]
-    (go (>! =features= features)
-        (>! =stats=    stats)
-        ((IO-merge [:NAME :GEOID]) [=features= =stats=] =O=)
-        (close! =features=)
-        (close! =stats=)
-        (prn (<! =O=))))  ;FIXME -> Just putting the final take at the bottom of the operations fixed this... just move the `close`s below and see.
+      stats
+      '(
+         {"01001" {:properties {:B01001_001E 139179, :state "01", :state-legislative-district-_upper-chamber_ "001"}}}
+         {"01005" {:properties {:B01001_001E 133243, :state "01", :state-legislative-district-_upper-chamber_ "005"}}}
+         {"01006" {:properties {:B01001_001E 137291, :state "01", :state-legislative-district-_upper-chamber_ "006"}}}
+         {"01007" {:properties {:B01001_001E 141053, :state "01", :state-legislative-district-_upper-chamber_ "007"}}}
+         {"01008" {:properties {:B01001_001E 140026, :state "01", :state-legislative-district-_upper-chamber_ "008"}}}
+         {"01009" {:properties {:B01001_001E 139951, :state "01", :state-legislative-district-_upper-chamber_ "009"}}}
+         {"01024" {:properties {:B01001_001E 138832, :state "01", :state-legislative-district-_upper-chamber_ "024"}}}
+         {"01025" {:properties {:B01001_001E 137584, :state "01", :state-legislative-district-_upper-chamber_ "025"}}}
+         {"01026" {:properties {:B01001_001E 132574, :state "01", :state-legislative-district-_upper-chamber_ "026"}}}
+         {"01034" {:properties {:B01001_001E 135926, :state "01", :state-legislative-district-_upper-chamber_ "034"}}}
+         {"01035" {:properties {:B01001_001E 136856, :state "01", :state-legislative-district-_upper-chamber_ "035"}}})]
+  (go (((IO-merge [:NAME :GEOID]) [features stats])))) ;=O=)
+      ;(prn (<! =O=))
+      ;(close! =O=)))
+      ;(prn (<! =O=)))  ;FIXME -> Just putting the final take at the bottom of the operations fixed this... just move the `close`s below and see.
 
 ; =>
 #_({:properties

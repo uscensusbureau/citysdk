@@ -66,15 +66,13 @@
                             (go (close! =geos?=)
                                 (let [=stats= (chan 1)]
                                      ((I=O<<=IO= -<IO-pp-census-stats>-) args =stats=)
-                                     ;(<! (<|/timeout 500))
                                      ((IO-merge [key-g key-s]) [geos (<! =stats=)] =O=)
-                                     ;(<! (<|/timeout 2000))
                                      (close! =stats=)))
                       (go (close! =geos?=))))
-                :stats-only (go ((I=O<<=IO= IO-pp->census-stats)         args =O=))
-                :geos-only  (go ((I=O<<=IO= (IO-pp->census-GeoJSON $g$)) args =O=))
-                :geocodes   (go ((I=O<<=IO= (IO-census-wms $g$))         args =O=))
-                :no-values  (go (>! =O= err-no-values))
+                :stats-only ((I=O<<=IO= IO-pp->census-stats)         args =O=)
+                :geos-only  ((I=O<<=IO= (IO-pp->census-GeoJSON $g$)) args =O=)
+                :geocodes   ((I=O<<=IO= (IO-census-wms $g$))         args =O=)
+                :no-values  (>! =O= err-no-values)
                 (prn "No matching clause for the arguments provided. Please check arguments against requirements"))))))
 
 
@@ -100,7 +98,7 @@
           (close! =GKM=)
           (((Icb<-wms-args<<=IO= $g$) (IO-census $g$))
            I
-           (fn [res] (cb (js/JSON.stringify (clj->js res)))))))))
+           (fn [res] (cb (clj->js res))))))))
 
 
 
