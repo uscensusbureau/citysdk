@@ -1,6 +1,6 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan]
+    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan onto-chan]
                          :refer-macros [go]]
     [ajax.core           :refer [GET POST]]
     [cljs-promises.async :refer [pair-port value-port]]
@@ -38,13 +38,8 @@
 
 (defn deep-reverse-MAP-NODES
   "Recursively reverses the order of the key/value _pairs_ inside a map"
-  {:test
-   #(assert (= (deep-reverse-MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
-               {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7}))}
   [m]
   (transform MAP-NODES #(into {} (reverse %)) m))
-
-;(test deep-reverse-MAP-NODES)
 
 (defn deep-linked-map
   "
@@ -55,37 +50,12 @@
   [m]
   (transform MAP-NODES #(into (-=-/map) (vec %)) m))
 
-; Examples =============================================
-
-; Note, inside a go-block, it seems that any map literals are immediately
-; changed into `hash-map`, so the only way to preserve an `array-map` is to
-; `let` bind the args into a variable before invoking the go-block
-
-#_(let [mp1 {:vintage      "2016"
-             :sourcePath   ["acs" "acs5"]
-             :geoHierarchy {:state "12" :county "*"}
-             :values       ["B01001_001E" "NAME"]
-             :predicates   {:B00001_001E "0:30000"}
-             :statsKey     "test key"}]
-    (go (let [=I= (promise-chan (map deep-linked-map))]
-          (>! =I= mp1)
-          (prn (str "mp1:"))
-          (prn mp1)
-          (prn (str "<! =I=:"))
-          (prn (<! =I=)))))
-
-; =======================================================
-
-
 (defn map-rename-keys
   "
   Applies a function over the keys in a provided map
   "
   [f m]
   (transform MAP-KEYS f m))
-
-;(map-rename-keys name {:a "c" :b "d"})
-;=> {"a" "c", "b" "d"}
 
 (defn map-over-keys
   "
@@ -94,24 +64,14 @@
   [f m]
   (transform MAP-VALS f m))
 
-;(map-over-keys inc {:a 1 :b 2 :c 3})
-;=> {:a 2, :b 3, :c 4}
-
 (defn keys->strs
   "
   Translates Clojure (edn) key-forms of geographic identifyers into strings,
   which are valid as parameters of a Census Data API URL construction.
   "
-  {:test #(assert
-            (= (keys->strs
-                 (name :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))
-               "american indian area/alaska native area (reservation or statistical entity only) (or part)"))}
   [s]
   (s/replace s #"-_|_|!|-"
              {"-_" " (" "_" ")" "!" "/" "-" " "}))
-
-
-#_(keys->strs (name :state))
 
 (defn strs->keys
   "
@@ -119,59 +79,9 @@
   to Clojure (edn) key-forms of geographic identifyers. Also valid URL components
   of the raw.github directory structure.
   "
-  {:test #(assert
-            (= (keyword
-                 (strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)"))
-               :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))}
   [s]
   (s/replace s #" \(|\)|/| "
              {" (" "-_" ")" "_" "/" "!" " " "-"}))
-
-#_(name "string")
-;; Examples ==============================
-;
-;(keys->strs "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
-; => "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else")
-;
-;(strs->keys "american indian area/alaska native area (reservation or statistical entity only) (or part)/or something else")
-;=> "american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_!or-something-else"
-;
-;(mapv strs->keys ["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"]
-; => ["B01001_001E"]
-; "NAME"
-; "B00001_001E"
-; "state"
-; "state-legislative-district-_upper-chamber_")
-;
-;; Help from [Stack Overflow](https://stackoverflow.com/questions/37734468/constructing-a-map-on-anonymous-function-in-clojure)
-;; =======================================
-
-
-#_(defn I=O=stringify
-    [I =O=]
-    (let [options #js{:bufferLength 25600}]
-         (take! (value-port (bfj/stringify I options))
-                (fn [res] (put! =O= res)))))
-
-#_(let [I (clj->js {:testing "one two"})
-        =O= (chan 1)]
-    (go (I=O=stringify I =O=)
-        (prn (<! =O=))))
-
-;
-;(defn zip->geojson->put!
-;  "
-;  Uses `shpjs` NPM library to convert zipfile into GeoJSON format.
-;  Uses `cljs-promises` to convert the promise returned from `shpjs` to a
-;  promise-cum-core.async `chan` (`value-port`). Once the promise is resolved,
-;  the GeoJSON is `take!`en out of the `value-port` and `put!` into a passed `chan`.
-;  "
-;  [val =port=]
-;  (prn (str "zip->json'ing..."))
-;  (take! (value-port (shpjs val))
-;         (fn [res] (put! =port=
-;                         (js/JSON.stringify res)
-;                         #(close! =port=)))))
 
 ; Examples =======================================
 
@@ -187,18 +97,18 @@
 #_(defn test-promise
     [?happy?]
     (js/Promise. (fn [resolve reject]
-                   (let [answer "This promise was "]
+                   (let [answer "This promise was "])
                    (if (= ?happy? "happy")
                        (resolve (str answer "resolved!"))
-                       (reject  (js/Error. (str answer "rejected :("))))))))
+                       (reject  (js/Error. (str answer "rejected :(")))))))
 
 
 #_(-> (test-promise "happy")
       (.then (fn [fulfilled] (prn fulfilled))))
 
 #_(-> (test-promise "poop")
-      (.then (fn [fulfilled] (js/console.log fulfilled)))
-      (.catch (fn [error]    (js/console.log error))))
+      (.then (fn [fulfilled] (prn fulfilled)))
+      (.catch (fn [error]    (prn error))))
 
 
 
@@ -208,6 +118,103 @@
         (close! =O=)))
 
 ; ==================================================
+
+(defn $GET$
+  "
+  Takes two initial inputs: the response format desired and an error message,
+  which is logged in console for debugging.
+  Returns a set of Curried functions:
+  1: takes a =url= channel
+  2: takes a =response= channel.
+  3: takes an =err= channel (for propogation/coordination)
+  Once first created (with format and err-log-msg) and upon accepting the first
+  input (=url=) channel, the following channel accepting functions
+  are wrapped with some local state that stores the last url sent in, the last
+  response put out and any prior errors.
+  If url passed in === the last url (cached in an `atom`), the
+  function pumps a cached response (`atom`) instead of - in the case the
+  url argument =/= last url - calling a cljs-ajax `GET` request.
+  Any new payloads received by `GET` will replace the last response `atom` via
+  `reset!` *and* be put into the out-bound =response= chan.
+  "
+  [format err-log-msg]
+  (fn [=url=]
+    (let [$url$ (atom "")
+          $res$ (atom [])
+          $err$ (atom {})]
+      (fn [=res=]
+        (fn [=err=]
+          (take!
+            =url=
+            (fn [url]
+              (cond
+                (and (= url @$url$)
+                     (not (empty? @$err$)))
+                (do (prn err-log-msg)
+                    (put! =err= @$err$)
+                    (reset! $err$ {})) ; <- if internets have failed, allow retry
+                (and (= url @$url$)
+                     (empty? @$err$))
+                (do (put! =res= @$res$))
+                :else
+                (let [cfg {:error-handler
+                           (fn [{:keys [status status-text]}]
+                             (do (prn err-log-msg)
+                                 (reset! $url$ url)
+                                 (put! =res= {})
+                                 (->> (reset!
+                                        $err$
+                                        (str "ERROR status: " status
+                                             " " status-text
+                                             " for URL " url
+                                             " ... output empty `{}`"))
+                                      (put! =err=))))}]
+                  (if (= format :json)
+                    (let [json
+                          (merge cfg {:response-format :json
+                                      :keywords?       true
+                                      :handler
+                                      (fn [res]
+                                        (do (reset! $err$ {})
+                                            (reset! $url$ url)
+                                            (->> (reset! $res$ res)
+                                                 (put! =res=))))})]
+                      (GET url json))
+                    (let [edn
+                          (merge cfg {:handler
+                                      (fn [res]
+                                        (do (reset! $err$ {})
+                                            (reset! $url$ url)
+                                            (->> (reset! $res$ (read-string res))
+                                                 (put! =res=))))})]
+                      (GET url edn))))))))))))
+
+
+(def $GET$-json ($GET$ :json "Invalid JSON request..."))
+
+(def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
+
+(defn =I=>I
+  "Takes a function that accepts a channel as input and converts it to a fn
+  with a synchronous input. If buffer provided, passes that to the internal
+  `chan`. If buffer and transducer provided, passes those accordingly."
+  [f]
+  (let [f- (fn [=I= I] (do (put! =I= I) (f =I=)))]
+    (fn
+      ([I]           (let [=I= (chan 1)]         (f- =I= I)))
+      ([I buf]       (let [=I= (chan buf)]       (f- =I= I)))
+      ([I buf xform] (let [=I= (chan buf xform)] (f- =I= I))))))
+
+(defn =O=>cb
+  "Takes a function that pumps output into a channel and converts it to a fn
+  with a callback API. If buffer provided, passes that to the internal `chan`.
+  If buffer and transducer provided, passes those in accordingly."
+  [f]
+  (let [f- (fn [=O= cb] (do (f =O=) (take! =O= (fn [O] (cb O)))))]
+    (fn
+      ([cb]           (let [=O= (chan 1)]         (f- =O= cb)))
+      ([cb buf]       (let [=O= (chan buf)]       (f- =O= cb)))
+      ([cb buf xform] (let [=O= (chan buf xform)] (f- =O= cb))))))
 
 
 (defn IO-ajax-GET-json
@@ -225,45 +232,6 @@
     (go (GET (<! =URL=) args))))
 
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
-
-
-(defn IO-cache-GET-edn
-  "
-  Takes an atom as a one-time cachable value and returns a function that accepts
-  I/O ports as with IO-ajax-GET.  On first remote GET, the atom is hydrated via
-  an actual HTTP request. On following calls, the atom is dereferenced to provide
-  the response. Only useful for a single value that doesn't need to change during
-  a runtime.
-  "
-  [cache]
-  (fn [=URL= =RES=]
-      (if (empty? @cache)
-          (let [args {:handler
-                      (fn [r] (go (>! =RES= (read-string r))
-                                  (reset! cache (read-string r))
-                                  (close! =RES=)))
-                      :error-handler
-                      (fn [e] (go (>! =RES= (error (get-in e [:parse-error :original-text])))
-                                  (close! =RES=)))}]
-               (go (GET (<! =URL=) args)))
-          (go (>! =RES= @cache) (close! =RES=)))))
-
-;    ~~~888~~~   ,88~-_   888~-_     ,88~-_
-;       888     d888   \  888   \   d888   \
-;       888    88888    | 888    | 88888    |
-;       888    88888    | 888    | 88888    |
-;       888     Y888   /  888   /   Y888   /
-;       888      `88_-~   888_-~     `88_-~
-
-
-#_(let [=O= (chan 1)
-        =I= (chan 1)]
-    (go (>! =I= URL-GEOKEYMAP)
-        ((IO-cache-GET-edn $geoKeyMap$) =I= =O=)
-        (prn (<! =O=))
-        (close! =I=)
-        (close! =O=)))
-
 
 
 (defn js->args

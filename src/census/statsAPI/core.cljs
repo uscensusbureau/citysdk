@@ -66,7 +66,7 @@
               ;(do (vreset! state this) nil)
             ;(if (= ?keywords :keywords)
               (rf acc
-                  (zipmap (x/into [] (map keyword @state))
+                  (zipmap (mapv keyword @state)
                           (map-idcs-range parse-if-number
                                           parse-range
                                           this)))))))))

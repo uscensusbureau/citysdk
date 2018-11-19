@@ -37,8 +37,8 @@
   (is (= (transduce
            (xf!-csv-response->JSON
              {:values     ["B01001_001E" "NAME"]
-              :predicates {:B00001_001E "0:30000"}}
-             :keywords)
+              :predicates {:B00001_001E "0:30000"}
+              :keywords})
            conj
            [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
             ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
