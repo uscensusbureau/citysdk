@@ -22,8 +22,8 @@
                                  map-target-idcs
                                  map-idcs-range
                                  $GET$
-                                 =I=>I
-                                 =O=>cb
+                                 I-<I=
+                                 cb-<OE=
                                  $GET$-json
                                  $GET$-edn]]))
 
@@ -77,7 +77,7 @@
         =err= (chan 1)]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (((($GET$ :json "nope") =url=) =res=) =err=)
+          ((($GET$ :json "nope") =url=) =err= =res=)
           (close! =url=)
           (is (= (<! =res=)
                  {:name "NAME",
@@ -94,7 +94,7 @@
         test$ ($GET$-json =url=)]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          ((test$ =res=) =err=)
+          (test$ =err= =res=)
           (let [res (<! =res=)]
             (is (= res
                    {:name "NAME",
@@ -102,7 +102,7 @@
                     :group "N/A",
                     :limit 0}))
             (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-            ((test$ =res=) =err=)
+            (test$ =err= =res=)
             (is (identical?
                   (<! =res=)
                   res))
@@ -114,16 +114,16 @@
   (let [=url= (chan 1)
         =res= (chan 1)
         =err= (chan 1)
-        test$ ($GET$-json =url=)]
+        test$ ($GET$-json =err= =res=)]
     (test-async
       (go (>! =url= "/data/bad.json")
-          ((test$ =res=) =err=)
+          (test$ =res= =err=)
           (let [err (<! =err=)]
             (prn err)
             (is (= err
                    "ERROR status: 0 Request failed. for URL /data/bad.json ... output empty `{}`"))
             (>! =url= "/data/bad.json")
-            ((test$ =res=) =err=)
+            (test$ =err= =res=)
             (is (identical?
                   (<! =err=)
                   err))
@@ -133,25 +133,46 @@
 
 
 (deftest =I=>I-test
-  (test-async
-    (go (let [=O= (chan 1)
-              tfn (fn [=I=]
-                    (fn [=O=] (take! =I= #(put! =O= %))))]
-          (((=I=>I tfn) "went through internal =I=") =O=)
+  (let [=O= (chan 1)
+        =E= (chan 1)
+        tfn (fn [=I=]
+              (fn [=E= =O=] (take! =I= (fn [O] (do (put! =O= O))))))
+        Efn (fn [=I=]
+              (fn [=E= =O=] (take! =I= (fn [O] (put! =E= O)))))]
+    (test-async
+      (go ((I-<I= tfn "went through internal =I=") =E= =O=)
           (is (= (<! =O=)
-                 "went through internal =I="))))))
+                 "went through internal =I="))
+          ((I-<I= Efn "error! from =E=") =E= =O=)
+          (is (= (<! =E=)
+                 "error! from =E="))
+          (close! =O=)
+          (close! =E=)))))
+
 
 (deftest =O=>cb-test
-  (test-async
-    (go (let [=I= (chan 1)
-              $r$ (atom "") ; needed for test result evaluation
-              tfn (fn [=I=]
-                    (fn [=O=] (take! =I= #(put! =O= %))))
-              tcb (fn [O] (reset! $r$ O))]
-          (>! =I= "went through internal =O=")
-          ((=O=>cb (tfn =I=)) tcb) ; <- beware any extra parens here
+  (let [=I= (chan 1)
+        $r$ (atom "") ; needed for test result evaluation
+        tfn (fn [=I=]
+              (fn [=E= =O=] (take! =I= (fn [O] (put! =O= O)))))
+        Efn (fn [=I=]
+              (fn [=E= =O=] (take! =I= (fn [O] (put! =E= O)))))
+        tcb (fn [E O] (if-let [err E]
+                        (reset! $r$ err)
+                        (reset! $r$ O)))]
+    (test-async
+      (go (>! =I= "went through internal =O=")
+          (cb-<OE= (tfn =I=) tcb) ; <- beware any extra parens here
+          (<! (timeout 500))
           (is (= @$r$
-                 "went through internal =O="))))))
+                 "went through internal =O="))
+          (>! =I= "error! from =E=")
+          (cb-<OE= (Efn =I=) tcb) ; <- beware any extra parens here
+          (<! (timeout 500))
+          (is (= @$r$
+                 "error! from =E="))
+          (close! =I=)))))
+
 
 
 

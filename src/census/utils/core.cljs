@@ -1,7 +1,8 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan onto-chan]
-                         :refer-macros [go]]
+    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
+                                 onto-chan to-chan]
+                         :refer-macros [go go-loop alt!]]
     [ajax.core           :refer [GET POST]]
     [cljs-promises.async :refer [pair-port value-port]]
     [cuerdas.core        :as s]
@@ -142,79 +143,94 @@
     (let [$url$ (atom "")
           $res$ (atom [])
           $err$ (atom {})]
-      (fn [=res=]
-        (fn [=err=]
-          (take!
-            =url=
-            (fn [url]
-              (cond
-                (and (= url @$url$)
-                     (not (empty? @$err$)))
-                (do (prn err-log-msg)
-                    (put! =err= @$err$)
-                    (reset! $err$ {})) ; <- if internets have failed, allow retry
-                (and (= url @$url$)
-                     (empty? @$err$))
-                (do (put! =res= @$res$))
-                :else
-                (let [cfg {:error-handler
-                           (fn [{:keys [status status-text]}]
-                             (do (prn err-log-msg)
-                                 (reset! $url$ url)
-                                 (put! =res= {})
-                                 (->> (reset!
-                                        $err$
-                                        (str "ERROR status: " status
-                                             " " status-text
-                                             " for URL " url
-                                             " ... output empty `{}`"))
-                                      (put! =err=))))}]
-                  (if (= format :json)
-                    (let [json
-                          (merge cfg {:response-format :json
-                                      :keywords?       true
-                                      :handler
-                                      (fn [res]
-                                        (do (reset! $err$ {})
-                                            (reset! $url$ url)
-                                            (->> (reset! $res$ res)
-                                                 (put! =res=))))})]
-                      (GET url json))
-                    (let [edn
-                          (merge cfg {:handler
-                                      (fn [res]
-                                        (do (reset! $err$ {})
-                                            (reset! $url$ url)
-                                            (->> (reset! $res$ (read-string res))
-                                                 (put! =res=))))})]
-                      (GET url edn))))))))))))
+      (fn [=err= =res=]
+        (take!
+          =url=
+          (fn [url]
+            (cond
+              (and (= url @$url$)
+                   (not (empty? @$err$)))
+              (do (prn err-log-msg)
+                  (put! =err= @$err$)
+                  (reset! $err$ {})) ; <- if internets have failed, allow retry
+              (and (= url @$url$)
+                   (empty? @$err$))
+              (do (put! =res= @$res$))
+              :else
+              (let [cfg {:error-handler
+                         (fn [{:keys [status status-text]}]
+                           (do (prn err-log-msg)
+                               (reset! $url$ url)
+                               (put! =res= {})
+                               (->> (reset!
+                                      $err$
+                                      (str "ERROR status: " status
+                                           " " status-text
+                                           " for URL " url
+                                           " ... output empty `{}`"))
+                                    (put! =err=))))}]
+                (if (= format :json)
+                  (let [json
+                        (merge cfg {:response-format :json
+                                    :keywords?       true
+                                    :handler
+                                    (fn [res]
+                                      (do (reset! $err$ {})
+                                          (reset! $url$ url)
+                                          (->> (reset! $res$ res)
+                                               (put! =res=))))})]
+                    (GET url json))
+                  (let [edn
+                        (merge cfg {:handler
+                                    (fn [res]
+                                      (do (reset! $err$ {})
+                                          (reset! $url$ url)
+                                          (->> (reset! $res$ (read-string res))
+                                               (put! =res=))))})]
+                    (GET url edn)))))))))))
 
 
 (def $GET$-json ($GET$ :json "Invalid JSON request..."))
 
 (def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
 
-(defn =I=>I
-  "Takes a function that accepts a channel as input and converts it to a fn
-  with a synchronous input. If buffer provided, passes that to the internal
-  `chan`. If buffer and transducer provided, passes those accordingly."
-  [f]
-  (let [f- (fn [=I= I] (do (put! =I= I) (f =I=)))]
-    (fn
-      ([I]           (let [=I= (chan 1)]         (f- =I= I)))
-      ([I buf]       (let [=I= (chan buf)]       (f- =I= I)))
-      ([I buf xform] (let [=I= (chan buf xform)] (f- =I= I))))))
 
-(defn =O=>cb
-  "Takes a function that pumps output into a channel and converts it to a fn
-  with a callback API. If buffer provided, passes that to the internal `chan`.
-  If buffer and transducer provided, passes those in accordingly."
-  [f]
-  (let [f- (fn [=O= cb] (do (f =O=) (take! =O= (fn [O] (cb O)))))]
-    (fn
-      ([cb]           (let [=O= (chan 1)]         (f- =O= cb)))
-      ([cb buf]       (let [=O= (chan buf)]       (f- =O= cb)))
-      ([cb buf xform] (let [=O= (chan buf xform)] (f- =O= cb))))))
+(defn throw-err
+  "
+  Throws an error... meant to be used in transducer `comp`osed with another
+  transducer or as `(map u/throw-error)`.
+  "
+  [x]
+  (if (instance? err-type x)
+    (throw x)
+    x))
+
+
+(defn I-<I=
+  "Takes a function (f =I=) that accepts a channel as input and converts it to
+  a fn with a synchronous input (f I) . If buffer provided, passes that to the internal `chan`. If buffer and transducer provided, passes those accordingly."
+  ([f I]           (I-<I= f I 1   (map throw-err)))
+  ([f I buf]       (I-<I= f I buf (map throw-err)))
+  ([f I buf xform] (let [=I= (chan buf xform)]
+                     (do (put! =I= I)
+                         (f =I=)))))
+                         ;(close! =I=))))) ;; <- can't close else race
+
+
+(defn cb-<OE=
+  "Can only be used as the last wrapper as the callback will not be able to
+  be coordinated with any other channel (go blocks don't interpret lamdbas).
+
+  Takes a function (f =O=) that pumps output into a channel and converts it to a fn with a callback API (f cb). If buffer provided, passes that to the internal `chan`. If buffer and transducer provided, passes those in accordingly."
+  ([f cb]           (cb-<OE= f cb 1 (map throw-err)))
+  ([f cb buf]       (cb-<OE= f cb buf (map throw-err)))
+  ([f cb buf xform] (let [=O= (chan buf xform)
+                          =E= (chan 1 (map throw-err))]
+                      (go (f =E= =O=)
+                          (alt! =E= ([err] (cb err nil))
+                                =O= ([res] (cb nil res)))))))
+
+
 
 
 (defn IO-ajax-GET-json
@@ -278,16 +294,6 @@
                              :county-subdivision "93"
                              :congressional-district "01",
                              :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}})
-
-(defn throw-err
-  "
-  Throws an error... meant to be used in transducer `comp`osed with another
-  transducer or as `(map u/throw-error)`.
-  "
-  [x]
-  (if (instance? err-type x)
-    (throw x)
-    x))
 
 (defn I=O<<=IO=
   "
