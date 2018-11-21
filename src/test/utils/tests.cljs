@@ -2,7 +2,7 @@
   (:require
     [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
                                  timeout]
-                         :refer-macros [go]]
+                         :refer-macros [go alt!]]
     [ajax.core           :refer [GET POST]]
     [cljs.test           :refer-macros [async deftest is are testing run-tests]]
     [cljs.reader         :refer [read-string]]
@@ -49,7 +49,7 @@
          {"a" "b", "c" "d"})))
 
 (deftest map-over-keys-test
-  (is (= (map-rename-keys inc {:a 1 :b 2})
+  (is (= (map-over-keys inc {:a 1 :b 2})
          {:a 2 :b 3})))
 
 (deftest keys->strs-test
@@ -77,7 +77,7 @@
         =err= (chan 1)]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          ((($GET$ :json "nope") =url=) =err= =res=)
+          (((($GET$ :json "nope") =url=) =err=) =res=)
           (close! =url=)
           (is (= (<! =res=)
                  {:name "NAME",
@@ -94,7 +94,7 @@
         test$ ($GET$-json =url=)]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (test$ =err= =res=)
+          ((test$ =err=) =res=)
           (let [res (<! =res=)]
             (is (= res
                    {:name "NAME",
@@ -102,7 +102,7 @@
                     :group "N/A",
                     :limit 0}))
             (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-            (test$ =err= =res=)
+            ((test$ =err=) =res=)
             (is (identical?
                   (<! =res=)
                   res))
@@ -114,16 +114,16 @@
   (let [=url= (chan 1)
         =res= (chan 1)
         =err= (chan 1)
-        test$ ($GET$-json =err= =res=)]
+        test$ ($GET$-json =url=)]
     (test-async
       (go (>! =url= "/data/bad.json")
-          (test$ =res= =err=)
+          ((test$ =err=) =res=)
           (let [err (<! =err=)]
             (prn err)
             (is (= err
                    "ERROR status: 0 Request failed. for URL /data/bad.json ... output empty `{}`"))
             (>! =url= "/data/bad.json")
-            (test$ =err= =res=)
+            ((test$ =err=) =res=)
             (is (identical?
                   (<! =err=)
                   err))
@@ -132,31 +132,37 @@
             (close! =res=))))))
 
 
-(deftest =I=>I-test
+(deftest I-<I=-test
   (let [=O= (chan 1)
         =E= (chan 1)
         tfn (fn [=I=]
-              (fn [=E= =O=] (take! =I= (fn [O] (do (put! =O= O))))))
+              (fn [=E=]
+                (fn [=O=] (take! =I= (fn [O] (put! =O= O))))))
         Efn (fn [=I=]
-              (fn [=E= =O=] (take! =I= (fn [O] (put! =E= O)))))]
+              (fn [=E=]
+                (fn [=O=] (take! =I= (fn [E] (put! =E= E))))))]
     (test-async
-      (go ((I-<I= tfn "went through internal =I=") =E= =O=)
-          (is (= (<! =O=)
+      (go (((I-<I= tfn "went through internal =I=") =E=) =O=)
+          (is (= (alt! =O= "went through internal =I="
+                       =E= "error! from =E=")
                  "went through internal =I="))
-          ((I-<I= Efn "error! from =E=") =E= =O=)
-          (is (= (<! =E=)
+          (((I-<I= Efn "went through internal =I=") =E=) =O=)
+          (is (= (alt! =O= "went through internal =I="
+                       =E= "error! from =E=")
                  "error! from =E="))
           (close! =O=)
           (close! =E=)))))
 
 
-(deftest =O=>cb-test
+(deftest cb-<OE=-test
   (let [=I= (chan 1)
         $r$ (atom "") ; needed for test result evaluation
         tfn (fn [=I=]
-              (fn [=E= =O=] (take! =I= (fn [O] (put! =O= O)))))
+              (fn [=E=]
+                (fn [=O=] (take! =I= (fn [O] (put! =O= O))))))
         Efn (fn [=I=]
-              (fn [=E= =O=] (take! =I= (fn [O] (put! =E= O)))))
+              (fn [=E=]
+                (fn [=O=] (take! =I= (fn [E] (put! =E= E))))))
         tcb (fn [E O] (if-let [err E]
                         (reset! $r$ err)
                         (reset! $r$ O)))]
@@ -172,6 +178,25 @@
           (is (= @$r$
                  "error! from =E="))
           (close! =I=)))))
+
+#_(deftest cb-<OE=-AND-I-<I=-test
+    (let [$r$ (atom "") ; needed for test result evaluation
+          tfn (fn [=I=]
+                (fn [=E= =O=] (take! =I= (fn [O] (put! =O= O)))))
+          Efn (fn [=I=]
+                (fn [=E= =O=] (take! =I= (fn [E] (put! =E= E)))))
+          tcb (fn [E O] (if-let [err E]
+                          (reset! $r$ err)
+                          (reset! $r$ O)))]
+      (test-async
+        (go (cb-<OE= (I-<I= tfn "went through internal =O=") tcb) ; <- beware any extra parens here
+            (<! (timeout 500))
+            (is (= @$r$))
+            (cb-<OE= (I-<I= Efn "error! from =E=") tcb) ; <- beware any extra parens here
+            (<! (timeout 500))
+            (is (= @$r$
+                   "error! from =E="))))))
+
 
 
 

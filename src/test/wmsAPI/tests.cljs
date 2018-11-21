@@ -26,6 +26,7 @@
           :geo [:STATE],
           :lookup-up-in :2010})))
 
+
 (deftest lookup-id->match?-test
   (is (= (lookup-id->match? :CONCITY    ; ↓ seq'd inverted geoKeyMap ↓
                             [{:2017 {:wms {:layers ["24"], :lookup [:STATE :CONCITY]}}
@@ -66,12 +67,22 @@
       [:features 0 :attributes])))
 
 (deftest try-census-wms-test
-  (let [=O= (promise-chan)]
+  (let [=O= (chan 1)]
     (test-async ; NTS: test-async needs to enclose the `go` directly
       (go (try-census-wms *g* ts/args-ok-wms-only 0 =O=)
-          (is (= (<! =O=)
-                 {:STATE {:state "12"}}))
-          (close! =O=)))))
+          (let [res (<! =O=)]
+            (is (= res
+                  {:STATE {:state "12"}}))
+            (try-census-wms *g* ts/args-ok-wms-only 0 =O=)
+            (is (identical? (<! =O=)
+                            res))
+            (close! =O=))))))
+
+(let [=O= (promise-chan)]
+  ;(test-async ; NTS: test-async needs to enclose the `go` directly
+    (go (try-census-wms *g* ts/args-ok-wms-only 0 =O=)
+        (prn (<! =O=))
+        (close! =O=)))
 
 (deftest wms-engage?-test
   (is (and (= (wms-engage? {:geoHierarchy {:county {:lat 1 :lng -7} :tract "*"}})
@@ -87,7 +98,7 @@
         =args-out= (promise-chan)]
     (test-async
       (go (>! =args-in= args-in)
-          (IO-census-wms =args-in= =args-out=)
+          ((IO-census-wms *g*) =args-in= =args-out=)
           (is (= (<! =args-out=)
                  {:vintage "2017",
                   :geoHierarchy {:state "51", :county "*"}}))
@@ -98,13 +109,12 @@
 (deftest Icb<-wms-args<<=IO=-test
   (let [args-in {:vintage     "2017",
                  :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}]
-    (async done
-      ((Icb<-wms-args<<=IO= Icb<==IO=fixture)
-       args-in
-       (fn [args-out]
-         (is (= args-out
-                {:vintage "2017",
-                 :geoHierarchy {:state "51", :county "*"}}))
-         (done))))))
+    (test-async
+      (go ((Icb<-wms-args<<=IO= Icb<==IO=fixture)
+           args-in
+           (fn [args-out]
+             (is (= args-out
+                    {:vintage "2017",
+                     :geoHierarchy {:state "51", :county "*"}}))))))))
 
 (run-tests)

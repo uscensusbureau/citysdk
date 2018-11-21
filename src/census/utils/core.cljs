@@ -139,55 +139,56 @@
   `reset!` *and* be put into the out-bound =response= chan.
   "
   [format err-log-msg]
-  (fn [=url=]
-    (let [$url$ (atom "")
-          $res$ (atom [])
-          $err$ (atom {})]
-      (fn [=err= =res=]
-        (take!
-          =url=
-          (fn [url]
-            (cond
-              (and (= url @$url$)
-                   (not (empty? @$err$)))
-              (do (prn err-log-msg)
-                  (put! =err= @$err$)
-                  (reset! $err$ {})) ; <- if internets have failed, allow retry
-              (and (= url @$url$)
-                   (empty? @$err$))
-              (do (put! =res= @$res$))
-              :else
-              (let [cfg {:error-handler
-                         (fn [{:keys [status status-text]}]
-                           (do (prn err-log-msg)
-                               (reset! $url$ url)
-                               (put! =res= {})
-                               (->> (reset!
-                                      $err$
-                                      (str "ERROR status: " status
-                                           " " status-text
-                                           " for URL " url
-                                           " ... output empty `{}`"))
-                                    (put! =err=))))}]
-                (if (= format :json)
-                  (let [json
-                        (merge cfg {:response-format :json
-                                    :keywords?       true
-                                    :handler
-                                    (fn [res]
-                                      (do (reset! $err$ {})
-                                          (reset! $url$ url)
-                                          (->> (reset! $res$ res)
-                                               (put! =res=))))})]
-                    (GET url json))
-                  (let [edn
-                        (merge cfg {:handler
-                                    (fn [res]
-                                      (do (reset! $err$ {})
-                                          (reset! $url$ url)
-                                          (->> (reset! $res$ (read-string res))
-                                               (put! =res=))))})]
-                    (GET url edn)))))))))))
+  (let [$url$ (atom "")
+        $res$ (atom [])
+        $err$ (atom {})]
+    (fn [=url=]
+      (fn [=err=]
+        (fn [=res=]
+          (take!
+            =url=
+            (fn [url]
+              (cond
+                (and (= url @$url$)
+                     (not (empty? @$err$)))
+                (do (prn err-log-msg)
+                    (put! =err= @$err$)
+                    (reset! $err$ {})) ; <- if internets have failed, allow retry
+                (and (= url @$url$)
+                     (empty? @$err$))
+                (do (put! =res= @$res$))
+                :else
+                (let [cfg {:error-handler
+                           (fn [{:keys [status status-text]}]
+                             (do (prn err-log-msg)
+                                 (reset! $url$ url)
+                                 (put! =res= {})
+                                 (->> (reset!
+                                        $err$
+                                        (str "ERROR status: " status
+                                             " " status-text
+                                             " for URL " url
+                                             " ... output empty `{}`"))
+                                      (put! =err=))))}]
+                  (if (= format :json)
+                    (let [json
+                          (merge cfg {:response-format :json
+                                      :keywords?       true
+                                      :handler
+                                      (fn [res]
+                                        (do (reset! $err$ {})
+                                            (reset! $url$ url)
+                                            (->> (reset! $res$ res)
+                                                 (put! =res=))))})]
+                      (GET url json))
+                    (let [edn
+                          (merge cfg {:handler
+                                      (fn [res]
+                                        (do (reset! $err$ {})
+                                            (reset! $url$ url)
+                                            (->> (reset! $res$ (read-string res))
+                                                 (put! =res=))))})]
+                      (GET url edn))))))))))))
 
 
 (def $GET$-json ($GET$ :json "Invalid JSON request..."))
@@ -226,7 +227,7 @@
   ([f cb buf]       (cb-<OE= f cb buf (map throw-err)))
   ([f cb buf xform] (let [=O= (chan buf xform)
                           =E= (chan 1 (map throw-err))]
-                      (go (f =E= =O=)
+                      (go ((f =E=) =O=)
                           (alt! =E= ([err] (cb err nil))
                                 =O= ([res] (cb nil res)))))))
 
