@@ -23,7 +23,7 @@
                                  map-idcs-range
                                  $GET$
                                  I-<I=
-                                 cb-<OE=
+                                 cb-<O?=
                                  $GET$-json
                                  $GET$-edn]]))
 
@@ -168,12 +168,12 @@
                         (reset! $r$ O)))]
     (test-async
       (go (>! =I= "went through internal =O=")
-          (cb-<OE= (tfn =I=) tcb) ; <- beware any extra parens here
+          (cb-<O?= (tfn =I=) tcb) ; <- beware any extra parens here
           (<! (timeout 500))
           (is (= @$r$
                  "went through internal =O="))
           (>! =I= "error! from =E=")
-          (cb-<OE= (Efn =I=) tcb) ; <- beware any extra parens here
+          (cb-<O?= (Efn =I=) tcb) ; <- beware any extra parens here
           (<! (timeout 500))
           (is (= @$r$
                  "error! from =E="))
@@ -189,10 +189,10 @@
                           (reset! $r$ err)
                           (reset! $r$ O)))]
       (test-async
-        (go (cb-<OE= (I-<I= tfn "went through internal =O=") tcb) ; <- beware any extra parens here
+        (go (cb-<O= (I-<I= tfn "went through internal =O=") tcb) ; <- beware any extra parens here
             (<! (timeout 500))
             (is (= @$r$))
-            (cb-<OE= (I-<I= Efn "error! from =E=") tcb) ; <- beware any extra parens here
+            (cb-<O= (I-<I= Efn "error! from =E=") tcb) ; <- beware any extra parens here
             (<! (timeout 500))
             (is (= @$r$
                    "error! from =E="))))))

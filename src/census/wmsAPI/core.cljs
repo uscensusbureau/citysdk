@@ -8,7 +8,7 @@
     [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
                        :refer-macros [select transform traverse setval]]
     [census.utils.core :refer [I=O<<=IO=
-                               I-<I= cb-<OE= $GET$
+                               I-<I= cb-<O?= $GET$
                                amap-type vec-type throw-err js->args
                                URL-WMS URL-GEOKEYMAP $geoKeyMap$]]))
 
@@ -125,14 +125,16 @@
   channel that will convey the result. Tries to cal the WMS and puts the
   `configed-map` into the channel if successful.
   "
-  [$g$ args server-idx =err= =res=]
+  [$g$ args server-idx =res=]
   (go (let [=args= (chan 1 (map #(configed-map $g$
                                    (get-in % [:features 0 :attributes]))))
-            url    (wms-url-builder $g$ args server-idx)]
+            url    (wms-url-builder $g$ args server-idx)
+            =err=  (chan 1)]
         (((I-<I= $GET$-wms url) =err= ) =args=)
         ;((I=O<<=IO= IO-ajax-GET-json) url =args=)
         (>! =res= (<! =args=))
-        (close! =args=)))) ; don't do anything on error... may try again.
+        (close! =args=)
+        (close! =err=)))) ; don't do anything on error... may try again.
 
 
 (defn wms-engage?
@@ -164,7 +166,7 @@
               (if (wms-engage? args-in)
                 (loop [args args-in
                        idx 0]
-                  (try-census-wms $g$ args idx =err= =res=)
+                  (try-census-wms $g$ args idx =res=)
                   (let [{:keys [layers sub-level]} (geoKey->wms-config $g$ args)
                         result (<! =res=)]
                     (cond
@@ -186,24 +188,27 @@
                 (do (>! =args-out= args-in)
                     (close! =res=)))))))))
 
+
 (defn censusWMS
   "
-  Provided a synchronous input and callback API to IO-census-wms
+  Provided a synchronous input and callback API to IO-census-wms. If JSON is
+  supplied, converts it to clj construct for internal use.
   "
   [$g$]    ; takes an async I/O function
   (fn [I cb]
-    (let [args (js->args I)]  ; converts any #js types to cljs with proper keys
-      (go (cb-<OE= (I-<I= (IO-census-wms $g$) args) cb)))))
+    (let [args-in (js->args I)]  ; converts any #js types to cljs with proper keys
+      (go (cb-<O?= (I-<I= (IO-census-wms $g$) args-in) cb)))))
 
 
-(defn Icb<-wms-args-<I=
+(defn I<-wms-args-<I=
   "Provides a syncronous input to a function that accepts a channel for args
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [f]
     (fn [I]
-      (let [=args= (chan 1)
-            =err=  (chan 1 (map throw-err))
-            args   (js->args I)]
-        (go ((I-<I= (IO-census-wms $g$) args) =err= =args=)
-            (f =args=))))))
+      (let [=args-O= (promise-chan)
+            =err=    (chan 1 (map throw-err))
+            args-in  (js->args I)]
+        (go (((I-<I= (IO-census-wms $g$) args-in) =err=) =args-O=)
+            (alt! =err=    nil
+                  =args-O= (f =args-O=)))))))

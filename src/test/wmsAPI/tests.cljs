@@ -13,7 +13,7 @@
                                 try-census-wms
                                 wms-engage?
                                 IO-census-wms
-                                Icb<-wms-args<<=IO=]]))
+                                I<-wms-args-<I=]]))
 
 (deftest geoKey->wms-config-test
   (is (= (geoKey->wms-config *g* ts/args-ok-wms-only)
@@ -78,6 +78,20 @@
                             res))
             (close! =O=))))))
 
+(deftest test-atom-via-chan
+  (let [=O= (chan 1)
+        $A$ (atom {})]
+    (test-async ; NTS: test-async needs to enclose the `go` directly
+      (go (>! =O= (reset! $A$ {:key "val"}))
+          (let [res (<! =O=)]
+            (is (= res
+                   {:key "val"}))
+            (>! =O= @$A$)
+            (is (identical? (<! =O=)
+                            res))
+            (close! =O=))))))
+
+
 (let [=O= (promise-chan)]
   ;(test-async ; NTS: test-async needs to enclose the `go` directly
     (go (try-census-wms *g* ts/args-ok-wms-only 0 =O=)
@@ -106,11 +120,11 @@
           (close! =args-out=)))))
 
 
-(deftest Icb<-wms-args<<=IO=-test
+(deftest I<-wms-args-<I=
   (let [args-in {:vintage     "2017",
                  :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}]
     (test-async
-      (go ((Icb<-wms-args<<=IO= Icb<==IO=fixture)
+      (go ((I<-wms-args-<I= Icb<==IO=fixture) ; FIXME change Icb to I interface
            args-in
            (fn [args-out]
              (is (= args-out

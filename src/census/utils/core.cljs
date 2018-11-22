@@ -156,7 +156,7 @@
                     (reset! $err$ {})) ; <- if internets have failed, allow retry
                 (and (= url @$url$)
                      (empty? @$err$))
-                (do (put! =res= @$res$))
+                (put! =res= @$res$)
                 :else
                 (let [cfg {:error-handler
                            (fn [{:keys [status status-text]}]
@@ -218,13 +218,13 @@
                          ;(close! =I=))))) ;; <- can't close else race
 
 
-(defn cb-<OE=
+(defn cb-<O?=
   "Can only be used as the last wrapper as the callback will not be able to
   be coordinated with any other channel (go blocks don't interpret lamdbas).
 
   Takes a function (f =O=) that pumps output into a channel and converts it to a fn with a callback API (f cb). If buffer provided, passes that to the internal `chan`. If buffer and transducer provided, passes those in accordingly."
-  ([f cb]           (cb-<OE= f cb 1 (map throw-err)))
-  ([f cb buf]       (cb-<OE= f cb buf (map throw-err)))
+  ([f cb]           (cb-<O?= f cb 1 (map throw-err)))
+  ([f cb buf]       (cb-<O?= f cb buf (map throw-err)))
   ([f cb buf xform] (let [=O= (chan buf xform)
                           =E= (chan 1 (map throw-err))]
                       (go ((f =E=) =O=)
