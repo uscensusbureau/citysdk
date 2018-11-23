@@ -92,7 +92,7 @@
 (def xf-translate-examples
      (comp
        (map digest-one-example-url)
-       (map ut/js->args)))
+       (map ut/->args)))
 
 (into [] xf-translate-examples di/index-abv)
 

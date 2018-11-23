@@ -6,7 +6,7 @@
                           :as <|]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err err-type I=O<<=IO= js->args $geoKeyMap$
+    [census.utils.core    :refer [throw-err err-type I=O<<=IO= ->args $geoKeyMap$
                                   IO-cache-GET-edn URL-GEOKEYMAP]]
     [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
     [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp-census-geos>-
@@ -55,7 +55,7 @@
   (fn [=I= =O=]
     (go (let [args    (<! =I=)
               deploy  (deploy-census-function args)
-              key-g   (first ((ids<-$g$<<args $g$) args))
+              key-g   (first ((ids<-$g$<-args $g$) args))
               key-s   (keyword (first (get args :values)))
               =geos?= (chan 1)]
           (prn deploy)
@@ -69,7 +69,7 @@
                                      ((IO-merge [key-g key-s]) [geos (<! =stats=)] =O=)
                                      (close! =stats=)))
                       (go (close! =geos?=))))
-                :stats-only ((I=O<<=IO= IO-pp->census-stats)         args =O=)
+                :stats-only ((I=O<<=IO= IOE->census-stats)         args =O=)
                 :geos-only  ((I=O<<=IO= (IO-pp->census-GeoJSON $g$)) args =O=)
                 :geocodes   ((I=O<<=IO= (IO-census-wms $g$))         args =O=)
                 :no-values  (>! =O= err-no-values)

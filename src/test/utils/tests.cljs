@@ -13,7 +13,7 @@
                                  map-over-keys
                                  keys->strs
                                  strs->keys
-                                 js->args
+                                 ->args
                                  args->js
                                  xf<<
                                  xf!<<
@@ -24,6 +24,7 @@
                                  $GET$
                                  I-<I=
                                  cb-<O?=
+                                 Icb-<IO?=
                                  $GET$-json
                                  $GET$-edn]]))
 
@@ -77,7 +78,7 @@
         =err= (chan 1)]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (((($GET$ :json "nope") =url=) =err=) =res=)
+          (($GET$ :json "nope") =url= =res= =err=)
           (close! =url=)
           (is (= (<! =res=)
                  {:name "NAME",
@@ -90,11 +91,10 @@
 (deftest $GET$-json-ok-test
   (let [=url= (chan 1)
         =res= (chan 1)
-        =err= (chan 1)
-        test$ ($GET$-json =url=)]
+        =err= (chan 1)]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          ((test$ =err=) =res=)
+          ($GET$-json =url= =res= =err=)
           (let [res (<! =res=)]
             (is (= res
                    {:name "NAME",
@@ -102,7 +102,7 @@
                     :group "N/A",
                     :limit 0}))
             (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-            ((test$ =err=) =res=)
+            ($GET$-json =url= =res= =err=)
             (is (identical?
                   (<! =res=)
                   res))
@@ -113,17 +113,16 @@
 (deftest $GET$-json-err-test
   (let [=url= (chan 1)
         =res= (chan 1)
-        =err= (chan 1)
-        test$ ($GET$-json =url=)]
+        =err= (chan 1)]
     (test-async
       (go (>! =url= "/data/bad.json")
-          ((test$ =err=) =res=)
+          ($GET$-json =url= =res= =err=)
           (let [err (<! =err=)]
             (prn err)
             (is (= err
                    "ERROR status: 0 Request failed. for URL /data/bad.json ... output empty `{}`"))
             (>! =url= "/data/bad.json")
-            ((test$ =err=) =res=)
+            ($GET$-json =url= =res= =err=)
             (is (identical?
                   (<! =err=)
                   err))
@@ -134,19 +133,16 @@
 
 (deftest I-<I=-test
   (let [=O= (chan 1)
+        =I= (chan 1)
         =E= (chan 1)
-        tfn (fn [=I=]
-              (fn [=E=]
-                (fn [=O=] (take! =I= (fn [O] (put! =O= O))))))
-        Efn (fn [=I=]
-              (fn [=E=]
-                (fn [=O=] (take! =I= (fn [E] (put! =E= E))))))]
+        tfn (fn [=I= =O= =E=] (take! =I= (fn [O] (put! =O= O))))
+        Efn (fn [=I= =O= =E=] (take! =I= (fn [E] (put! =E= E))))]
     (test-async
-      (go (((I-<I= tfn "went through internal =I=") =E=) =O=)
+      (go (I-<I= tfn "went through internal =I=" =I= =O= =E=)
           (is (= (alt! =O= "went through internal =I="
                        =E= "error! from =E=")
                  "went through internal =I="))
-          (((I-<I= Efn "went through internal =I=") =E=) =O=)
+          (I-<I= Efn "went through internal =I=" =I= =O= =E=)
           (is (= (alt! =O= "went through internal =I="
                        =E= "error! from =E=")
                  "error! from =E="))
@@ -154,51 +150,53 @@
           (close! =E=)))))
 
 
-(deftest cb-<OE=-test
+(deftest cb-<O?=-test
   (let [=I= (chan 1)
+        =O= (chan 1)
+        =E= (chan 1)
         $r$ (atom "") ; needed for test result evaluation
-        tfn (fn [=I=]
-              (fn [=E=]
-                (fn [=O=] (take! =I= (fn [O] (put! =O= O))))))
-        Efn (fn [=I=]
-              (fn [=E=]
-                (fn [=O=] (take! =I= (fn [E] (put! =E= E))))))
+        tfn (fn [=I= =O= =E=] (go (>! =O= (<! =I=))))
+        Efn (fn [=I= =O= =E=] (go (>! =E= (<! =I=))))
         tcb (fn [E O] (if-let [err E]
                         (reset! $r$ err)
                         (reset! $r$ O)))]
     (test-async
       (go (>! =I= "went through internal =O=")
-          (cb-<O?= (tfn =I=) tcb) ; <- beware any extra parens here
+          (cb-<O?= tfn tcb =I= =O= =E=)
           (<! (timeout 500))
           (is (= @$r$
                  "went through internal =O="))
           (>! =I= "error! from =E=")
-          (cb-<O?= (Efn =I=) tcb) ; <- beware any extra parens here
+          (cb-<O?= Efn tcb =I= =O= =E=)
           (<! (timeout 500))
           (is (= @$r$
                  "error! from =E="))
-          (close! =I=)))))
-
-#_(deftest cb-<OE=-AND-I-<I=-test
-    (let [$r$ (atom "") ; needed for test result evaluation
-          tfn (fn [=I=]
-                (fn [=E= =O=] (take! =I= (fn [O] (put! =O= O)))))
-          Efn (fn [=I=]
-                (fn [=E= =O=] (take! =I= (fn [E] (put! =E= E)))))
-          tcb (fn [E O] (if-let [err E]
-                          (reset! $r$ err)
-                          (reset! $r$ O)))]
-      (test-async
-        (go (cb-<O= (I-<I= tfn "went through internal =O=") tcb) ; <- beware any extra parens here
-            (<! (timeout 500))
-            (is (= @$r$))
-            (cb-<O= (I-<I= Efn "error! from =E=") tcb) ; <- beware any extra parens here
-            (<! (timeout 500))
-            (is (= @$r$
-                   "error! from =E="))))))
+          (close! =I=)
+          (close! =O=)
+          (close! =E=)))))
 
 
 
+(deftest cb-<-$GET$-json-test
+  (let [=url= (chan 1)
+        =res= (chan 1)
+        =err= (chan 1)
+        $r$ (atom "")
+        tcb (fn [E O] (if-let [err E]
+                        (reset! $r$ err)
+                        (reset! $r$ O)))]
+    (test-async
+      (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
+          (cb-<O?= $GET$-json tcb =url= =res= =err=)
+          (<! (timeout 500))
+          (is (= @$r$
+                 {:name "NAME",
+                  :label "Canonical Name for Geography",
+                  :group "N/A",
+                  :limit 0}))
+          (close! =url=)
+          (close! =err=)
+          (close! =res=)))))
 
 
 (run-tests)

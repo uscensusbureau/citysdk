@@ -8,7 +8,7 @@
     ;[census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
     ;[census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp->census-stats>-]]
     [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< educt<< throw-err err-type
-                                  js->args I=O<<=IO= IO-cache-GET-edn map-over-keys]]))
+                                  ->args I=O<<=IO= IO-cache-GET-edn map-over-keys]]))
     ;[test.fixtures.core   :refer [*g*]]))
 
 

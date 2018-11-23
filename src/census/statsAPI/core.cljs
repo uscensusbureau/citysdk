@@ -1,13 +1,14 @@
 (ns census.statsAPI.core
   (:require
-    [cljs.core.async    :refer [>! <! chan promise-chan close! take! pipeline-async]
-                        :refer-macros [go]]
+    [cljs.core.async    :refer [>! <! chan promise-chan close! take! to-chan
+                                pipeline-async]
+                        :refer-macros [go alt!]]
     [cuerdas.core       :refer [join numeric? parse-number]]
     [net.cgrand.xforms  :as x]
-    [census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
-    [census.utils.core  :refer [I=O<<=IO= IO-ajax-GET-json xf!<< educt<< xf<<
+    ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
+    [census.utils.core  :refer [$GET$ I-<I= xf!<< educt<< xf<<
                                 amap-type vec-type throw-err map-idcs-range
-                                keys->strs js->args strs->keys
+                                keys->strs ->args strs->keys
                                 URL-WMS URL-STATS]]))
 
 (defn kv-pair->str [[k v] separator]
@@ -54,28 +55,18 @@
   If provided `:keywords` as an argument, will return a map with Clojure keys.
   Otherwise, will return map keys as strings.
   "
-  ;([args] (xf!-csv-response->JSON args nil))
-  [{:keys [values predicates]}] ;?keywords]
+  [{:keys [values predicates]}]
   (let [parse-range [0 (+ (count values) (count predicates))]]
     (xf!<<
       (fn [state rf acc this]
         (let [prev @state]
           (if (nil? prev)
-            ;(if (= ?keywords :keywords)
               (vreset! state (mapv strs->keys this))
-              ;(do (vreset! state this) nil)
-            ;(if (= ?keywords :keywords)
               (rf acc
                   (zipmap (mapv keyword @state)
                           (map-idcs-range parse-if-number
                                           parse-range
                                           this)))))))))
-              ;(rf acc
-              ;    (zipmap @state
-              ;            (map-idcs-range parse-if-number
-              ;                            parse-range
-              ;                            this)))))))))))
-
 
 ; Examples ===========================================
 
@@ -141,30 +132,19 @@
 
 ; ====================================================
 
-(defn IO-pp->census-stats
-  "
-  Internal function for calling the Census API using a Clojure Map and getting
-  stats returned as a clojure map.
+(def $GET$-census-stats ($GET$ :json "Unlucky Census stats request... "))
 
-  Note: Inside `go` blocks, any map literals `{}` are converted into hash-maps.
-  Make sure to bind the args in a wrapping `(let [args ...(go` rather than from
-  within a shared `go` context.
+(defn IOE->census-stats
   "
-  [=I= =O=]
+  Internal function for calling the Census API using a Clojure Map. Returns stats
+  from Census API unaltered.
+  "
+  [=I= =O= =E=]
   (go (let [args  (<! =I=)
-            url   (stats-url-builder args)
-            =url= (chan 1)
-            =res= (chan 1 (educt<< (xf!-csv-response->JSON args)))]
-        (prn url)
-        (>! =url= url)
-        ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-        (pipeline-async 4 =res= (I=O<<=IO= IO-ajax-GET-json) =url= false)
-        ;(close! =url=)
-        ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
-        ;(prn (<! =res=))
-        (close! =url=)
-        (>! =O= (<! =res=))
-        (close! =res=))))
+            url   (stats-url-builder args)]
+        ($GET$-census-stats (to-chan [url]) =O= =E=))))
+
+
 
 
 ;      e            888                       d8
@@ -176,7 +156,7 @@
 ;                                 888
 ;
 
-(defn geoid<-stat
+(defn xf-geoid+<-stat
   "
   Takes an integer argument denoting the number of stat vars the user requested.
   Returns a function of one item (from the Census API response
@@ -190,7 +170,7 @@
 
 ;; Examples ==============================
 
-#_(eduction  (geoid<-stat 3)
+#_(eduction  (xf-geoid+<-stat 3)
              ;conj
              '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
                {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
@@ -215,22 +195,50 @@
 ;                        :state "12",
 ;                        :state-legislative-district-_upper-chamber_ "035"}}}]
 
+(defn xf-stats-mergeable
+  [args vars#]
+  (comp
+    (xf!-csv-response->JSON args)
+    (xf-geoid+<-stat vars#)))
+
+#_(let [args {:vintage      "2016"
+              :sourcePath   ["acs" "acs5"]
+              :geoHierarchy {:state "01" :county "073" :tract "000100"}
+              :values       ["B01001_001E" "B01001_001M"]}
+        vars# 2]
+    (eduction
+      (xf-stats-mergeable args vars#)
+      ;conj
+      [["B01001_001E" "B01001_001M" "state" "county" "tract"]
+       ["3111" "369" "01" "073" "000100"]
+       ["3111" "222" "21" "0223" "000100"]]))
 
 (defn -<IO-pp-census-stats>-
-  [=I= =O=]
+  [=I= =O= =E=]
   (go (let [args    (<! =I=)
             vars#   (+ (count (get args :values))
                        (count (get args :predicates)))
-            =args=  (chan 1)
-            =stats= (chan 1 (educt<< (geoid<-stat vars#)))]
-        (>! =args= args)
-        (pipeline-async 1 =stats= (I=O<<=IO= IO-pp->census-stats) =args= false)
-        ;(IO-pp->census-stats =args= =stats=)
-        (>! =O= (<! =stats=))
-        (close! =args=)
-        (close! =stats=))))
+                         ; TODO ↓ test performance of educt<< vs other means
+            =stats+= (chan 1 (educt<< (xf-stats-mergeable args vars#)))]
+        (IOE->census-stats (to-chan [args]) =stats+= =E=)
+        (>! =O= (<! =stats+=))
+        (close! =stats+=))))
 
-
+#_(let [args {:vintage      "2016"
+              :sourcePath   ["acs" "acs5"]
+              :geoHierarchy {:county "*"}
+              :values       ["B01001_001E" "B01001_001M"]}
+        =I= (chan 1)
+        =O= (chan 1)
+        =E= (chan 1)]
+    (go
+        (>! =I= args)
+        (-<IO-pp-census-stats>- =I= =O= =E=)
+        (alt! =O= ([O] (prn O))
+              =E= ([E] (prn (str "Error: " E))))
+        (close! =I=)
+        (close! =O=)
+        (close! =E=)))
 
 ;; Examples ==============================
 

@@ -12,17 +12,15 @@
     [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
                                  if-path continue-then-stay selected?]
                          :refer-macros [select transform traverse setval recursive-path]]))
-    ;["bfj" :as bfj]))
 
 (def $geoKeyMap$ (atom {}))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def URL-GEOJSON "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
-
-;FIXME === !!! ===
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/configs/geojson/index.edn")
 
+;FIXME === !!! ===
 (def base-url-database "TODO?")
 
 (def vec-type cljs.core/PersistentVector)
@@ -120,16 +118,25 @@
 
 ; ==================================================
 
+
+(defn throw-err
+  "
+  Throws an error... meant to be used in transducer `comp`osed with another
+  transducer or as `(map u/throw-error)`.
+  "
+  [x]
+  (if (instance? err-type x)
+    (throw x)
+    x))
+
 (defn $GET$
   "
   Takes two initial inputs: the response format desired and an error message,
-  which is logged in console for debugging.
-  Returns a set of Curried functions:
+  which is logged in console for debugging. Takes three channel inputs
   1: takes a =url= channel
   2: takes a =response= channel.
   3: takes an =err= channel (for propogation/coordination)
-  Once first created (with format and err-log-msg) and upon accepting the first
-  input (=url=) channel, the following channel accepting functions
+  Once first created (with format and err-log-msg) the following channel fns
   are wrapped with some local state that stores the last url sent in, the last
   response put out and any prior errors.
   If url passed in === the last url (cached in an `atom`), the
@@ -142,80 +149,69 @@
   (let [$url$ (atom "")
         $res$ (atom [])
         $err$ (atom {})]
-    (fn [=url=]
-      (fn [=err=]
-        (fn [=res=]
-          (take!
-            =url=
-            (fn [url]
-              (cond
-                (and (= url @$url$)
-                     (not (empty? @$err$)))
-                (do (prn err-log-msg)
-                    (put! =err= @$err$)
-                    (reset! $err$ {})) ; <- if internets have failed, allow retry
-                (and (= url @$url$)
-                     (empty? @$err$))
-                (put! =res= @$res$)
-                :else
-                (let [cfg {:error-handler
-                           (fn [{:keys [status status-text]}]
-                             (do (prn err-log-msg)
-                                 (reset! $url$ url)
-                                 (put! =res= {})
-                                 (->> (reset!
-                                        $err$
-                                        (str "ERROR status: " status
-                                             " " status-text
-                                             " for URL " url
-                                             " ... output empty `{}`"))
-                                      (put! =err=))))}]
-                  (if (= format :json)
-                    (let [json
-                          (merge cfg {:response-format :json
-                                      :keywords?       true
-                                      :handler
-                                      (fn [res]
-                                        (do (reset! $err$ {})
-                                            (reset! $url$ url)
-                                            (->> (reset! $res$ res)
-                                                 (put! =res=))))})]
-                      (GET url json))
-                    (let [edn
-                          (merge cfg {:handler
-                                      (fn [res]
-                                        (do (reset! $err$ {})
-                                            (reset! $url$ url)
-                                            (->> (reset! $res$ (read-string res))
-                                                 (put! =res=))))})]
-                      (GET url edn))))))))))))
+    (fn
+      ([=url= =res=] (($GET$ format err-log-msg) =url= =res= (chan 1 (map throw-err))))
+      ([=url= =res= =err=]
+       (take!
+         =url=
+         (fn [url]
+           (cond
+             (and (= url @$url$)
+                  (not (empty? @$err$)))
+             (do (prn err-log-msg)
+                 (put! =err= @$err$)
+                 (reset! $err$ {})) ; <- if internets have failed, allow retry
+             (and (= url @$url$)
+                  (empty? @$err$))
+             (do (prn "$GET$ data from cache... ")
+                 (put! =res= @$res$))
+             :else
+             (do (prn "$GET$ data from source:")
+                 (prn (str url))
+                 (let [cfg {:error-handler
+                            (fn [{:keys [status status-text]}]
+                              (do (prn err-log-msg)
+                                  (reset! $url$ url)
+                                  (put! =res= {})
+                                  (->> (reset! $err$
+                                         (str "ERROR status: " status
+                                              " " status-text
+                                              " for URL " url
+                                              " ... output empty `{}`"))
+                                       (put! =err=))))}]
+                   (if (= format :json)
+                     (let [json
+                           (merge cfg {:response-format :json
+                                       :keywords?       true
+                                       :handler
+                                       (fn [res]
+                                         (do (reset! $err$ {})
+                                             (reset! $url$ url)
+                                             (->> (reset! $res$ res)
+                                                  (put! =res=))))})]
+                       (GET url json))
+                     (let [edn
+                           (merge cfg {:handler
+                                       (fn [res]
+                                         (do (reset! $err$ {})
+                                             (reset! $url$ url)
+                                             (->> (reset! $res$ (read-string res))
+                                                  (put! =res=))))})]
+                       (GET url edn))))))))))))
 
 
 (def $GET$-json ($GET$ :json "Invalid JSON request..."))
 
 (def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
 
-
-(defn throw-err
-  "
-  Throws an error... meant to be used in transducer `comp`osed with another
-  transducer or as `(map u/throw-error)`.
-  "
-  [x]
-  (if (instance? err-type x)
-    (throw x)
-    x))
-
-
 (defn I-<I=
-  "Takes a function (f =I=) that accepts a channel as input and converts it to
-  a fn with a synchronous input (f I) . If buffer provided, passes that to the internal `chan`. If buffer and transducer provided, passes those accordingly."
-  ([f I]           (I-<I= f I 1   (map throw-err)))
-  ([f I buf]       (I-<I= f I buf (map throw-err)))
-  ([f I buf xform] (let [=I= (chan buf xform)]
-                     (do (put! =I= I)
-                         (f =I=)))))
-                         ;(close! =I=))))) ;; <- can't close else race
+  "Takes a function which accepts three `chan`s [=I= =O= =E=] and converts it to a
+   fn with a synchronous input (f I) . If buffer provided, passes that to the
+   internal `chan` (replaces =I=).
+   If buffer and transducer provided, passes those accordingly."
+  [f I =I= =O= =E=]
+  (go (>! =I= I)
+      (f =I= =O= =E=)))
 
 
 (defn cb-<O?=
@@ -223,15 +219,10 @@
   be coordinated with any other channel (go blocks don't interpret lamdbas).
 
   Takes a function (f =O=) that pumps output into a channel and converts it to a fn with a callback API (f cb). If buffer provided, passes that to the internal `chan`. If buffer and transducer provided, passes those in accordingly."
-  ([f cb]           (cb-<O?= f cb 1 (map throw-err)))
-  ([f cb buf]       (cb-<O?= f cb buf (map throw-err)))
-  ([f cb buf xform] (let [=O= (chan buf xform)
-                          =E= (chan 1 (map throw-err))]
-                      (go ((f =E=) =O=)
-                          (alt! =E= ([err] (cb err nil))
-                                =O= ([res] (cb nil res)))))))
-
-
+  [f cb =I= =O= =E=]
+  (go (f =I= =O= =E=)
+      (alt! =O= ([O] (cb nil O))
+            =E= ([E] (cb E nil)))))
 
 
 (defn IO-ajax-GET-json
@@ -251,7 +242,7 @@
 ; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
 
 
-(defn js->args
+(defn ->args
   [args]
   (if (= (type args) amap-type)
     (let [{:keys [vintage]} args]
@@ -266,11 +257,11 @@
 
 ;; Examples ==============================
 (comment
-  (js->args ts/test-js-args-1)
-  (js->args ts/test-js-args-2)
-  (js->args ts/test-args-6))
+  (->args ts/test-js-args-1)
+  (->args ts/test-js-args-2)
+  (->args ts/test-args-6))
 
-#_(js->args test.core/test-js-args-2)
+#_(->args test.core/test-js-args-2)
 ;; =>
 ;;{:vintage "2016",
 ;; :sourcePath ["acs" "acs5"],

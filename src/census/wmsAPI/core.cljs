@@ -1,7 +1,9 @@
 (ns census.wmsAPI.core
   (:require
-    [cljs.core.async   :refer [>! <! chan promise-chan close! take!]
-                       :refer-macros [go alt!]]
+    [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
+                               timeout]
+                       :refer-macros [go alt!]
+                       :as <|]
     [clojure.set       :refer [map-invert]]
     [cuerdas.core      :refer [join]]
     [linked.core       :as -=-]
@@ -9,14 +11,14 @@
                        :refer-macros [select transform traverse setval]]
     [census.utils.core :refer [I=O<<=IO=
                                I-<I= cb-<O?= $GET$
-                               amap-type vec-type throw-err js->args
+                               amap-type vec-type throw-err ->args
                                URL-WMS URL-GEOKEYMAP $geoKeyMap$]]))
 
-(defn geoKey->wms-config
+(defn $g$->wms-cfg
   "
   Creates a configuration map for the WMS url-builder from the geoHierarchy map.
   "
-  ([$g$ args] (geoKey->wms-config $g$ args 0))
+  ([$g$ args] ($g$->wms-cfg $g$ args 0))
   ([$g$ {:keys [geoHierarchy vintage]} server-index]
    (let [[[scope {:keys [lat lng]}] sub-level] (vec geoHierarchy)
          {:keys [lookup layers]} (get-in $g$ [scope (keyword (str vintage)) :wms])
@@ -72,7 +74,7 @@
   ([$g$ args] (wms-url-builder $g$ args 0))
   ([$g$ args server-index]
    (let [{:keys [vintage layers cur-layer-idx lat lng geo]}
-         (geoKey->wms-config $g$ args server-index)]
+         ($g$->wms-cfg $g$ args server-index)]
      (str URL-WMS
           (cond
             (= "2010" (str vintage)) (str "TIGERweb/tigerWMS_Census2010")
@@ -115,8 +117,7 @@
                       {(get (select [ALL ALL] geo-keys) idx)
                        (get wms-vals idx)}))))))
 
-(def $GET$-wms
-  ($GET$ :json "unlucky Census WMS request... "))
+(def $GET$-wms ($GET$ :json "unlucky Census WMS request... "))
 
 (defn try-census-wms
   "
@@ -126,14 +127,15 @@
   `configed-map` into the channel if successful.
   "
   [$g$ args server-idx =res=]
-  (go (let [=args= (chan 1 (map #(configed-map $g$
-                                   (get-in % [:features 0 :attributes]))))
-            url    (wms-url-builder $g$ args server-idx)
-            =err=  (chan 1)]
-        (((I-<I= $GET$-wms url) =err= ) =args=)
-        ;((I=O<<=IO= IO-ajax-GET-json) url =args=)
-        (>! =res= (<! =args=))
-        (close! =args=)
+  (go (let [=args=> (chan 1 (map #(configed-map $g$
+                                    (get-in % [:features 0 :attributes]))))
+            url     (wms-url-builder $g$ args server-idx)
+            =err=   (chan 1)
+            =>args= (chan 1)]
+        (I-<I= $GET$-wms url =>args= =args=> =err=)
+        (>! =res= (<! =args=>))
+        (close! =>args=)
+        (close! =args=>)
         (close! =err=)))) ; don't do anything on error... may try again.
 
 
@@ -149,6 +151,7 @@
       false)))
 
 
+
 (defn IO-census-wms
   "
   Fetches a remote geoKeyMap resource and caches it to local atom ($geoKeyMap$)
@@ -158,36 +161,38 @@
   skipped.
   "
   [$g$]
-  (fn [=args-in=]
-    (fn [=err=]
-      (fn [=args-out=]
-        (go (let [args-in (<! =args-in=)
-                  =res=   (chan 1)]
-              (if (wms-engage? args-in)
-                (loop [args args-in
-                       idx 0]
-                  (try-census-wms $g$ args idx =res=)
-                  (let [{:keys [layers sub-level]} (geoKey->wms-config $g$ args)
-                        result (<! =res=)]
+  (fn [=>args= =args=> =err=]
+    (go (let [args-in (<! =>args=)
+              =res= (chan 1)]
+          (if (not (wms-engage? args-in))
+            (do (>! =args=> args-in)
+                (close! =res=))
+            (loop [args args-in idx 0]
+              (do (try-census-wms $g$ args idx =res=)
+                  (let [{:keys [layers sub-level]} ($g$->wms-cfg $g$ args)
+                        res (<! =res=)]
                     (cond
-                      (not (empty? result))
-                      (do (>! =args-out=
+                      (not (empty? res))
+                      (do (>! =args=>
                             (transform :geoHierarchy #(into {} %)
                               (setval :geoHierarchy
                                 (conj (-=-/map)
-                                  (into (-=-/map) (traverse MAP-VALS result))
+                                  (into (-=-/map) (traverse MAP-VALS res))
                                   (into (-=-/map) [sub-level]))
                                 args)))
                           (close! =res=))
-                      (and (empty? result) (not (nil? (get layers (inc idx)))))
+                      (and (empty? res) (not (nil? (get layers (inc idx)))))
                       (recur args (inc idx))
                       :else
-                      (do (>! =args-out= {})
-                          (>! =err= "No Geography found for this lat/lng pair")
-                          (close! =res=)))))
-                (do (>! =args-out= args-in)
-                    (close! =res=)))))))))
+                      (do (>! =err= "No FIPS (Census geocodes) found for given arguments")
+                          (close! =res=)))))))))))
 
+(defn I-<wms=I=
+  "Provides a syncronous input to a function that accepts a channel for args
+  and calls the Census WMS for geocoding; providing the results to the channel"
+  [$g$]
+  (fn [I =>args= =args=> =err=]
+    (I-<I= (IO-census-wms $g$) (->args I) =>args= =args=> =err=)))
 
 (defn censusWMS
   "
@@ -196,19 +201,14 @@
   "
   [$g$]    ; takes an async I/O function
   (fn [I cb]
-    (let [args-in (js->args I)]  ; converts any #js types to cljs with proper keys
-      (go (cb-<O?= (I-<I= (IO-census-wms $g$) args-in) cb)))))
+    (let [=>args= (promise-chan (map ->args))
+          =args=> (chan 1)
+          =err=   (chan 1)]
+      (go (>! =>args= I)
+          (cb-<O?= (IO-census-wms $g$) cb =>args= =args=> =err=)
+          (<! (timeout 1000))
+          (close! =>args=)
+          (close! =args=>)
+          (close! =err=)))))
 
 
-(defn I<-wms-args-<I=
-  "Provides a syncronous input to a function that accepts a channel for args
-  and calls the Census WMS for geocoding; providing the results to the channel"
-  [$g$]
-  (fn [f]
-    (fn [I]
-      (let [=args-O= (promise-chan)
-            =err=    (chan 1 (map throw-err))
-            args-in  (js->args I)]
-        (go (((I-<I= (IO-census-wms $g$) args-in) =err=) =args-O=)
-            (alt! =err=    nil
-                  =args-O= (f =args-O=)))))))

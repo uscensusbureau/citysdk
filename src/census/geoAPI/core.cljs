@@ -74,7 +74,7 @@
   Takes a pattern of maps and triggers the URL builder accordingly
   "
   ([$g$ ["500k"         vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]] (lg-warn->geo $g$ "500k" vin :zip-code-tabulation-area USr)) ; big!
-  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (geo-error $g$ res vin :zip-code-tabulation-area)) ; no other than 500k
+  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (geo-error    $g$ res vin :zip-code-tabulation-area)) ; no other than 500k
   ([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (lg-warn->geo $g$ res vin :county USr)) ; big!
   ([$g$ [res            vin _   [lev _  ]                     nil               ]] (geo-error    $g$ res vin lev))     ; no valid geography
   ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (geo-error    $g$ res vin lev))     ; tries US, only states
@@ -103,7 +103,7 @@
   stats returned as a clojure map.
   "
   [$g$]
-  (fn [=I= =O=]
+  (fn [=I= =O= =E=]
       (go (let [args  (<! =I=)
                 =url= (chan 1)
                 url   (geo-url-composer $g$ args)]
@@ -182,7 +182,7 @@
 
 
 
-(defn ids<-$g$<<args
+(defn ids<-$g$<-args
   "
   Takes the request argument and pulls out a vector of the component identifiers
   from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
@@ -195,7 +195,7 @@
 
 ;; Examples ==============================
 
-#_((ids<-$g$<<args *g*) {:vintage       "2010"
+#_((ids<-$g$<-args *g*) {:vintage       "2010"
                          :sourcePath    ["acs" "acs5"]
                          ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
                          :geoHierarchy  {:county "*"} ;; @ 30 seconds
@@ -243,7 +243,7 @@
 ;                                     [-85.729832 31.632373]]]}}}
 
 #_(eduction   (map (geoid<-feature
-                     ((ids<-$g$<<args *g*)
+                     ((ids<-$g$<-args *g*)
                       {:vintage      "2010"
                        :sourcePath   ["acs" "acs5"]
                        ;:geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
@@ -298,16 +298,16 @@
 ;==========================================
 
 
-(defn educt<-features+geoids
+(defn features<-geoids
   [ids]
   (comp
     (map #(get % :features))
-    (educt<< (geoid<-feature ids))))
+    (into [] (geoid<-feature ids))))
     ;(x/into [])))
 
 ;; Examples =================================
 
-#_(eduction  (educt<-features+geoids `(:STATE :COUNTY))
+#_(eduction  (features<-geoids `(:STATE :COUNTY))
              ;conj
              [{:type "FeatureCollection"
                :features [{:type "Feature",
@@ -382,11 +382,11 @@
 
 (defn -<IO-pp-census-geos>-
   [$g$]
-  (fn [=I= =O=]
+  (fn [=I= =O= =E=]
     (go (let [args       (<! =I=)
               =args=     (chan 1)
-              ids        ((ids<-$g$<<args $g$) args)
-              =features= (chan 1 (educt<-features+geoids ids))]
+              ids        ((ids<-$g$<-args $g$) args)
+              =features= (chan 1 (features<-geoids ids))]
           (>! =args= args)
           ;(prn args)
           ;(prn ids)

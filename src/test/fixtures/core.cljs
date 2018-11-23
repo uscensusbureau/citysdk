@@ -22,6 +22,21 @@
   (async done
     (take! =test= (fn [_] (done)))))
 
+(defn test-async-timed
+  "Asynchronous test awaiting ch to produce a value or close."
+  [time-in =test=]
+  (async done
+    (take! =test= (fn [_] (do (prn (str "Elapsed ms: "(- (js/Date.) time-in)))
+                              (done))))))
+
+
+#_(defn test-async-time
+    [afn args f]
+    (let [time-in (js/Date.)]
+      (afn args
+           (fn [res] (do (f res)
+                         (prn (str "Elapsed ms: "(- (js/Date.) time-in))))))))
+
 
 (defn Icb<==IO=fixture
   [=I= =O=]
