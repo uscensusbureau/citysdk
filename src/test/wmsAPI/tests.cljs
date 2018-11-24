@@ -13,7 +13,7 @@
                                 configed-map
                                 try-census-wms
                                 wms-engage?
-                                IO-census-wms
+                                IOE-census-wms
                                 I-<wms=I=
                                 censusWMS]]))
 
@@ -100,7 +100,7 @@
               false))))
 
 
-(deftest IO-census-wms-test
+(deftest IOE-census-wms-test
   (let [args-in {:vintage     "2017",
                  :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
         =>args= (chan 1)
@@ -108,7 +108,7 @@
         =err=   (chan 1)]
     (test-async
       (go (>! =>args= args-in)
-          ((IO-census-wms *g*) =>args= =args=> =err=)
+          ((IOE-census-wms *g*) =>args= =args=> =err=)
           (is (= (<! =args=>)
                  {:vintage "2017",
                   :geoHierarchy {:state "51", :county "*"}}))

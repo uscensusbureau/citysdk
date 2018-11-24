@@ -1,12 +1,9 @@
 (ns test.statsAPI.tests
   (:require
-    [cljs.core.async      :refer [chan promise-chan close! >! <! pipeline
-                                  timeout]
+    [cljs.core.async      :refer [chan close! >! <! timeout]
                           :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [test-async test-async-timed Icb<==IO=fixture]
-                          :as ts]
-    ;[census.utils.core    :refer [stats-key]]
+    [test.fixtures.core   :refer [test-async test-async-timed heap-spot]]
     [census.statsAPI.core :refer [stats-url-builder
                                   parse-if-number
                                   xf!-csv->clj
@@ -144,15 +141,31 @@
         cb  (fn [E O] (if-let [err E]
                         (reset! $S$ err)
                         (reset! $S$ O)))
-        time-in (js/Date.)]
+        time-in (js/Date.)
+        heap-in (heap-spot)]
     (test-async-timed
       "censusStatsJSON-test"
       time-in
-      (go (censusStatsJSON args cb)
+      heap-in
+      (go (censusStatsJSON args-big cb)
           (<! (timeout 500))
           ;(js/console.log @$S$)))))
           (is (= @$S$
                  "[{\"B01001_001E\":3111,\"B01001_001M\":369,\"state\":\"01\",\"county\":\"073\",\"tract\":\"000100\"}]"))))))
+
+; With eduction:
+; "$GET$ data from source:"
+;"https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&for=zip code tabulation area:*"
+; "censusStatsJSON-test: Heap used: "
+;{:rss 53.21, :heapTotal 51.27, :heapUsed 54.55, :external 2.56}
+;"censusStatsJSON-test: Elapsed ms= 2532"
+; With transduce
+;"$GET$ data from cache proxy:"
+;#object[cljs$core$str] "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&for=zip code tabulation area:*"
+;"censusStatsJSON-test: Heap used: "
+;{:rss 90.79, :heapTotal 79.54, :heapUsed 61.04, :external 2.51}
+;"censusStatsJSON-test: Elapsed ms= 2829"
+
 
 (deftest -<IO-pp-census-stats>-test
   (let [args-ok {:vintage      "2016"

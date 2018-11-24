@@ -152,7 +152,7 @@
 
 
 
-(defn IO-census-wms
+(defn IOE-census-wms
   "
   Fetches a remote geoKeyMap resource and caches it to local atom ($geoKeyMap$)
   then tries to find the appropriate geographic identifiers for a provided
@@ -192,7 +192,7 @@
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [I =>args= =args=> =err=]
-    (I-<I= (IO-census-wms $g$) (->args I) =>args= =args=> =err=)))
+    (I-<I= (IOE-census-wms $g$) (->args I) =>args= =args=> =err=)))
 
 (defn censusWMS
   "
@@ -205,7 +205,7 @@
           =args=> (chan 1)
           =err=   (chan 1)]
       (go (>! =>args= I)
-          (cb-<O?= (IO-census-wms $g$) cb =>args= =args=> =err=)
+          (cb-<O?= (IOE-census-wms $g$) cb =>args= =args=> =err=)
           (<! (timeout 1000))
           (close! =>args=)
           (close! =args=>)

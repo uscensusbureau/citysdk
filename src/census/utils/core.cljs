@@ -163,7 +163,8 @@
                  (reset! $err$ {})) ; <- if internets have failed, allow retry
              (and (= url @$url$)
                   (empty? @$err$))
-             (do (prn "$GET$ data from cache... ")
+             (do (prn "$GET$ data from cache:")
+                 (prn url)
                  (put! =res= @$res$))
              :else
              (do (prn "$GET$ data from source:")
@@ -233,23 +234,6 @@
       (alt! =O= ([O] (do (cb nil O)))
             =E= ([E] (do (cb E nil))))))
 
-(defn IO-ajax-GET-json
-  "
-  I/O (chans) API which takes a URL from an this port (=I=), makes a `cljs-ajax`
-  GET request to the provided URL and puts the response in the output (=O=) port.
-  "
-  [=URL= =RES=]
-  (let [args {:response-format :json
-              :handler
-              (fn [r] (go (>! =RES= r) (close! =RES=)))
-              :error-handler
-              (fn [e] (go (>! =RES= (error (get-in e [:parse-error :original-text]))) (close! =RES=)))
-              :keywords?       true}]
-    (go (GET (<! =URL=) args))))
-
-; MORE OPTIONS: https://github.com/JulianBirch/cljs-ajax#getpostput
-
-
 (defn ->args
   [args]
   (if (= (type args) amap-type)
@@ -286,71 +270,7 @@
     (prn (clj->js geoKeys))
     (clj->js (setval :geoHierarchy geoKeys args))))
 
-#_(args->js  {:vintage "2010",
-              :values ["H001001" "NAME"],
-              :sourcePath ["dec" "cd113"],
-              :geoHierarchy {:american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_ "R",
-                             :state "01",
-                             :county-subdivision "93"
-                             :congressional-district "01",
-                             :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}})
 
-(defn I=O<<=IO=
-  "
-  Adapter, which wraps asynchronous I/O ports next to provide a synchronous
-  next.
-
-  This is good for kicking off async functions, but also is the required
-  signature/contract for `pipeline-async`.
-  "
-  [f]                                   ; takes an async I/O function
-  (fn [I =O=]                           ; returns a function with a sync next / `chan` output
-    (let [=I= (chan 1 (map throw-err))] ; create internal `chan`
-      (go (>! =I= I)                    ; put sync `I` into `=I=`
-          (f =I= =O=)                   ; call the wrapped function with the newly created `=I=`
-          (close! =I=)))))              ; close the port to flush out values
-
-;; Tested: working
-;
-;(defn args+cb<<=IO=
-;  "
-;  Adapter, which wraps asynchronous I/O ports next to provide a synchronous
-;  next and expose the output to a callback and converts any #js args to proper
-;  cljs syntax (with keyword translation)
-;
-;  This is good for touch & go asynchronous functions, which do not require
-;  'enduring relationships' or concerted application between other async
-;  functions (e.g., exposing asynchronous functions as a library).
-;  "
-;  [f]                                           ; takes an async I/O function
-;  (fn [I cb ?state]                             ; returns a function with sync next  / callback for output
-;    (let [=I=  (chan 1)                      ; create two internal `chan`s for i/o
-;          =O=  (chan 1 (map throw-err))
-;          args (js->args I)]                    ; converts any #js types to cljs with proper keys
-;      (go (>! =I= args)
-;          (f =I= =O= ?state)                 ; apply the async I/O function with the internal `chan`s
-;          (take! =O= #(do (cb %)          ; use async `take!` to allow lambdas/closures
-;                          (close! =I=) ; close the ports to flush the values
-;                          (close! =O=)))))))
-
-;; Tested: working
-;
-;(defn js-I=O<<=IO=
-;  "
-;  Adapter, which wraps asynchronous I/O ports next to provide a synchronous
-;  next, which converts values from =I= channel to js arguments. Created
-;  initially for async js library (e.g., `workerpool`) interop.
-;  "
-;  [f]                            ; takes an async I/O function
-;  (fn [I =O= ?state]             ; returns a function with a sync next / `chan` output
-;    (let [=I= (chan 1)
-;          js-args (clj->js I)]       ; create internal `chan`
-;      (go (>! =I= js-args)       ; put sync `I` into `=I=`
-;             (f =I= =O= ?state)  ; call the wrapped function with the newly created `=I=`
-;             (close! =I=))))) ; close the port to flush out values
-;
-
-; ==================================================
 
 (defn xf<<
   "
@@ -406,6 +326,8 @@
   Transducer, which wraps a transducer to provide the right level of contract
   for a core.async chan through which data is not an item, but a collection.
   I.e., treating the collection as a single transducible item.
+
+  Uses eduction.
   "
   [xfn]
   (fn [rf]
@@ -414,28 +336,7 @@
       ([acc] (rf acc))
       ([acc coll]
        (rf acc (eduction xfn coll))))))
-;; Tested 1: working
 
-;; Examples ==============================
-
-#_(let [url "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*&key=6980d91653a1f78acd456d9187ed28e23ea5d4e3"
-        =O= (chan 1)
-        =I= (chan 1)]
-    (go (>! =I= url)
-        ((I=O<<=IO= IO-ajax-GET-json) url =O=)
-        (pprint (<! =O=))))
-;=>
-; [["B01001_001E"
-;   "NAME"
-;   "B00001_001E"
-;   "state"
-;   "state legislative district (upper chamber)"]
-;  ["486727"
-;   "State Senate District 4 (2016), Florida"
-;   "28800"
-;   "12"
-;   "004"]])
-;; =======================================
 
 (defn map-target
   "

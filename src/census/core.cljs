@@ -8,8 +8,8 @@
     [cuerdas.core         :refer [join split]]
     [census.utils.core    :refer [throw-err err-type I=O<<=IO= ->args $geoKeyMap$
                                   IO-cache-GET-edn URL-GEOKEYMAP]]
-    [census.wmsAPI.core   :refer [IO-census-wms Icb<-wms-args<<=IO=]]
-    [census.geoAPI.core   :refer [IO-pp->census-GeoJSON -<IO-pp-census-geos>-
+    [census.wmsAPI.core   :refer [IOE-census-wms Icb<-wms-args<<=IO=]]
+    [census.geoAPI.core   :refer [IOE-census-GeoJSON -<IO-pp-census-geos>-
                                   ids<-$g$<<args]]
     [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp-census-stats>-]]
     [census.merger.core   :refer [IO-merge]]
@@ -70,8 +70,8 @@
                                      (close! =stats=)))
                       (go (close! =geos?=))))
                 :stats-only ((I=O<<=IO= IOE->census-stats)         args =O=)
-                :geos-only  ((I=O<<=IO= (IO-pp->census-GeoJSON $g$)) args =O=)
-                :geocodes   ((I=O<<=IO= (IO-census-wms $g$))         args =O=)
+                :geos-only  ((I=O<<=IO= (IOE-census-GeoJSON $g$)) args =O=)
+                :geocodes   ((I=O<<=IO= (IOE-census-wms $g$))         args =O=)
                 :no-values  (>! =O= err-no-values)
                 (prn "No matching clause for the arguments provided. Please check arguments against requirements"))))))
 

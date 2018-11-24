@@ -16,18 +16,42 @@
 ;(prn stats-key)
 (def *g* (read-edn "./src/configs/geojson/index.edn"))
 
+()
 (defn test-async
   "Asynchronous test awaiting ch to produce a value or close."
   [=test=]
   (async done
     (take! =test= (fn [_] (done)))))
 
+(defn heap-spot
+  []
+  (reduce-kv #(assoc %1 (keyword %2) (/ %3 1024 1024))
+             {}
+             (js->clj (js/process.memoryUsage))))
+
+(defn heap-diff
+  [heap-out heap-in]
+  (reduce-kv #(assoc %1 (keyword %2) (/ (js/Math.round (* 100 %3)) 100))
+             {}
+             (merge-with - heap-out heap-in)))
+
+(merge-with -
+  {:rss 92.88, :heapTotal 53.84, :heapUsed 44.76, :external 0.05}
+  {:rss 61.88, :heapTotal 42.84, :heapUsed 31.76, :external 0.04})
+
 (defn test-async-timed
   "Asynchronous test awaiting ch to produce a value or close."
-  [test-name time-in =test=]
-  (async done
-    (take! =test= (fn [_] (do (prn (str test-name ": Elapsed ms= "(- (js/Date.) time-in)))
-                              (done))))))
+  ([test-name time-in =test=] (test-async-timed test-name time-in nil =test=))
+  ([test-name time-in heap-in =test=]
+   (async done
+     (take! =test=
+            (fn [_]
+              (do (if-let [heap-before heap-in]
+                    (do (prn (str test-name " - Heap stats (MB):"))
+                        (prn (heap-diff (heap-spot) heap-before)))
+                    nil)
+                  (prn (str test-name ": Elapsed ms= "(- (js/Date.) time-in)))
+                  (done)))))))
 
 
 #_(defn test-async-time

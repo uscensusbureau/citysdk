@@ -1,16 +1,17 @@
-(ns census.discovery.core
+(ns configs.discovery.core
   (:require
     [cljs.core.async :as <|]
     [defun.core :refer-macros [defun]]
     [cuerdas.core :as s]
     [datascript.core :as d]
     [datascript.db :as db]
-    [census.utils.core :as ut :refer [stats-key]]
+    [census.utils.core :refer [strs->keys ->args]]
+    [configs.utils.fixtures :refer [stats-key read-edn]]
     [census.geoAPI.core :refer [geo-pattern-maker]]))
 
-(def geoKeyMap     (ut/read-edn "./src/census/geojson/index.edn"))
-(def examples      (ut/read-edn "./src/census/discovery/example-urls.edn"))
-(def examples-abv  (ut/read-edn "./src/census/discovery/example-urls-abv.edn"))
+(def geoKeyMap     (read-edn "./src/census/geojson/index.edn"))
+(def examples      (read-edn "./src/census/discovery/example-urls.edn"))
+(def examples-abv  (read-edn "./src/census/discovery/example-urls-abv.edn"))
 
 (def test-index-str
   "https://api.census.gov/data/2013/pep/subcty?get=NAME,STNAME,CTYNAME,POP&for=place:08000&in=state:09&in=county:001&in=county subdivision:08070&DATE=6")
@@ -49,7 +50,7 @@
           args
           (let [[i ii] (first geos)
                 [k val-]  (s/split ii #":")
-                key-   (keyword (ut/strs->keys k))] ; convert strings to edn keys
+                key-   (keyword (strs->keys k))] ; convert strings to edn keys
             (if (or (= "in" i) (= "for" i))
                 (recur (merge-with into args {:geoHierarchy {key- val-}}) (rest geos))
                 (recur (merge-with into args {:predicates {(keyword i) ii}}) (rest geos))))))))
@@ -92,7 +93,7 @@
 (def xf-translate-examples
      (comp
        (map digest-one-example-url)
-       (map ut/->args)))
+       (map ->args)))
 
 (into [] xf-translate-examples di/index-abv)
 

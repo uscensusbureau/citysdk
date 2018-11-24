@@ -176,8 +176,19 @@
           (close! =O=)
           (close! =E=)))))
 
+; TODO:
+
+#_(args->js  {:vintage "2010",
+              :values ["H001001" "NAME"],
+              :sourcePath ["dec" "cd113"],
+              :geoHierarchy {:american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_ "R",
+                             :state "01",
+                             :county-subdivision "93"
+                             :congressional-district "01",
+                             :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}})
 
 
+; FIXME: delete?
 
 (deftest cb-<-$GET$-json-test
   (let [=url= (chan 1)
