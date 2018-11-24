@@ -24,9 +24,9 @@
 
 (defn test-async-timed
   "Asynchronous test awaiting ch to produce a value or close."
-  [time-in =test=]
+  [test-name time-in =test=]
   (async done
-    (take! =test= (fn [_] (do (prn (str "Elapsed ms: "(- (js/Date.) time-in)))
+    (take! =test= (fn [_] (do (prn (str test-name ": Elapsed ms= "(- (js/Date.) time-in)))
                               (done))))))
 
 

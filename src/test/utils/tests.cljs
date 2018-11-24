@@ -146,6 +146,7 @@
           (is (= (alt! =O= "went through internal =I="
                        =E= "error! from =E=")
                  "error! from =E="))
+          (close! =I=)
           (close! =O=)
           (close! =E=)))))
 
@@ -174,6 +175,7 @@
           (close! =I=)
           (close! =O=)
           (close! =E=)))))
+
 
 
 

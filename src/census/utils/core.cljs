@@ -205,25 +205,33 @@
 (def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
 
 (defn I-<I=
-  "Takes a function which accepts three `chan`s [=I= =O= =E=] and converts it to a
+  "
+  Takes a function which accepts three `chan`s [=I= =O= =E=] and converts it to a
    fn with a synchronous input (f I) . If buffer provided, passes that to the
    internal `chan` (replaces =I=).
-   If buffer and transducer provided, passes those accordingly."
+   If buffer and transducer provided, passes those accordingly.
+   "
   [f I =I= =O= =E=]
   (go (>! =I= I)
       (f =I= =O= =E=)))
 
 
 (defn cb-<O?=
-  "Can only be used as the last wrapper as the callback will not be able to
-  be coordinated with any other channel (go blocks don't interpret lamdbas).
+  "
+  Can only be used as the last wrapper as the callback. Function can't be
+  be coordinated with any other channel (go blocks don't interpret nested
+  anonymous functions (the callback)).
 
-  Takes a function (f =O=) that pumps output into a channel and converts it to a fn with a callback API (f cb). If buffer provided, passes that to the internal `chan`. If buffer and transducer provided, passes those in accordingly."
+  Takes a function (f =O=) that pumps output into a channel and converts it to a
+  fn with a callback API (f cb). If buffer provided, passes that to the internal
+  `chan`. If buffer and transducer provided, passes those in accordingly.
+
+  Closes =O= and =E= chans on completion
+  "
   [f cb =I= =O= =E=]
   (go (f =I= =O= =E=)
-      (alt! =O= ([O] (cb nil O))
-            =E= ([E] (cb E nil)))))
-
+      (alt! =O= ([O] (do (cb nil O)))
+            =E= ([E] (do (cb E nil))))))
 
 (defn IO-ajax-GET-json
   "

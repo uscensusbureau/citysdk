@@ -1,12 +1,12 @@
 (ns census.statsAPI.core
   (:require
     [cljs.core.async    :refer [>! <! chan promise-chan close! take! to-chan
-                                pipeline-async]
+                                pipeline-async timeout]
                         :refer-macros [go alt!]]
     [cuerdas.core       :refer [join numeric? parse-number]]
     [net.cgrand.xforms  :as x]
     ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
-    [census.utils.core  :refer [$GET$ I-<I= xf!<< educt<< xf<<
+    [census.utils.core  :refer [$GET$ I-<I= cb-<O?= xf!<< educt<< xf<<
                                 amap-type vec-type throw-err map-idcs-range
                                 keys->strs ->args strs->keys
                                 URL-WMS URL-STATS]]))
@@ -46,7 +46,7 @@
       (parse-number s)
       s))
 
-(defn xf!-csv-response->JSON
+(defn xf!-csv->clj
   "
   Stateful transducer, which stores the first item as a list of a keys to apply
   (via `zipmap`) to the rest of the items in a collection. Serves to turn the
@@ -61,76 +61,20 @@
       (fn [state rf acc this]
         (let [prev @state]
           (if (nil? prev)
-              (vreset! state (mapv strs->keys this))
+              (do (vreset! state (mapv strs->keys this))
+                  nil)
               (rf acc
                   (zipmap (mapv keyword @state)
                           (map-idcs-range parse-if-number
                                           parse-range
                                           this)))))))))
 
-; Examples ===========================================
+(defn xf-stats->js
+  [args]
+  (comp
+    (xf!-csv->clj args)
+    (map #(clj->js % :keywordize-keys true))))
 
-#_(eduction (xf!-csv-response->JSON
-              {:values ["B01001_001E" "NAME" "B00001_001E"]})
-              ;:keywords)
-             ;conj
-            [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
-             ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
-             ["491350","State Senate District 6 (2016), Florida","29938","12","006"],
-             ["494981","State Senate District 40 (2016), Florida","29661","12","040"]])
-
-; =>
-
-; ({"B01001_001E" 486727,
-;  "NAME" "State Senate District 4 (2016), Florida",
-;  "B00001_001E" 28800,
-;  "state" "12",
-;  "state legislative district (upper chamber)" "004"}
-; {"B01001_001E" 491350,
-;  "NAME" "State Senate District 6 (2016), Florida",
-;  "B00001_001E" 29938,
-;  "state" "12",
-;  "state legislative district (upper chamber)" "006"}
-; {"B01001_001E" 494981,
-;  "NAME" "State Senate District 40 (2016), Florida",
-;  "B00001_001E" 29661,
-;  "state" "12",
-;  "state legislative district (upper chamber)" "040"})
-
-
-
-
-; ====================================================
-
-; Examples ===========================================
-
-
-#_(transduce (educt<< (xf!-csv-response->JSON {:values ["B01001_001E" "NAME" "B00001_001E"]}))
-             conj
-             ; (wrapped in an extra collection [] for testing)
-             [[["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
-               ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
-               ["491350","State Senate District 6 (2016), Florida","29938","12","006"],
-               ["494981","State Senate District 40 (2016), Florida","29661","12","040"]]])
-
-; =>
-; [({:B01001_001E 486727,
-;   :NAME "State Senate District 4 (2016), Florida",
-;   :B00001_001E 28800,
-;   :state "12",
-;   :state-legislative-district-_upper-chamber_ "004"}
-;  {:B01001_001E 491350,
-;   :NAME "State Senate District 6 (2016), Florida",
-;   :B00001_001E 29938,
-;   :state "12",
-;   :state-legislative-district-_upper-chamber_ "006"}
-;  {:B01001_001E 494981,
-;   :NAME "State Senate District 40 (2016), Florida",
-;   :B00001_001E 29661,
-;   :state "12",
-;   :state-legislative-district-_upper-chamber_ "040"})]
-
-; ====================================================
 
 (def $GET$-census-stats ($GET$ :json "Unlucky Census stats request... "))
 
@@ -144,7 +88,20 @@
             url   (stats-url-builder args)]
         ($GET$-census-stats (to-chan [url]) =O= =E=))))
 
+(defn censusStatsJSON
+  "
+  Solo function to just get Census stats back as conventional JSON instead of
+  csv-like output of 'raw' Census API. Not to be coordinated with other functions.
 
+  Note on channels: (cb-<O?=) closes =O= and =E= on completing the callback
+  "
+  [I cb]
+  (let [args (->args I)
+        =O= (chan 1 (comp (educt<< (xf-stats->js args))
+                          (map to-array)
+                          (map js/JSON.stringify)))
+        =E= (chan 1 (map throw-err))]
+    (go (cb-<O?= IOE->census-stats cb (to-chan [args]) =O= =E=))))
 
 
 ;      e            888                       d8
@@ -154,7 +111,7 @@
 ;  /____Y88b  Y888  888 C888  888 888  888P  888   Y888    , 888      888D
 ; /      Y88b  "88_/888  "88_-888 888-_88"   '88_/  "88___/  888    \_88P
 ;                                 888
-;
+
 
 (defn xf-geoid+<-stat
   "
@@ -170,48 +127,13 @@
 
 ;; Examples ==============================
 
-#_(eduction  (xf-geoid+<-stat 3)
-             ;conj
-             '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
-               {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
-               {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
-               {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
-               {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"}))
-
-; =>
-; [{"12040" {:properties {:B01001_001E 494981,
-;                        :NAME "State Senate District 40 (2016), Florida",
-;                        :B00001_001E 29661,
-;                        :state "12",
-;                        :state-legislative-district-_upper-chamber_ "040"}}}
-; {"12036" {:properties {:B01001_001E 492259,
-;                        :NAME "State Senate District 36 (2016), Florida",
-;                        :B00001_001E 29475,
-;                        :state "12",
-;                        :state-legislative-district-_upper-chamber_ "036"}}}
-; {"12035" {:properties {:B01001_001E 493899,
-;                        :NAME "State Senate District 35 (2016), Florida",
-;                        :B00001_001E 25615,
-;                        :state "12",
-;                        :state-legislative-district-_upper-chamber_ "035"}}}]
-
 (defn xf-stats-mergeable
   [args vars#]
   (comp
-    (xf!-csv-response->JSON args)
+    (xf!-csv->clj args)
     (xf-geoid+<-stat vars#)))
 
-#_(let [args {:vintage      "2016"
-              :sourcePath   ["acs" "acs5"]
-              :geoHierarchy {:state "01" :county "073" :tract "000100"}
-              :values       ["B01001_001E" "B01001_001M"]}
-        vars# 2]
-    (eduction
-      (xf-stats-mergeable args vars#)
-      ;conj
-      [["B01001_001E" "B01001_001M" "state" "county" "tract"]
-       ["3111" "369" "01" "073" "000100"]
-       ["3111" "222" "21" "0223" "000100"]]))
+
 
 (defn -<IO-pp-census-stats>-
   [=I= =O= =E=]
