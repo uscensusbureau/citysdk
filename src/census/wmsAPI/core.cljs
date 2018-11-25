@@ -10,7 +10,7 @@
     [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
                        :refer-macros [select transform traverse setval]]
     [census.utils.core :refer [I=O<<=IO=
-                               I-<I= cb-<O?= $GET$
+                               I-<I= =O?>-cb $GET$
                                amap-type vec-type throw-err ->args
                                URL-WMS URL-GEOKEYMAP $geoKeyMap$]]))
 
@@ -117,7 +117,7 @@
                       {(get (select [ALL ALL] geo-keys) idx)
                        (get wms-vals idx)}))))))
 
-(def $GET$-wms ($GET$ :json "unlucky Census WMS request... "))
+(def $GET$-wms ($GET$ :json "Unsuccessful Census WMS request... "))
 
 (defn try-census-wms
   "
@@ -205,7 +205,7 @@
           =args=> (chan 1)
           =err=   (chan 1)]
       (go (>! =>args= I)
-          (cb-<O?= (IOE-census-wms $g$) cb =>args= =args=> =err=)
+          (=O?>-cb (IOE-census-wms $g$) cb =>args= =args=> =err=)
           (<! (timeout 1000))
           (close! =>args=)
           (close! =args=>)

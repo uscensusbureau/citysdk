@@ -1,15 +1,14 @@
 (ns census.geoAPI.core
   (:require
-    [cljs.core.async    :refer [>! <! chan close! pipeline-async]
-                        :refer-macros [go]]
+    [cljs.core.async    :refer [>! <! chan close! to-chan]
+                        :refer-macros [go alt!]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
-    [net.cgrand.xforms  :as x]
+    ;[net.cgrand.xforms  :as x]
     ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
-                                xf<< educt<< I-<I= cb-<O?= $GET$
-                                map-over-keys keys->strs error throw-err err-type
-                                I=O<<=IO= IO-ajax-GET-json]]))
+                                xf<< educt<< I-<I= =O?>-cb $GET$
+                                map-over-keys keys->strs error throw-err err-type]]))
     ;[test.fixtures.core   :refer [*g*]]))
 
 
@@ -100,28 +99,19 @@
        (geo-pattern-matcher $g$)))
 
 (def $GET$-census-GeoJSON
-  ($GET$ :json "Unlucky Census GeoJSON request"))
+  ($GET$ :json "Unsuccessful Census GeoJSON request"))
 
 (defn IOE-census-GeoJSON
   "
-  Internal function for calling the Census API using a Clojure Map and getting
-  stats returned as a clojure map.
+  Internal function for calling Github cartography 'API' for GeoJSON
   "
   [$g$]
   (fn [=I= =O= =E=]
     (go (let [args  (<! =I=)
-              =url= (chan 1)
               url   (geo-url-composer $g$ args)]
           (if (= "" url)
-              (do (>! =O= "Invalid GeoJSON request. Please check arguments against requirements.")
-                  (close! =url=))
-              (do (prn "Inside IO-pp->census-GeoJSON:")
-                  (js/console.log (js/process.memoryUsage))
-                  (>! =url= url)
-                  ; IO-ajax-GET closes the =res= chan; pipeline-async closes the =url= when =res= is closed
-                  ;(pipeline-async 2 =O= (I=O<<=IO= IO-ajax-GET-json) =url= false)
-                  (close! =url=)))))))
-                  ; =O= chan is closed by the consumer; pipeline closes the =res= when =O= is closed
+              (>! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
+              ($GET$-census-GeoJSON (to-chan [url]) =O= =E=))))))
 
 
 
@@ -178,23 +168,22 @@
     (let [[& ids] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
       ids)))
 
-
 (defn geoid<-feature
   "
   Takes the component ids from with the GeoJSON and a single feature to
   generate a :GEOID if not available within the GeoJSON.
   "
-  [ids]
+  [GEOIDS<-JSON] ;; <- Note: These args come in as a '() list...
   (xf<< (fn [rf acc this]
-          (rf acc {(apply str (map (:properties this) ids)) this})))) ;  from @cgrand
-;{(reduce str (map #(get-in m [:properties %]) ids)) m}) ;  uses @ 1kb per
+          (rf acc {(apply str (map (:properties this) GEOIDS<-JSON)) this})))) ;  from @cgrand
 
 
-(defn features<-geoids
+
+(defn xf-features<-geoids
   [ids]
   (comp
-    (map #(get % :features))
-    (into [] (geoid<-feature ids))))
+    (mapcat :features)
+    (geoid<-feature ids)))
     ;(x/into [])))
 
 
@@ -203,13 +192,11 @@
   [$g$]
   (fn [=I= =O= =E=]
     (go (let [args       (<! =I=)
-              =args=     (chan 1)
               ids        ((ids<-$g$<-args $g$) args)
-              =features= (chan 1 (features<-geoids ids))]
-          (>! =args= args)
-          ;(prn args)
-          ;(prn ids)
-          (pipeline-async 1 =features= (I=O<<=IO= (IOE-census-GeoJSON $g$)) =args= false)
-          (>! =O= (<! =features=))
-          (close! =args=)
+              =features= (chan 1 (xf-features<-geoids ids))]
+          (prn args)
+          (prn ids)
+          ((IOE-census-GeoJSON $g$) (to-chan [args]) =features= =E=)
+          (alt! =features= ([O] (>! =O= O))
+                =E=        ([E] (>! =E= E)))
           (close! =features=)))))

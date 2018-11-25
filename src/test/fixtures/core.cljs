@@ -16,7 +16,8 @@
 ;(prn stats-key)
 (def *g* (read-edn "./src/configs/geojson/index.edn"))
 
-()
+(defn time-spot [] (js/Date.))
+
 (defn test-async
   "Asynchronous test awaiting ch to produce a value or close."
   [=test=]

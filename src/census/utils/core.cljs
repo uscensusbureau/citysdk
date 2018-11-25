@@ -217,7 +217,7 @@
       (f =I= =O= =E=)))
 
 
-(defn cb-<O?=
+(defn =O?>-cb
   "
   Can only be used as the last wrapper as the callback. Function can't be
   be coordinated with any other channel (go blocks don't interpret nested

@@ -183,10 +183,12 @@
         =I= (chan 1)
         =O= (chan 1)
         =E= (chan 1)
-        time-in (js/Date.)]
+        time-in (js/Date.)
+        heap-in (heap-spot)]
     (test-async-timed
       "-<IO-pp-census-stats>-test"
       time-in
+      heap-in
       (go
         (>! =I= args-ok)
         (-<IO-pp-census-stats>- =I= =O= =E=)

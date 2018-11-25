@@ -6,7 +6,7 @@
     [cuerdas.core       :refer [join numeric? parse-number]]
     [net.cgrand.xforms  :as x]
     ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
-    [census.utils.core  :refer [$GET$ I-<I= cb-<O?= xf!<< educt<< xf<<
+    [census.utils.core  :refer [$GET$ I-<I= =O?>-cb xf!<< educt<< xf<<
                                 amap-type vec-type throw-err map-idcs-range
                                 keys->strs ->args strs->keys
                                 URL-WMS URL-STATS]]))
@@ -76,7 +76,7 @@
     (map #(clj->js % :keywordize-keys true))))
 
 
-(def $GET$-census-stats ($GET$ :json "Unlucky Census stats request... "))
+(def $GET$-census-stats ($GET$ :json "Unsuccessful Census stats request... "))
 
 (defn IOE->census-stats
   "
@@ -101,7 +101,7 @@
                           (map to-array)
                           (map js/JSON.stringify)))
         =E= (chan 1 (map throw-err))]
-    (go (cb-<O?= IOE->census-stats cb (to-chan [args]) =O= =E=))))
+    (go (=O?>-cb IOE->census-stats cb (to-chan [args]) =O= =E=))))
 
 
 ;      e            888                       d8

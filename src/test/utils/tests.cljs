@@ -23,7 +23,7 @@
                                  map-idcs-range
                                  $GET$
                                  I-<I=
-                                 cb-<O?=
+                                 =O?>-cb
                                  Icb-<IO?=
                                  $GET$-json
                                  $GET$-edn]]))
@@ -151,7 +151,7 @@
           (close! =E=)))))
 
 
-(deftest cb-<O?=-test
+(deftest =O?>-cb-test
   (let [=I= (chan 1)
         =O= (chan 1)
         =E= (chan 1)
@@ -163,12 +163,12 @@
                         (reset! $r$ O)))]
     (test-async
       (go (>! =I= "went through internal =O=")
-          (cb-<O?= tfn tcb =I= =O= =E=)
+          (=O?>-cb tfn tcb =I= =O= =E=)
           (<! (timeout 500))
           (is (= @$r$
                  "went through internal =O="))
           (>! =I= "error! from =E=")
-          (cb-<O?= Efn tcb =I= =O= =E=)
+          (=O?>-cb Efn tcb =I= =O= =E=)
           (<! (timeout 500))
           (is (= @$r$
                  "error! from =E="))
@@ -200,7 +200,7 @@
                         (reset! $r$ O)))]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (cb-<O?= $GET$-json tcb =url= =res= =err=)
+          (=O?>-cb $GET$-json tcb =url= =res= =err=)
           (<! (timeout 500))
           (is (= @$r$
                  {:name "NAME",
