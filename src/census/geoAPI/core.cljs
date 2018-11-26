@@ -1,21 +1,17 @@
 (ns census.geoAPI.core
   (:require
-    [cljs.core.async    :refer [>! <! chan close! to-chan]
+    [cljs.core.async    :refer [>! <! chan close! to-chan pipeline onto-chan
+                                take! put!]
                         :refer-macros [go alt!]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
     ;[net.cgrand.xforms  :as x]
     ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
-                                xf<< educt<< I-<I= =O?>-cb $GET$
-                                map-over-keys keys->strs error throw-err err-type]]))
+                                xf<< educt<< transduct<< I-<I= =O?>-cb $GET$
+                                map-over-keys keys->strs error throw-err
+                                err-type amap-type]]))
     ;[test.fixtures.core   :refer [*g*]]))
-
-
-
-;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-(comment
-  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
 
 
 (defn geo-error
@@ -98,20 +94,21 @@
   (->> (geo-pattern-maker $g$ args)
        (geo-pattern-matcher $g$)))
 
-(def $GET$-census-GeoJSON
-  ($GET$ :json "Unsuccessful Census GeoJSON request"))
+(def $GET$-census-GeoJSON-str
+  ($GET$ :raw "Unsuccessful Census GeoJSON request"))
 
-(defn IOE-census-GeoJSON
+(defn IOE-census-GeoJSON-str
   "
   Internal function for calling Github cartography 'API' for GeoJSON
   "
   [$g$]
   (fn [=I= =O= =E=]
-    (go (let [args  (<! =I=)
-              url   (geo-url-composer $g$ args)]
-          (if (= "" url)
-              (>! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
-              ($GET$-census-GeoJSON (to-chan [url]) =O= =E=))))))
+    (take! =I=
+           (fn [args]
+             (let [url (geo-url-composer $g$ args)]
+               (if (= "" url)
+                 (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
+                 ($GET$-census-GeoJSON-str (to-chan [url]) =O= =E=)))))))
 
 
 
@@ -157,46 +154,71 @@
 
 
 
-(defn ids<-$g$<-args
+(defn GEOIDS<-$g$<-args
   "
   Takes the request argument and pulls out a vector of the component identifiers
   from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
   in deep-merging with statistics.
   "
-  [$g$]
-  (fn [{:keys [geoHierarchy vintage]}]
-    (let [[& ids] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
-      ids)))
+  [$g$ {:keys [geoHierarchy vintage]}]
+  (let [[& GEOIDS] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
+    GEOIDS)) ;; <- Note: These args are returned as a '() list...
 
-(defn geoid<-feature
+(defn xf-mergeable-features
   "
-  Takes the component ids from with the GeoJSON and a single feature to
+  Takes the component GEOIDS from with the GeoJSON and a single feature to
   generate a :GEOID if not available within the GeoJSON.
   "
-  [GEOIDS<-JSON] ;; <- Note: These args come in as a '() list...
-  (xf<< (fn [rf acc this]
-          (rf acc {(apply str (map (:properties this) GEOIDS<-JSON)) this})))) ;  from @cgrand
+  [$g$ args]
+  (let [GEOIDS (GEOIDS<-$g$<-args $g$ args)]
+    (xf<< (fn [rf acc this]
+            (rf acc {(apply str (map (:properties this) GEOIDS))
+                     this})))))
 
 
+; TODO: import IOE-.. and xf-.. to merger and apply them together there
 
-(defn xf-features<-geoids
-  [ids]
+(defn xf-mergeable<-GeoCLJS
+  "
+  Transducer, which reshapes a GeoJSON 'FeatureCollection' into a shape that's
+  mergable with other data. Shape = [{'GEOID' {:properties & kvs {& kvs }}}}]
+  "
+  [$g$ args]
   (comp
-    (mapcat :features)
-    (geoid<-feature ids)))
-    ;(x/into [])))
+    (mapcat :features) ; turns a single map into a collection
+    (xf-mergeable-features $g$ args)))
+
+    ;COUNTIES: "-<IO-pp-census-geos>-test - Heap stats (MB):"
+    ;{:rss 421.85, :heapTotal 392.41, :heapUsed 360.27, :external 29.38}
+    ;"-<IO-pp-census-geos>-test: Elapsed ms= 12354"
+
+    ; (transduct<< (geoid<-feature GEOIDS<-JSON))))
+    ; COUNTIES:  "-<IO-pp-census-geos>-test - Heap stats (MB):"
+    ;{:rss 420.79, :heapTotal 391.41, :heapUsed 364.33, :external 29.39}
+    ;"-<IO-pp-census-geos>-test: Elapsed ms= 10784"
+
+; FIXME: create -<..>- adapter within merger and apply xf-.. to IOE there
+; Article on transducers: http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/
+
+(def $GET$-census-GeoCLJ
+  ($GET$ :json "Unsuccessful Census GeoJSON (for merge) request"))
 
 
-
-(defn -<IO-pp-census-geos>-
+(defn cfg-Census-GeoCLJ
+  "
+  Internal function for calling Github cartography 'API' for GeoJSON
+  "
   [$g$]
-  (fn [=I= =O= =E=]
-    (go (let [args       (<! =I=)
-              ids        ((ids<-$g$<-args $g$) args)
-              =features= (chan 1 (xf-features<-geoids ids))]
-          (prn args)
-          (prn ids)
-          ((IOE-census-GeoJSON $g$) (to-chan [args]) =features= =E=)
-          (alt! =features= ([O] (>! =O= O))
-                =E=        ([E] (>! =E= E)))
-          (close! =features=)))))
+  (fn [=args= =cfg=]
+    (prn "In cfg-Census-GeoCLJ")
+    (take! =args=
+           (fn [args]
+             (let [url   (geo-url-composer $g$ args)
+                   xform (xf-mergeable<-GeoCLJS $g$ args)]
+               (if (= "" url)
+                 (put! =cfg= "Invalid GeoJSON request. Please check arguments against requirements.")
+                 (do (prn "putting -> =cfg= inside cfg-Census-GeoCLJ")
+                     (put! =cfg= {:url    url
+                                  :xform  xform
+                                  :getter $GET$-census-GeoCLJ}))))))))
+                          ; ($GET$-census-GeoCLJ (to-chan [url]) =O= =E=)))))))

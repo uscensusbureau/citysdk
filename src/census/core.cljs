@@ -9,7 +9,7 @@
     [census.utils.core    :refer [throw-err err-type I=O<<=IO= ->args $geoKeyMap$
                                   IO-cache-GET-edn URL-GEOKEYMAP]]
     [census.wmsAPI.core   :refer [IOE-census-wms Icb<-wms-args<<=IO=]]
-    [census.geoAPI.core   :refer [IOE-census-GeoJSON -<IO-pp-census-geos>-
+    [census.geoAPI.core   :refer [cfg-Census-GeoCLJ -<IO-pp-census-geos>-
                                   ids<-$g$<<args]]
     [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp-census-stats>-]]
     [census.merger.core   :refer [IO-merge]]
@@ -61,7 +61,7 @@
           (prn deploy)
           (case deploy
                 :stats+geos
-                (go ((I=O<<=IO= (-<IO-pp-census-geos>- $g$)) args =geos?=)
+                (go ((I=O<<=IO= (-<xf+IOE-census-geos>- $g$)) args =geos?=)
                     (if-let [geos (<! =geos?=)]
                             (go (close! =geos?=)
                                 (let [=stats= (chan 1)]
@@ -70,7 +70,7 @@
                                      (close! =stats=)))
                       (go (close! =geos?=))))
                 :stats-only ((I=O<<=IO= IOE->census-stats)         args =O=)
-                :geos-only  ((I=O<<=IO= (IOE-census-GeoJSON $g$)) args =O=)
+                :geos-only  ((I=O<<=IO= (cfg-Census-GeoCLJ $g$)) args =O=)
                 :geocodes   ((I=O<<=IO= (IOE-census-wms $g$))         args =O=)
                 :no-values  (>! =O= err-no-values)
                 (prn "No matching clause for the arguments provided. Please check arguments against requirements"))))))

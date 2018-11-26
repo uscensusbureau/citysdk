@@ -3,7 +3,7 @@
     [cljs.core.async      :refer [chan close! >! <! timeout]
                           :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [test-async test-async-timed heap-spot]]
+    [test.fixtures.core   :refer [test-async test-async-timed heap-spot time-spot]]
     [census.statsAPI.core :refer [stats-url-builder
                                   parse-if-number
                                   xf!-csv->clj
@@ -183,7 +183,7 @@
         =I= (chan 1)
         =O= (chan 1)
         =E= (chan 1)
-        time-in (js/Date.)
+        time-in (time-spot)
         heap-in (heap-spot)]
     (test-async-timed
       "-<IO-pp-census-stats>-test"

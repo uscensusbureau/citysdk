@@ -129,6 +129,10 @@
     (throw x)
     x))
 
+; TODO: read up:
+; http://clojure-doc.org/articles/language/concurrency_and_parallelism.html
+;  http://java.ociweb.com/mark/stm/article.html
+
 (defn $GET$
   "
   Takes two initial inputs: the response format desired and an error message,
@@ -146,9 +150,9 @@
   `reset!` *and* be put into the out-bound =response= chan.
   "
   [format err-log-msg]
-  (let [$url$ (atom "")
-        $res$ (atom [])
-        $err$ (atom {})]
+  (let [$url$ (volatile! "")
+        $res$ (volatile! [])
+        $err$ (volatile! {})]
     (fn
       ([=url= =res=] (($GET$ format err-log-msg) =url= =res= (chan 1 (map throw-err))))
       ([=url= =res= =err=]
@@ -156,13 +160,11 @@
          =url=
          (fn [url]
            (cond
-             (and (= url @$url$)
-                  (not (empty? @$err$)))
+             (and (= url @$url$) (not (empty? @$err$)))
              (do (prn err-log-msg)
                  (put! =err= @$err$)
-                 (reset! $err$ {})) ; <- if internets have failed, allow retry
-             (and (= url @$url$)
-                  (empty? @$err$))
+                 (vreset! $err$ {})) ; <- if internets have failed, allow retry
+             (and (= url @$url$) (empty? @$err$))
              (do (prn "$GET$ data from cache:")
                  (prn url)
                  (put! =res= @$res$))
@@ -172,33 +174,47 @@
                  (let [cfg {:error-handler
                             (fn [{:keys [status status-text]}]
                               (do (prn err-log-msg)
-                                  (reset! $url$ url)
+                                  (vreset! $url$ url)
                                   (put! =res= {})
-                                  (->> (reset! $err$
+                                  (->> (vreset! $err$
                                          (str "ERROR status: " status
                                               " " status-text
                                               " for URL " url
                                               " ... output empty `{}`"))
                                        (put! =err=))))}]
-                   (if (= format :json)
+                   (case format
+                     :json
                      (let [json
                            (merge cfg {:response-format :json
                                        :keywords?       true
                                        :handler
                                        (fn [res]
-                                         (do (reset! $err$ {})
-                                             (reset! $url$ url)
-                                             (->> (reset! $res$ res)
+                                         (do (vreset! $err$ {})
+                                             (vreset! $url$ url)
+                                             (->> (vreset! $res$ res)
                                                   (put! =res=))))})]
                        (GET url json))
+                     :edn
                      (let [edn
                            (merge cfg {:handler
                                        (fn [res]
-                                         (do (reset! $err$ {})
-                                             (reset! $url$ url)
-                                             (->> (reset! $res$ (read-string res))
+                                         (do (vreset! $err$ {})
+                                             (vreset! $url$ url)
+                                             (->> (vreset! $res$ (read-string res))
                                                   (put! =res=))))})]
-                       (GET url edn))))))))))))
+                       (GET url edn))
+                     :raw
+                     (let [raw
+                           (merge cfg {:handler
+                                       (fn [res]
+                                         (do (vreset! $err$ {})
+                                             (vreset! $url$ url)
+                                             (->> (vreset! $res$ res)
+                                                  (put! =res=))))})]
+                       (GET url raw))))))))))))
+
+
+
 
 
 (def $GET$-json ($GET$ :json "Invalid JSON request..."))
@@ -244,7 +260,6 @@
           geoKeys (map-rename-keys strs->keys geoCljs)]
       (do (oset! args "vintage"      (clj->js (str vintage)))
           (oset! args "geoHierarchy" (clj->js geoKeys))
-          ;(prn (str "args from args-digester: " (js->clj args :keywordize-keys true)))
           (js->clj args :keywordize-keys true)))))
 
 ;; Examples ==============================
@@ -290,8 +305,6 @@
       ([acc] (rf acc))
       ([acc this] (f rf acc this)))))
 
-;; Tested: working
-
 (defn xf!<<
   "
   Stateful transducifier wrapper, which takes the seed of a transducer (essential
@@ -336,6 +349,24 @@
       ([acc] (rf acc))
       ([acc coll]
        (rf acc (eduction xfn coll))))))
+
+
+
+(defn transduct<<
+  "
+  Transducer, which wraps a transducer to provide the right level of contract
+  for a core.async chan through which data is not an item, but a collection.
+  I.e., treating the collection as a single transducible item.
+
+  Uses eduction.
+  "
+  [xfn]
+  (fn [rf]
+    (fn
+      ([] (rf))
+      ([acc] (rf acc))
+      ([acc coll]
+       (rf acc (transduce xfn conj coll))))))
 
 
 (defn map-target

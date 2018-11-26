@@ -1,18 +1,119 @@
 (ns census.merger.core
   (:require
-    [cljs.core.async      :refer [>! <! chan promise-chan close! pipeline put!]
-                          :refer-macros [go]
+    [cljs.core.async      :refer [>! <! chan promise-chan close! pipeline put!
+                                  to-chan take!]
+                          :refer-macros [go alt! go-loop]
                           :as <|]
     [ajax.core            :refer [GET POST]]
     [net.cgrand.xforms    :as x]
-    ;[census.geoAPI.core   :refer [IO-pp->census-GeoJSON]]
+    [census.geoAPI.core   :refer [cfg-Census-GeoCLJ]]
     ;[census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp->census-stats>-]]
-    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< educt<< throw-err err-type
-                                  ->args I=O<<=IO= IO-cache-GET-edn map-over-keys]]))
-    ;[test.fixtures.core   :refer [*g*]]))
+    [census.utils.core    :refer [URL-GEOKEYMAP $geoKeyMap$ xf<< educt<<
+                                  throw-err err-type ->args map-over-keys
+                                  amap-type $GET$]]))
 
 
+(def pre-cfg-Census-GeoCLJ [cfg-Census-GeoCLJ true])
 
+(def $GET$-geoKeyMap ($GET$ :edn "Unsuccessful fetch for geoKeyMap (configuration)"))
+
+(defn merge-spooler
+  [=args= cfgs]
+  (let [=GKM= (promise-chan)]
+    ($GET$-geoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM=)
+    (fn [=O= =E=]
+      (go (let [*g*   (<! =GKM=)
+                =cfg= (chan 1)]
+            (prn "In merge-spooler")
+            (loop [todo       cfgs
+                   [cfg $g$?] (first cfgs)
+                   acc        (transient [])]
+              (if (nil? (first todo))
+                (do (prn "putting persistent! in merge-spooler")
+                    (>! =O= (persistent! acc)))
+                (do (if $g$?
+                      ((cfg *g*) =args= =cfg=)
+                      (cfg =args= =cfg=))
+                    (if-let [{:keys [url xform getter]} (<! =cfg=)]
+                      (let [=xform= (chan 1 xform)
+                            =err=   (chan 1 (map throw-err))]
+                        (prn "Inside if-let of merge-spooler loop!")
+                        (getter (to-chan [url]) =xform= =err=)
+                        (alt! =xform= ([data] (do (prn "inside alt! =xform=")
+                                                  (close! =xform=)
+                                                  (close! =err=)
+                                                  (recur (rest todo)
+                                                         (second todo)
+                                                         (conj! acc data))))
+                              =err=   ([err] (do (close! =xform=)
+                                                 (close! =err=)
+                                                 (prn "Error during merge...")
+                                                 (>! =E= err)))))
+                      (>! =E= cfg))))))))))
+
+(let [args  {:vintage      "2016"
+             :geoHierarchy {:state "44" :school-district-_secondary_ "*"}
+             :geoResolution "500k"}
+      =args= (promise-chan)
+      =O=    (chan 1)
+      =E=    (chan 1)]
+  (go (>! =args= args)
+      ((merge-spooler =args= [pre-cfg-Census-GeoCLJ]) =O= =E=)
+      (alt! =O= ([data] (prn data))
+            =E= ([err]  (prn "Error! ")))
+      (close! =args=)
+      (close! =O=)
+      (close! =E=)))
+
+
+; TODO: define getter as a generalized fn wrapper for $GET$
+(comment
+  (defn test-GETTER-cfgd
+    ([=args= =xform= =err=] (test-GETTER-cfgd =args= =xform= =err= nil))
+    ([=args= =xform= =err= $g$]
+     (go (>! =xform= (<! =args=))
+         (when $g$ (prn $g$))
+         (close! =args=)
+         (close! =xform=)
+         (close! =err=))))
+
+  (def test-cfg-1 [test-GETTER-cfgd
+                   (to-chan ["TEST URL #1 -> "])
+                   (chan 1 (map #(str % " via xform ")))
+                   (chan 1 (map throw-err))
+                   "geoKeyMap goes here"])
+
+  (def test-cfg-2 [test-GETTER-cfgd
+                   (to-chan ["TEST URL Numero Dos -> "])
+                   (chan 1 (map #(str % " went through xform ->")))
+                   (chan 1 (map throw-err))])
+
+  (defn merge-spooler
+    [sources]
+    (fn [=O= =E=]
+      (go-loop [todo sources
+                this (first sources)
+                acc  (transient [])]
+        (if (nil? (first todo))
+            (>! =O= (persistent! acc))
+            (let [[GETTER =args= =xform= =err= & [$g$?]] this]
+              (if $g$?
+                ((GETTER $g$?) =args= =xform= =err=)
+                (GETTER =args= =xform= =err=))
+              (alt! =xform= ([data] (recur (rest todo)
+                                           (second todo)
+                                           (conj! acc data)))
+                    =err=   ([err]  (do (prn "Error during merge...")
+                                        (>! =E= err)))))))))
+
+
+  (let [=O= (chan 1)
+        =E= (chan 1)]
+    (go ((merge-spooler [test-cfg-1 test-cfg-2]) =O= =E=)
+        (alt! =O= ([data] (prn data))
+              =E= ([err]  (prn "Error! ")))
+        (close! =O=)
+        (close! =E=))))
 
 
 ;      e    e                             /
@@ -26,6 +127,7 @@
 ;
 
 
+
 (defn group-by-keys
   "
   Implementation of `group-by` (produces a map) via @cgrand's `xforms`
@@ -36,40 +138,40 @@
 
 
 ; Examples ================================================
-(group-by-keys
-  (concat
-    [{"12040" {:type "Feature",
-               :properties {:STATEFP "01",
-                            :GEOID "01005",
-                            :STATE "123",
-                            :COUNTY "456"},
-               :geometry {:type "Polygon",
-                          :coordinates [[[-85.748032 31.619181]
-                                         [-85.729832 31.632373]]]}}}
-     {"12035" {:type "Feature",
-               :properties {:STATEFP "01",
-                            :GEOID "01005",
-                            :STATE "789",
-                            :COUNTY "1011"},
-               :geometry {:type "Polygon",
-                          :coordinates [[[-85.748032 31.619181]
-                                         [-85.729832 31.632373]]]}}}]
+#_(group-by-keys
+    (concat
+      [{"12040" {:type "Feature",
+                 :properties {:STATEFP "01",
+                              :GEOID "01005",
+                              :STATE "123",
+                              :COUNTY "456"},
+                 :geometry {:type "Polygon",
+                            :coordinates [[[-85.748032 31.619181]
+                                           [-85.729832 31.632373]]]}}}
+       {"12035" {:type "Feature",
+                 :properties {:STATEFP "01",
+                              :GEOID "01005",
+                              :STATE "789",
+                              :COUNTY "1011"},
+                 :geometry {:type "Polygon",
+                            :coordinates [[[-85.748032 31.619181]
+                                           [-85.729832 31.632373]]]}}}]
 
-    [{"12040" {:properties {:B01001_001E 494981,
-                            :NAME "State Senate District 40 (2016), Florida",
-                            :B00001_001E 29661,
-                            :state "12",
-                            :state-legislative-district-_upper-chamber_ "040"}}}
-     {"12036" {:properties {:B01001_001E 492259,
-                            :NAME "State Senate District 36 (2016), Florida",
-                            :B00001_001E 29475,
-                            :state "12",
-                            :state-legislative-district-_upper-chamber_ "036"}}}
-     {"12035" {:properties {:B01001_001E 493899,
-                            :NAME "State Senate District 35 (2016), Florida",
-                            :B00001_001E 25615,
-                            :state "12",
-                            :state-legislative-district-_upper-chamber_ "035"}}}]))
+      [{"12040" {:properties {:B01001_001E 494981,
+                              :NAME "State Senate District 40 (2016), Florida",
+                              :B00001_001E 29661,
+                              :state "12",
+                              :state-legislative-district-_upper-chamber_ "040"}}}
+       {"12036" {:properties {:B01001_001E 492259,
+                              :NAME "State Senate District 36 (2016), Florida",
+                              :B00001_001E 29475,
+                              :state "12",
+                              :state-legislative-district-_upper-chamber_ "036"}}}
+       {"12035" {:properties {:B01001_001E 493899,
+                              :NAME "State Senate District 35 (2016), Florida",
+                              :B00001_001E 25615,
+                              :state "12",
+                              :state-legislative-district-_upper-chamber_ "035"}}}]))
 
 ; =>
 ; {("12040") [{"12040" {:type "Feature",
@@ -127,39 +229,39 @@
          maps))
 
 ; Examples ================================================
-(x/for [[_ pairs]
-        {'("12040") [{"12040" {:type "Feature",
-                               :properties {:STATEFP "01",
-                                            :GEOID "01005",
-                                            :STATE "123",
-                                            :COUNTY "456"},
-                               :geometry {:type "Polygon",
-                                          :coordinates [[[-85.748032 31.619181]
-                                                         [-85.729832 31.632373]]]}}}
-                     {"12040" {:properties {:B01001_001E 494981,
-                                            :NAME "State Senate District 40 (2016), Florida",
-                                            :B00001_001E 29661,
-                                            :state "12",
-                                            :state-legislative-district-_upper-chamber_ "040"}}}],
-         '("12035") [{"12035" {:type "Feature",
-                               :properties {:STATEFP "01",
-                                            :GEOID "01005",
-                                            :STATE "789",
-                                            :COUNTY "1011"},
-                               :geometry {:type "Polygon",
-                                          :coordinates [[[-85.748032 31.619181]
-                                                         [-85.729832 31.632373]]]}}}
-                     {"12035" {:properties {:B01001_001E 493899,
-                                            :NAME "State Senate District 35 (2016), Florida",
-                                            :B00001_001E 25615,
-                                            :state "12",
-                                            :state-legislative-district-_upper-chamber_ "035"}}}],
-         '("12036") [{"12036" {:properties {:B01001_001E 492259,
-                                            :NAME "State Senate District 36 (2016), Florida",
-                                            :B00001_001E 29475,
-                                            :state "12",
-                                            :state-legislative-district-_upper-chamber_ "036"}}}]}]
-       (apply deep-merge-with pairs))
+#_(x/for [[_ pairs]
+          {'("12040") [{"12040" {:type "Feature",
+                                 :properties {:STATEFP "01",
+                                              :GEOID "01005",
+                                              :STATE "123",
+                                              :COUNTY "456"},
+                                 :geometry {:type "Polygon",
+                                            :coordinates [[[-85.748032 31.619181]
+                                                           [-85.729832 31.632373]]]}}}
+                       {"12040" {:properties {:B01001_001E 494981,
+                                              :NAME "State Senate District 40 (2016), Florida",
+                                              :B00001_001E 29661,
+                                              :state "12",
+                                              :state-legislative-district-_upper-chamber_ "040"}}}],
+           '("12035") [{"12035" {:type "Feature",
+                                 :properties {:STATEFP "01",
+                                              :GEOID "01005",
+                                              :STATE "789",
+                                              :COUNTY "1011"},
+                                 :geometry {:type "Polygon",
+                                            :coordinates [[[-85.748032 31.619181]
+                                                           [-85.729832 31.632373]]]}}}
+                       {"12035" {:properties {:B01001_001E 493899,
+                                              :NAME "State Senate District 35 (2016), Florida",
+                                              :B00001_001E 25615,
+                                              :state "12",
+                                              :state-legislative-district-_upper-chamber_ "035"}}}],
+           '("12036") [{"12036" {:properties {:B01001_001E 492259,
+                                              :NAME "State Senate District 36 (2016), Florida",
+                                              :B00001_001E 29475,
+                                              :state "12",
+                                              :state-legislative-district-_upper-chamber_ "036"}}}]}]
+         (apply deep-merge-with pairs))
 
 
 ; =>
@@ -416,43 +518,43 @@
 
 ;(eduction  (xf-merge-filter->FeatureCollection [:B00001_001E :GEOID :extra]))
          ;conj
-(->> (concat [{"12040" {:type "Feature",
-                        :properties {:STATEFP "01",
-                                     :GEOID "01005",
-                                     :STATE "123",
-                                     :COUNTY "456"},
-                        :geometry {:type "Polygon",
-                                   :coordinates [[[-85.748032 31.619181]
-                                                  [-85.729832 31.632373]]]}}}
-              {"12035" {:type "Feature",
-                        :properties {:STATEFP "01",
-                                     :GEOID "01005",
-                                     :STATE "789",
-                                     :COUNTY "1011"},
-                        :geometry {:type "Polygon",
-                                   :coordinates [[[-85.748032 31.619181]
-                                                  [-85.729832 31.632373]]]}}}]
+#_(->> (concat [{"12040" {:type "Feature",
+                          :properties {:STATEFP "01",
+                                       :GEOID "01005",
+                                       :STATE "123",
+                                       :COUNTY "456"},
+                          :geometry {:type "Polygon",
+                                     :coordinates [[[-85.748032 31.619181]
+                                                    [-85.729832 31.632373]]]}}}
+                {"12035" {:type "Feature",
+                          :properties {:STATEFP "01",
+                                       :GEOID "01005",
+                                       :STATE "789",
+                                       :COUNTY "1011"},
+                          :geometry {:type "Polygon",
+                                     :coordinates [[[-85.748032 31.619181]
+                                                    [-85.729832 31.632373]]]}}}]
 
-             [{"12040" {:properties {:B01001_001E 494981,
-                                     :NAME "State Senate District 40 (2016), Florida",
-                                     :B00001_001E 29661,
-                                     :state "12",
-                                     :state-legislative-district-_upper-chamber_ "040"}}}
-              {"12036" {:properties {:B01001_001E 492259,
-                                     :NAME "State Senate District 36 (2016), Florida",
-                                     :B00001_001E 29475,
-                                     :state "12",
-                                     :state-legislative-district-_upper-chamber_ "036"}}}
-              {"12035" {:properties {:B01001_001E 493899,
-                                     :NAME "State Senate District 35 (2016), Florida",
-                                     :B00001_001E 25615,
-                                     :state "12",
-                                     :state-legislative-district-_upper-chamber_ "035"}}}])
-     ; concat turns two collections into one
-     group-by-keys
-     ;(group-by-keys)
-     ;; group-by-keys needs access to the whole collection
-     (eduction (xf-merge-filter [:GEOID :NAME])))
+               [{"12040" {:properties {:B01001_001E 494981,
+                                       :NAME "State Senate District 40 (2016), Florida",
+                                       :B00001_001E 29661,
+                                       :state "12",
+                                       :state-legislative-district-_upper-chamber_ "040"}}}
+                {"12036" {:properties {:B01001_001E 492259,
+                                       :NAME "State Senate District 36 (2016), Florida",
+                                       :B00001_001E 29475,
+                                       :state "12",
+                                       :state-legislative-district-_upper-chamber_ "036"}}}
+                {"12035" {:properties {:B01001_001E 493899,
+                                       :NAME "State Senate District 35 (2016), Florida",
+                                       :B00001_001E 25615,
+                                       :state "12",
+                                       :state-legislative-district-_upper-chamber_ "035"}}}])
+       ; concat turns two collections into one
+       group-by-keys
+       ;(group-by-keys)
+       ;; group-by-keys needs access to the whole collection
+       (eduction (xf-merge-filter [:GEOID :NAME])))
      ;(eduction (xf<< (fn [rf acc [_ {:as this}]] (rf acc (apply deep-merge-with this))))))
      ;(eduction (xf-merge-filter->FeatureCollection [:GEOID :NAME])))
 
@@ -630,28 +732,28 @@
 
 ; Example ========================================
 
-(let [=O=        (chan 1)
-      features
-      '(
-         {"01005" {:type "Feature", :geometry {:bbox [-87.95181699999999 33.253484 -86.953616 34.211647], :type "Polygon", :coordinates [[[-87.951785 33.91993] [-87.926196 33.919618] [-87.921454 33.919542] [-87.94939699999999 33.769908] [-87.95181699999999 33.858906999999995] [-87.951785 33.91993]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "005", :AFFGEOID "610U500US01005", :GEOID "01005", :AWATER 145834431, :NAME "5", :ALAND 6840348927}}}
-        {"01024" {:type "Feature", :geometry {:bbox [-88.473227 31.697951902948795 -87.45707800000001 33.415568], :type "Polygon", :coordinates [[[-88.473227 31.893856] [-88.468879 31.930262]  [-88.471214 31.851384999999997] [-88.472642 31.875152999999997] [-88.473227 31.893856]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "024", :AFFGEOID "610U500US01024", :GEOID "01024", :AWATER 139823284, :NAME "24", :ALAND 9960246621}}}
-        {"01007" {:type "Feature", :geometry {:bbox [-86.65103099999999 34.62715800000001 -86.407681 34.9917405111499], :type "Polygon", :coordinates [[[-86.65103099999999 34.77151500000001] [-86.64435999999999 34.771505999999995] [-86.632905 34.771415999999995] [-86.631608 34.7714] [-86.621123 34.771324] [-86.65103099999999 34.77151500000001]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "007", :AFFGEOID "610U500US01007", :GEOID "01007", :AWATER 2763071, :NAME "7", :ALAND 508764837}}}
-        {"01018" {:type "Feature", :geometry {:bbox [-87.06575199999999 33.246007 -86.69438799999999 33.572006], :type "Polygon", :coordinates [[[-87.06575199999999 33.26763] [-87.064842 33.268857] [-87.063431]]]}}})
+#_(let [=O=        (chan 1)
+        features
+        '(
+           {"01005" {:type "Feature", :geometry {:bbox [-87.95181699999999 33.253484 -86.953616 34.211647], :type "Polygon", :coordinates [[[-87.951785 33.91993] [-87.926196 33.919618] [-87.921454 33.919542] [-87.94939699999999 33.769908] [-87.95181699999999 33.858906999999995] [-87.951785 33.91993]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "005", :AFFGEOID "610U500US01005", :GEOID "01005", :AWATER 145834431, :NAME "5", :ALAND 6840348927}}}
+          {"01024" {:type "Feature", :geometry {:bbox [-88.473227 31.697951902948795 -87.45707800000001 33.415568], :type "Polygon", :coordinates [[[-88.473227 31.893856] [-88.468879 31.930262]  [-88.471214 31.851384999999997] [-88.472642 31.875152999999997] [-88.473227 31.893856]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "024", :AFFGEOID "610U500US01024", :GEOID "01024", :AWATER 139823284, :NAME "24", :ALAND 9960246621}}}
+          {"01007" {:type "Feature", :geometry {:bbox [-86.65103099999999 34.62715800000001 -86.407681 34.9917405111499], :type "Polygon", :coordinates [[[-86.65103099999999 34.77151500000001] [-86.64435999999999 34.771505999999995] [-86.632905 34.771415999999995] [-86.631608 34.7714] [-86.621123 34.771324] [-86.65103099999999 34.77151500000001]]]}, :properties {:STATEFP "01", :LSAD "LU", :LSY "2016", :SLDUST "007", :AFFGEOID "610U500US01007", :GEOID "01007", :AWATER 2763071, :NAME "7", :ALAND 508764837}}}
+          {"01018" {:type "Feature", :geometry {:bbox [-87.06575199999999 33.246007 -86.69438799999999 33.572006], :type "Polygon", :coordinates [[[-87.06575199999999 33.26763] [-87.064842 33.268857] [-87.063431]]]}}})
 
-      stats
-      '(
-         {"01001" {:properties {:B01001_001E 139179, :state "01", :state-legislative-district-_upper-chamber_ "001"}}}
-         {"01005" {:properties {:B01001_001E 133243, :state "01", :state-legislative-district-_upper-chamber_ "005"}}}
-         {"01006" {:properties {:B01001_001E 137291, :state "01", :state-legislative-district-_upper-chamber_ "006"}}}
-         {"01007" {:properties {:B01001_001E 141053, :state "01", :state-legislative-district-_upper-chamber_ "007"}}}
-         {"01008" {:properties {:B01001_001E 140026, :state "01", :state-legislative-district-_upper-chamber_ "008"}}}
-         {"01009" {:properties {:B01001_001E 139951, :state "01", :state-legislative-district-_upper-chamber_ "009"}}}
-         {"01024" {:properties {:B01001_001E 138832, :state "01", :state-legislative-district-_upper-chamber_ "024"}}}
-         {"01025" {:properties {:B01001_001E 137584, :state "01", :state-legislative-district-_upper-chamber_ "025"}}}
-         {"01026" {:properties {:B01001_001E 132574, :state "01", :state-legislative-district-_upper-chamber_ "026"}}}
-         {"01034" {:properties {:B01001_001E 135926, :state "01", :state-legislative-district-_upper-chamber_ "034"}}}
-         {"01035" {:properties {:B01001_001E 136856, :state "01", :state-legislative-district-_upper-chamber_ "035"}}})]
-  (go (((IO-merge [:NAME :GEOID]) [features stats])))) ;=O=)
+        stats
+        '(
+           {"01001" {:properties {:B01001_001E 139179, :state "01", :state-legislative-district-_upper-chamber_ "001"}}}
+           {"01005" {:properties {:B01001_001E 133243, :state "01", :state-legislative-district-_upper-chamber_ "005"}}}
+           {"01006" {:properties {:B01001_001E 137291, :state "01", :state-legislative-district-_upper-chamber_ "006"}}}
+           {"01007" {:properties {:B01001_001E 141053, :state "01", :state-legislative-district-_upper-chamber_ "007"}}}
+           {"01008" {:properties {:B01001_001E 140026, :state "01", :state-legislative-district-_upper-chamber_ "008"}}}
+           {"01009" {:properties {:B01001_001E 139951, :state "01", :state-legislative-district-_upper-chamber_ "009"}}}
+           {"01024" {:properties {:B01001_001E 138832, :state "01", :state-legislative-district-_upper-chamber_ "024"}}}
+           {"01025" {:properties {:B01001_001E 137584, :state "01", :state-legislative-district-_upper-chamber_ "025"}}}
+           {"01026" {:properties {:B01001_001E 132574, :state "01", :state-legislative-district-_upper-chamber_ "026"}}}
+           {"01034" {:properties {:B01001_001E 135926, :state "01", :state-legislative-district-_upper-chamber_ "034"}}}
+           {"01035" {:properties {:B01001_001E 136856, :state "01", :state-legislative-district-_upper-chamber_ "035"}}})]
+    (go (((IO-merge [:NAME :GEOID]) [features stats])))) ;=O=)
       ;(prn (<! =O=))
       ;(close! =O=)))
       ;(prn (<! =O=)))  ;FIXME -> Just putting the final take at the bottom of the operations fixed this... just move the `close`s below and see.
