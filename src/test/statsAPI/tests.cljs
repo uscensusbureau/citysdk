@@ -135,7 +135,7 @@
               :values       ["B01001_001E" "B01001_001M"]}
         args-big {:vintage      "2016"
                   :sourcePath   ["acs" "acs5"]
-                  :geoHierarchy {:zip-code-tabulation-area "*"}
+                  :geoHierarchy {:state "*"}
                   :values       ["B01001_001E" "B01001_001M"]}
         $S$ (atom "")
         cb  (fn [E O] (if-let [err E]
@@ -147,7 +147,7 @@
       "censusStatsJSON-test"
       time-in
       heap-in
-      (go (censusStatsJSON args-big cb)
+      (go (censusStatsJSON args cb)
           (<! (timeout 500))
           ;(js/console.log @$S$)))))
           (is (= @$S$

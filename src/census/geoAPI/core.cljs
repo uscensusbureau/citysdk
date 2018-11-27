@@ -185,8 +185,8 @@
   "
   [$g$ args]
   (comp
-    (mapcat :features) ; turns a single map into a collection
-    (xf-mergeable-features $g$ args)))
+    (map #(get % :features)) ; turns a single map into a collection
+    (educt<< (xf-mergeable-features $g$ args))))
 
     ;COUNTIES: "-<IO-pp-census-geos>-test - Heap stats (MB):"
     ;{:rss 421.85, :heapTotal 392.41, :heapUsed 360.27, :external 29.38}
@@ -221,4 +221,5 @@
                      (put! =cfg= {:url    url
                                   :xform  xform
                                   :getter $GET$-census-GeoCLJ}))))))))
-                          ; ($GET$-census-GeoCLJ (to-chan [url]) =O= =E=)))))))
+
+(def pre-cfg-Census-GeoCLJ [cfg-Census-GeoCLJ true])
