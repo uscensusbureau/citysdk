@@ -15,7 +15,7 @@
 
 (comment
   ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]}))
+  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=4096"]}))
   ;; or in Node: node --max-old-space-size=4096
 
 (defn deep-merge-with
@@ -161,48 +161,49 @@
 
 
 
-(def $GET$-geoKeyMap ($GET$ :edn "Unsuccessful fetch for geoKeyMap (configuration)"))
-
-(def =GKM= (promise-chan))
-
-($GET$-geoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM=)
 
 (defn merge-spooler
-  [=args= cfgs]
+  [$g$ =arg= cfgs]
   (fn [=O= =E=]
-    (go (let [=cfg= (chan 1)
-              $ids$ (atom [])
-              $g$   (<! =GKM=)]
-          (loop [todo cfgs
-                 [cfg ?$g$] (first cfgs)
-                 acc (transient [])]
-            (if (nil? (first todo))
-                (do ;(prn "putting persistent! in merge-spooler")
+    (let [=args= (promise-chan)]
+      (go (>! =args= (<! =arg=))
+          (let [=cfg= (chan 1)
+                $ids$ (atom [])]
+            (loop [todo cfgs
+                   [cfg ?=$g$] (first cfgs)
+                   acc (transient [])]
+              (if (nil? (first todo))
+                (do (prn "Working on it ...")
                     (>! =O=
-                        (->> (persistent! acc)
-                             (reduce concat)
-                             ; TODO: ask @cgrand about this...
-                             ;(transduce (group-merge-filter @$ids$) conj)))
-                             (group-by-keys)
-                             (transduce (xf-merge->filter @$ids$) conj)))
-                    (close! =cfg=))
-                (do (if ?$g$
+                        (as-> (persistent! acc) coll
+                              (reduce concat coll)
+                              ; TODO: ask @cgrand about this...
+                              ;(transduce (group-merge-filter @$ids$) conj)))
+                              (group-by-keys coll)
+                              (transduce (xf-merge->filter @$ids$) conj coll)
+                              (js/JSON.stringify
+                                (js-obj "type" "FeatureCollection"
+                                        "features" (clj->js coll)))))
+                    (close! =cfg=)
+                    (close! =args=))
+                (do (if ?=$g$
                         ((cfg $g$) =args= =cfg=)
                         (cfg =args= =cfg=))
                     (if-let [{:keys [getter url xform filter-id]} (<! =cfg=)]
-                            (let [=xform= (chan 1 xform)
-                                  =err=   (chan 1 (map throw-err))]
-                              (swap! $ids$ conj filter-id)
-                              (getter (to-chan [url]) =xform= =err=)
-                              (alt! =xform= ([data] (do (close! =xform=)
-                                                        (close! =err=)
-                                                        (recur (rest todo)
-                                                               (second todo)
-                                                               (conj! acc data))))
-                                    =err=    ([err] (do (close! =xform=)
-                                                        (close! =err=)
-                                                        (>! =E= err)))))
+                      (let [=xform= (chan 1 xform)
+                            =err=   (chan 1 (map throw-err))]
+                        (swap! $ids$ conj filter-id)
+                        (getter (to-chan [url]) =xform= =err=)
+                        (alt! =xform= ([data] (do (close! =xform=)
+                                                  (close! =err=)
+                                                  (recur (rest todo)
+                                                         (second todo)
+                                                         (conj! acc data))))
+                              =err=    ([err] (do (close! =xform=)
+                                                  (close! =err=)
+                                                  (>! =E= err)))))
                       (do (>! =E= cfg)
-                          (close! =cfg=))))))))))
+                          (close! =cfg=)
+                          (close! =args=)))))))))))
 
 

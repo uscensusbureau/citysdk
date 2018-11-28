@@ -1,18 +1,18 @@
 (ns test.statsAPI.tests
   (:require
-    [cljs.core.async      :refer [chan close! >! <! timeout]
-                          :refer-macros [go alt!]]
-    [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [test-async test-async-timed heap-spot time-spot]]
-    [census.statsAPI.core :refer [stats-url-builder
-                                  parse-if-number
-                                  xf!-csv->clj
-                                  xf-geoid+<-stat
-                                  xf-stats->js
-                                  xf-stats-mergeable
-                                  IOE->census-stats
-                                  censusStatsJSON
-                                  -<IO-pp-census-stats>-]]))
+    [cljs.core.async       :refer [chan close! >! <! timeout]
+                           :refer-macros [go alt!]]
+    [cljs.test             :refer-macros [async deftest is testing run-tests]]
+    [test.fixtures.core    :refer [test-async test-async-timed heap-spot time-spot]]
+    [census.statsAPI.core  :refer [stats-url-builder
+                                   parse-if-number
+                                   xf!-csv->clj
+                                   xf-geoid+<-stat
+                                   xf-stats->js
+                                   xf-stats-mergeable
+                                   IOE->census-stats
+                                   censusStatsJSON
+                                   cfg-Census-Stats]]))
 
 (deftest stats-url-builder-test
   (let [args-1 {:vintage      "2016"
@@ -106,38 +106,35 @@
                 :county "073"
                 :tract "000100"}}})))))
 
+(def ARGS-2 {:vintage      "2016"
+             :sourcePath   ["acs" "acs5"]
+             :geoHierarchy {:state "44" :county "*"}
+             :values       ["B01001_001E" "B01001_001M"]})
+
 (deftest IOE->census-stats-test
-  (let [args {:vintage      "2016"
-              :sourcePath   ["acs" "acs5"]
-              :geoHierarchy {:state "01" :county "073" :tract "000100"}
-              :values       ["B01001_001E" "B01001_001M"]}
-        =I= (chan 1)
+  (let [=I= (chan 1)
         =O= (chan 1)
         =E= (chan 1)
         time-in (js/Date.)]
     (test-async-timed
       "IOE->census-stats-test"
       time-in
-      (go (>! =I= args)
+      (go (>! =I= ARGS-2)
           (IOE->census-stats =I= =O= =E=)
           (is (= (alt! =O= ([res] res)
                        =E= ([err] err))
-                 [["B01001_001E" "B01001_001M" "state" "county" "tract"]
-                  ["3111" "369" "01" "073" "000100"]]))
+                 [["B01001_001E" "B01001_001M" "state" "county"]
+                  ["49228" "-555555555" "44" "001"]
+                  ["164886" "-555555555" "44" "003"]
+                  ["82714" "-555555555" "44" "005"]
+                  ["631344" "-555555555" "44" "007"]
+                  ["126319" "-555555555" "44" "009"]]))
           (close! =I=)
           (close! =O=)
           (close! =E=)))))
 
 (deftest censusStatsJSON-test
-  (let [args {:vintage      "2016"
-              :sourcePath   ["acs" "acs5"]
-              :geoHierarchy {:state "01" :county "073" :tract "000100"}
-              :values       ["B01001_001E" "B01001_001M"]}
-        args-big {:vintage      "2016"
-                  :sourcePath   ["acs" "acs5"]
-                  :geoHierarchy {:state "*"}
-                  :values       ["B01001_001E" "B01001_001M"]}
-        $S$ (atom "")
+  (let [$S$ (atom "")
         cb  (fn [E O] (if-let [err E]
                         (reset! $S$ err)
                         (reset! $S$ O)))
@@ -147,11 +144,11 @@
       "censusStatsJSON-test"
       time-in
       heap-in
-      (go (censusStatsJSON args cb)
+      (go (censusStatsJSON ARGS-2 cb)
           (<! (timeout 500))
           ;(js/console.log @$S$)))))
           (is (= @$S$
-                 "[{\"B01001_001E\":3111,\"B01001_001M\":369,\"state\":\"01\",\"county\":\"073\",\"tract\":\"000100\"}]"))))))
+                 "[{\"B01001_001E\":49228,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"001\"},{\"B01001_001E\":164886,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"003\"},{\"B01001_001E\":82714,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"005\"},{\"B01001_001E\":631344,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"007\"},{\"B01001_001E\":126319,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"009\"}]"))))))
 
 ; With eduction:
 ; "$GET$ data from source:"
@@ -167,47 +164,41 @@
 ;"censusStatsJSON-test: Elapsed ms= 2829"
 
 
-(deftest -<IO-pp-census-stats>-test
-  (let [args-ok {:vintage      "2016"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:state "01" :county "073" :tract "000100"}
-                 :values       ["B01001_001E" "B01001_001M"]}
-        args-big {:vintage      "2016"
-                  :sourcePath   ["acs" "acs5"]
-                  :geoHierarchy {:zip "*"}
-                  :values       ["B01001_001E" "B01001_001M"]}
-        args-na {:vintage      "1991"
-                 :sourcePath   ["acs" "acs5"]
-                 :geoHierarchy {:county "*"}
-                 :values       ["B01001_001E" "B01001_001M"]}
-        =I= (chan 1)
-        =O= (chan 1)
-        =E= (chan 1)
+;  888~~  888 Y88b    /      e    e      888~~
+;  888___ 888  Y88b  /      d8b  d8b     888___
+;  888    888   Y88b/      d888bdY88b    888
+;  888    888   /Y88b     / Y88Y Y888b   888
+;  888    888  /  Y88b   /   YY   Y888b  888
+;  888    888 /    Y88b /          Y888b 888___
+
+
+
+(deftest cfg-Census-Stats-test
+  (let [args-1 {:vintage      "2016"
+                :sourcePath   ["acs" "acs5"]
+                :geoHierarchy {:state "01" :county "073" :tract "000100"}
+                :values       ["B01001_001E" "B01001_001M"]}
+        =args= (chan 1)
+        =cfg=  (chan 1)
         time-in (time-spot)
         heap-in (heap-spot)]
     (test-async-timed
-      "-<IO-pp-census-stats>-test"
+      "cfg-Census-Stats-test"
       time-in
       heap-in
-      (go
-        (>! =I= args-ok)
-        (-<IO-pp-census-stats>- =I= =O= =E=)
-        (is (= (alt! =O= ([res] (apply str res))
-                     =E= ([err] err))
-               "{\"01073000100\" {:properties {:B01001_001E 3111, :B01001_001M 369, :state \"01\", :county \"073\", :tract \"000100\"}}}"))
-        (>! =I= args-na)
-        (-<IO-pp-census-stats>- =I= =O= =E=)
-        (is (= (alt! =O= ([O] O)
-                     =E= ([E] (str "Error: " E)))
-               "Error: ERROR status: 404  for URL https://api.census.gov/data/1991/acs/acs5?get=B01001_001E,B01001_001M&for=county:* ... output empty `{}`"))
-        ;(>! =I= args-big)
-        ;(-<IO-pp-census-stats>- =I= =O= =E=)
-        ;(is (= (alt! =O= ([O] O)
-        ;             =E= ([E] (str "Error: " E)))
-        ;       "")) ; <- Meant to break to test performance (eduction won... this time)
-        (close! =I=)
-        (close! =O=)
-        (close! =E=)))))
+      (go (>! =args= args-1)
+          (cfg-Census-Stats =args= =cfg=)
+          (let [{:keys [url xform getter filter-id]} (<! =cfg=)]
+            (is (= url
+                   "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100"))
+            (is (= (fn? xform)
+                   true))
+            (is (= (fn? getter)
+                   true))
+            (is (= filter-id
+                   :B01001_001E))
+            (close! =args=)
+            (close! =cfg=))))))
 
 
 (run-tests)

@@ -1,24 +1,17 @@
 (ns census.core
   (:require
     [cljs.core.async      :refer-macros [go]
-                          :refer [chan >! <! close! pipeline-async
-                                  promise-chan]
-                          :as <|]
+                          :refer [chan >! <! close! pipeline-async to-chan take!
+                                  put! promise-chan]]
     [defun.core           :refer-macros [defun]]
     [cuerdas.core         :refer [join split]]
-    [census.utils.core    :refer [throw-err err-type I=O<<=IO= ->args $geoKeyMap$
-                                  IO-cache-GET-edn URL-GEOKEYMAP]]
-    [census.wmsAPI.core   :refer [IOE-census-wms Icb<-wms-args<<=IO=]]
-    [census.geoAPI.core   :refer [cfg-Census-GeoCLJ -<IO-pp-census-geos>-
-                                  ids<-$g$<<args]]
-    [census.statsAPI.core :refer [IO-pp->census-stats -<IO-pp-census-stats>-]]
-    [census.merger.core   :refer [IO-merge]]
-    [net.cgrand.xforms    :as x]
+    [census.utils.core    :refer [throw-err err-type =O?>-cb ->args
+                                  $GET$ URL-GEOKEYMAP amap-type]]
+    [census.wmsAPI.core   :refer [=>args=census-wms=args=> I-<wms=I=]]
+    [census.geoAPI.core   :refer [IOE-census-GeoJSON-str pre-cfg-Census-GeoCLJ]]
+    [census.statsAPI.core :refer [IOE->census-stats pre-cfg-Census-Stats]]
+    [census.merger.core   :refer [merge-spooler]]
     [test.fixtures.core   :as ts]))
-    ;[clojure.test         :as test
-    ;                      :refer-macros [async deftest is testing run-tests]]
-    ;[taoensso.tufte       :refer-macros [defnp p profiled profile]
-    ;                      :as tufte]))
 
 
 (def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
@@ -50,55 +43,44 @@
 
 #_(prn ts/args-ok-wms-only)
 
-(defn IO-census
+
+(defn IOE-Census
   [$g$]
-  (fn [=I= =O=]
-    (go (let [args    (<! =I=)
-              deploy  (deploy-census-function args)
-              key-g   (first ((ids<-$g$<-args $g$) args))
-              key-s   (keyword (first (get args :values)))
-              =geos?= (chan 1)]
+  (fn [=I= =O= =E=]
+    (take! =I=
+      (fn [args]
+        (let [deploy (deploy-census-function args)]
           (prn deploy)
           (case deploy
-                :stats+geos
-                (go ((I=O<<=IO= (-<xf+IOE-census-geos>- $g$)) args =geos?=)
-                    (if-let [geos (<! =geos?=)]
-                            (go (close! =geos?=)
-                                (let [=stats= (chan 1)]
-                                     ((I=O<<=IO= -<IO-pp-census-stats>-) args =stats=)
-                                     ((IO-merge [key-g key-s]) [geos (<! =stats=)] =O=)
-                                     (close! =stats=)))
-                      (go (close! =geos?=))))
-                :stats-only ((I=O<<=IO= IOE->census-stats)         args =O=)
-                :geos-only  ((I=O<<=IO= (cfg-Census-GeoCLJ $g$)) args =O=)
-                :geocodes   ((I=O<<=IO= (IOE-census-wms $g$))         args =O=)
-                :no-values  (>! =O= err-no-values)
-                (prn "No matching clause for the arguments provided. Please check arguments against requirements"))))))
+            :stats+geos ((merge-spooler $g$ (to-chan [args]) [pre-cfg-Census-Stats pre-cfg-Census-GeoCLJ]) =O= =E=)
+            :stats-only (IOE->census-stats (to-chan [args]) =O= =E=)
+            :geos-only  ((IOE-census-GeoJSON-str $g$) (to-chan [args]) =O= =E=)
+            :geocodes   ((=>args=census-wms=args=> $g$) (to-chan [args]) =O= =E=)
+            :no-values  (put! =E= err-no-values)
+            (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))))
 
 
-(let [args {:vintage       "2016"
-            :geoHierarchy  {:state "01" :state-legislative-district-_upper-chamber_ "*"}
-            :sourcePath    ["acs" "acs5"]
-            :geoResolution "500k"
-            :values        ["B01001_001E"]}
-      =I= (chan 1)
-      =O= (chan 1 (map throw-err))]
-  (go (>! =I= args)
-      ;(prn args)
-      (IO-census =I= =O=)
-      (prn (<! =O=))
-      (close! =I=)))
-      ;(close! =O=)))
+(def $GET$-geoKeyMap ($GET$ :edn "Unsuccessful fetch for geoKeyMap (configuration)"))
+
+(def =GKM= (promise-chan))
+
+($GET$-geoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM=)
 
 (defn census
   [I cb]
-  (let [=GKM= (chan 1)]
-    ((I=O<<=IO= (IO-cache-GET-edn $geoKeyMap$)) URL-GEOKEYMAP =GKM=)
-    (go (let [$g$ (<! =GKM=)]
-          (close! =GKM=)
-          (((Icb<-wms-args<<=IO= $g$) (IO-census $g$))
-           I
-           (fn [res] (cb (clj->js res))))))))
+  (let [=args=> (chan 1)
+        =O=     (chan 1)
+        =E=     (chan 1)]
+    (take! =GKM=
+           (fn [$g$]
+             ((I-<wms=I= $g$) I =args=>)
+             (take! =args=>
+               (fn [?args]
+                   (if (= (type ?args) amap-type)
+                       (do ((IOE-Census $g$) (to-chan [?args]) =O= =E=)
+                           (take! =O= (fn [r] (cb nil r)))
+                           (take! =E= (fn [e] (cb e nil))))
+                       (cb ?args nil))))))))
 
 
 
@@ -106,15 +88,17 @@
   [args f]
   (let [time-in (js/Date.)]
      (census args
-             (fn [res] (do (f res)
-                           (prn (str "Elapsed ms: "(- (js/Date.) time-in))))))))
+             (fn [err res] (if res
+                             (do (f res)
+                                 (prn (str "Elapsed ms: "(- (js/Date.) time-in))))
+                             (prn "Error: " err))))))
 
 (prn ts/args-ok-s+g-vals)
 (comment
   (test-async-time ts/args-ok-wms-only prn)
   (test-async-time (ts/test-args 9 3 3 0) prn)
-  (test-async-time ts/args-ok-geo-only prn) ; 1st = "Elapsed ms: 22589" 2nd = "Elapsed ms: 18298" 3rd = "Elapsed ms: 37648"
-  (test-async-time ts/args-ok-s+g-v+ps prn) ; "Elapsed ms: 2444"
+  ;(test-async-time ts/args-ok-geo-only prn) ; 1st = "Elapsed ms: 22589" 2nd = "Elapsed ms: 18298" 3rd = "Elapsed ms: 37648"
+  (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; "Elapsed ms: 2444"
   (test-async-time ts/args-ok-s+g-v+ps prn)
   ; { rss: 267894784,
   ;   heapTotal: 243630080,

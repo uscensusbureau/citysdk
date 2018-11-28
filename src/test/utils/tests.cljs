@@ -131,26 +131,6 @@
             (close! =res=))))))
 
 
-(deftest I-<I=-test
-  (let [=O= (chan 1)
-        =I= (chan 1)
-        =E= (chan 1)
-        tfn (fn [=I= =O= =E=] (take! =I= (fn [O] (put! =O= O))))
-        Efn (fn [=I= =O= =E=] (take! =I= (fn [E] (put! =E= E))))]
-    (test-async
-      (go (I-<I= tfn "went through internal =I=" =I= =O= =E=)
-          (is (= (alt! =O= "went through internal =I="
-                       =E= "error! from =E=")
-                 "went through internal =I="))
-          (I-<I= Efn "went through internal =I=" =I= =O= =E=)
-          (is (= (alt! =O= "went through internal =I="
-                       =E= "error! from =E=")
-                 "error! from =E="))
-          (close! =I=)
-          (close! =O=)
-          (close! =E=)))))
-
-
 (deftest =O?>-cb-test
   (let [=I= (chan 1)
         =O= (chan 1)

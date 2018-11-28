@@ -6,7 +6,7 @@
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
-                                xf<< educt<< transduct<< I-<I= =O?>-cb $GET$
+                                xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type]]))
 
@@ -58,7 +58,8 @@
          ["Warning, you are about to make a large GeoJSON request."
           "This may take some time -> consider local data caching."
           "The response may also cause VM heap capacity overflow."
-          "Node heap may be increased via `--max-old-space-size=`"]]
+          "Node heap may be increased via `--max-old-space-size=`"
+          "For all ZCTAs: Use `--max-old-space-size=4096"]]
      (do (doseq [s strs] (prn s))
          (geo-scoper $g$ res vin lev USr STr st)))))
 
@@ -101,11 +102,11 @@
   [$g$]
   (fn [=I= =O= =E=]
     (take! =I=
-           (fn [args]
-             (let [url (geo-url-composer $g$ args)]
-               (if (= "" url)
-                 (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
-                 ($GET$-census-GeoJSON-str (to-chan [url]) =O= =E=)))))))
+      (fn [args]
+        (let [url (geo-url-composer $g$ args)]
+          (if (= "" url)
+            (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
+            ($GET$-census-GeoJSON-str (to-chan [url]) =O= =E=)))))))
 
 
 

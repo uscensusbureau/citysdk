@@ -133,6 +133,7 @@
 ; http://clojure-doc.org/articles/language/concurrency_and_parallelism.html
 ;  http://java.ociweb.com/mark/stm/article.html
 
+
 (defn $GET$
   "
   Takes two initial inputs: the response format desired and an error message,
@@ -170,17 +171,17 @@
                  (put! =res= @$res$))
              :else
              (do (prn "$GET$ data from source:")
-                 (prn (str url))
+                 (prn url)
                  (let [cfg {:error-handler
                             (fn [{:keys [status status-text]}]
                               (do (prn err-log-msg)
                                   (vreset! $url$ url)
                                   (put! =res= {})
                                   (->> (vreset! $err$
-                                         (str "ERROR status: " status
-                                              " " status-text
-                                              " for URL " url
-                                              " ... output empty `{}`"))
+                                                (str "ERROR status: " status
+                                                     " " status-text
+                                                     " for URL " url
+                                                     " ... output empty `{}`"))
                                        (put! =err=))))}]
                    (case format
                      :json
@@ -216,22 +217,9 @@
 
 
 
-
 (def $GET$-json ($GET$ :json "Invalid JSON request..."))
 
 (def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
-
-(defn I-<I=
-  "
-  Takes a function which accepts three `chan`s [=I= =O= =E=] and converts it to a
-   fn with a synchronous input (f I) . If buffer provided, passes that to the
-   internal `chan` (replaces =I=).
-   If buffer and transducer provided, passes those accordingly.
-   "
-  [f I =I= =O= =E=]
-  (go (>! =I= I)
-      (f =I= =O= =E=)))
-
 
 (defn =O?>-cb
   "
@@ -247,8 +235,8 @@
   "
   [f cb =I= =O= =E=]
   (go (f =I= =O= =E=)
-      (alt! =O= ([O] (do (cb nil O)))
-            =E= ([E] (do (cb E nil))))))
+      (alt! =O= ([O] (cb nil O))
+            =E= ([E] (cb E nil)))))
 
 (defn ->args
   [args]
