@@ -5,13 +5,10 @@
                         :refer-macros [go alt!]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
-    ;[net.cgrand.xforms  :as x]
-    ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< I-<I= =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type]]))
-    ;[test.fixtures.core   :refer [*g*]]))
 
 
 (defn geo-error
@@ -176,8 +173,6 @@
                      this})))))
 
 
-; TODO: import IOE-.. and xf-.. to merger and apply them together there
-
 (defn xf-mergeable<-GeoCLJS
   "
   Transducer, which reshapes a GeoJSON 'FeatureCollection' into a shape that's
@@ -188,17 +183,6 @@
     (map #(get % :features)) ; turns a single map into a collection
     (educt<< (xf-mergeable-features $g$ args))))
 
-    ;COUNTIES: "-<IO-pp-census-geos>-test - Heap stats (MB):"
-    ;{:rss 421.85, :heapTotal 392.41, :heapUsed 360.27, :external 29.38}
-    ;"-<IO-pp-census-geos>-test: Elapsed ms= 12354"
-
-    ; (transduct<< (geoid<-feature GEOIDS<-JSON))))
-    ; COUNTIES:  "-<IO-pp-census-geos>-test - Heap stats (MB):"
-    ;{:rss 420.79, :heapTotal 391.41, :heapUsed 364.33, :external 29.39}
-    ;"-<IO-pp-census-geos>-test: Elapsed ms= 10784"
-
-; FIXME: create -<..>- adapter within merger and apply xf-.. to IOE there
-; Article on transducers: http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/
 
 (def $GET$-census-GeoCLJ
   ($GET$ :json "Unsuccessful Census GeoJSON (for merge) request"))
@@ -210,16 +194,16 @@
   "
   [$g$]
   (fn [=args= =cfg=]
-    (prn "In cfg-Census-GeoCLJ")
     (take! =args=
-           (fn [args]
-             (let [url   (geo-url-composer $g$ args)
-                   xform (xf-mergeable<-GeoCLJS $g$ args)]
-               (if (= "" url)
-                 (put! =cfg= "Invalid GeoJSON request. Please check arguments against requirements.")
-                 (do (prn "putting -> =cfg= inside cfg-Census-GeoCLJ")
-                     (put! =cfg= {:url    url
-                                  :xform  xform
-                                  :getter $GET$-census-GeoCLJ}))))))))
+      (fn [args]
+        (let [url   (geo-url-composer $g$ args)
+              xform (xf-mergeable<-GeoCLJS $g$ args)
+              g-key (first (GEOIDS<-$g$<-args $g$ args))]
+          (if (= "" url)
+              (put! =cfg= "Invalid GeoJSON request. Please check arguments against requirements.")
+              (put! =cfg= {:url       url
+                           :xform     xform
+                           :getter    $GET$-census-GeoCLJ
+                           :filter-id g-key})))))))
 
 (def pre-cfg-Census-GeoCLJ [cfg-Census-GeoCLJ true])

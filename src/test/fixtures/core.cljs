@@ -36,9 +36,9 @@
              {}
              (merge-with - heap-out heap-in)))
 
-(merge-with -
-  {:rss 92.88, :heapTotal 53.84, :heapUsed 44.76, :external 0.05}
-  {:rss 61.88, :heapTotal 42.84, :heapUsed 31.76, :external 0.04})
+#_(merge-with -
+    {:rss 92.88, :heapTotal 53.84, :heapUsed 44.76, :external 0.05}
+    {:rss 61.88, :heapTotal 42.84, :heapUsed 31.76, :external 0.04})
 
 (defn test-async-timed
   "Asynchronous test awaiting ch to produce a value or close."
