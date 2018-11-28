@@ -7,8 +7,7 @@
                                   time-spot heap-spot]]
     [census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
     [census.statsAPI.core :refer [pre-cfg-Census-Stats]]
-    [census.geoAPI.core   :refer [xf-mergeable<-geojson
-                                  pre-cfg-Census-GeoCLJ]]
+    [census.geoAPI.core   :refer [pre-cfg-Census-GeoCLJ]]
     [census.merger.core   :refer [deep-merge-with
                                   xf-deep-merge
                                   xf-remove-unmerged
@@ -234,7 +233,7 @@
                 :values        ["B01001_001E" "B01001_001M"]}
         args-3 {:sourcePath    ["acs" "acs5"]
                 :vintage       "2016"
-                :geoHierarchy  {:state "12":state-legislative-district-_upper-chamber_ "*"}
+                :geoHierarchy  {:zip-code-tabulation-area "*"}
                 :geoResolution "500k"
                 :values        ["B01001_001E" "B01001_001M"]}
         time-in (time-spot)
@@ -246,16 +245,16 @@
       (go (let [=args= (promise-chan)
                 =O= (chan 1) ;(educt<< (xf-group->merge->filter [s-key g-key])))
                 =E= (chan 1)]
-            (>! =args= args-1)
+            (>! =args= args-3)
             ((merge-spooler =args= [pre-cfg-Census-Stats pre-cfg-Census-GeoCLJ]) =O= =E=)
-            (is (= (alt! =O= ([data] (js/JSON.stringify (js-obj "type" "FeatureCollection"
-                                                                "features" (clj->js data))))
+            (is (= (alt! =O= ([data] (js/console.log (js/JSON.stringify (js-obj "type" "FeatureCollection"
+                                                                                "features" (clj->js data)))))
                          =E= ([err]  err)))
                 ARGS-1-JS-RES)
-            ((merge-spooler =args= [pre-cfg-Census-Stats pre-cfg-Census-GeoCLJ]) =O= =E=)
-            (is (= (alt! =O= ([data] data)
-                         =E= ([err]  err)))
-                ARGS-1-CLJ-RES)
+            ;((merge-spooler =args= [pre-cfg-Census-Stats pre-cfg-Census-GeoCLJ]) =O= =E=)
+            ;(is (= (alt! =O= ([data] data)
+            ;             =E= ([err]  err)))
+            ;    ARGS-1-CLJ-RES)
             (close! =args=)
             (close! =O=)
             (close! =E=))))))
@@ -280,6 +279,18 @@
 ; "merge-spooler-test - Heap stats (MB):"
 ;{:rss 310.68, :heapTotal 278.92, :heapUsed 259.22, :external 29.41}
 ;"merge-spooler-test: Elapsed ms= 6588"
+
+; ; TODO: HAVE TO INCREASE HEAP TO 4G
+; From source (all :zip-code-tabulation-area - stringified):
+; "merge-spooler-test - Heap stats (MB):"
+;{:rss 3087.4, :heapTotal 2979.65, :heapUsed 2913.22, :external 98.74}
+;"merge-spooler-test: Elapsed ms= 123062"
+
+; From cache (all :zip-codes - stringified):
+; "merge-spooler-test - Heap stats (MB):"
+;{:rss 976.56, :heapTotal 1014.16, :heapUsed 861.99, :external 98.65}
+;"merge-spooler-test: Elapsed ms= 111716"
+;
 ;; =======================================
 
 (run-tests)
