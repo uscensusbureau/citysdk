@@ -13,14 +13,54 @@
 (defn read-edn [path] (read-string (str (fs/readFileSync path))))
 
 (def stats-key (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
-(prn stats-key)
+;(prn stats-key)
 (def *g* (read-edn "./src/configs/geojson/index.edn"))
+
+(defn time-spot [] (js/Date.))
 
 (defn test-async
   "Asynchronous test awaiting ch to produce a value or close."
   [=test=]
   (async done
     (take! =test= (fn [_] (done)))))
+
+(defn heap-spot
+  []
+  (reduce-kv #(assoc %1 (keyword %2) (/ %3 1024 1024))
+             {}
+             (js->clj (js/process.memoryUsage))))
+
+(defn heap-diff
+  [heap-out heap-in]
+  (reduce-kv #(assoc %1 (keyword %2) (/ (js/Math.round (* 100 %3)) 100))
+             {}
+             (merge-with - heap-out heap-in)))
+
+#_(merge-with -
+    {:rss 92.88, :heapTotal 53.84, :heapUsed 44.76, :external 0.05}
+    {:rss 61.88, :heapTotal 42.84, :heapUsed 31.76, :external 0.04})
+
+(defn test-async-timed
+  "Asynchronous test awaiting ch to produce a value or close."
+  ([test-name time-in =test=] (test-async-timed test-name time-in nil =test=))
+  ([test-name time-in heap-in =test=]
+   (async done
+     (take! =test=
+            (fn [_]
+              (do (if-let [heap-before heap-in]
+                    (do (prn (str test-name " - Heap stats (MB):"))
+                        (prn (heap-diff (heap-spot) heap-before)))
+                    nil)
+                  (prn (str test-name ": Elapsed ms= "(- (js/Date.) time-in)))
+                  (done)))))))
+
+
+#_(defn test-async-time
+    [afn args f]
+    (let [time-in (js/Date.)]
+      (afn args
+           (fn [res] (do (f res)
+                         (prn (str "Elapsed ms: "(- (js/Date.) time-in))))))))
 
 
 (defn Icb<==IO=fixture
@@ -126,7 +166,7 @@
 (def args-ok-wms-only (test-args 9 2 4 0))
 #_{:vintage     "2016",
    :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}}
-
+;(prn args-ok-wms-only)
 
 (def args-na-wms-only (test-args 9 0 4 0))
 #_{:vintage "2016",
@@ -222,32 +262,32 @@
         args-ok-s+g-vals
         args-ok-geo-only])
 
-(comment
-  { vintage: 2014,
-    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*'}}
-  { vintage: 2016,
-    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
-    sourcePath: [ 'acs', 'acs5' ],
-    geoResolution: '5m',
-    predicates: { B00001_001E: '0:1000000' },
-    values: [ 'B01001_001E']}
-  { vintage: '2015',
-    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
-    sourcePath: [ 'cbp' ],
-    values: [ 'ESTAB']}
-  { vintage: '2015',
-     geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
-     sourcePath: [ 'cbp' ],
-     geoResolution: '20m',
-     values: [ 'ESTAB']}
-  { vintage: 2014,
-    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*' },
-    geoResolution: '500k'}
-  { vintage: 2016,
-   sourcePath: [ 'acs', 'acs5' ],
-   values: [ 'B25001_001E' ],
-   geoHierarchy: { 'zip-code-tabulation-area': '*' },
-   geoResolution: '500k',})
+;(comment
+;  { vintage: 2014,
+;    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*'}}
+;  { vintage: 2016,
+;    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+;    sourcePath: [ 'acs', 'acs5' ],
+;    geoResolution: '5m',
+;    predicates: { B00001_001E: '0:1000000' },
+;    values: [ 'B01001_001E']}
+;  { vintage: '2015',
+;    geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+;    sourcePath: [ 'cbp' ],
+;    values: [ 'ESTAB']}
+;  { vintage: '2015',
+;     geoHierarchy: { county: { lat: 28.2639, lng: -80.7214 } },
+;     sourcePath: [ 'cbp' ],
+;     geoResolution: '20m',
+;     values: [ 'ESTAB']}
+;  { vintage: 2014,
+;    geoHierarchy: { state: { lat: 28.2639, lng: -80.7214 }, county: '*' },
+;    geoResolution: '500k'}
+;  { vintage: 2016,
+;   sourcePath: [ 'acs', 'acs5' ],
+;   values: [ 'B25001_001E' ],
+;   geoHierarchy: { 'zip-code-tabulation-area': '*' },
+;   geoResolution: '500k',})
 
 
 

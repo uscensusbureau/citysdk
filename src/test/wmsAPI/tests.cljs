@@ -1,22 +1,24 @@
 (ns test.wmsAPI.tests
   (:require
-    [cljs.core.async    :refer [chan promise-chan close! >! <! pipeline]
-                        :refer-macros [go]]
+    [cljs.core.async    :refer [chan promise-chan close! >! <! pipeline
+                                take! put! timeout to-chan]
+                        :refer-macros [go alt!]]
     [cljs.test          :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core :refer [*g* test-async Icb<==IO=fixture]
                         :as ts]
-    [census.wmsAPI.core :refer [geoKey->wms-config
+    [census.wmsAPI.core :refer [$g$->wms-cfg
                                 lookup-id->match?
                                 search-id->match?
                                 wms-url-builder
                                 configed-map
                                 try-census-wms
                                 wms-engage?
-                                IO-census-wms
-                                Icb<-wms-args<<=IO=]]))
+                                =>args=census-wms=args=>
+                                I-<wms=I=
+                                censusWMS]]))
 
 (deftest geoKey->wms-config-test
-  (is (= (geoKey->wms-config *g* ts/args-ok-wms-only)
+  (is (= ($g$->wms-cfg *g* ts/args-ok-wms-only)
          {:vintage 2014,
           :layers ["82"],
           :cur-layer-idx 0,
@@ -25,6 +27,7 @@
           :sub-level [:county "*"],
           :geo [:STATE],
           :lookup-up-in :2010})))
+
 
 (deftest lookup-id->match?-test
   (is (= (lookup-id->match? :CONCITY    ; ↓ seq'd inverted geoKeyMap ↓
@@ -66,12 +69,26 @@
       [:features 0 :attributes])))
 
 (deftest try-census-wms-test
-  (let [=O= (promise-chan)]
-    (test-async ; NTS: test-async needs to enclose the `go` directly
+  (let [=O= (chan 1)]
+    (test-async
       (go (try-census-wms *g* ts/args-ok-wms-only 0 =O=)
-          (is (= (<! =O=)
-                 {:STATE {:state "12"}}))
-          (close! =O=)))))
+          (let [res (<! =O=)]
+            (is (= res
+                   {:STATE {:state "12"}}))
+            (close! =O=))))))
+
+(deftest test-atom-via-chan
+  (let [=O= (chan 1)
+        $A$ (atom {})]
+    (test-async
+      (go (>! =O= (reset! $A$ {:key "val"}))
+          (let [res (<! =O=)]
+            (is (= res
+                   {:key "val"}))
+            (>! =O= @$A$)
+            (is (identical? (<! =O=)
+                            res))
+            (close! =O=))))))
 
 (deftest wms-engage?-test
   (is (and (= (wms-engage? {:geoHierarchy {:county {:lat 1 :lng -7} :tract "*"}})
@@ -80,31 +97,56 @@
               false))))
 
 
-(deftest IO-census-wms-test
+(deftest =>args=census-wms=args=>-test
   (let [args-in {:vintage     "2017",
                  :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
-        =args-in=  (chan 1)
-        =args-out= (promise-chan)]
+        =>args= (chan 1)
+        =args=> (chan 1)]
     (test-async
-      (go (>! =args-in= args-in)
-          (IO-census-wms =args-in= =args-out=)
-          (is (= (<! =args-out=)
+      (go (>! =>args= args-in)
+          ((=>args=census-wms=args=> *g*) =>args= =args=>)
+          (is (= (<! =args=>)
                  {:vintage "2017",
                   :geoHierarchy {:state "51", :county "*"}}))
-          (close! =args-in=)
-          (close! =args-out=)))))
+          (close! =>args=)
+          (close! =args=>)))))
 
 
-(deftest Icb<-wms-args<<=IO=-test
+(deftest I-<wms=I=-test
   (let [args-in {:vintage     "2017",
-                 :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}]
-    (async done
-      ((Icb<-wms-args<<=IO= Icb<==IO=fixture)
-       args-in
-       (fn [args-out]
-         (is (= args-out
-                {:vintage "2017",
-                 :geoHierarchy {:state "51", :county "*"}}))
-         (done))))))
+                 :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
+        args-na {:vintage     "1997"
+                 :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
+        =args=> (chan 1)]
+    (test-async
+      (go ((I-<wms=I= *g*) args-in =args=>)
+          (is (= (<! =args=>)
+                 {:vintage "2017",
+                  :geoHierarchy {:state "51", :county "*"}}))
+          ((I-<wms=I= *g*) args-na =args=>)
+          (is (= (<! =args=>)
+                 "No FIPS (Census geocodes) found for given arguments"))
+          (close! =args=>)))))
+
+(deftest censusWMS-test
+  (let [args-in (clj->js {:vintage     "2017",
+                          :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
+                         :keywordize-keys true)
+        args-na {:vintage     "1997"
+                 :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
+        $r$ (atom "")
+        tcb (fn [E O] (if-let [err E]
+                        (reset! $r$ err)
+                        (reset! $r$ O)))]
+    (test-async
+      (go ((censusWMS *g*) args-in tcb)
+          (<! (timeout 1000))
+          (is (= @$r$
+                 {:vintage "2017",
+                  :geoHierarchy {:state "51", :county "*"}}))
+          ((censusWMS *g*) args-na tcb)
+          (<! (timeout 1000))
+          (is (= @$r$
+                 "No FIPS (Census geocodes) found for given arguments"))))))
 
 (run-tests)
