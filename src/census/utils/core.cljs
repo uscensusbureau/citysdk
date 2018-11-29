@@ -180,8 +180,7 @@
                                   (->> (vreset! $err$
                                                 (str "ERROR status: " status
                                                      " " status-text
-                                                     " for URL " url
-                                                     " ... output empty `{}`"))
+                                                     " for URL " url))
                                        (put! =err=))))}]
                    (case format
                      :json

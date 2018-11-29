@@ -3,28 +3,34 @@
     [cljs.core.async    :refer [>! <! chan close! to-chan pipeline onto-chan
                                 take! put!]
                         :refer-macros [go alt!]]
-    [cuerdas.core       :refer [join]]
+    [cuerdas.core       :refer [join]
+                        :refer-macros [istr]]
     [defun.core         :refer-macros [defun]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type]]))
 
-
 (defn geo-error
   [$g$ res vin lev]
-  (let [e [(str "No GeoJSON found for " (name lev) " at this scope")
-           (str "in vintage: " vin)
-           (str "at resolution: " res)]]
+  (let [e-gen
+        [(str "No GeoJSON found for: '" (keys->strs (name lev)) "'")
+         (str "at this scope in vintage: " vin)
+         (str "at resolution: " res)]]
     (if-let [vins (get-in $g$ [lev])]
-      (-> (conj e
-            (str "For " (str lev) " try one of the following `{:<vintage> {:<scopes> ...`")
-            [(map-over-keys #(get-in % [:scopes]) vins)]))
-      (-> (conj e
-            (str "Sorry, there is no GeoJSON for " (name lev) " available.")
-            "Try one of these instead: "
-            (vec (map #(keys->strs (name (key %)))
-                      $g$)))))))
+      (let [e-try
+            [(str "For '" (keys->strs (name lev)) "' try of of the following:")
+             (str "=== :us = nation-level '" (name lev) "' geoResolution ===")
+             (str "=== :st = state-levels '" (name lev) "' geoResolution ===")]]
+        (do (doseq [e e-gen] (prn e))
+            (doseq [t e-try] (prn t))
+            (doseq [s (vec (map-over-keys #(get-in % [:scopes]) vins))] (prn s))
+            ""))
+      (let [e-NA "=== available geoHierarchy levels ==="]
+        (do (doseq [e e-gen] (prn e))
+            (prn e-NA)
+            (doseq [s (vec (map #(keys->strs (name (key %))) $g$))] (prn s))
+            "")))))
 
 
 (defn geo-url-builder
@@ -68,7 +74,7 @@
   Takes a pattern of maps and triggers the URL builder accordingly
   "
   ([$g$ ["500k"         vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]] (lg-warn->geo $g$ "500k" vin :zip-code-tabulation-area USr)) ; big!
-  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (geo-error    $g$ res vin :zip-code-tabulation-area)) ; no other than 500k
+  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (geo-error    $g$ res vin :zip-code-tabulation-area)) ; only 500k
   ([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (lg-warn->geo $g$ res vin :county USr)) ; big!
   ([$g$ [res            vin _   [lev _  ]                     nil               ]] (geo-error    $g$ res vin lev))     ; no valid geography
   ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (geo-error    $g$ res vin lev))     ; tries US, only states

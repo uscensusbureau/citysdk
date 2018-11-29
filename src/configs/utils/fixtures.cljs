@@ -7,6 +7,9 @@
 (defn read-edn [path]
   (read-string (str (fs/readFileSync path))))
 
+; TODO: ? https://github.com/loganpowell/census-geojson/blob/44b621e173952d7a349267f0a5cf946b591c291b/src/census/core.cljs
+; If users want a simple way to save the file on Node...
+
 (defn config->mkdirp->fsW!
   "
   Takes some configs.geojson and a directory and - internally - calls Node `fs/writeFile`
