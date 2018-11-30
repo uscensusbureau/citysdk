@@ -11,7 +11,7 @@
                                 big-G
                                 G-patterner
                                 G-pattern-cfg
-                                C-G-dispatch->
+                                C-G-pattern->url
                                 IOE-C-GeoJSON
                                 GEOIDS<-$g$<-args
                                 xf-mergeable-features
@@ -89,7 +89,7 @@
            :st ["500k"]}])))
 
 (deftest geo-url-composer-test
-  (is (= (C-G-dispatch-> *g* TEST-ARGS-1)
+  (is (= (C-G-pattern->url *g* TEST-ARGS-1)
          "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/12/state-legislative-district-_upper-chamber_.json")))
 
 (def TEST-ARGS-2

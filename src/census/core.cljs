@@ -5,7 +5,7 @@
     [defun.core           :refer-macros [defun]]
     [census.utils.core    :refer [throw-err err-type =O?>-cb ->args
                                   $GET$ URL-GEOKEYMAP amap-type]]
-    [census.wmsAPI.core   :refer [=>args=C-GIS=args=> I-<wms=I=]]
+    [census.wmsAPI.core   :refer [=>args=GIS=args=> I-<wms=I=]]
     [census.geoAPI.core   :refer [IOE-C-GeoJSON cfg>cfg=C-GeoCLJ]]
     [census.statsAPI.core :refer [IOE-C-S->JSON cfg>cfg=C-Stats]]
                                   ;IOE-C->stats ]]
@@ -51,14 +51,14 @@
           (prn deploy)
           (case deploy
             :stats+geos ((I=OE-M-spooler $g$ (to-chan [args]) [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ]) =O= =E=)
-            :stats-only (IOE-C-S->JSON (to-chan [args]) =O= =E=)
+            :stats-only (IOE-C-S->JSON       (to-chan [args]) =O= =E=)
             :geos-only  ((IOE-C-GeoJSON $g$) (to-chan [args]) =O= =E=)
-            :geocodes   ((=>args=C-GIS=args=> $g$) (to-chan [args]) =O= =E=)
+            :geocodes   ((=>args=GIS=args=> $g$) (to-chan [args]) =O= =E=)
             :no-values  (put! =E= err-no-vals)
             (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))))
 
 
-(def $GET$-GeoKeyMap ($GET$ :edn "Unsuccessful fetch for geoKeyMap (configuration)"))
+(def $GET$-GeoKeyMap ($GET$ :edn "Unsuccessful fetch for configuration."))
 
 (def =GKM= (promise-chan))
 
@@ -76,8 +76,8 @@
           (fn [?args]
             (if (= (type ?args) amap-type)
                 (do ((IOE-Census $g$) (to-chan [?args]) =O= =E=)
-                    (take! =O= (fn [r] (cb nil r))))
-                    ;(take! =E= (fn [e] (cb e nil))))
+                    (take! =O= (fn [r] (cb nil r)))
+                    (take! =E= (fn [e] (cb e nil))))
                 (cb ?args nil))))))))
 
 

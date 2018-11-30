@@ -147,7 +147,7 @@
 
 
 
-(defn =>args=C-GIS=args=>
+(defn =>args=GIS=args=>
   "
   Fetches a remote geoKeyMap resource and caches it to local atom ($geoKeyMap$)
   then tries to find the appropriate geographic identifiers for a provided
@@ -188,7 +188,7 @@
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [I =args=>]
-    ((=>args=C-GIS=args=> $g$) (to-chan [(->args I)]) =args=>)))
+    ((=>args=GIS=args=> $g$) (to-chan [(->args I)]) =args=>)))
 
 ;(defn censusWMS
 ;  "

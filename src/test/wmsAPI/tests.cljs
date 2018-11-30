@@ -13,7 +13,7 @@
                                 configed-map
                                 try-census-wms
                                 wms-engage?
-                                =>args=C-GIS=args=>
+                                =>args=GIS=args=>
                                 I-<wms=I=
                                 censusWMS]]))
 
@@ -104,7 +104,7 @@
         =args=> (chan 1)]
     (test-async
       (go (>! =>args= args-in)
-          ((=>args=C-GIS=args=> *g*) =>args= =args=>)
+          ((=>args=GIS=args=> *g*) =>args= =args=>)
           (is (= (<! =args=>)
                  {:vintage "2017",
                   :geoHierarchy {:state "51", :county "*"}}))
