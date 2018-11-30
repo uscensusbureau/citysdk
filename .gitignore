@@ -3,3 +3,5 @@ node_modules
 .shadow-cljs
 .env
 .gitattributes
+.nrepl-port
+pom.xml

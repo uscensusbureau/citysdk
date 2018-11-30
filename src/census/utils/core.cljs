@@ -167,12 +167,12 @@
                  (put! =err= @$err$)
                  (vreset! $err$ {})) ; <- if internets have failed, allow retry
              (and (= url @$url$) (empty? @$err$))
-             (do (prn "Getting data from cache:")
-                 (prn url)
+             (do (when (not silent?) (do (prn "Getting data from cache:")
+                                         (prn url)))
                  (put! =res= @$res$))
              :else
-             (do (prn "Getting data from source:")
-                 (prn url)
+             (do (when (not silent?) (do (prn "Getting data from source:")
+                                         (prn url)))
                  (let [cfg {:error-handler
                             (fn [{:keys [status status-text]}]
                               (do (prn err-log-msg)
