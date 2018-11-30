@@ -156,7 +156,8 @@
         $err$ (volatile! {})]
     (fn
       ([=url= =res=] (($GET$ format err-log-msg) =url= =res= (chan 1 (map throw-err))))
-      ([=url= =res= =err=]
+      ([=url= =res= =err=] (($GET$ format err-log-msg) =url= =res= =err= false))
+      ([=url= =res= =err= silent?] ; TODO: Silence logging for config
        (take!
          =url=
          (fn [url]

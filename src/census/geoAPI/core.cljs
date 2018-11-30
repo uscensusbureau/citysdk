@@ -39,7 +39,7 @@
      (str (join "/" [URL-GEOJSON res vin st (name lev)]) ".json"))))
 
 (defn scope
-  ([$g$ res vin lev USr]     (scope $g$ res vin lev USr nil nil))
+  ([$g$ res vin lev USr]     (scope $g$ res vin lev USr nil))
   ([$g$ res vin lev USr STr] (scope $g$ res vin lev USr STr nil))
   ([$g$ res vin lev USr STr st]
    (let [STr? (not (nil? (some #(= res %) STr)))
@@ -54,7 +54,7 @@
 
 ; FIXME: Can we do without this?
 (defn big-G
-  ([$g$ res vin lev USr]     (big-G $g$ res vin lev USr nil nil))
+  ([$g$ res vin lev USr]     (big-G $g$ res vin lev USr nil))
   ([$g$ res vin lev USr STr] (big-G $g$ res vin lev USr STr nil))
   ([$g$ res vin lev USr STr st]
    (let [strs
@@ -72,7 +72,7 @@
   "
   ([$g$ ["500k"         vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
-  ([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
+  ;([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
   ([$g$ [res            vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
   ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
   ([$g$ [res            vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
