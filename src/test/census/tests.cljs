@@ -51,7 +51,7 @@
                     :statsKey ts/stats-key}
                    prn)
 
-  (test-async-time {:vintage 2016                      ; :stats+geos ms = 22034
+  (test-async-time {:vintage 22                      ; :stats+geos ms = 22034
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:county "*"}

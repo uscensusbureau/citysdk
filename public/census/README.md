@@ -59,7 +59,7 @@ census(
       }
     }
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 // -> {"vintage":"2015","geoHierarchy":{"state":"12","county":"009"}}
@@ -84,7 +84,7 @@ census(
       "county" : "*"      // <- syntax = "<descendant>" : "*"
     }
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 // -> {"vintage":"2015","geoHierarchy":{"state":"12","county":"*"}}
@@ -129,7 +129,7 @@ census(
     "sourcePath" : ["cbp"],  // required 
     "values" : ["ESTAB"]     // required 
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 // -> [{"ESTAB":13648,"state":"12","county":"009"}]
@@ -185,7 +185,7 @@ census(
     "values" : ["ESTAB"],          // required 
     "statsKey" : "<your key here>" // required for > 500 calls per day
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 // -> [{"ESTAB":13648,"state":"12","county":"009"}]
@@ -206,17 +206,17 @@ census(
   {
     "vintage" : "2017",
     "geoHierarchy" : {
-      "state" : "51"
+      "state" : "51",
       "county" : "*"
     },
-    "sourcePath" : ["acs" "acs1"],  
-    "values" : ["NAME"]             
+    "sourcePath" : ["acs", "acs1"],  
+    "values" : ["NAME"],            
     "predicates" : {                
         "B01001_001E" : "0:100000"  // number range separated by `:`
     },
     "statsKey" : "<your key here>"
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 /* -> 
@@ -259,12 +259,12 @@ census(
   {
     "vintage" : "2017",
     "geoHierarchy" : {
-      "state" : "51"
+      "state" : "51",
       "county" : "*"
     },
     "geoResolution" : "500k"
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 ```
@@ -289,18 +289,18 @@ census(
   {
     "vintage" : "2017",
     "geoHierarchy" : {
-      "state" : "51"
+      "state" : "51",
       "county" : "*"
     },
-    "sourcePath" : ["acs" "acs1"],  
-    "values" : ["NAME"]             
+    "sourcePath" : ["acs", "acs1"],  
+    "values" : ["NAME"],             
     "predicates" : {                // optional  
         "B01001_001E" : "0:100000"  
     },
     "statsKey" : "<your key here>",
     "geoResolution" : "500k"
   }, 
-  (r) => console.log(r)
+  (err, res) => console.log(res)
 )
 
 ```

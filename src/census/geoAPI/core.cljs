@@ -17,8 +17,8 @@
     (if-let [vins (get-in $g$ [lev])]
       (let [e-try
             [(str "For '" (keys->strs (name lev)) "' try of of the following:")
-             (str "=== :us = nation-level '" (name lev) "' geoResolution ===")
-             (str "=== :st = state-levels '" (name lev) "' geoResolution ===")]]
+             (str "=== :us = nation-level '" (name lev) "' geoResolutions ===")
+             (str "=== :st = state-levels '" (name lev) "' geoResolutions ===")]]
         (do (doseq [e e-gen] (prn e))
             (doseq [t e-try] (prn t))
             (doseq [s (vec (map-over-keys #(get-in % [:scopes]) vins))] (prn s))
@@ -90,7 +90,7 @@
         pattern   [geoResolution vintage state level geoScopes]]
     pattern))
 
-(defn C-G-dispatch->
+(defn C-G-pattern->url
   [$g$ args]
   (->> (G-pattern-cfg $g$ args)
        (G-patterner $g$)))
@@ -106,7 +106,7 @@
   (fn [=I= =O= =E=]
     (take! =I=
       (fn [args]
-        (let [url (C-G-dispatch-> $g$ args)]
+        (let [url (C-G-pattern->url $g$ args)]
           (if (= "" url)
             (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
             ($GET$-C-GeoJSON (to-chan [url]) =O= =E=)))))))
@@ -123,7 +123,7 @@
     ([args cb url?]
      (if url?
        ((Icb<-wms-args<<=IO= IOE-census-GeoJSON) args
-         #(cb #js {:url      (C-G-dispatch-> {} args)
+         #(cb #js {:url      (C-G-pattern->url {} args)
                    :response (js/JSON.stringify (clj->js %))}))
        ((Icb<-wms-args<<=IO= IOE-census-GeoJSON) args
          #(cb (js/JSON.stringify (clj->js %)))))))
@@ -201,7 +201,7 @@
   (fn [=args= =cfg=]
     (take! =args=
       (fn [args]
-        (let [url   (C-G-dispatch-> $g$ args)
+        (let [url   (C-G-pattern->url $g$ args)
               xform (xf-mergeable<-GeoCLJS $g$ args)
               g-key (first (GEOIDS<-$g$+args $g$ args))]
           (if (= "" url)
