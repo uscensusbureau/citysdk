@@ -62,7 +62,7 @@
 
 (def =GKM= (promise-chan))
 
-($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM=)
+($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= :silent)
 
 (defn census
   [I cb]
