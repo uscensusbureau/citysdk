@@ -1,6 +1,6 @@
 {
   "name": "census-js",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "census.js",
   "scripts": {

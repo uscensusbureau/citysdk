@@ -155,8 +155,7 @@
         $res$ (volatile! [])
         $err$ (volatile! {})]
     (fn
-      ([=url= =res=] (($GET$ format err-log-msg) =url= =res= (chan 1 (map throw-err))))
-      ([=url= =res= =err=] (($GET$ format err-log-msg) =url= =res= =err= false))
+      ([=url= =res= =err=] (($GET$ format err-log-msg) =url= =res= =err= nil))
       ([=url= =res= =err= silent?] ; TODO: Silence logging for config
        (take!
          =url=
@@ -167,12 +166,12 @@
                  (put! =err= @$err$)
                  (vreset! $err$ {})) ; <- if internets have failed, allow retry
              (and (= url @$url$) (empty? @$err$))
-             (do (when (not silent?) (do (prn "Getting data from cache:")
-                                         (prn url)))
+             (do (when (nil? silent?) (do (prn "Getting data from cache:")
+                                          (prn url)))
                  (put! =res= @$res$))
              :else
-             (do (when (not silent?) (do (prn "Getting data from source:")
-                                         (prn url)))
+             (do (when (nil? silent?) (do (prn "Getting data from source:")
+                                          (prn url)))
                  (let [cfg {:error-handler
                             (fn [{:keys [status status-text]}]
                               (do (prn err-log-msg)
