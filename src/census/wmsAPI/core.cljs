@@ -64,12 +64,12 @@
            inverted-geoKeyMap))))
 
 
-(defn wms-url-builder
+(defn C->GIS-url
   "
   Constructs a URL for the TigerWeb Web Mapping Service (WMS) using a lookup
   from the geoKeyMap configuration file cross-referenced against the users args.
   "
-  ([$g$ args] (wms-url-builder $g$ args 0))
+  ([$g$ args] (C->GIS-url $g$ args 0))
   ([$g$ args server-index]
    (let [{:keys [vintage layers cur-layer-idx lat lng geo]}
          ($g$->wms-cfg $g$ args server-index)]
@@ -127,7 +127,7 @@
   [$g$ args server-idx =res=]
   (let [=args=> (chan 1 (map #(configed-map $g$
                                 (get-in % [:features 0 :attributes]))))
-        url     (wms-url-builder $g$ args server-idx)]
+        url     (C->GIS-url $g$ args server-idx)]
     ($GET$-wms (to-chan [url]) =args=> =args=>)
     (take! =args=> (fn [args->] (do (put! =res= args->)
                                     (close! =args=>))))))
@@ -147,7 +147,7 @@
 
 
 
-(defn =>args=census-wms=args=>
+(defn =>args=C-GIS=args=>
   "
   Fetches a remote geoKeyMap resource and caches it to local atom ($geoKeyMap$)
   then tries to find the appropriate geographic identifiers for a provided
@@ -188,21 +188,21 @@
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [I =args=>]
-    ((=>args=census-wms=args=> $g$) (to-chan [(->args I)]) =args=>)))
+    ((=>args=C-GIS=args=> $g$) (to-chan [(->args I)]) =args=>)))
 
-(defn censusWMS
-  "
-  Provided a synchronous input and callback API to IO-census-wms. If JSON is
-  supplied, converts it to clj construct for internal use.
-  "
-  [$g$]    ; takes an async I/O function
-  (fn [I cb]
-    (let [=>args= (promise-chan (map ->args))
-          =args=> (chan 1)]
-      (go (>! =>args= I)
-          ((=>args=census-wms=args=> $g$) =>args= =args=>)
-          (cb (<! =args=>))
-          (close! =>args=)
-          (close! =args=>)))))
+;(defn censusWMS
+;  "
+;  Provided a synchronous input and callback API to IO-census-wms. If JSON is
+;  supplied, converts it to clj construct for internal use.
+;  "
+;  [$g$]    ; takes an async I/O function
+;  (fn [I cb]
+;    (let [=>args= (promise-chan (map ->args))
+;          =args=> (chan 1)]
+;      (go (>! =>args= I)
+;          ((=>args=census-wms=args=> $g$) =>args= =args=>)
+;          (cb (<! =args=>))
+;          (close! =>args=)
+;          (close! =args=>)))))
 
 

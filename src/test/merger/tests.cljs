@@ -6,13 +6,13 @@
     [test.fixtures.core   :refer [*g* test-async test-async-timed
                                   time-spot heap-spot]]
     [census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
-    [census.statsAPI.core :refer [pre-cfg-Census-Stats]]
-    [census.geoAPI.core   :refer [pre-cfg-Census-GeoCLJ]]
-    [census.merger.core   :refer [deep-merge-with-coll
+    [census.statsAPI.core :refer [cfg>cfg=C-Stats]]
+    [census.geoAPI.core   :refer [cfg>cfg=C-GeoCLJ]]
+    [census.merger.core   :refer [deep-merge-a-coll
                                   remove-unmerged
-                                  xf-group-merge-filter
-                                  xf-group-merge-filter->JSON
-                                  merge-spooler]]))
+                                  xf<-Grands->JS
+                                  xf-Grands-M->JSON
+                                  I=OE-M-spooler]]))
 
 
 ;==========================================
@@ -80,10 +80,8 @@
                        :coordinates [[[-85.748032 31.619181]
                                       [-85.729832 31.632373]]]}}})
 
-(get-in INSIDE-x-into->deep-merge-with-2 [0 :properties])
 
-
-(transduce (xf-group-merge-filter->JSON [:GEOID :B01001_001E]) conj CONCATED-LIST)
+(transduce (xf-Grands-M->JSON [:GEOID :B01001_001E]) conj CONCATED-LIST)
 
 (def GROUPED-LIST
   {'("12040") [{"12040" {:type       "Feature",
@@ -118,38 +116,38 @@
                                       :state                                      "12",
                                       :state-legislative-district-_upper-chamber_ "036"}}}]})
 
-
-(deftest group-by-keys-test
-  (is (= (group-by-keys CONCATED-LIST)
-         GROUPED-LIST)))
-
-(deftest deep-merge-with-test
-  (is (= (deep-merge-with-seq
-           {"12040" {:type       "Feature",
-                     :properties {:STATEFP "01",
-                                  :GEOID   "01005",
-                                  :STATE   "123",
-                                  :COUNTY  "456"},
-                     :geometry   {:type        "Polygon",
-                                  :coordinates [[[-85.748032 31.619181]
-                                                 [-85.729832 31.632373]]]}}}
-           {"12040" {:properties {:B01001_001E                                494981,
-                                  :NAME                                       "State Senate District 40 (2016), Florida",
-                                  :B00001_001E                                29661,
-                                  :state                                      "12",
-                                  :state-legislative-district-_upper-chamber_ "040"}}})
-         {"12040" {:type "Feature",
-                   :properties {:STATEFP "01",
-                                :COUNTY "456",
-                                :STATE "123",
-                                :state "12",
-                                :GEOID "01005",
-                                :B01001_001E 494981,
-                                :state-legislative-district-_upper-chamber_ "040",
-                                :B00001_001E 29661,
-                                :NAME "State Senate District 40 (2016), Florida"},
-                   :geometry {:type "Polygon",
-                              :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}})))
+;
+;(deftest group-by-keys-test
+;  (is (= (group-by-keys CONCATED-LIST)
+;         GROUPED-LIST)))
+;
+;(deftest deep-merge-with-test
+;  (is (= (deep-merge-with-seq
+;           {"12040" {:type       "Feature",
+;                     :properties {:STATEFP "01",
+;                                  :GEOID   "01005",
+;                                  :STATE   "123",
+;                                  :COUNTY  "456"},
+;                     :geometry   {:type        "Polygon",
+;                                  :coordinates [[[-85.748032 31.619181]
+;                                                 [-85.729832 31.632373]]]}}}
+;           {"12040" {:properties {:B01001_001E                                494981,
+;                                  :NAME                                       "State Senate District 40 (2016), Florida",
+;                                  :B00001_001E                                29661,
+;                                  :state                                      "12",
+;                                  :state-legislative-district-_upper-chamber_ "040"}}})
+;         {"12040" {:type "Feature",
+;                   :properties {:STATEFP "01",
+;                                :COUNTY "456",
+;                                :STATE "123",
+;                                :state "12",
+;                                :GEOID "01005",
+;                                :B01001_001E 494981,
+;                                :state-legislative-district-_upper-chamber_ "040",
+;                                :B00001_001E 29661,
+;                                :NAME "State Senate District 40 (2016), Florida"},
+;                   :geometry {:type "Polygon",
+;                              :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}})))
 
 (def MERGED-LIST
   [{"12040" {:type "Feature",
@@ -184,12 +182,12 @@
                           :state "12",
                           :state-legislative-district-_upper-chamber_ "036"}}}])
 
-
-(deftest xf-deep-merge-test
-  (is (= (transduce xf-deep-merge-seq
-                    conj
-                    GROUPED-LIST)
-         MERGED-LIST)))
+;
+;(deftest xf-deep-merge-test
+;  (is (= (transduce xf-deep-merge-seq
+;                    conj
+;                    GROUPED-LIST)
+;         MERGED-LIST)))
 
 
 (def FILTERED-LIST
@@ -218,19 +216,19 @@
     :geometry {:type "Polygon",
                :coordinates [[[-85.748032 31.619181] [-85.729832 31.632373]]]}}])
 
-
-(deftest xf-remove-unmerged-test
-  (is (= (transduce (xf-remove-unmerged [:GEOID :B01001_001E])
-                    conj
-                    MERGED-LIST)
-         FILTERED-LIST)))
-
-
-(deftest xf-merge->filter-test
-  (is (= (transduce (xf-merge->filter [:GEOID :B01001_001E])
-                    conj
-                    GROUPED-LIST)
-         FILTERED-LIST)))
+;
+;(deftest xf-remove-unmerged-test
+;  (is (= (transduce (xf-remove-unmerged [:GEOID :B01001_001E])
+;                    conj
+;                    MERGED-LIST)
+;         FILTERED-LIST)))
+;
+;
+;(deftest xf-merge->filter-test
+;  (is (= (transduce (xf-merge->filter [:GEOID :B01001_001E])
+;                    conj
+;                    GROUPED-LIST)
+;         FILTERED-LIST)))
 
 (def ARGS-4-STATS+GEOS-CLJ
   [{:properties {:school-district-_secondary_ "00420",
@@ -270,8 +268,8 @@
 (deftest merge-spooler-merge-test
   (let [args-4 {:sourcePath    ["acs" "acs5"]
                 :vintage       "2016"
-                ;:geoHierarchy  {:state "44" :school-district-_elementary_ "*"} ; <- collection
-                :geoHierarchy  {:state "44" :school-district-_secondary_ "*"} ; <- single feature
+                :geoHierarchy  {:state "44" :school-district-_elementary_ "*"} ; <- collection
+                ;:geoHierarchy  {:state "44" :school-district-_secondary_ "*"} ; <- single feature
                 :geoResolution "500k"
                 :values        ["B01001_001E" "B01001_001M"]}
         time-in (time-spot)
@@ -284,7 +282,7 @@
                 =O=    (chan 1)
                 =E=    (chan 1)]
             (>! =args= args-4)
-            ((merge-spooler *g* =args= [pre-cfg-Census-Stats pre-cfg-Census-GeoCLJ]) =O= =E=)
+            ((I=OE-M-spooler *g* =args= [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ]) =O= =E=)
             (is (= (alt! =O= ([data] data)
                          =E= ([err]  err))
                    JSON-school-secondary))
@@ -332,7 +330,7 @@
                 =O=    (chan 1)
                 =E=    (chan 1)]
             (>! =args= args-2)
-            ((merge-spooler *g* =args= [pre-cfg-Census-Stats pre-cfg-Census-GeoCLJ ]) =O= =E=)
+            ((I=OE-M-spooler *g* =args= [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ ]) =O= =E=)
             (alt! =O= ([data] (prn data))
                   =E= ([err]  (prn err)))
             (close! =args=)

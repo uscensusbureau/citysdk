@@ -2,13 +2,10 @@
   (:require
     [cljs.core.async       :refer [>! <! chan promise-chan close! pipeline put!
                                    to-chan take!]
-                           :refer-macros [go alt! go-loop]
-                           :as <|]
+                           :refer-macros [go alt! go-loop]]
     [cuerdas.core          :refer-macros [istr]
                            :as s]
     [net.cgrand.xforms     :as x]
-    [net.cgrand.xforms.rfs :as rf]
-    [oops.core]
     [census.utils.core     :refer [URL-GEOKEYMAP xf<< educt<<
                                    throw-err err-type ->args map-over-keys
                                    amap-type $GET$]]))
@@ -114,12 +111,12 @@
 ;    (into a (x/for [[k v] b] [k (deep-merge-with-2 (a k) v)]))
 ;    b))
 
-(defn deep-merge-with-coll
+(defn deep-merge-a-coll
   [maps]
   (apply merge-with
          (fn [& args]
            (if (every? map? args)
-             (deep-merge-with-coll args)
+             (deep-merge-a-coll args)
              (last args)))
          maps))
 
@@ -148,26 +145,26 @@
         v))))
 
 
-(defn xf-group-merge-filter
+(defn xf<-Grands->JS
   [IDS]
   (comp (x/into [])
-        (map deep-merge-with-coll)
+        (map deep-merge-a-coll)
         (map (remove-unmerged IDS))
         (map clj->js)))
 
 
-(defn xf-group-merge-filter->JSON
+(defn xf-Grands-M->JSON
   "
   Implementation of `group-by` (produces a map) via @cgrand's `xforms`
   See 'Usage': https://github.com/cgrand/xforms#usage
   "
   [IDS]
-  (comp (x/by-key keys (xf-group-merge-filter IDS))
-        (remove (fn [[_ v]] (nil? v)))
-        (map #(get % 1))
-        (map js/JSON.stringify)))
+  (comp (x/by-key keys (xf<-Grands->JS IDS))
+        (remove   (fn [[_ v]] (nil? v)))
+        (map      #(get % 1))
+        (map      js/JSON.stringify)))
 
-(defn merge-spooler
+(defn I=OE-M-spooler
   [$g$ =arg= cfgs]
   (fn [=O= =E=]
     (let [=args= (promise-chan)]
@@ -182,7 +179,7 @@
                     (>! =O=
                         (as-> (persistent! acc) coll
                               (reduce concat coll)
-                              (eduction (xf-group-merge-filter->JSON @$ids$) coll)
+                              (eduction (xf-Grands-M->JSON @$ids$) coll)
                               (s/join "," coll)
                               (istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
                     (close! =cfg=)

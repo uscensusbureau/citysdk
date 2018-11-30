@@ -7,7 +7,7 @@
     [datascript.db :as db]
     [census.utils.core :refer [strs->keys ->args]]
     [configs.utils.fixtures :refer [stats-key read-edn]]
-    [census.geoAPI.core :refer [geo-pattern-maker]]))
+    [census.geoAPI.core :refer [G-pattern-cfg]]))
 
 (def geoKeyMap     (read-edn "./src/census/geojson/index.edn"))
 (def examples      (read-edn "./src/census/discovery/example-urls.edn"))
@@ -79,12 +79,12 @@
                              :db/cardinality :db.cardinality/many}})
 
 
-(geo-pattern-maker geoKeyMap {:vintage "2016",
-                              :values ["H001001" "NAME"],
-                              :sourcePath ["dec" "cd113"],
-                              :geoHierarchy {:state "*"
-                                             :county "*"}
-                              :geoResolution "500k"})
+(G-pattern-cfg geoKeyMap {:vintage           "2016",
+                          :values        ["H001001" "NAME"],
+                          :sourcePath    ["dec" "cd113"],
+                          :geoHierarchy  {:state "*"
+                                          :county "*"}
+                          :geoResolution "500k"})
 
 (defn datomize-one-examples-uniques
   [{:keys [sourcePath geoHierarchy] :as args}])

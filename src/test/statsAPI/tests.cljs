@@ -4,15 +4,15 @@
                            :refer-macros [go alt!]]
     [cljs.test             :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core    :refer [test-async test-async-timed heap-spot time-spot]]
-    [census.statsAPI.core  :refer [stats-url-builder
-                                   parse-if-number
-                                   xf!-csv->clj
-                                   xf-geoid+<-stat
+    [census.statsAPI.core  :refer [C-S-args->url
+                                   ->num?->#
+                                   xf!-CSV->CLJ
+                                   xf-'key'<w-stat
                                    xf-stats->js
-                                   xf-stats-mergeable
-                                   IOE->census-stats
+                                   xf-mergeable<-stats
+                                   IOE-C->stats
                                    censusStatsJSON
-                                   cfg-Census-Stats]]))
+                                   =cfg=C-Stats]]))
 
 (deftest stats-url-builder-test
   (let [args-1 {:vintage      "2016"
@@ -25,17 +25,17 @@
                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
                 :values       ["B01001_001E" "NAME"]
                 :predicates   {:B00001_001E "0:30000"}}]
-    (is (= (stats-url-builder args-1)
+    (is (= (C-S-args->url args-1)
            "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100&key=NA-key"))
-    (is (= (stats-url-builder args-2)
+    (is (= (C-S-args->url args-2)
            "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*"))))
 
 (deftest parse-if-number-test
-  (is (= (parse-if-number "30")
+  (is (= (->num?-># "30")
          30))
-  (is (= (parse-if-number "string")
+  (is (= (->num?-># "string")
          "string"))
-  (is (= (parse-if-number "0.5")
+  (is (= (->num?-># "0.5")
          0.5)))
 
 (deftest xf!-csv->clj-test
@@ -44,7 +44,7 @@
         input [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
                ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
                ["491350","State Senate District 6 (2016), Florida","29938","12","006"]]]
-    (is (= (transduce (xf!-csv->clj args) conj [] input)
+    (is (= (transduce (xf!-CSV->CLJ args) conj [] input)
            [{:B01001_001E 491350,
              :NAME "State Senate District 6 (2016), Florida",
              :B00001_001E 29938,
@@ -74,7 +74,7 @@
                 {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
                 {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
                 {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"})]
-       (is (= (transduce (xf-geoid+<-stat 2) conj input)
+       (is (= (transduce (xf-'key'<w-stat 2) conj input)
               [{"01001" {:properties {:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}}}
                {"01003" {:properties {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}}}
                {"01005" {:properties {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}}}
@@ -90,7 +90,7 @@
                ["3111" "369" "01" "073" "000100"]
                ["3111" "222" "21" "0223" "000100"]]
         vars# 2]
-    (is (= (transduce (xf-stats-mergeable args vars#) conj input)
+    (is (= (transduce (xf-mergeable<-stats args vars#) conj input)
            '({"210223000100"
               {:properties
                {:B01001_001E 3111
@@ -120,7 +120,7 @@
       "IOE->census-stats-test"
       time-in
       (go (>! =I= ARGS-2)
-          (IOE->census-stats =I= =O= =E=)
+          (IOE-C->stats =I= =O= =E=)
           (is (= (alt! =O= ([res] res)
                        =E= ([err] err))
                  [["B01001_001E" "B01001_001M" "state" "county"]
@@ -187,7 +187,7 @@
       time-in
       heap-in
       (go (>! =args= args-1)
-          (cfg-Census-Stats =args= =cfg=)
+          (=cfg=C-Stats =args= =cfg=)
           (let [{:keys [url xform getter filter-id]} (<! =cfg=)]
             (is (= url
                    "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100"))
