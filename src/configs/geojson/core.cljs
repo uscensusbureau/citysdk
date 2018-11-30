@@ -9,7 +9,7 @@
     [defun.core                :refer-macros [defun]]
     [cljs-promises.async       :refer [value-port]]
     [census.utils.core         :refer [map-target error err-type]]
-    [configs.utils.fixtures    :refer [read-edn config->mkdirp->fsW!]]
+    [configs.utils.fixtures    :refer [read-edn FileSaver]]
     [configs.geojson.filepaths :as geos]
     [configs.geojson.filepaths_abv :as geos_abv]
     ["fs" :as fs]
@@ -430,7 +430,7 @@
                         =json= (chan 1 (x-geojson-config directory filepath))]
                     (do (fsR-file->put! path =zip=)
                         (pipeline-async 1 =json= zip->geojson->put! =zip=)
-                        (config->mkdirp->fsW! (<! =json=))
+                        (FileSaver (<! =json=))
                         (recur)))
                   (do (prn (str "File already exists: " path))
                       (recur)))))

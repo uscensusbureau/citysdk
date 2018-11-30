@@ -9,11 +9,11 @@
     [census.wmsAPI.core :refer [$g$->wms-cfg
                                 lookup-id->match?
                                 search-id->match?
-                                wms-url-builder
+                                C->GIS-url
                                 configed-map
                                 try-census-wms
                                 wms-engage?
-                                =>args=census-wms=args=>
+                                =>args=C-GIS=args=>
                                 I-<wms=I=
                                 censusWMS]]))
 
@@ -44,7 +44,7 @@
        '(:consolidated-cities))))
 
 (deftest wms-url-builder-test
-  (is (= (wms-url-builder *g* ts/args-ok-wms-only)
+  (is (= (C->GIS-url *g* ts/args-ok-wms-only)
          "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/Mapserver/82/query?geometry=-80.7214,28.2639&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=pjson&outFields=STATE")))
 
 (deftest configed-map-test
@@ -104,7 +104,7 @@
         =args=> (chan 1)]
     (test-async
       (go (>! =>args= args-in)
-          ((=>args=census-wms=args=> *g*) =>args= =args=>)
+          ((=>args=C-GIS=args=> *g*) =>args= =args=>)
           (is (= (<! =args=>)
                  {:vintage "2017",
                   :geoHierarchy {:state "51", :county "*"}}))

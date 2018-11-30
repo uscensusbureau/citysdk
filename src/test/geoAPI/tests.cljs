@@ -5,18 +5,18 @@
     [cljs.test          :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core :refer [*g* test-async test-async-timed
                                 time-spot heap-spot]]
-    [census.geoAPI.core :refer [geo-error
-                                geo-url-builder
-                                geo-scoper
-                                lg-warn->geo
-                                geo-pattern-matcher
-                                geo-pattern-maker
-                                geo-url-composer
-                                IOE-census-GeoJSON-str
+    [census.geoAPI.core :refer [G-err
+                                G-pattern->url
+                                scope
+                                big-G
+                                G-patterner
+                                G-pattern-cfg
+                                C-G-dispatch->
+                                IOE-C-GeoJSON
                                 GEOIDS<-$g$<-args
                                 xf-mergeable-features
                                 xf-mergeable<-GeoCLJS
-                                cfg-Census-GeoCLJ]]))
+                                =cfg=C-GeoCLJ]]))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 (comment
@@ -36,7 +36,7 @@
   (let [vin 2022
         res "500k"
         lev :county]
-    (is (= (geo-error *g* res vin lev)
+    (is (= (G-err *g* res vin lev)
            ["No GeoJSON found for county at this scope" "in vintage: 2022" "at resolution: 500k" "For :county try one of the following `{:<vintage> {:<scopes> ...`"
             [{:2017 {:us ["5m" "20m" "500k"], :st nil},
               :2016 {:us ["5m" "20m" "500k"], :st nil},
@@ -52,9 +52,9 @@
         res "500k"
         lev :county
         st  "01"]
-    (is (= (geo-url-builder res vin lev)
+    (is (= (G-pattern->url res vin lev)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2022/county.json"))
-    (is (= (geo-url-builder res vin lev st)
+    (is (= (G-pattern->url res vin lev st)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2022/01/county.json"))))
 
 (deftest geo-scoper-test
@@ -64,11 +64,11 @@
         USr ["5m" "20m" "500k"]
         STr nil
         st "01"]
-    (is (= (geo-scoper *g* res vin lev USr)
+    (is (= (scope *g* res vin lev USr)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))
-    (is (= (geo-scoper *g* res vin lev USr STr)
+    (is (= (scope *g* res vin lev USr STr)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))
-    (is (= (geo-scoper *g* res vin lev USr STr st)
+    (is (= (scope *g* res vin lev USr STr st)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))))
 
 (deftest lg-warn->geo-test ;; TESTS SIDE EFFECT: Logs warning to console
@@ -78,18 +78,18 @@
         USr ["5m" "20m" "500k"]
         STr nil
         st "01"]
-    (is (= (lg-warn->geo *g* res vin lev USr STr st)
+    (is (= (big-G *g* res vin lev USr STr st)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))))
 
 (deftest geo-pattern-maker-test
-  (is (= (geo-pattern-maker *g* TEST-ARGS-1)
+  (is (= (G-pattern-cfg *g* TEST-ARGS-1)
          ["500k" "2016" "12"
           [:state-legislative-district-_upper-chamber_ "*"]
           {:us nil,
            :st ["500k"]}])))
 
 (deftest geo-url-composer-test
-  (is (= (geo-url-composer *g* TEST-ARGS-1)
+  (is (= (C-G-dispatch-> *g* TEST-ARGS-1)
          "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/12/state-legislative-district-_upper-chamber_.json")))
 
 (def TEST-ARGS-2
@@ -110,7 +110,7 @@
       "IOE-census-GeoJSON-test"
       time-in
       heap-in
-      (go ((IOE-census-GeoJSON-str *g*) (to-chan [TEST-ARGS-2]) =O= =E=)
+      (go ((IOE-C-GeoJSON *g*) (to-chan [TEST-ARGS-2]) =O= =E=)
           (is (= (alt! =O= ([O] O)
                        =E= ([E] (do (prn "Error:")
                                     E)))
@@ -277,7 +277,7 @@
       time-in
       heap-in
       (go (>! =args= args-1)
-          ((cfg-Census-GeoCLJ *g*) =args= =cfg=)
+          ((=cfg=C-GeoCLJ *g*) =args= =cfg=)
           (let [{:keys [url xform getter filter-id]} (<! =cfg=)]
             (is (= url
                    "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/01/tract.json"))
