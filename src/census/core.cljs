@@ -60,13 +60,15 @@
 
 (def $GET$-GeoKeyMap ($GET$ :edn "Unsuccessful fetch for configuration."))
 
+(def =GKM= (promise-chan))
+
+($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM=)
+
 (defn census
   [I cb]
-  (let [=GKM=   (promise-chan)
-        =args=> (chan 1)
+  (let [=args=> (chan 1)
         =O=     (chan 1)
         =E=     (chan 1)]
-    ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM=)
     (take! =GKM=
       (fn [$g$]
         ((I-<wms=I= $g$) I =args=>)
