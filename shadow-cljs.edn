@@ -9,8 +9,21 @@
                 [frankiesardo/linked "1.3.0"]
                 [net.cgrand/xforms "0.18.2"]]
  :nrepl        {:port 3333}
- :builds       {:lib {:target           :node-library
-                      :output-dir       "public/census"
-                      :output-to        "public/census/census.js"
-                      :compiler-options {:optimizations :advanced}
-                      :exports-var      census.core/census}}}
+ :builds
+               {:lib    {:target           :node-library
+                         :output-dir       "public/census"
+                         :output-to        "public/census/census.js"
+                         :compiler-options {:optimizations :advanced}
+                         :exports-var      census.core/census}
+                :SDK    {:target           :node-library
+                         :output-dir       "public/citySDK"
+                         :output-to        "public/citySDK/citySDK.js"
+                         :compiler-options {:optimizations :advanced}
+                         :exports          {:citySDK census.core/census
+                                            :stats   census.statsAPI.core/censusStatsJSON
+                                            :geojson census.geoAPI.core/getCensusGeoJSON}}
+                :worker {:target           :browser
+                         :output-dir       "public/js"
+                         :asset-path       "/js"
+                         :modules         {:worker {:entries [worker.core]
+                                                    :web-worker true}}}}}

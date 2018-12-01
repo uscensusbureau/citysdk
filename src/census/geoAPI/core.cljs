@@ -1,12 +1,13 @@
 (ns census.geoAPI.core
   (:require
-    [cljs.core.async    :refer [chan close! to-chan onto-chan take! put!]]
+    [cljs.core.async    :refer [chan close! to-chan onto-chan take! put!
+                                promise-chan]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
-                                err-type amap-type]]))
+                                err-type amap-type ->args]]))
 
 (defn G-err
   [$g$ res vin lev]
@@ -114,19 +115,24 @@
 
 
 
-#_(defn getCensusGeoJSON
-    "
+(def $GET$-GeoKeyMap ($GET$ :edn "Unsuccessful fetch for configuration."))
+
+(defn getCensusGeoJSON
+  "
     Library function, which takes a JSON object as input, constructs a call to get
     Github raw file and returns GeoJSON.
     "
-    ([args cb] (getCensusGeoJSON args cb false))
-    ([args cb url?]
-     (if url?
-       ((Icb<-wms-args<<=IO= IOE-census-GeoJSON) args
-         #(cb #js {:url      (C-G-pattern->url {} args)
-                   :response (js/JSON.stringify (clj->js %))}))
-       ((Icb<-wms-args<<=IO= IOE-census-GeoJSON) args
-         #(cb (js/JSON.stringify (clj->js %)))))))
+  [I cb]
+  (let [args (->args I)
+        =O= (chan 1 (comp (map clj->js)
+                          (map js/JSON.stringify)))
+        =E= (chan 1 (map throw-err))
+        =GKM= (promise-chan)]
+    ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
+    (take! =GKM=
+      (fn [$g$]
+        (=O?>-cb (IOE-C-GeoJSON $g$) cb (to-chan [args]) =O= =E=)))))
+
 
 
 ;; Examples  ========================================
