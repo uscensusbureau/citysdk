@@ -80,4 +80,7 @@
                     (take! =E= (fn [e] (cb e nil))))
                 (cb ?args nil))))))))
 
+(defn citySDK []
+  #js {:citySDK census})
+
 

@@ -19,11 +19,14 @@
                          :output-dir       "public/citySDK"
                          :output-to        "public/citySDK/citySDK.js"
                          :compiler-options {:optimizations :advanced}
+                         ;:exports-fn       census.core/citySDK}
                          :exports          {:citySDK census.core/census
                                             :stats   census.statsAPI.core/censusStatsJSON
                                             :geojson census.geoAPI.core/getCensusGeoJSON}}
                 :worker {:target           :browser
                          :output-dir       "public/js"
                          :asset-path       "/js"
-                         :modules         {:worker {:entries [worker.core]
+                         :modules         {:main   {:entries [census.core]}
+                                           :worker {:entries [worker.core]
+                                                    :depends-on #{:main}
                                                     :web-worker true}}}}}
