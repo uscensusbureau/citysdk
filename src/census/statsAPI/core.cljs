@@ -77,8 +77,11 @@
     (xf!-CSV->CLJ args)
     (map #(clj->js % :keywordize-keys true))))
 
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-C-stats ($GET$ :json "Census statistics"))
+(def $GET$-C-stats ($GET$ :json "Census statistics" $url$ $res$ $err$))
 
 (defn IOE-C->stats
   "

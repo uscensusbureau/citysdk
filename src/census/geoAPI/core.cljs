@@ -96,7 +96,11 @@
   (->> (G-pattern-cfg $g$ args)
        (G-patterner $g$)))
 
-(def $GET$-C-GeoJSON ($GET$ :raw "Census GeoJSON"))
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
+
+(def $GET$-C-GeoJSON ($GET$ :raw "Census GeoJSON" $url$ $res$ $err$))
 
 (defn IOE-C-GeoJSON
   "
@@ -113,8 +117,12 @@
 
 
 
+(def $url-2$ (atom ""))
+(def $res-2$ (atom []))
+(def $err-2$ (atom {}))
 
-(def $GET$-GeoKeyMap ($GET$ :edn "configuration"))
+
+(def $GET$-GeoKeyMap ($GET$ :edn "configuration" $url-2$ $res-2$ $err-2$))
 
 (defn getCensusGeoJSON
   "
@@ -193,9 +201,11 @@
     (map #(get % :features)) ; turns a single map into a collection
     (educt<< (xf-mergeable-features $g$ args))))
 
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-C-GeoCLJ
-  ($GET$ :json "Census GeoJSON (for merge)"))
+(def $GET$-C-GeoCLJ ($GET$ :json "Census GeoJSON (for merge)" $url$ $res$ $err$))
 
 
 (defn =cfg=C-GeoCLJ

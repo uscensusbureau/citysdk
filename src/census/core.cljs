@@ -57,8 +57,11 @@
             :no-values  (put! =E= err-no-vals)
             (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))))
 
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-GeoKeyMap ($GET$ :edn "configuration"))
+(def $GET$-GeoKeyMap ($GET$ :edn "configuration" $url$ $res$ $err$))
 
 (def =GKM= (promise-chan))
 
