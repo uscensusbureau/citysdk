@@ -26,7 +26,7 @@
             (prn "Error: " err))))))
 
 (comment
-  (test-async-time ts/args-ok-wms-only prn)            ; :geocodes   ms = 275
+  (test-async-time ts/args-ok-wms-only js/console.log) ; :geocodes   ms = 275
   (test-async-time (ts/test-args 9 3 3 0) prn)         ; :geocodes   ms = 362
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274

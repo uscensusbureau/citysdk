@@ -1,12 +1,13 @@
 (ns census.geoAPI.core
   (:require
-    [cljs.core.async    :refer [chan close! to-chan onto-chan take! put!]]
+    [cljs.core.async    :refer [chan close! to-chan onto-chan take! put!
+                                promise-chan]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
-                                err-type amap-type]]))
+                                err-type amap-type ->args]]))
 
 (defn G-err
   [$g$ res vin lev]
@@ -72,7 +73,7 @@
   "
   ([$g$ ["500k"         vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
-  ;([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
+  ([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
   ([$g$ [res            vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
   ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
   ([$g$ [res            vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
@@ -95,8 +96,11 @@
   (->> (G-pattern-cfg $g$ args)
        (G-patterner $g$)))
 
-(def $GET$-C-GeoJSON
-  ($GET$ :raw "Unsuccessful Census GeoJSON request"))
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
+
+(def $GET$-C-GeoJSON ($GET$ :raw "Census GeoJSON" $url$ $res$ $err$))
 
 (defn IOE-C-GeoJSON
   "
@@ -113,20 +117,29 @@
 
 
 
+(def $url-2$ (atom ""))
+(def $res-2$ (atom []))
+(def $err-2$ (atom {}))
 
-#_(defn getCensusGeoJSON
-    "
+
+(def $GET$-GeoKeyMap ($GET$ :edn "configuration" $url-2$ $res-2$ $err-2$))
+
+(defn getCensusGeoJSON
+  "
     Library function, which takes a JSON object as input, constructs a call to get
     Github raw file and returns GeoJSON.
     "
-    ([args cb] (getCensusGeoJSON args cb false))
-    ([args cb url?]
-     (if url?
-       ((Icb<-wms-args<<=IO= IOE-census-GeoJSON) args
-         #(cb #js {:url      (C-G-pattern->url {} args)
-                   :response (js/JSON.stringify (clj->js %))}))
-       ((Icb<-wms-args<<=IO= IOE-census-GeoJSON) args
-         #(cb (js/JSON.stringify (clj->js %)))))))
+  [I cb]
+  (let [args (->args I)
+        =O= (chan 1 (comp (map clj->js)
+                          (map js/JSON.stringify)))
+        =E= (chan 1 (map throw-err))
+        =GKM= (promise-chan)]
+    ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
+    (take! =GKM=
+      (fn [$g$]
+        (=O?>-cb (IOE-C-GeoJSON $g$) cb (to-chan [args]) =O= =E=)))))
+
 
 
 ;; Examples  ========================================
@@ -188,9 +201,11 @@
     (map #(get % :features)) ; turns a single map into a collection
     (educt<< (xf-mergeable-features $g$ args))))
 
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-C-GeoCLJ
-  ($GET$ :json "Unsuccessful Census GeoJSON (for merge) request"))
+(def $GET$-C-GeoCLJ ($GET$ :json "Census GeoJSON (for merge)" $url$ $res$ $err$))
 
 
 (defn =cfg=C-GeoCLJ

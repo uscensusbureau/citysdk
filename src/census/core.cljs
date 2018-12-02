@@ -3,7 +3,7 @@
     [cljs.core.async      :refer [chan close! to-chan take!
                                   put! promise-chan]]
     [defun.core           :refer-macros [defun]]
-    [census.utils.core    :refer [throw-err err-type =O?>-cb ->args
+    [census.utils.core    :refer [throw-err err-type =O?>-cb ->args args->js
                                   $GET$ URL-GEOKEYMAP amap-type]]
     [census.wmsAPI.core   :refer [=>args=GIS=args=> I-<wms=I=]]
     [census.geoAPI.core   :refer [IOE-C-GeoJSON cfg>cfg=C-GeoCLJ]]
@@ -53,15 +53,20 @@
             :stats+geos ((I=OE-M-spooler $g$ (to-chan [args]) [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ]) =O= =E=)
             :stats-only (IOE-C-S->JSON       (to-chan [args]) =O= =E=)
             :geos-only  ((IOE-C-GeoJSON $g$) (to-chan [args]) =O= =E=)
-            :geocodes   ((=>args=GIS=args=> $g$) (to-chan [args]) =O= =E=)
+            :geocodes   (put! =O= (args->js args))
             :no-values  (put! =E= err-no-vals)
             (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))))
 
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-GeoKeyMap ($GET$ :edn "Unsuccessful fetch for configuration."))
+(def $GET$-GeoKeyMap ($GET$ :edn "configuration" $url$ $res$ $err$))
 
 (def =GKM= (promise-chan))
 
+; TODO: Calling the function "releases" $GET$'s local state into the global scope
+; HOW do we achieve this for the other functions?
 ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
 
 (defn census
@@ -79,5 +84,8 @@
                     (take! =O= (fn [r] (cb nil r)))
                     (take! =E= (fn [e] (cb e nil))))
                 (cb ?args nil))))))))
+
+(defn citySDK []
+  #js {:citySDK census})
 
 

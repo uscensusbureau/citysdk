@@ -77,18 +77,21 @@
     (xf!-CSV->CLJ args)
     (map #(clj->js % :keywordize-keys true))))
 
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-C-stats ($GET$ :json "Unsuccessful Census stats request... "))
+(def $GET$-C-stats ($GET$ :json "Census statistics" $url$ $res$ $err$))
 
-;(defn IOE-C->stats
-;  "
-;  Internal function for calling the Census API using a Clojure Map. Returns stats
-;  from Census API unaltered.
-;  "
-;  [=I= =O= =E=]
-;  (go (let [args  (<! =I=)
-;            url   (C-S-args->url args)]
-;        ($GET$-C-stats (to-chan [url]) =O= =E=))))
+(defn IOE-C->stats
+  "
+  Internal function for calling the Census API using a Clojure Map. Returns stats
+  from Census API unaltered.
+  "
+  [=I= =O= =E=]
+  (go (let [args  (<! =I=)
+            url   (C-S-args->url args)]
+        ($GET$-C-stats (to-chan [url]) =O= =E=))))
 
 (defn IOE-C-S->JSON
   "
@@ -104,20 +107,20 @@
         (pipeline 1 =O= (comp (educt<< (xf-stats->js args))
                               (map to-array)
                               (map js/JSON.stringify)) =JSON=)))))
-;
-;(defn censusStatsJSON
-;  "
-;  Solo function to just get Census stats back as conventional JSON instead of
-;  csv-like output of 'raw' Census API. Not to be coordinated with other functions.
-;  Note on channels: (cb-<O?=) closes =O= and =E= on completing the callback
-;  "
-;  [I cb]
-;  (let [args (->args I)
-;        =O= (chan 1 (comp (educt<< (xf-stats->js args))
-;                          (map to-array)
-;                          (map js/JSON.stringify)))
-;        =E= (chan 1 (map throw-err))]
-;    (go (=O?>-cb IOE-C->stats cb (to-chan [args]) =O= =E=))))
+
+(defn censusStatsJSON
+  "
+  Solo function to just get Census stats back as conventional JSON instead of
+  csv-like output of 'raw' Census API. Not to be coordinated with other functions.
+  Note on channels: (cb-<O?=) closes =O= and =E= on completing the callback
+  "
+  [I cb]
+  (let [args (->args I)
+        =O= (chan 1 (comp (educt<< (xf-stats->js args))
+                          (map to-array)
+                          (map js/JSON.stringify)))
+        =E= (chan 1 (map throw-err))]
+    (=O?>-cb IOE-C-S->JSON cb (to-chan [args]) =O= =E=)))
 
 
 ;      e            888                       d8

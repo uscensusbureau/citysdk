@@ -23,8 +23,8 @@ cljs_promises.core.race = (function cljs_promises$core$race(coll){
 return Promise.race(cljs_promises.core.cast_as_array(coll));
 });
 cljs_promises.core.then = (function cljs_promises$core$then(var_args){
-var G__8991 = arguments.length;
-switch (G__8991) {
+var G__32670 = arguments.length;
+switch (G__32670) {
 case 2:
 return cljs_promises.core.then.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 

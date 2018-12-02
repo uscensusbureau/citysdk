@@ -13,7 +13,7 @@
                                 G-pattern-cfg
                                 C-G-pattern->url
                                 IOE-C-GeoJSON
-                                GEOIDS<-$g$<-args
+                                GEOIDS<-$g$+args
                                 xf-mergeable-features
                                 xf-mergeable<-GeoCLJS
                                 =cfg=C-GeoCLJ]]))
@@ -119,7 +119,7 @@
           (close! =E=)))))
 
 (deftest ids<-$g$<-args-test
-  (is (= (GEOIDS<-$g$<-args *g* TEST-ARGS-2)
+  (is (= (GEOIDS<-$g$+args *g* TEST-ARGS-2)
          '(:GEOID))))
 
 

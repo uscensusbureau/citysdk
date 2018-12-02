@@ -10,53 +10,53 @@ var temp__5455__auto__ = cljs.core.get_in.cljs$core$IFn$_invoke$arity$2($g$,new 
 if(cljs.core.truth_(temp__5455__auto__)){
 var vins = temp__5455__auto__;
 var e_try = new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [["For '",cljs.core.str.cljs$core$IFn$_invoke$arity$1(census.utils.core.keys__GT_strs(cljs.core.name(lev))),"' try of of the following:"].join(''),["=== :us = nation-level '",cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.name(lev)),"' geoResolutions ==="].join(''),["=== :st = state-levels '",cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.name(lev)),"' geoResolutions ==="].join('')], null);
-var seq__17436_17969 = cljs.core.seq(e_gen);
-var chunk__17437_17970 = null;
-var count__17438_17971 = (0);
-var i__17439_17972 = (0);
+var seq__34742_34872 = cljs.core.seq(e_gen);
+var chunk__34743_34873 = null;
+var count__34744_34874 = (0);
+var i__34745_34875 = (0);
 while(true){
-if((i__17439_17972 < count__17438_17971)){
-var e_17973 = chunk__17437_17970.cljs$core$IIndexed$_nth$arity$2(null,i__17439_17972);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_17973], 0));
+if((i__34745_34875 < count__34744_34874)){
+var e_34876 = chunk__34743_34873.cljs$core$IIndexed$_nth$arity$2(null,i__34745_34875);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_34876], 0));
 
 
-var G__17974 = seq__17436_17969;
-var G__17975 = chunk__17437_17970;
-var G__17976 = count__17438_17971;
-var G__17977 = (i__17439_17972 + (1));
-seq__17436_17969 = G__17974;
-chunk__17437_17970 = G__17975;
-count__17438_17971 = G__17976;
-i__17439_17972 = G__17977;
+var G__34877 = seq__34742_34872;
+var G__34878 = chunk__34743_34873;
+var G__34879 = count__34744_34874;
+var G__34880 = (i__34745_34875 + (1));
+seq__34742_34872 = G__34877;
+chunk__34743_34873 = G__34878;
+count__34744_34874 = G__34879;
+i__34745_34875 = G__34880;
 continue;
 } else {
-var temp__5457__auto___17978 = cljs.core.seq(seq__17436_17969);
-if(temp__5457__auto___17978){
-var seq__17436_17979__$1 = temp__5457__auto___17978;
-if(cljs.core.chunked_seq_QMARK_(seq__17436_17979__$1)){
-var c__4461__auto___17980 = cljs.core.chunk_first(seq__17436_17979__$1);
-var G__17981 = cljs.core.chunk_rest(seq__17436_17979__$1);
-var G__17982 = c__4461__auto___17980;
-var G__17983 = cljs.core.count(c__4461__auto___17980);
-var G__17984 = (0);
-seq__17436_17969 = G__17981;
-chunk__17437_17970 = G__17982;
-count__17438_17971 = G__17983;
-i__17439_17972 = G__17984;
+var temp__5457__auto___34881 = cljs.core.seq(seq__34742_34872);
+if(temp__5457__auto___34881){
+var seq__34742_34882__$1 = temp__5457__auto___34881;
+if(cljs.core.chunked_seq_QMARK_(seq__34742_34882__$1)){
+var c__4461__auto___34883 = cljs.core.chunk_first(seq__34742_34882__$1);
+var G__34884 = cljs.core.chunk_rest(seq__34742_34882__$1);
+var G__34885 = c__4461__auto___34883;
+var G__34886 = cljs.core.count(c__4461__auto___34883);
+var G__34887 = (0);
+seq__34742_34872 = G__34884;
+chunk__34743_34873 = G__34885;
+count__34744_34874 = G__34886;
+i__34745_34875 = G__34887;
 continue;
 } else {
-var e_17985 = cljs.core.first(seq__17436_17979__$1);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_17985], 0));
+var e_34888 = cljs.core.first(seq__34742_34882__$1);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_34888], 0));
 
 
-var G__17986 = cljs.core.next(seq__17436_17979__$1);
-var G__17987 = null;
-var G__17988 = (0);
-var G__17989 = (0);
-seq__17436_17969 = G__17986;
-chunk__17437_17970 = G__17987;
-count__17438_17971 = G__17988;
-i__17439_17972 = G__17989;
+var G__34889 = cljs.core.next(seq__34742_34882__$1);
+var G__34890 = null;
+var G__34891 = (0);
+var G__34892 = (0);
+seq__34742_34872 = G__34889;
+chunk__34743_34873 = G__34890;
+count__34744_34874 = G__34891;
+i__34745_34875 = G__34892;
 continue;
 }
 } else {
@@ -65,53 +65,53 @@ continue;
 break;
 }
 
-var seq__17441_17990 = cljs.core.seq(e_try);
-var chunk__17442_17991 = null;
-var count__17443_17992 = (0);
-var i__17444_17993 = (0);
+var seq__34746_34893 = cljs.core.seq(e_try);
+var chunk__34747_34894 = null;
+var count__34748_34895 = (0);
+var i__34749_34896 = (0);
 while(true){
-if((i__17444_17993 < count__17443_17992)){
-var t_17995 = chunk__17442_17991.cljs$core$IIndexed$_nth$arity$2(null,i__17444_17993);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([t_17995], 0));
+if((i__34749_34896 < count__34748_34895)){
+var t_34897 = chunk__34747_34894.cljs$core$IIndexed$_nth$arity$2(null,i__34749_34896);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([t_34897], 0));
 
 
-var G__17996 = seq__17441_17990;
-var G__17997 = chunk__17442_17991;
-var G__17998 = count__17443_17992;
-var G__17999 = (i__17444_17993 + (1));
-seq__17441_17990 = G__17996;
-chunk__17442_17991 = G__17997;
-count__17443_17992 = G__17998;
-i__17444_17993 = G__17999;
+var G__34898 = seq__34746_34893;
+var G__34899 = chunk__34747_34894;
+var G__34900 = count__34748_34895;
+var G__34901 = (i__34749_34896 + (1));
+seq__34746_34893 = G__34898;
+chunk__34747_34894 = G__34899;
+count__34748_34895 = G__34900;
+i__34749_34896 = G__34901;
 continue;
 } else {
-var temp__5457__auto___18001 = cljs.core.seq(seq__17441_17990);
-if(temp__5457__auto___18001){
-var seq__17441_18002__$1 = temp__5457__auto___18001;
-if(cljs.core.chunked_seq_QMARK_(seq__17441_18002__$1)){
-var c__4461__auto___18003 = cljs.core.chunk_first(seq__17441_18002__$1);
-var G__18004 = cljs.core.chunk_rest(seq__17441_18002__$1);
-var G__18005 = c__4461__auto___18003;
-var G__18006 = cljs.core.count(c__4461__auto___18003);
-var G__18007 = (0);
-seq__17441_17990 = G__18004;
-chunk__17442_17991 = G__18005;
-count__17443_17992 = G__18006;
-i__17444_17993 = G__18007;
+var temp__5457__auto___34902 = cljs.core.seq(seq__34746_34893);
+if(temp__5457__auto___34902){
+var seq__34746_34904__$1 = temp__5457__auto___34902;
+if(cljs.core.chunked_seq_QMARK_(seq__34746_34904__$1)){
+var c__4461__auto___34905 = cljs.core.chunk_first(seq__34746_34904__$1);
+var G__34909 = cljs.core.chunk_rest(seq__34746_34904__$1);
+var G__34910 = c__4461__auto___34905;
+var G__34911 = cljs.core.count(c__4461__auto___34905);
+var G__34912 = (0);
+seq__34746_34893 = G__34909;
+chunk__34747_34894 = G__34910;
+count__34748_34895 = G__34911;
+i__34749_34896 = G__34912;
 continue;
 } else {
-var t_18009 = cljs.core.first(seq__17441_18002__$1);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([t_18009], 0));
+var t_34913 = cljs.core.first(seq__34746_34904__$1);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([t_34913], 0));
 
 
-var G__18010 = cljs.core.next(seq__17441_18002__$1);
-var G__18011 = null;
-var G__18012 = (0);
-var G__18013 = (0);
-seq__17441_17990 = G__18010;
-chunk__17442_17991 = G__18011;
-count__17443_17992 = G__18012;
-i__17444_17993 = G__18013;
+var G__34914 = cljs.core.next(seq__34746_34904__$1);
+var G__34915 = null;
+var G__34916 = (0);
+var G__34917 = (0);
+seq__34746_34893 = G__34914;
+chunk__34747_34894 = G__34915;
+count__34748_34895 = G__34916;
+i__34749_34896 = G__34917;
 continue;
 }
 } else {
@@ -120,57 +120,57 @@ continue;
 break;
 }
 
-var seq__17446_18015 = cljs.core.seq(cljs.core.vec(census.utils.core.map_over_keys(((function (e_try,vins,temp__5455__auto__,e_gen){
-return (function (p1__17434_SHARP_){
-return cljs.core.get_in.cljs$core$IFn$_invoke$arity$2(p1__17434_SHARP_,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"scopes","scopes",-1571524352)], null));
+var seq__34750_34920 = cljs.core.seq(cljs.core.vec(census.utils.core.map_over_keys(((function (e_try,vins,temp__5455__auto__,e_gen){
+return (function (p1__34740_SHARP_){
+return cljs.core.get_in.cljs$core$IFn$_invoke$arity$2(p1__34740_SHARP_,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"scopes","scopes",-1571524352)], null));
 });})(e_try,vins,temp__5455__auto__,e_gen))
 ,vins)));
-var chunk__17447_18016 = null;
-var count__17448_18017 = (0);
-var i__17449_18018 = (0);
+var chunk__34751_34922 = null;
+var count__34752_34923 = (0);
+var i__34753_34924 = (0);
 while(true){
-if((i__17449_18018 < count__17448_18017)){
-var s_18020 = chunk__17447_18016.cljs$core$IIndexed$_nth$arity$2(null,i__17449_18018);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_18020], 0));
+if((i__34753_34924 < count__34752_34923)){
+var s_34926 = chunk__34751_34922.cljs$core$IIndexed$_nth$arity$2(null,i__34753_34924);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_34926], 0));
 
 
-var G__18022 = seq__17446_18015;
-var G__18023 = chunk__17447_18016;
-var G__18024 = count__17448_18017;
-var G__18025 = (i__17449_18018 + (1));
-seq__17446_18015 = G__18022;
-chunk__17447_18016 = G__18023;
-count__17448_18017 = G__18024;
-i__17449_18018 = G__18025;
+var G__34929 = seq__34750_34920;
+var G__34930 = chunk__34751_34922;
+var G__34931 = count__34752_34923;
+var G__34932 = (i__34753_34924 + (1));
+seq__34750_34920 = G__34929;
+chunk__34751_34922 = G__34930;
+count__34752_34923 = G__34931;
+i__34753_34924 = G__34932;
 continue;
 } else {
-var temp__5457__auto___18027 = cljs.core.seq(seq__17446_18015);
-if(temp__5457__auto___18027){
-var seq__17446_18028__$1 = temp__5457__auto___18027;
-if(cljs.core.chunked_seq_QMARK_(seq__17446_18028__$1)){
-var c__4461__auto___18029 = cljs.core.chunk_first(seq__17446_18028__$1);
-var G__18031 = cljs.core.chunk_rest(seq__17446_18028__$1);
-var G__18032 = c__4461__auto___18029;
-var G__18033 = cljs.core.count(c__4461__auto___18029);
-var G__18034 = (0);
-seq__17446_18015 = G__18031;
-chunk__17447_18016 = G__18032;
-count__17448_18017 = G__18033;
-i__17449_18018 = G__18034;
+var temp__5457__auto___34933 = cljs.core.seq(seq__34750_34920);
+if(temp__5457__auto___34933){
+var seq__34750_34934__$1 = temp__5457__auto___34933;
+if(cljs.core.chunked_seq_QMARK_(seq__34750_34934__$1)){
+var c__4461__auto___34935 = cljs.core.chunk_first(seq__34750_34934__$1);
+var G__34936 = cljs.core.chunk_rest(seq__34750_34934__$1);
+var G__34937 = c__4461__auto___34935;
+var G__34938 = cljs.core.count(c__4461__auto___34935);
+var G__34939 = (0);
+seq__34750_34920 = G__34936;
+chunk__34751_34922 = G__34937;
+count__34752_34923 = G__34938;
+i__34753_34924 = G__34939;
 continue;
 } else {
-var s_18035 = cljs.core.first(seq__17446_18028__$1);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_18035], 0));
+var s_34940 = cljs.core.first(seq__34750_34934__$1);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_34940], 0));
 
 
-var G__18036 = cljs.core.next(seq__17446_18028__$1);
-var G__18037 = null;
-var G__18038 = (0);
-var G__18039 = (0);
-seq__17446_18015 = G__18036;
-chunk__17447_18016 = G__18037;
-count__17448_18017 = G__18038;
-i__17449_18018 = G__18039;
+var G__34941 = cljs.core.next(seq__34750_34934__$1);
+var G__34942 = null;
+var G__34943 = (0);
+var G__34944 = (0);
+seq__34750_34920 = G__34941;
+chunk__34751_34922 = G__34942;
+count__34752_34923 = G__34943;
+i__34753_34924 = G__34944;
 continue;
 }
 } else {
@@ -182,53 +182,53 @@ break;
 return "";
 } else {
 var e_NA = "=== available geoHierarchy levels ===";
-var seq__17462_18042 = cljs.core.seq(e_gen);
-var chunk__17463_18043 = null;
-var count__17464_18044 = (0);
-var i__17465_18045 = (0);
+var seq__34754_34945 = cljs.core.seq(e_gen);
+var chunk__34755_34946 = null;
+var count__34756_34947 = (0);
+var i__34757_34948 = (0);
 while(true){
-if((i__17465_18045 < count__17464_18044)){
-var e_18047 = chunk__17463_18043.cljs$core$IIndexed$_nth$arity$2(null,i__17465_18045);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_18047], 0));
+if((i__34757_34948 < count__34756_34947)){
+var e_34949 = chunk__34755_34946.cljs$core$IIndexed$_nth$arity$2(null,i__34757_34948);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_34949], 0));
 
 
-var G__18048 = seq__17462_18042;
-var G__18049 = chunk__17463_18043;
-var G__18050 = count__17464_18044;
-var G__18051 = (i__17465_18045 + (1));
-seq__17462_18042 = G__18048;
-chunk__17463_18043 = G__18049;
-count__17464_18044 = G__18050;
-i__17465_18045 = G__18051;
+var G__34950 = seq__34754_34945;
+var G__34951 = chunk__34755_34946;
+var G__34952 = count__34756_34947;
+var G__34953 = (i__34757_34948 + (1));
+seq__34754_34945 = G__34950;
+chunk__34755_34946 = G__34951;
+count__34756_34947 = G__34952;
+i__34757_34948 = G__34953;
 continue;
 } else {
-var temp__5457__auto___18052 = cljs.core.seq(seq__17462_18042);
-if(temp__5457__auto___18052){
-var seq__17462_18054__$1 = temp__5457__auto___18052;
-if(cljs.core.chunked_seq_QMARK_(seq__17462_18054__$1)){
-var c__4461__auto___18056 = cljs.core.chunk_first(seq__17462_18054__$1);
-var G__18057 = cljs.core.chunk_rest(seq__17462_18054__$1);
-var G__18058 = c__4461__auto___18056;
-var G__18059 = cljs.core.count(c__4461__auto___18056);
-var G__18060 = (0);
-seq__17462_18042 = G__18057;
-chunk__17463_18043 = G__18058;
-count__17464_18044 = G__18059;
-i__17465_18045 = G__18060;
+var temp__5457__auto___34954 = cljs.core.seq(seq__34754_34945);
+if(temp__5457__auto___34954){
+var seq__34754_34955__$1 = temp__5457__auto___34954;
+if(cljs.core.chunked_seq_QMARK_(seq__34754_34955__$1)){
+var c__4461__auto___34956 = cljs.core.chunk_first(seq__34754_34955__$1);
+var G__34957 = cljs.core.chunk_rest(seq__34754_34955__$1);
+var G__34958 = c__4461__auto___34956;
+var G__34959 = cljs.core.count(c__4461__auto___34956);
+var G__34960 = (0);
+seq__34754_34945 = G__34957;
+chunk__34755_34946 = G__34958;
+count__34756_34947 = G__34959;
+i__34757_34948 = G__34960;
 continue;
 } else {
-var e_18062 = cljs.core.first(seq__17462_18054__$1);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_18062], 0));
+var e_34961 = cljs.core.first(seq__34754_34955__$1);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_34961], 0));
 
 
-var G__18063 = cljs.core.next(seq__17462_18054__$1);
-var G__18064 = null;
-var G__18065 = (0);
-var G__18066 = (0);
-seq__17462_18042 = G__18063;
-chunk__17463_18043 = G__18064;
-count__17464_18044 = G__18065;
-i__17465_18045 = G__18066;
+var G__34962 = cljs.core.next(seq__34754_34955__$1);
+var G__34963 = null;
+var G__34964 = (0);
+var G__34965 = (0);
+seq__34754_34945 = G__34962;
+chunk__34755_34946 = G__34963;
+count__34756_34947 = G__34964;
+i__34757_34948 = G__34965;
 continue;
 }
 } else {
@@ -239,57 +239,57 @@ break;
 
 cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([e_NA], 0));
 
-var seq__17467_18067 = cljs.core.seq(cljs.core.vec(cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (e_NA,temp__5455__auto__,e_gen){
-return (function (p1__17435_SHARP_){
-return census.utils.core.keys__GT_strs(cljs.core.name(cljs.core.key(p1__17435_SHARP_)));
+var seq__34758_34966 = cljs.core.seq(cljs.core.vec(cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (e_NA,temp__5455__auto__,e_gen){
+return (function (p1__34741_SHARP_){
+return census.utils.core.keys__GT_strs(cljs.core.name(cljs.core.key(p1__34741_SHARP_)));
 });})(e_NA,temp__5455__auto__,e_gen))
 ,$g$)));
-var chunk__17468_18068 = null;
-var count__17469_18069 = (0);
-var i__17470_18070 = (0);
+var chunk__34759_34967 = null;
+var count__34760_34968 = (0);
+var i__34761_34969 = (0);
 while(true){
-if((i__17470_18070 < count__17469_18069)){
-var s_18071 = chunk__17468_18068.cljs$core$IIndexed$_nth$arity$2(null,i__17470_18070);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_18071], 0));
+if((i__34761_34969 < count__34760_34968)){
+var s_34970 = chunk__34759_34967.cljs$core$IIndexed$_nth$arity$2(null,i__34761_34969);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_34970], 0));
 
 
-var G__18073 = seq__17467_18067;
-var G__18074 = chunk__17468_18068;
-var G__18075 = count__17469_18069;
-var G__18076 = (i__17470_18070 + (1));
-seq__17467_18067 = G__18073;
-chunk__17468_18068 = G__18074;
-count__17469_18069 = G__18075;
-i__17470_18070 = G__18076;
+var G__34971 = seq__34758_34966;
+var G__34972 = chunk__34759_34967;
+var G__34973 = count__34760_34968;
+var G__34974 = (i__34761_34969 + (1));
+seq__34758_34966 = G__34971;
+chunk__34759_34967 = G__34972;
+count__34760_34968 = G__34973;
+i__34761_34969 = G__34974;
 continue;
 } else {
-var temp__5457__auto___18077 = cljs.core.seq(seq__17467_18067);
-if(temp__5457__auto___18077){
-var seq__17467_18078__$1 = temp__5457__auto___18077;
-if(cljs.core.chunked_seq_QMARK_(seq__17467_18078__$1)){
-var c__4461__auto___18080 = cljs.core.chunk_first(seq__17467_18078__$1);
-var G__18081 = cljs.core.chunk_rest(seq__17467_18078__$1);
-var G__18082 = c__4461__auto___18080;
-var G__18083 = cljs.core.count(c__4461__auto___18080);
-var G__18084 = (0);
-seq__17467_18067 = G__18081;
-chunk__17468_18068 = G__18082;
-count__17469_18069 = G__18083;
-i__17470_18070 = G__18084;
+var temp__5457__auto___34975 = cljs.core.seq(seq__34758_34966);
+if(temp__5457__auto___34975){
+var seq__34758_34976__$1 = temp__5457__auto___34975;
+if(cljs.core.chunked_seq_QMARK_(seq__34758_34976__$1)){
+var c__4461__auto___34977 = cljs.core.chunk_first(seq__34758_34976__$1);
+var G__34978 = cljs.core.chunk_rest(seq__34758_34976__$1);
+var G__34979 = c__4461__auto___34977;
+var G__34980 = cljs.core.count(c__4461__auto___34977);
+var G__34981 = (0);
+seq__34758_34966 = G__34978;
+chunk__34759_34967 = G__34979;
+count__34760_34968 = G__34980;
+i__34761_34969 = G__34981;
 continue;
 } else {
-var s_18085 = cljs.core.first(seq__17467_18078__$1);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_18085], 0));
+var s_34982 = cljs.core.first(seq__34758_34976__$1);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_34982], 0));
 
 
-var G__18086 = cljs.core.next(seq__17467_18078__$1);
-var G__18087 = null;
-var G__18088 = (0);
-var G__18089 = (0);
-seq__17467_18067 = G__18086;
-chunk__17468_18068 = G__18087;
-count__17469_18069 = G__18088;
-i__17470_18070 = G__18089;
+var G__34983 = cljs.core.next(seq__34758_34976__$1);
+var G__34984 = null;
+var G__34985 = (0);
+var G__34986 = (0);
+seq__34758_34966 = G__34983;
+chunk__34759_34967 = G__34984;
+count__34760_34968 = G__34985;
+i__34761_34969 = G__34986;
 continue;
 }
 } else {
@@ -305,8 +305,8 @@ return "";
  * Composes a URL to call raw GeoJSON files hosted on Github
  */
 census.geoAPI.core.G_pattern__GT_url = (function census$geoAPI$core$G_pattern__GT_url(var_args){
-var G__17484 = arguments.length;
-switch (G__17484) {
+var G__34763 = arguments.length;
+switch (G__34763) {
 case 3:
 return census.geoAPI.core.G_pattern__GT_url.cljs$core$IFn$_invoke$arity$3((arguments[(0)]),(arguments[(1)]),(arguments[(2)]));
 
@@ -336,8 +336,8 @@ return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(cuerdas.core.join.cljs$core$
 census.geoAPI.core.G_pattern__GT_url.cljs$lang$maxFixedArity = 4;
 
 census.geoAPI.core.scope = (function census$geoAPI$core$scope(var_args){
-var G__17491 = arguments.length;
-switch (G__17491) {
+var G__34767 = arguments.length;
+switch (G__34767) {
 case 5:
 return census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$5((arguments[(0)]),(arguments[(1)]),(arguments[(2)]),(arguments[(3)]),(arguments[(4)]));
 
@@ -365,12 +365,12 @@ return census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$7($g$,res,vin,lev,US
 });
 
 census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$7 = (function ($g$,res,vin,lev,USr,STr,st){
-var STr_QMARK_ = (!((cljs.core.some((function (p1__17487_SHARP_){
-return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(res,p1__17487_SHARP_);
+var STr_QMARK_ = (!((cljs.core.some((function (p1__34764_SHARP_){
+return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(res,p1__34764_SHARP_);
 }),STr) == null)));
 var USr_QMARK_ = (!((cljs.core.some(((function (STr_QMARK_){
-return (function (p1__17488_SHARP_){
-return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(res,p1__17488_SHARP_);
+return (function (p1__34765_SHARP_){
+return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(res,p1__34765_SHARP_);
 });})(STr_QMARK_))
 ,USr) == null)));
 var st_QMARK_ = (!((st == null)));
@@ -394,8 +394,8 @@ return census.geoAPI.core.G_err($g$,res,vin,lev);
 census.geoAPI.core.scope.cljs$lang$maxFixedArity = 7;
 
 census.geoAPI.core.big_G = (function census$geoAPI$core$big_G(var_args){
-var G__17501 = arguments.length;
-switch (G__17501) {
+var G__34769 = arguments.length;
+switch (G__34769) {
 case 5:
 return census.geoAPI.core.big_G.cljs$core$IFn$_invoke$arity$5((arguments[(0)]),(arguments[(1)]),(arguments[(2)]),(arguments[(3)]),(arguments[(4)]));
 
@@ -424,53 +424,53 @@ return census.geoAPI.core.big_G.cljs$core$IFn$_invoke$arity$7($g$,res,vin,lev,US
 
 census.geoAPI.core.big_G.cljs$core$IFn$_invoke$arity$7 = (function ($g$,res,vin,lev,USr,STr,st){
 var strs = new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, ["Warning, you are about to make a large GeoJSON request.","This may take some time -> consider local data caching.","The response may also cause VM heap capacity overflow.","Node heap may be increased via `--max-old-space-size=`","For all ZCTAs: Use `--max-old-space-size=4096"], null);
-var seq__17506_18101 = cljs.core.seq(strs);
-var chunk__17508_18102 = null;
-var count__17509_18103 = (0);
-var i__17510_18104 = (0);
+var seq__34770_34999 = cljs.core.seq(strs);
+var chunk__34771_35000 = null;
+var count__34772_35001 = (0);
+var i__34773_35002 = (0);
 while(true){
-if((i__17510_18104 < count__17509_18103)){
-var s_18105 = chunk__17508_18102.cljs$core$IIndexed$_nth$arity$2(null,i__17510_18104);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_18105], 0));
+if((i__34773_35002 < count__34772_35001)){
+var s_35003 = chunk__34771_35000.cljs$core$IIndexed$_nth$arity$2(null,i__34773_35002);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_35003], 0));
 
 
-var G__18106 = seq__17506_18101;
-var G__18107 = chunk__17508_18102;
-var G__18108 = count__17509_18103;
-var G__18109 = (i__17510_18104 + (1));
-seq__17506_18101 = G__18106;
-chunk__17508_18102 = G__18107;
-count__17509_18103 = G__18108;
-i__17510_18104 = G__18109;
+var G__35004 = seq__34770_34999;
+var G__35005 = chunk__34771_35000;
+var G__35006 = count__34772_35001;
+var G__35007 = (i__34773_35002 + (1));
+seq__34770_34999 = G__35004;
+chunk__34771_35000 = G__35005;
+count__34772_35001 = G__35006;
+i__34773_35002 = G__35007;
 continue;
 } else {
-var temp__5457__auto___18110 = cljs.core.seq(seq__17506_18101);
-if(temp__5457__auto___18110){
-var seq__17506_18111__$1 = temp__5457__auto___18110;
-if(cljs.core.chunked_seq_QMARK_(seq__17506_18111__$1)){
-var c__4461__auto___18112 = cljs.core.chunk_first(seq__17506_18111__$1);
-var G__18113 = cljs.core.chunk_rest(seq__17506_18111__$1);
-var G__18114 = c__4461__auto___18112;
-var G__18115 = cljs.core.count(c__4461__auto___18112);
-var G__18116 = (0);
-seq__17506_18101 = G__18113;
-chunk__17508_18102 = G__18114;
-count__17509_18103 = G__18115;
-i__17510_18104 = G__18116;
+var temp__5457__auto___35008 = cljs.core.seq(seq__34770_34999);
+if(temp__5457__auto___35008){
+var seq__34770_35009__$1 = temp__5457__auto___35008;
+if(cljs.core.chunked_seq_QMARK_(seq__34770_35009__$1)){
+var c__4461__auto___35012 = cljs.core.chunk_first(seq__34770_35009__$1);
+var G__35013 = cljs.core.chunk_rest(seq__34770_35009__$1);
+var G__35014 = c__4461__auto___35012;
+var G__35015 = cljs.core.count(c__4461__auto___35012);
+var G__35016 = (0);
+seq__34770_34999 = G__35013;
+chunk__34771_35000 = G__35014;
+count__34772_35001 = G__35015;
+i__34773_35002 = G__35016;
 continue;
 } else {
-var s_18117 = cljs.core.first(seq__17506_18111__$1);
-cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_18117], 0));
+var s_35017 = cljs.core.first(seq__34770_35009__$1);
+cljs.core.prn.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([s_35017], 0));
 
 
-var G__18118 = cljs.core.next(seq__17506_18111__$1);
-var G__18119 = null;
-var G__18120 = (0);
-var G__18121 = (0);
-seq__17506_18101 = G__18118;
-chunk__17508_18102 = G__18119;
-count__17509_18103 = G__18120;
-i__17510_18104 = G__18121;
+var G__35018 = cljs.core.next(seq__34770_35009__$1);
+var G__35019 = null;
+var G__35020 = (0);
+var G__35021 = (0);
+seq__34770_34999 = G__35018;
+chunk__34771_35000 = G__35019;
+count__34772_35001 = G__35020;
+i__34773_35002 = G__35021;
 continue;
 }
 } else {
@@ -491,575 +491,575 @@ census.geoAPI.core.big_G.cljs$lang$maxFixedArity = 7;
  * @param {...*} var_args
  */
 census.geoAPI.core.G_patterner = (function() { 
-var census$geoAPI$core$G_patterner__delegate = function (args__7638__auto__){
-var ocr_17540 = cljs.core.vec(args__7638__auto__);
-try{if(((cljs.core.vector_QMARK_(ocr_17540)) && ((cljs.core.count(ocr_17540) === 2)))){
-try{var ocr_17540_1__17730 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(1));
-if(((cljs.core.vector_QMARK_(ocr_17540_1__17730)) && ((cljs.core.count(ocr_17540_1__17730) === 5)))){
-try{var ocr_17540_1__17730_3__17739 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(3));
-if(((cljs.core.vector_QMARK_(ocr_17540_1__17730_3__17739)) && ((cljs.core.count(ocr_17540_1__17730_3__17739) === 2)))){
-try{var ocr_17540_1__17730_3__17739_0__17742 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-if(cljs.core.keyword_identical_QMARK_(ocr_17540_1__17730_3__17739_0__17742,new cljs.core.Keyword(null,"zip-code-tabulation-area","zip-code-tabulation-area",-1640974557))){
-try{var ocr_17540_1__17730_0__17736 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-if((ocr_17540_1__17730_0__17736 === "500k")){
-try{var ocr_17540_1__17730_4__17740 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(4));
-if((((!((ocr_17540_1__17730_4__17740 == null))))?(((((ocr_17540_1__17730_4__17740.cljs$lang$protocol_mask$partition0$ & (256))) || ((cljs.core.PROTOCOL_SENTINEL === ocr_17540_1__17730_4__17740.cljs$core$ILookup$))))?true:(((!ocr_17540_1__17730_4__17740.cljs$lang$protocol_mask$partition0$))?cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_17540_1__17730_4__17740):false)):cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_17540_1__17730_4__17740))){
-try{var ocr_17540_1__17730_4__17740_st__17756 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if((ocr_17540_1__17730_4__17740_st__17756 === null)){
-try{var ocr_17540_1__17730_4__17740_us__17755 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_us__17755,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+var census$geoAPI$core$G_patterner__delegate = function (args__21996__auto__){
+var ocr_34775 = cljs.core.vec(args__21996__auto__);
+try{if(((cljs.core.vector_QMARK_(ocr_34775)) && ((cljs.core.count(ocr_34775) === 2)))){
+try{var ocr_34775_1__34796 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(1));
+if(((cljs.core.vector_QMARK_(ocr_34775_1__34796)) && ((cljs.core.count(ocr_34775_1__34796) === 5)))){
+try{var ocr_34775_1__34796_3__34800 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(3));
+if(((cljs.core.vector_QMARK_(ocr_34775_1__34796_3__34800)) && ((cljs.core.count(ocr_34775_1__34796_3__34800) === 2)))){
+try{var ocr_34775_1__34796_3__34800_0__34802 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+if(cljs.core.keyword_identical_QMARK_(ocr_34775_1__34796_3__34800_0__34802,new cljs.core.Keyword(null,"zip-code-tabulation-area","zip-code-tabulation-area",-1640974557))){
+try{var ocr_34775_1__34796_0__34797 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+if((ocr_34775_1__34796_0__34797 === "500k")){
+try{var ocr_34775_1__34796_4__34801 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(4));
+if((((!((ocr_34775_1__34796_4__34801 == null))))?(((((ocr_34775_1__34796_4__34801.cljs$lang$protocol_mask$partition0$ & (256))) || ((cljs.core.PROTOCOL_SENTINEL === ocr_34775_1__34796_4__34801.cljs$core$ILookup$))))?true:(((!ocr_34775_1__34796_4__34801.cljs$lang$protocol_mask$partition0$))?cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_34775_1__34796_4__34801):false)):cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_34775_1__34796_4__34801))){
+try{var ocr_34775_1__34796_4__34801_st__34808 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if((ocr_34775_1__34796_4__34801_st__34808 === null)){
+try{var ocr_34775_1__34796_4__34801_us__34807 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_us__34807,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.big_G.cljs$core$IFn$_invoke$arity$5($g$,"500k",vin,new cljs.core.Keyword(null,"zip-code-tabulation-area","zip-code-tabulation-area",-1640974557),USr);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17878){if((e17878 instanceof Error)){
-var e__5452__auto__ = e17878;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
+}catch (e34848){if((e34848 instanceof Error)){
+var e__21043__auto__ = e34848;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto__;
+throw e__21043__auto__;
 }
 } else {
-throw e17878;
+throw e34848;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17877){if((e17877 instanceof Error)){
-var e__5452__auto__ = e17877;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
+}catch (e34847){if((e34847 instanceof Error)){
+var e__21043__auto__ = e34847;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto__;
+throw e__21043__auto__;
 }
 } else {
-throw e17877;
+throw e34847;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17875){if((e17875 instanceof Error)){
-var e__5452__auto__ = e17875;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
+}catch (e34845){if((e34845 instanceof Error)){
+var e__21043__auto__ = e34845;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto__;
+throw e__21043__auto__;
 }
 } else {
-throw e17875;
+throw e34845;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17872){if((e17872 instanceof Error)){
-var e__5452__auto__ = e17872;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_0__17736 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-if(cljs.core.truth_((function (){var fexpr__17874 = ((function (ocr_17540_1__17730_0__17736,e__5452__auto__,ocr_17540_1__17730_3__17739_0__17742,ocr_17540_1__17730_3__17739,ocr_17540_1__17730,ocr_17540){
-return (function (p1__17514_SHARP_){
-return (!(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("500k",p1__17514_SHARP_)));
-});})(ocr_17540_1__17730_0__17736,e__5452__auto__,ocr_17540_1__17730_3__17739_0__17742,ocr_17540_1__17730_3__17739,ocr_17540_1__17730,ocr_17540))
+}catch (e34842){if((e34842 instanceof Error)){
+var e__21043__auto__ = e34842;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_0__34797 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+if(cljs.core.truth_((function (){var fexpr__34844 = ((function (ocr_34775_1__34796_0__34797,e__21043__auto__,ocr_34775_1__34796_3__34800_0__34802,ocr_34775_1__34796_3__34800,ocr_34775_1__34796,ocr_34775){
+return (function (p1__34774_SHARP_){
+return (!(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("500k",p1__34774_SHARP_)));
+});})(ocr_34775_1__34796_0__34797,e__21043__auto__,ocr_34775_1__34796_3__34800_0__34802,ocr_34775_1__34796_3__34800,ocr_34775_1__34796,ocr_34775))
 ;
-return fexpr__17874(ocr_17540_1__17730_0__17736);
+return fexpr__34844(ocr_34775_1__34796_0__34797);
 })())){
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.G_err($g$,res,vin,new cljs.core.Keyword(null,"zip-code-tabulation-area","zip-code-tabulation-area",-1640974557));
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17873){if((e17873 instanceof Error)){
-var e__5452__auto____$1 = e17873;
-if((e__5452__auto____$1 === cljs.core.match.backtrack)){
+}catch (e34843){if((e34843 instanceof Error)){
+var e__21043__auto____$1 = e34843;
+if((e__21043__auto____$1 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$1;
+throw e__21043__auto____$1;
 }
 } else {
-throw e17873;
+throw e34843;
 
 }
 }} else {
-throw e__5452__auto__;
+throw e__21043__auto__;
 }
 } else {
-throw e17872;
+throw e34842;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17852){if((e17852 instanceof Error)){
-var e__5452__auto__ = e17852;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_4__17740 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(4));
-if((ocr_17540_1__17730_4__17740 === null)){
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34822){if((e34822 instanceof Error)){
+var e__21043__auto__ = e34822;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_4__34801 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(4));
+if((ocr_34775_1__34796_4__34801 === null)){
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.G_err($g$,res,vin,lev);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17853){if((e17853 instanceof Error)){
-var e__5452__auto____$1 = e17853;
-if((e__5452__auto____$1 === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_4__17740 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(4));
-if((((!((ocr_17540_1__17730_4__17740 == null))))?(((((ocr_17540_1__17730_4__17740.cljs$lang$protocol_mask$partition0$ & (256))) || ((cljs.core.PROTOCOL_SENTINEL === ocr_17540_1__17730_4__17740.cljs$core$ILookup$))))?true:(((!ocr_17540_1__17730_4__17740.cljs$lang$protocol_mask$partition0$))?cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_17540_1__17730_4__17740):false)):cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_17540_1__17730_4__17740))){
-try{var ocr_17540_1__17730_2__17738 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(2));
-if((ocr_17540_1__17730_2__17738 === null)){
-try{var ocr_17540_1__17730_4__17740_us__17772 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if((ocr_17540_1__17730_4__17740_us__17772 === null)){
-try{var ocr_17540_1__17730_4__17740_st__17773 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_st__17773,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34823){if((e34823 instanceof Error)){
+var e__21043__auto____$1 = e34823;
+if((e__21043__auto____$1 === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_4__34801 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(4));
+if((((!((ocr_34775_1__34796_4__34801 == null))))?(((((ocr_34775_1__34796_4__34801.cljs$lang$protocol_mask$partition0$ & (256))) || ((cljs.core.PROTOCOL_SENTINEL === ocr_34775_1__34796_4__34801.cljs$core$ILookup$))))?true:(((!ocr_34775_1__34796_4__34801.cljs$lang$protocol_mask$partition0$))?cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_34775_1__34796_4__34801):false)):cljs.core.native_satisfies_QMARK_(cljs.core.ILookup,ocr_34775_1__34796_4__34801))){
+try{var ocr_34775_1__34796_2__34799 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(2));
+if((ocr_34775_1__34796_2__34799 === null)){
+try{var ocr_34775_1__34796_4__34801_us__34812 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if((ocr_34775_1__34796_4__34801_us__34812 === null)){
+try{var ocr_34775_1__34796_4__34801_st__34813 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_st__34813,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.G_err($g$,res,vin,lev);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17871){if((e17871 instanceof Error)){
-var e__5452__auto____$2 = e17871;
-if((e__5452__auto____$2 === cljs.core.match.backtrack)){
+}catch (e34841){if((e34841 instanceof Error)){
+var e__21043__auto____$2 = e34841;
+if((e__21043__auto____$2 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$2;
+throw e__21043__auto____$2;
 }
 } else {
-throw e17871;
+throw e34841;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17870){if((e17870 instanceof Error)){
-var e__5452__auto____$2 = e17870;
-if((e__5452__auto____$2 === cljs.core.match.backtrack)){
+}catch (e34840){if((e34840 instanceof Error)){
+var e__21043__auto____$2 = e34840;
+if((e__21043__auto____$2 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$2;
+throw e__21043__auto____$2;
 }
 } else {
-throw e17870;
+throw e34840;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17856){if((e17856 instanceof Error)){
-var e__5452__auto____$2 = e17856;
-if((e__5452__auto____$2 === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_2__17738 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(2));
-if((ocr_17540_1__17730_2__17738 === "*")){
-try{var ocr_17540_1__17730_4__17740_us__17772 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if((ocr_17540_1__17730_4__17740_us__17772 === null)){
-try{var ocr_17540_1__17730_4__17740_st__17773 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_st__17773,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34826){if((e34826 instanceof Error)){
+var e__21043__auto____$2 = e34826;
+if((e__21043__auto____$2 === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_2__34799 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(2));
+if((ocr_34775_1__34796_2__34799 === "*")){
+try{var ocr_34775_1__34796_4__34801_us__34812 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if((ocr_34775_1__34796_4__34801_us__34812 === null)){
+try{var ocr_34775_1__34796_4__34801_st__34813 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_st__34813,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.G_err($g$,res,vin,lev);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17869){if((e17869 instanceof Error)){
-var e__5452__auto____$3 = e17869;
-if((e__5452__auto____$3 === cljs.core.match.backtrack)){
+}catch (e34839){if((e34839 instanceof Error)){
+var e__21043__auto____$3 = e34839;
+if((e__21043__auto____$3 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$3;
+throw e__21043__auto____$3;
 }
 } else {
-throw e17869;
+throw e34839;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17868){if((e17868 instanceof Error)){
-var e__5452__auto____$3 = e17868;
-if((e__5452__auto____$3 === cljs.core.match.backtrack)){
+}catch (e34838){if((e34838 instanceof Error)){
+var e__21043__auto____$3 = e34838;
+if((e__21043__auto____$3 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$3;
+throw e__21043__auto____$3;
 }
 } else {
-throw e17868;
+throw e34838;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17857){if((e17857 instanceof Error)){
-var e__5452__auto____$3 = e17857;
-if((e__5452__auto____$3 === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_2__17738 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(2));
-if((ocr_17540_1__17730_2__17738 === null)){
-try{var ocr_17540_1__17730_4__17740_us__17772 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_us__17772,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-try{var ocr_17540_1__17730_4__17740_st__17773 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_st__17773,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226));
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34827){if((e34827 instanceof Error)){
+var e__21043__auto____$3 = e34827;
+if((e__21043__auto____$3 === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_2__34799 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(2));
+if((ocr_34775_1__34796_2__34799 === null)){
+try{var ocr_34775_1__34796_4__34801_us__34812 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_us__34812,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+try{var ocr_34775_1__34796_4__34801_st__34813 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_st__34813,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226));
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$5($g$,res,vin,lev,USr);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17867){if((e17867 instanceof Error)){
-var e__5452__auto____$4 = e17867;
-if((e__5452__auto____$4 === cljs.core.match.backtrack)){
+}catch (e34837){if((e34837 instanceof Error)){
+var e__21043__auto____$4 = e34837;
+if((e__21043__auto____$4 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$4;
+throw e__21043__auto____$4;
 }
 } else {
-throw e17867;
+throw e34837;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17866){if((e17866 instanceof Error)){
-var e__5452__auto____$4 = e17866;
-if((e__5452__auto____$4 === cljs.core.match.backtrack)){
+}catch (e34836){if((e34836 instanceof Error)){
+var e__21043__auto____$4 = e34836;
+if((e__21043__auto____$4 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$4;
+throw e__21043__auto____$4;
 }
 } else {
-throw e17866;
+throw e34836;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17858){if((e17858 instanceof Error)){
-var e__5452__auto____$4 = e17858;
-if((e__5452__auto____$4 === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_2__17738 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(2));
-if((ocr_17540_1__17730_2__17738 === "*")){
-try{var ocr_17540_1__17730_4__17740_us__17772 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_us__17772,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-try{var ocr_17540_1__17730_4__17740_st__17773 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_st__17773,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226));
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34828){if((e34828 instanceof Error)){
+var e__21043__auto____$4 = e34828;
+if((e__21043__auto____$4 === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_2__34799 = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(2));
+if((ocr_34775_1__34796_2__34799 === "*")){
+try{var ocr_34775_1__34796_4__34801_us__34812 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_us__34812,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+try{var ocr_34775_1__34796_4__34801_st__34813 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_st__34813,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226));
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$5($g$,res,vin,lev,USr);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17865){if((e17865 instanceof Error)){
-var e__5452__auto____$5 = e17865;
-if((e__5452__auto____$5 === cljs.core.match.backtrack)){
+}catch (e34835){if((e34835 instanceof Error)){
+var e__21043__auto____$5 = e34835;
+if((e__21043__auto____$5 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$5;
+throw e__21043__auto____$5;
 }
 } else {
-throw e17865;
+throw e34835;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17864){if((e17864 instanceof Error)){
-var e__5452__auto____$5 = e17864;
-if((e__5452__auto____$5 === cljs.core.match.backtrack)){
+}catch (e34834){if((e34834 instanceof Error)){
+var e__21043__auto____$5 = e34834;
+if((e__21043__auto____$5 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$5;
+throw e__21043__auto____$5;
 }
 } else {
-throw e17864;
+throw e34834;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17859){if((e17859 instanceof Error)){
-var e__5452__auto____$5 = e17859;
-if((e__5452__auto____$5 === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_4__17740_st__17773 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if((ocr_17540_1__17730_4__17740_st__17773 === null)){
-try{var ocr_17540_1__17730_4__17740_us__17772 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_us__17772,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226));
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34829){if((e34829 instanceof Error)){
+var e__21043__auto____$5 = e34829;
+if((e__21043__auto____$5 === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_4__34801_st__34813 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if((ocr_34775_1__34796_4__34801_st__34813 === null)){
+try{var ocr_34775_1__34796_4__34801_us__34812 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_us__34812,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226));
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$5($g$,res,vin,lev,USr);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17863){if((e17863 instanceof Error)){
-var e__5452__auto____$6 = e17863;
-if((e__5452__auto____$6 === cljs.core.match.backtrack)){
+}catch (e34833){if((e34833 instanceof Error)){
+var e__21043__auto____$6 = e34833;
+if((e__21043__auto____$6 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$6;
+throw e__21043__auto____$6;
 }
 } else {
-throw e17863;
+throw e34833;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17860){if((e17860 instanceof Error)){
-var e__5452__auto____$6 = e17860;
-if((e__5452__auto____$6 === cljs.core.match.backtrack)){
-try{var ocr_17540_1__17730_4__17740_st__17773 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_st__17773,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-try{var ocr_17540_1__17730_4__17740_us__17772 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
-if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740_us__17772,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
-var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"us","us",746429226));
-var STr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_4__17740,new cljs.core.Keyword(null,"st","st",1455255828));
-var st = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(2));
-var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730_3__17739,(0));
-var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(0));
-var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_1__17730,(1));
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540,(0));
+}catch (e34830){if((e34830 instanceof Error)){
+var e__21043__auto____$6 = e34830;
+if((e__21043__auto____$6 === cljs.core.match.backtrack)){
+try{var ocr_34775_1__34796_4__34801_st__34813 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_st__34813,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+try{var ocr_34775_1__34796_4__34801_us__34812 = cljs.core.get.cljs$core$IFn$_invoke$arity$3(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226),new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780));
+if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801_us__34812,new cljs.core.Keyword("clojure.core.match","not-found","clojure.core.match/not-found",1553053780))){
+var USr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"us","us",746429226));
+var STr = cljs.core.get.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_4__34801,new cljs.core.Keyword(null,"st","st",1455255828));
+var st = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(2));
+var lev = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796_3__34800,(0));
+var res = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(0));
+var vin = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_1__34796,(1));
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775,(0));
 return census.geoAPI.core.scope.cljs$core$IFn$_invoke$arity$7($g$,res,vin,lev,USr,STr,st);
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17862){if((e17862 instanceof Error)){
-var e__5452__auto____$7 = e17862;
-if((e__5452__auto____$7 === cljs.core.match.backtrack)){
+}catch (e34832){if((e34832 instanceof Error)){
+var e__21043__auto____$7 = e34832;
+if((e__21043__auto____$7 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$7;
+throw e__21043__auto____$7;
 }
 } else {
-throw e17862;
-
-}
-}} else {
-throw cljs.core.match.backtrack;
-
-}
-}catch (e17861){if((e17861 instanceof Error)){
-var e__5452__auto____$7 = e17861;
-if((e__5452__auto____$7 === cljs.core.match.backtrack)){
-throw cljs.core.match.backtrack;
-} else {
-throw e__5452__auto____$7;
-}
-} else {
-throw e17861;
-
-}
-}} else {
-throw e__5452__auto____$6;
-}
-} else {
-throw e17860;
-
-}
-}} else {
-throw e__5452__auto____$5;
-}
-} else {
-throw e17859;
-
-}
-}} else {
-throw e__5452__auto____$4;
-}
-} else {
-throw e17858;
-
-}
-}} else {
-throw e__5452__auto____$3;
-}
-} else {
-throw e17857;
-
-}
-}} else {
-throw e__5452__auto____$2;
-}
-} else {
-throw e17856;
+throw e34832;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17854){if((e17854 instanceof Error)){
-var e__5452__auto____$2 = e17854;
-if((e__5452__auto____$2 === cljs.core.match.backtrack)){
+}catch (e34831){if((e34831 instanceof Error)){
+var e__21043__auto____$7 = e34831;
+if((e__21043__auto____$7 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$2;
+throw e__21043__auto____$7;
 }
 } else {
-throw e17854;
+throw e34831;
 
 }
 }} else {
-throw e__5452__auto____$1;
+throw e__21043__auto____$6;
 }
 } else {
-throw e17853;
+throw e34830;
 
 }
 }} else {
-throw e__5452__auto__;
+throw e__21043__auto____$5;
 }
 } else {
-throw e17852;
+throw e34829;
 
 }
 }} else {
-throw cljs.core.match.backtrack;
-
-}
-}catch (e17851){if((e17851 instanceof Error)){
-var e__5452__auto__ = e17851;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
-throw cljs.core.match.backtrack;
-} else {
-throw e__5452__auto__;
+throw e__21043__auto____$4;
 }
 } else {
-throw e17851;
+throw e34828;
 
 }
 }} else {
-throw cljs.core.match.backtrack;
+throw e__21043__auto____$3;
+}
+} else {
+throw e34827;
 
 }
-}catch (e17850){if((e17850 instanceof Error)){
-var e__5452__auto__ = e17850;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
-throw cljs.core.match.backtrack;
-} else {
-throw e__5452__auto__;
+}} else {
+throw e__21043__auto____$2;
 }
 } else {
-throw e17850;
+throw e34826;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17847){if((e17847 instanceof Error)){
-var e__5452__auto__ = e17847;
-if((e__5452__auto__ === cljs.core.match.backtrack)){
-try{if(((cljs.core.vector_QMARK_(ocr_17540)) && ((cljs.core.count(ocr_17540) >= (1))))){
-try{var ocr_17540_left__17844 = cljs.core.subvec.cljs$core$IFn$_invoke$arity$3(ocr_17540,(0),(1));
-if(((cljs.core.vector_QMARK_(ocr_17540_left__17844)) && ((cljs.core.count(ocr_17540_left__17844) === (1))))){
-var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_17540_left__17844,(0));
-var anthing_else = cljs.core.subvec.cljs$core$IFn$_invoke$arity$2(ocr_17540,(1));
+}catch (e34824){if((e34824 instanceof Error)){
+var e__21043__auto____$2 = e34824;
+if((e__21043__auto____$2 === cljs.core.match.backtrack)){
+throw cljs.core.match.backtrack;
+} else {
+throw e__21043__auto____$2;
+}
+} else {
+throw e34824;
+
+}
+}} else {
+throw e__21043__auto____$1;
+}
+} else {
+throw e34823;
+
+}
+}} else {
+throw e__21043__auto__;
+}
+} else {
+throw e34822;
+
+}
+}} else {
+throw cljs.core.match.backtrack;
+
+}
+}catch (e34821){if((e34821 instanceof Error)){
+var e__21043__auto__ = e34821;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
+throw cljs.core.match.backtrack;
+} else {
+throw e__21043__auto__;
+}
+} else {
+throw e34821;
+
+}
+}} else {
+throw cljs.core.match.backtrack;
+
+}
+}catch (e34820){if((e34820 instanceof Error)){
+var e__21043__auto__ = e34820;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
+throw cljs.core.match.backtrack;
+} else {
+throw e__21043__auto__;
+}
+} else {
+throw e34820;
+
+}
+}} else {
+throw cljs.core.match.backtrack;
+
+}
+}catch (e34817){if((e34817 instanceof Error)){
+var e__21043__auto__ = e34817;
+if((e__21043__auto__ === cljs.core.match.backtrack)){
+try{if(((cljs.core.vector_QMARK_(ocr_34775)) && ((cljs.core.count(ocr_34775) >= (1))))){
+try{var ocr_34775_left__34814 = cljs.core.subvec.cljs$core$IFn$_invoke$arity$3(ocr_34775,(0),(1));
+if(((cljs.core.vector_QMARK_(ocr_34775_left__34814)) && ((cljs.core.count(ocr_34775_left__34814) === (1))))){
+var $g$ = cljs.core.nth.cljs$core$IFn$_invoke$arity$2(ocr_34775_left__34814,(0));
+var anthing_else = cljs.core.subvec.cljs$core$IFn$_invoke$arity$2(ocr_34775,(1));
 return "";
 } else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17849){if((e17849 instanceof Error)){
-var e__5452__auto____$1 = e17849;
-if((e__5452__auto____$1 === cljs.core.match.backtrack)){
+}catch (e34819){if((e34819 instanceof Error)){
+var e__21043__auto____$1 = e34819;
+if((e__21043__auto____$1 === cljs.core.match.backtrack)){
 throw cljs.core.match.backtrack;
 } else {
-throw e__5452__auto____$1;
+throw e__21043__auto____$1;
 }
 } else {
-throw e17849;
+throw e34819;
 
 }
 }} else {
 throw cljs.core.match.backtrack;
 
 }
-}catch (e17848){if((e17848 instanceof Error)){
-var e__5452__auto____$1 = e17848;
-if((e__5452__auto____$1 === cljs.core.match.backtrack)){
-throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(ocr_17540)].join('')));
+}catch (e34818){if((e34818 instanceof Error)){
+var e__21043__auto____$1 = e34818;
+if((e__21043__auto____$1 === cljs.core.match.backtrack)){
+throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(ocr_34775)].join('')));
 } else {
-throw e__5452__auto____$1;
+throw e__21043__auto____$1;
 }
 } else {
-throw e17848;
+throw e34818;
 
 }
 }} else {
-throw e__5452__auto__;
+throw e__21043__auto__;
 }
 } else {
-throw e17847;
+throw e34817;
 
 }
 }};
 var census$geoAPI$core$G_patterner = function (var_args){
-var args__7638__auto__ = null;
+var args__21996__auto__ = null;
 if (arguments.length > 0) {
-var G__18148__i = 0, G__18148__a = new Array(arguments.length -  0);
-while (G__18148__i < G__18148__a.length) {G__18148__a[G__18148__i] = arguments[G__18148__i + 0]; ++G__18148__i;}
-  args__7638__auto__ = new cljs.core.IndexedSeq(G__18148__a,0,null);
+var G__35036__i = 0, G__35036__a = new Array(arguments.length -  0);
+while (G__35036__i < G__35036__a.length) {G__35036__a[G__35036__i] = arguments[G__35036__i + 0]; ++G__35036__i;}
+  args__21996__auto__ = new cljs.core.IndexedSeq(G__35036__a,0,null);
 } 
-return census$geoAPI$core$G_patterner__delegate.call(this,args__7638__auto__);};
+return census$geoAPI$core$G_patterner__delegate.call(this,args__21996__auto__);};
 census$geoAPI$core$G_patterner.cljs$lang$maxFixedArity = 0;
-census$geoAPI$core$G_patterner.cljs$lang$applyTo = (function (arglist__18149){
-var args__7638__auto__ = cljs.core.seq(arglist__18149);
-return census$geoAPI$core$G_patterner__delegate(args__7638__auto__);
+census$geoAPI$core$G_patterner.cljs$lang$applyTo = (function (arglist__35037){
+var args__21996__auto__ = cljs.core.seq(arglist__35037);
+return census$geoAPI$core$G_patterner__delegate(args__21996__auto__);
 });
 census$geoAPI$core$G_patterner.cljs$core$IFn$_invoke$arity$variadic = census$geoAPI$core$G_patterner__delegate;
 return census$geoAPI$core$G_patterner;
 })()
 ;
-census.geoAPI.core.G_pattern_cfg = (function census$geoAPI$core$G_pattern_cfg($g$,p__17907){
-var map__17931 = p__17907;
-var map__17931__$1 = (((((!((map__17931 == null))))?(((((map__17931.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__17931.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17931):map__17931);
-var map__17932 = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17931__$1,new cljs.core.Keyword(null,"geoHierarchy","geoHierarchy",380422740));
-var map__17932__$1 = (((((!((map__17932 == null))))?(((((map__17932.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__17932.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17932):map__17932);
-var geoHierarchy = map__17932__$1;
-var state = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17932__$1,new cljs.core.Keyword(null,"state","state",-1988618099));
-var vintage = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17931__$1,new cljs.core.Keyword(null,"vintage","vintage",818195578));
-var geoResolution = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17931__$1,new cljs.core.Keyword(null,"geoResolution","geoResolution",1206666050));
+census.geoAPI.core.G_pattern_cfg = (function census$geoAPI$core$G_pattern_cfg($g$,p__34849){
+var map__34850 = p__34849;
+var map__34850__$1 = (((((!((map__34850 == null))))?(((((map__34850.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__34850.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__34850):map__34850);
+var map__34851 = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__34850__$1,new cljs.core.Keyword(null,"geoHierarchy","geoHierarchy",380422740));
+var map__34851__$1 = (((((!((map__34851 == null))))?(((((map__34851.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__34851.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__34851):map__34851);
+var geoHierarchy = map__34851__$1;
+var state = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__34851__$1,new cljs.core.Keyword(null,"state","state",-1988618099));
+var vintage = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__34850__$1,new cljs.core.Keyword(null,"vintage","vintage",818195578));
+var geoResolution = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__34850__$1,new cljs.core.Keyword(null,"geoResolution","geoResolution",1206666050));
 var level = cljs.core.last(geoHierarchy);
 var geoScopes = cljs.core.get_in.cljs$core$IFn$_invoke$arity$2($g$,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.key(level),cljs.core.keyword.cljs$core$IFn$_invoke$arity$1(vintage),new cljs.core.Keyword(null,"scopes","scopes",-1571524352)], null));
 var pattern = new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [geoResolution,vintage,state,level,geoScopes], null);
@@ -1081,13 +1081,37 @@ var url = census.geoAPI.core.C_G_pattern__GT_url($g$,args);
 if(cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2("",url)){
 return cljs.core.async.put_BANG_.cljs$core$IFn$_invoke$arity$2(_EQ_E_EQ_,"Invalid GeoJSON request. Please check arguments against requirements.");
 } else {
-var G__17941 = cljs.core.async.to_chan(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [url], null));
-var G__17942 = _EQ_O_EQ_;
-var G__17943 = _EQ_E_EQ_;
-return (census.geoAPI.core.$GET$_C_GeoJSON.cljs$core$IFn$_invoke$arity$3 ? census.geoAPI.core.$GET$_C_GeoJSON.cljs$core$IFn$_invoke$arity$3(G__17941,G__17942,G__17943) : census.geoAPI.core.$GET$_C_GeoJSON.call(null,G__17941,G__17942,G__17943));
+var G__34854 = cljs.core.async.to_chan(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [url], null));
+var G__34855 = _EQ_O_EQ_;
+var G__34856 = _EQ_E_EQ_;
+return (census.geoAPI.core.$GET$_C_GeoJSON.cljs$core$IFn$_invoke$arity$3 ? census.geoAPI.core.$GET$_C_GeoJSON.cljs$core$IFn$_invoke$arity$3(G__34854,G__34855,G__34856) : census.geoAPI.core.$GET$_C_GeoJSON.call(null,G__34854,G__34855,G__34856));
 }
 }));
 });
+});
+census.geoAPI.core.$GET$_GeoKeyMap = census.utils.core.$GET$(new cljs.core.Keyword(null,"edn","edn",1317840885),"Unsuccessful fetch for configuration.");
+/**
+ * 
+ *  Library function, which takes a JSON object as input, constructs a call to get
+ *  Github raw file and returns GeoJSON.
+ *  
+ */
+census.geoAPI.core.getCensusGeoJSON = (function census$geoAPI$core$getCensusGeoJSON(I,cb){
+var args = census.utils.core.__GT_args(I);
+var _EQ_O_EQ_ = cljs.core.async.chan.cljs$core$IFn$_invoke$arity$2((1),cljs.core.comp.cljs$core$IFn$_invoke$arity$2(cljs.core.map.cljs$core$IFn$_invoke$arity$1(cljs.core.clj__GT_js),cljs.core.map.cljs$core$IFn$_invoke$arity$1(JSON.stringify)));
+var _EQ_E_EQ_ = cljs.core.async.chan.cljs$core$IFn$_invoke$arity$2((1),cljs.core.map.cljs$core$IFn$_invoke$arity$1(census.utils.core.throw_err));
+var _EQ_GKM_EQ_ = cljs.core.async.promise_chan.cljs$core$IFn$_invoke$arity$0();
+var G__34857_35038 = cljs.core.async.to_chan(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [census.utils.core.URL_GEOKEYMAP], null));
+var G__34858_35039 = _EQ_GKM_EQ_;
+var G__34859_35040 = cljs.core.async.chan.cljs$core$IFn$_invoke$arity$2((1),cljs.core.map.cljs$core$IFn$_invoke$arity$1(census.utils.core.throw_err));
+var G__34860_35041 = new cljs.core.Keyword(null,"silent","silent",-1142977785);
+(census.geoAPI.core.$GET$_GeoKeyMap.cljs$core$IFn$_invoke$arity$4 ? census.geoAPI.core.$GET$_GeoKeyMap.cljs$core$IFn$_invoke$arity$4(G__34857_35038,G__34858_35039,G__34859_35040,G__34860_35041) : census.geoAPI.core.$GET$_GeoKeyMap.call(null,G__34857_35038,G__34858_35039,G__34859_35040,G__34860_35041));
+
+return cljs.core.async.take_BANG_.cljs$core$IFn$_invoke$arity$2(_EQ_GKM_EQ_,((function (args,_EQ_O_EQ_,_EQ_E_EQ_,_EQ_GKM_EQ_){
+return (function ($g$){
+return census.utils.core._EQ_O_QMARK__GT__cb(census.geoAPI.core.IOE_C_GeoJSON($g$),cb,cljs.core.async.to_chan(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [args], null)),_EQ_O_EQ_,_EQ_E_EQ_);
+});})(args,_EQ_O_EQ_,_EQ_E_EQ_,_EQ_GKM_EQ_))
+);
 });
 /**
  * 
@@ -1096,14 +1120,14 @@ return (census.geoAPI.core.$GET$_C_GeoJSON.cljs$core$IFn$_invoke$arity$3 ? censu
  *   in deep-merging with statistics.
  *   
  */
-census.geoAPI.core.GEOIDS_LT__$g$_PLUS_args = (function census$geoAPI$core$GEOIDS_LT__$g$_PLUS_args($g$,p__17951){
-var map__17952 = p__17951;
-var map__17952__$1 = (((((!((map__17952 == null))))?(((((map__17952.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__17952.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__17952):map__17952);
-var geoHierarchy = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17952__$1,new cljs.core.Keyword(null,"geoHierarchy","geoHierarchy",380422740));
-var vintage = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__17952__$1,new cljs.core.Keyword(null,"vintage","vintage",818195578));
-var vec__17954 = cljs.core.get_in.cljs$core$IFn$_invoke$arity$2($g$,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.key(cljs.core.last(geoHierarchy)),cljs.core.keyword.cljs$core$IFn$_invoke$arity$1(vintage),new cljs.core.Keyword(null,"id<-json","id<-json",-1249818926)], null));
-var seq__17955 = cljs.core.seq(vec__17954);
-var GEOIDS = seq__17955;
+census.geoAPI.core.GEOIDS_LT__$g$_PLUS_args = (function census$geoAPI$core$GEOIDS_LT__$g$_PLUS_args($g$,p__34863){
+var map__34864 = p__34863;
+var map__34864__$1 = (((((!((map__34864 == null))))?(((((map__34864.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__34864.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__34864):map__34864);
+var geoHierarchy = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__34864__$1,new cljs.core.Keyword(null,"geoHierarchy","geoHierarchy",380422740));
+var vintage = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__34864__$1,new cljs.core.Keyword(null,"vintage","vintage",818195578));
+var vec__34866 = cljs.core.get_in.cljs$core$IFn$_invoke$arity$2($g$,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.key(cljs.core.last(geoHierarchy)),cljs.core.keyword.cljs$core$IFn$_invoke$arity$1(vintage),new cljs.core.Keyword(null,"id<-json","id<-json",-1249818926)], null));
+var seq__34867 = cljs.core.seq(vec__34866);
+var GEOIDS = seq__34867;
 return GEOIDS;
 });
 /**
@@ -1116,9 +1140,9 @@ census.geoAPI.core.xf_mergeable_features = (function census$geoAPI$core$xf_merge
 var GEOIDS = census.geoAPI.core.GEOIDS_LT__$g$_PLUS_args($g$,args);
 return census.utils.core.xf_LT__LT_(((function (GEOIDS){
 return (function (rf,acc,this$){
-var G__17959 = acc;
-var G__17960 = cljs.core.PersistentArrayMap.createAsIfByAssoc([cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.str,cljs.core.map.cljs$core$IFn$_invoke$arity$2(new cljs.core.Keyword(null,"properties","properties",685819552).cljs$core$IFn$_invoke$arity$1(this$),GEOIDS)),this$]);
-return (rf.cljs$core$IFn$_invoke$arity$2 ? rf.cljs$core$IFn$_invoke$arity$2(G__17959,G__17960) : rf.call(null,G__17959,G__17960));
+var G__34869 = acc;
+var G__34870 = cljs.core.PersistentArrayMap.createAsIfByAssoc([cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.str,cljs.core.map.cljs$core$IFn$_invoke$arity$2(new cljs.core.Keyword(null,"properties","properties",685819552).cljs$core$IFn$_invoke$arity$1(this$),GEOIDS)),this$]);
+return (rf.cljs$core$IFn$_invoke$arity$2 ? rf.cljs$core$IFn$_invoke$arity$2(G__34869,G__34870) : rf.call(null,G__34869,G__34870));
 });})(GEOIDS))
 );
 });
@@ -1129,8 +1153,8 @@ return (rf.cljs$core$IFn$_invoke$arity$2 ? rf.cljs$core$IFn$_invoke$arity$2(G__1
  *   
  */
 census.geoAPI.core.xf_mergeable_LT__GeoCLJS = (function census$geoAPI$core$xf_mergeable_LT__GeoCLJS($g$,args){
-return cljs.core.comp.cljs$core$IFn$_invoke$arity$2(cljs.core.map.cljs$core$IFn$_invoke$arity$1((function (p1__17961_SHARP_){
-return cljs.core.get.cljs$core$IFn$_invoke$arity$2(p1__17961_SHARP_,new cljs.core.Keyword(null,"features","features",-1146962336));
+return cljs.core.comp.cljs$core$IFn$_invoke$arity$2(cljs.core.map.cljs$core$IFn$_invoke$arity$1((function (p1__34871_SHARP_){
+return cljs.core.get.cljs$core$IFn$_invoke$arity$2(p1__34871_SHARP_,new cljs.core.Keyword(null,"features","features",-1146962336));
 })),census.utils.core.educt_LT__LT_(census.geoAPI.core.xf_mergeable_features($g$,args)));
 });
 census.geoAPI.core.$GET$_C_GeoCLJ = census.utils.core.$GET$(new cljs.core.Keyword(null,"json","json",1279968570),"Unsuccessful Census GeoJSON (for merge) request");

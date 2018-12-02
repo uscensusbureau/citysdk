@@ -150,75 +150,68 @@
   Any new payloads received by `GET` will replace the last response `atom` via
   `reset!` *and* be put into the out-bound =response= chan.
   "
-  [format err-log-msg]
-  (let [$url$ (volatile! "")
-        $res$ (volatile! [])
-        $err$ (volatile! {})]
-    (fn
-      ([=url= =res= =err=] (($GET$ format err-log-msg) =url= =res= =err= nil))
-      ([=url= =res= =err= silent?] ; TODO: Silence logging for config
-       (take!
-         =url=
-         (fn [url]
-           (cond
-             (and (= url @$url$) (not (empty? @$err$)))
-             (do (prn err-log-msg)
-                 (put! =err= @$err$)
-                 (vreset! $err$ {})) ; <- if internets have failed, allow retry
-             (and (= url @$url$) (empty? @$err$))
-             (do (when (nil? silent?) (do (prn "Getting data from cache:")
-                                          (prn url)))
-                 (put! =res= @$res$))
-             :else
-             (do (when (nil? silent?) (do (prn "Getting data from source:")
-                                          (prn url)))
-                 (let [cfg {:error-handler
-                            (fn [{:keys [status status-text]}]
-                              (do (prn err-log-msg)
-                                  (vreset! $url$ url)
-                                  (put! =res= {})
-                                  (->> (vreset! $err$
-                                                (str "ERROR status: " status
-                                                     " " status-text
-                                                     " for URL " url))
-                                       (put! =err=))))}]
-                   (case format
-                     :json
-                     (let [json
-                           (merge cfg {:response-format :json
-                                       :keywords?       true
-                                       :handler
-                                       (fn [res]
-                                         (do (vreset! $err$ {})
-                                             (vreset! $url$ url)
-                                             (->> (vreset! $res$ res)
-                                                  (put! =res=))))})]
-                       (GET url json))
-                     :edn
-                     (let [edn
-                           (merge cfg {:handler
-                                       (fn [res]
-                                         (do (vreset! $err$ {})
-                                             (vreset! $url$ url)
-                                             (->> (vreset! $res$ (read-string res))
-                                                  (put! =res=))))})]
-                       (GET url edn))
-                     :raw
-                     (let [raw
-                           (merge cfg {:handler
-                                       (fn [res]
-                                         (do (vreset! $err$ {})
-                                             (vreset! $url$ url)
-                                             (->> (vreset! $res$ res)
-                                                  (put! =res=))))})]
-                       (GET url raw))))))))))))
+  [format log-name $url$ $res$ $err$]
+  (fn
+    ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$) =url= =res= =err= nil))
+    ([=url= =res= =err= ?silent] ; TODO: Silence logging for config
+     (take!
+       =url=
+       (fn [url]
+         (cond
+           (and (= url @$url$) (not (empty? @$err$)))
+           (do (prn (str "Unsuccessful: " log-name " request."))
+               (put! =err= @$err$)
+               (reset! $err$ {})) ; <- if internets have failed, allow retry
+           (and (= url @$url$) (empty? @$err$))
+           (do (when (nil? ?silent)
+                     (do (prn (str "Getting " log-name " data from cache:"))
+                         (prn url)))
+               (put! =res= @$res$))
+           :else
+           (do (when (nil? ?silent)
+                     (do (prn (str "Getting " log-name " data from source:"))
+                         (prn url)))
+               (let [cfg {:error-handler
+                          (fn [{:keys [status status-text]}]
+                            (do (prn (str "Unsuccessful: " log-name " request"))
+                                (reset! $url$ url)
+                                (put! =res= {})
+                                (->> (reset! $err$
+                                              (str "ERROR status: " status
+                                                   " " status-text
+                                                   " for URL " url))
+                                     (put! =err=))))}]
+                 (case format
+                   :json
+                   (let [json
+                         (merge cfg {:response-format :json
+                                     :keywords?       true
+                                     :handler
+                                     (fn [res]
+                                       (do (reset! $err$ {})
+                                           (reset! $url$ url)
+                                           (->> (reset! $res$ res)
+                                                (put! =res=))))})]
+                     (GET url json))
+                   :edn
+                   (let [edn
+                         (merge cfg {:handler
+                                     (fn [res]
+                                       (do (reset! $err$ {})
+                                           (reset! $url$ url)
+                                           (->> (reset! $res$ (read-string res))
+                                                (put! =res=))))})]
+                     (GET url edn))
+                   :raw
+                   (let [raw
+                         (merge cfg {:handler
+                                     (fn [res]
+                                       (do (reset! $err$ {})
+                                           (reset! $url$ url)
+                                           (->> (reset! $res$ res)
+                                                (put! =res=))))})]
+                     (GET url raw)))))))))))
 
-
-
-
-(def $GET$-json ($GET$ :json "Invalid JSON request..."))
-
-(def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
 
 (defn =O?>-cb
   "
@@ -269,7 +262,7 @@
 (defn args->js
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    (prn (clj->js geoKeys))
+    ;(prn (clj->js geoKeys))
     (clj->js (setval :geoHierarchy geoKeys args))))
 
 

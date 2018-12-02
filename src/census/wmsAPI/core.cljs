@@ -114,8 +114,11 @@
                       ;; returns an empty map ({}) if invalid
                       {(get (select [ALL ALL] geo-keys) idx)
                        (get wms-vals idx)}))))))
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(def $GET$-wms ($GET$ :json "Unsuccessful Census WMS request... "))
+(def $GET$-wms ($GET$ :json "Census FIPS Geocoding" $url$ $res$ $err$))
 
 (defn try-census-wms
   "
