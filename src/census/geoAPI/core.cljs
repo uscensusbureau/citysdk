@@ -201,11 +201,11 @@
     (map #(get % :features)) ; turns a single map into a collection
     (educt<< (xf-mergeable-features $g$ args))))
 
-(def $url$ (atom ""))
-(def $res$ (atom []))
-(def $err$ (atom {}))
+(def $url-3$ (atom ""))
+(def $res-3$ (atom []))
+(def $err-3$ (atom {}))
 
-(def $GET$-C-GeoCLJ ($GET$ :json "Census GeoJSON (for merge)" $url$ $res$ $err$))
+(def $GET$-C-GeoCLJ ($GET$ :json "Census GeoJSON (for merge)" $url-3$ $res-3$ $err-3$))
 
 
 (defn =cfg=C-GeoCLJ

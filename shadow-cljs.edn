@@ -26,7 +26,7 @@
                 :worker {:target           :browser
                          :output-dir       "public/js"
                          :asset-path       "/js"
-                         :modules         {:main   {:entries [census.core]}
+                         :modules         {;:main   {:entries [census.core]}
                                            :worker {:entries [worker.core]
-                                                    :depends-on #{:main}
+                                                    ;:depends-on #{:main}
                                                     :web-worker true}}}}}
