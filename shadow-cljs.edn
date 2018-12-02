@@ -14,7 +14,7 @@
                          :output-dir       "public/census"
                          :output-to        "public/census/census.js"
                          :compiler-options {:optimizations :advanced}
-                         :exports-fn       census.core/census}
+                         :exports-var      census.core/census}
                 :SDK    {:target           :node-library
                          :output-dir       "public/citySDK"
                          :output-to        "public/citySDK/citySDK.js"

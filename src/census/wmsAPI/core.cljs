@@ -115,7 +115,7 @@
                       {(get (select [ALL ALL] geo-keys) idx)
                        (get wms-vals idx)}))))))
 
-(def $GET$-wms ($GET$ :json "Unsuccessful Census WMS request... "))
+(def $GET$-wms ($GET$ :json "Census FIPS Geocoding"))
 
 (defn try-census-wms
   "

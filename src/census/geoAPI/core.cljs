@@ -73,7 +73,7 @@
   "
   ([$g$ ["500k"         vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
-  ;([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
+  ([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
   ([$g$ [res            vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
   ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
   ([$g$ [res            vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
@@ -96,8 +96,7 @@
   (->> (G-pattern-cfg $g$ args)
        (G-patterner $g$)))
 
-(def $GET$-C-GeoJSON
-  ($GET$ :raw "Unsuccessful Census GeoJSON request"))
+(def $GET$-C-GeoJSON ($GET$ :raw "Census GeoJSON"))
 
 (defn IOE-C-GeoJSON
   "
@@ -115,7 +114,7 @@
 
 
 
-(def $GET$-GeoKeyMap ($GET$ :edn "Unsuccessful fetch for configuration."))
+(def $GET$-GeoKeyMap ($GET$ :edn "configuration"))
 
 (defn getCensusGeoJSON
   "
@@ -196,7 +195,7 @@
 
 
 (def $GET$-C-GeoCLJ
-  ($GET$ :json "Unsuccessful Census GeoJSON (for merge) request"))
+  ($GET$ :json "Census GeoJSON (for merge)"))
 
 
 (defn =cfg=C-GeoCLJ

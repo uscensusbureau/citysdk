@@ -78,17 +78,17 @@
     (map #(clj->js % :keywordize-keys true))))
 
 
-(def $GET$-C-stats ($GET$ :json "Unsuccessful Census stats request... "))
+(def $GET$-C-stats ($GET$ :json "Census statistics"))
 
-;(defn IOE-C->stats
-;  "
-;  Internal function for calling the Census API using a Clojure Map. Returns stats
-;  from Census API unaltered.
-;  "
-;  [=I= =O= =E=]
-;  (go (let [args  (<! =I=)
-;            url   (C-S-args->url args)]
-;        ($GET$-C-stats (to-chan [url]) =O= =E=))))
+(defn IOE-C->stats
+  "
+  Internal function for calling the Census API using a Clojure Map. Returns stats
+  from Census API unaltered.
+  "
+  [=I= =O= =E=]
+  (go (let [args  (<! =I=)
+            url   (C-S-args->url args)]
+        ($GET$-C-stats (to-chan [url]) =O= =E=))))
 
 (defn IOE-C-S->JSON
   "

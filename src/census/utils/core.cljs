@@ -150,34 +150,36 @@
   Any new payloads received by `GET` will replace the last response `atom` via
   `reset!` *and* be put into the out-bound =response= chan.
   "
-  [format err-log-msg]
-  (let [$url$ (volatile! "")
-        $res$ (volatile! [])
-        $err$ (volatile! {})]
+  [format log-name]
+  (let [$url$ (atom "")
+        $res$ (atom [])
+        $err$ (atom {})]
     (fn
-      ([=url= =res= =err=] (($GET$ format err-log-msg) =url= =res= =err= nil))
-      ([=url= =res= =err= silent?] ; TODO: Silence logging for config
+      ([=url= =res= =err=] (($GET$ format log-name) =url= =res= =err= nil))
+      ([=url= =res= =err= ?silent] ; TODO: Silence logging for config
        (take!
          =url=
          (fn [url]
            (cond
              (and (= url @$url$) (not (empty? @$err$)))
-             (do (prn err-log-msg)
+             (do (prn (str "Unsuccessful: " log-name " request."))
                  (put! =err= @$err$)
-                 (vreset! $err$ {})) ; <- if internets have failed, allow retry
+                 (reset! $err$ {})) ; <- if internets have failed, allow retry
              (and (= url @$url$) (empty? @$err$))
-             (do (when (nil? silent?) (do (prn "Getting data from cache:")
-                                          (prn url)))
+             (do (when (nil? ?silent)
+                       (do (prn (str "Getting " log-name " data from cache:"))
+                           (prn url)))
                  (put! =res= @$res$))
              :else
-             (do (when (nil? silent?) (do (prn "Getting data from source:")
-                                          (prn url)))
+             (do (when (nil? ?silent)
+                       (do (prn (str "Getting " log-name " data from source:"))
+                           (prn url)))
                  (let [cfg {:error-handler
                             (fn [{:keys [status status-text]}]
-                              (do (prn err-log-msg)
-                                  (vreset! $url$ url)
+                              (do (prn (str "Unsuccessful: " log-name " request"))
+                                  (reset! $url$ url)
                                   (put! =res= {})
-                                  (->> (vreset! $err$
+                                  (->> (reset! $err$
                                                 (str "ERROR status: " status
                                                      " " status-text
                                                      " for URL " url))
@@ -189,36 +191,30 @@
                                        :keywords?       true
                                        :handler
                                        (fn [res]
-                                         (do (vreset! $err$ {})
-                                             (vreset! $url$ url)
-                                             (->> (vreset! $res$ res)
+                                         (do (reset! $err$ {})
+                                             (reset! $url$ url)
+                                             (->> (reset! $res$ res)
                                                   (put! =res=))))})]
                        (GET url json))
                      :edn
                      (let [edn
                            (merge cfg {:handler
                                        (fn [res]
-                                         (do (vreset! $err$ {})
-                                             (vreset! $url$ url)
-                                             (->> (vreset! $res$ (read-string res))
+                                         (do (reset! $err$ {})
+                                             (reset! $url$ url)
+                                             (->> (reset! $res$ (read-string res))
                                                   (put! =res=))))})]
                        (GET url edn))
                      :raw
                      (let [raw
                            (merge cfg {:handler
                                        (fn [res]
-                                         (do (vreset! $err$ {})
-                                             (vreset! $url$ url)
-                                             (->> (vreset! $res$ res)
+                                         (do (reset! $err$ {})
+                                             (reset! $url$ url)
+                                             (->> (reset! $res$ res)
                                                   (put! =res=))))})]
                        (GET url raw))))))))))))
 
-
-
-
-(def $GET$-json ($GET$ :json "Invalid JSON request..."))
-
-(def $GET$-edn  ($GET$ :edn  "Invalid EDN request..."))
 
 (defn =O?>-cb
   "
