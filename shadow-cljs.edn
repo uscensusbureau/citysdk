@@ -14,19 +14,19 @@
                          :output-dir       "public/census"
                          :output-to        "public/census/census.js"
                          :compiler-options {:optimizations :advanced}
-                         :exports-var      census.core/census}
-                :SDK    {:target           :node-library
-                         :output-dir       "public/citySDK"
-                         :output-to        "public/citySDK/citySDK.js"
-                         :compiler-options {:optimizations :advanced}
-                         ;:exports-fn       census.core/citySDK}
-                         :exports          {:citySDK census.core/census
-                                            :stats   census.statsAPI.core/censusStatsJSON
-                                            :geojson census.geoAPI.core/getCensusGeoJSON}}
-                :worker {:target           :browser
-                         :output-dir       "public/js"
-                         :asset-path       "/js"
-                         :modules         {;:main   {:entries [census.core]}
-                                           :worker {:entries [worker.core]
-                                                    ;:depends-on #{:main}
-                                                    :web-worker true}}}}}
+                         :exports-var      census.core/census}}}
+                ;:SDK    {:target           :node-library
+                ;         :output-dir       "public/citySDK"
+                ;         :output-to        "public/citySDK/citySDK.js"
+                ;         :compiler-options {:optimizations :advanced}
+                ;         ;:exports-fn       census.core/citySDK}
+                ;         :exports          {:citySDK census.core/census
+                ;                            :stats   census.statsAPI.core/censusStatsJSON
+                ;                            :geojson census.geoAPI.core/getCensusGeoJSON}}
+                ;:worker {:target           :browser
+                ;         :output-dir       "public/worker"
+                ;         :asset-path       "/worker"
+                ;         :modules         {:census {:entries [census.core]}
+                ;                           :worker {:entries [worker.core]
+                ;                                    :depends-on #{:census}
+                ;                                    :web-worker true}}}}}
