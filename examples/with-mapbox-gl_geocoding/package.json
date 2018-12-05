@@ -1,14 +1,14 @@
 {
-  "name": "browserify-examples",
+  "name": "with-mapbox-gl_geocoding",
   "version": "0.2.2",
-  "description": "Starter created with census-js/CitySDK and mapbox-gl in mind",
+  "description": "Example using geocoding created with census-js/CitySDK and mapbox-gl",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/loganpowell/browserify-starter.git"
+    "url": "git+https://github.com/loganpowell/census-js-examples.git"
   },
   "keywords": [
     "geojson",
@@ -22,9 +22,9 @@
   "author": "Logan Powell",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/loganpowell/browserify-starter/issues"
+    "url": "https://github.com/loganpowell/census-js-examples/issues"
   },
-  "homepage": "https://github.com/loganpowell/browserify-starter#readme",
+  "homepage": "https://github.com/loganpowell/census-js-examples#readme",
   "dependencies": {
     "census-js": "^1.0.17",
     "mapbox-gl": "^0.52.0-beta.1",
