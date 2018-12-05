@@ -50,6 +50,7 @@ let values = ["B00001_001E"];
 let valueSelection = 0;
 let selection = values[valueSelection];
 let zoom = 9.0;
+let pitch = 45;
 
 // === CENSUS ARGUMENTS === //
 let Args = {
@@ -122,7 +123,8 @@ const map = new mapboxgl.Map({
   container: "map",
   style: "mapbox://styles/openideo/cj48m1z521vzo2rqws9kwesra",
   center,
-  zoom: zoom
+  zoom,
+  pitch
 });
 let geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken
