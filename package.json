@@ -1,0 +1,40 @@
+{
+  "name": "browserify-examples",
+  "version": "0.2.2",
+  "description": "Starter created with census-js/CitySDK and mapbox-gl in mind",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loganpowell/browserify-starter.git"
+  },
+  "keywords": [
+    "geojson",
+    "census",
+    "shapefiles",
+    "boundaries",
+    "government",
+    "usa",
+    "cartography"
+  ],
+  "author": "Logan Powell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/loganpowell/browserify-starter/issues"
+  },
+  "homepage": "https://github.com/loganpowell/browserify-starter#readme",
+  "dependencies": {
+    "census-js": "^1.0.17",
+    "mapbox-gl": "^0.52.0-beta.1",
+    "@mapbox/mapbox-gl-geocoder": "^2.3.0",
+    "chroma-js": "^1.4.1",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "babelify": "^10.0.0",
+    "watchify": "^3.11.0"
+  }
+}
