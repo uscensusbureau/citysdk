@@ -1,56 +1,15 @@
 let census = require("census-js");
 let mapboxgl = require("mapbox-gl");
-let MapboxGeocoder = require("@mapbox/mapbox-gl-geocoder");
 let chroma = require("chroma-js");
 let _ = require("lodash");
 
-
-// === CENSUS PREP === //
-let logger = function(json) {
-  document.getElementById("console").innerHTML = `${JSON.stringify(json,null,2)}`;
-};
-
-let setAndLog = function(res) {
-  try {
-    let json = JSON.parse(res);
-    logger(json);
-    return json;
-  } catch (e) {
-    logger(res);
-    return {};
-  }
-};
-
-let censusPromise = function(args) {
-  return new Promise(function(resolve, reject) {
-    census(args, function(err, json) {
-      if (!err) {
-        resolve(setAndLog(json));
-      } else {
-        reject(err);
-      }
-    });
-  });
-};
-
 // === TUNE DATA PARAMETERS === //
-let center = { lat: 28.2639, lng: -80.7214 };
-let values = ["B00001_001E"];
+let center = { lat: 37.0902, lng: -95.7129 };
+let values = ["B19083_001E"];
 let valueSelection = 0;
 let selection = values[valueSelection];
-let zoom = 9.0;
+let zoom = 4;
 
-// === CENSUS ARGUMENTS === //
-let Args = {
-  vintage: "2016",
-  geoHierarchy: {
-    county: center,
-    tract: "*"
-  },
-  sourcePath: ["acs", "acs5"],
-  values: values,
-  geoResolution: "500k"
-};
 
 // === TUNE CHOROPLETH VALUES  === //
 let quantiles = 5;
@@ -71,13 +30,7 @@ const map = new mapboxgl.Map({
   zoom,
   // pitch: 60
 });
-let geocoder = new MapboxGeocoder({
-  accessToken: mapboxgl.accessToken
-});
 
-
-
-map.addControl(geocoder, "top-left");
 
 let scale = [];
 
@@ -87,14 +40,14 @@ let quantileMaker = function(min, max) {
   let dataScale = Array.apply(null, { length: quantiles + 1 })
     .map(Number.prototype.valueOf, 0)
     .map(function(val, idx) { return idx === 0 ? min : (this.acc += bucket)},{ acc: min });
-  let normalScale = dataScale
-    .map(function(val, idx) { return idx === 0 ? Math.round((min + 1 / max) * 100) / 100 : val / max });
-  let chromaScale = normalScale.map(function(val) { return colorScale(val).hex() });
+  let chromaScale = dataScale.map(function(val) { return colorScale(val).hex() });
   scale = _.zip(dataScale, chromaScale);
 };
 
-let getCensusData = async function(args) {
-  let censusGeoJSON = await censusPromise(args);
+let getCensusData = async function(url) {
+  let response = await fetch(url);
+  let censusGeoJSON = await response.json();
+  console.log(url)
   let features = censusGeoJSON.features;
   let maxStat = _.maxBy(features, function(o) {
     return o.properties[selection];
@@ -108,47 +61,30 @@ let getCensusData = async function(args) {
   return { data: censusGeoJSON, stops: scale };
 };
 
-// Random ID maker for each mapbox geocoder-rendered data view to be unique
-let makeid = function() {
-  console.log("In makeID");
-  let text = "";
-  let possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 5; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  return text;
-};
+
+const ZCTA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-examples/master/data/ZCTAs-acs-acs5-B19083_001E-GINI.json"
+
 
 map.on("style.load", function() {
-  geocoder.on("result", function(ev) {
-    let sourceUID = makeid();
-    let layerUID = makeid();
-    let point = {
-      lng: ev.result.geometry.coordinates[0],
-      lat: ev.result.geometry.coordinates[1]
-    };
-    let newGeoHierarchy = Args.geoHierarchy;
-    _.set(Args, ["geoHierarchy", Object.keys(newGeoHierarchy)[0]], point);
-    getCensusData(Args).then(function(res) {
-      map.addSource(sourceUID, {
-        type: "geojson",
-        data: res.data
-      });
-      map.addLayer({
-        id: layerUID,
-        type: "fill",
-        source: sourceUID,
-        paint: {
-          "fill-color": {
-            property: selection,
-            stops: res.stops
-          },
-          "fill-outline-color": "#ffffff",
-          "fill-opacity": 0.5
-        }
-      });
-    })
-  });
+  getCensusData(ZCTA_URL).then(function(res) {
+    map.addSource("Census ZCTAs GINI", {
+      type: "geojson",
+      data: res.data
+    });
+    map.addLayer({
+      id: "ZCTAs",
+      type: "fill",
+      source: "Census ZCTAs GINI",
+      paint: {
+        "fill-color": {
+          property: selection,
+          stops: res.stops
+        },
+        "fill-outline-color": "#ffffff",
+        "fill-opacity": 0.5
+      }
+    });
+  })
 });
 
 
