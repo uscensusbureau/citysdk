@@ -8072,6 +8072,164 @@ function extend() {
 }
 
 },{}],40:[function(require,module,exports){
+let census = require("census-js");
+let mapboxgl = require("mapbox-gl");
+let MapboxGeocoder = require("@mapbox/mapbox-gl-geocoder");
+let chroma = require("chroma-js");
+let _ = require("lodash");
+
+
+// === CENSUS PREP === //
+let logger = function(json) {
+  document.getElementById("console").innerHTML = `${JSON.stringify(json,null,2)}`;
+};
+
+let setAndLog = function(res) {
+  try {
+    let json = JSON.parse(res);
+    logger(json);
+    return json;
+  } catch (e) {
+    logger(res);
+    return {};
+  }
+};
+
+let censusPromise = function(args) {
+  return new Promise(function(resolve, reject) {
+    census(args, function(err, json) {
+      if (!err) {
+        resolve(setAndLog(json));
+      } else {
+        reject(err);
+      }
+    });
+  });
+};
+
+// === TUNE DATA PARAMETERS === //
+let center = { lat: 28.2639, lng: -80.7214 };
+let values = ["B00001_001E"];
+let valueSelection = 0;
+let selection = values[valueSelection];
+let zoom = 9.0;
+
+// === CENSUS ARGUMENTS === //
+let Args = {
+  vintage: "2016",
+  geoHierarchy: {
+    county: center,
+    tract: "*"
+  },
+  sourcePath: ["acs", "acs5"],
+  values: values,
+  geoResolution: "500k"
+};
+
+// === TUNE CHOROPLETH VALUES  === //
+let quantiles = 5;
+// let colorScale = chroma.scale(["#ffffff", "#000000"]).domain([0, 1]);
+// let colorScale = chroma.scale('OrRd').domain([0, 1]);
+let colorScale = chroma.scale('PuBu').domain([0, 1]);
+
+
+// === MAPBOX FUNCTIONS === //
+
+mapboxgl.accessToken =
+  "pk.eyJ1Ijoib3BlbmlkZW8iLCJhIjoiY2pnemR0dmwyMHVhdDJ2bGV1bnl6amJqaiJ9._G3sOFQoJZklpO9pscg1mw";
+
+const map = new mapboxgl.Map({
+  container: "map",
+  style: "mapbox://styles/openideo/cj48m1z521vzo2rqws9kwesra",
+  center,
+  zoom,
+  // pitch: 60
+});
+let geocoder = new MapboxGeocoder({
+  accessToken: mapboxgl.accessToken
+});
+
+
+
+map.addControl(geocoder, "top-left");
+
+let scale = [];
+
+let quantileMaker = function(min, max) {
+  let diff = max - min;
+  let bucket = diff / quantiles;
+  let dataScale = Array.apply(null, { length: quantiles + 1 })
+    .map(Number.prototype.valueOf, 0)
+    .map(function(val, idx) { return idx === 0 ? min : (this.acc += bucket)},{ acc: min });
+  let normalScale = dataScale
+    .map(function(val, idx) { return idx === 0 ? Math.round((min + 1 / max) * 100) / 100 : val / max });
+  let chromaScale = normalScale.map(function(val) { return colorScale(val).hex() });
+  scale = _.zip(dataScale, chromaScale);
+};
+
+let getCensusData = async function(args) {
+  let censusGeoJSON = await censusPromise(args);
+  let features = censusGeoJSON.features;
+  let maxStat = _.maxBy(features, function(o) {
+    return o.properties[selection];
+  });
+  let maxVal = maxStat.properties[selection];
+  let minStat = _.minBy(features, function(o) {
+    return o.properties[selection];
+  });
+  let minVal = minStat.properties[selection];
+  quantileMaker(minVal, maxVal);
+  return { data: censusGeoJSON, stops: scale };
+};
+
+// Random ID maker for each mapbox geocoder-rendered data view to be unique
+let makeid = function() {
+  console.log("In makeID");
+  let text = "";
+  let possible =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
+};
+
+map.on("style.load", function() {
+  geocoder.on("result", function(ev) {
+    let sourceUID = makeid();
+    let layerUID = makeid();
+    let point = {
+      lng: ev.result.geometry.coordinates[0],
+      lat: ev.result.geometry.coordinates[1]
+    };
+    let newGeoHierarchy = Args.geoHierarchy;
+    _.set(Args, ["geoHierarchy", Object.keys(newGeoHierarchy)[0]], point);
+    getCensusData(Args).then(function(res) {
+      map.addSource(sourceUID, {
+        type: "geojson",
+        data: res.data
+      });
+      map.addLayer({
+        id: layerUID,
+        type: "fill",
+        source: sourceUID,
+        paint: {
+          "fill-color": {
+            property: selection,
+            stops: res.stops
+          },
+          "fill-outline-color": "#ffffff",
+          "fill-opacity": 0.5
+        }
+      });
+    })
+  });
+});
+
+
+// TODO: legend: https://www.mapbox.com/help/choropleth-studio-gl-pt-2/
+// TODO: https://www.mapbox.com/mapbox-gl-js/example/updating-choropleth/
+
+},{"@mapbox/mapbox-gl-geocoder":42,"census-js":43,"chroma-js":44,"lodash":48,"mapbox-gl":49}],41:[function(require,module,exports){
 module.exports = {
   'country.3148': {
     'name': 'France',
@@ -8091,7 +8249,7 @@ module.exports = {
   }
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 var Typeahead = require('suggestions');
@@ -8422,7 +8580,7 @@ MapboxGeocoder.prototype = {
 
 module.exports = MapboxGeocoder;
 
-},{"./exceptions":40,"events":7,"lodash.debounce":46,"mapbox/lib/services/geocoding":56,"suggestions":87,"xtend":104}],42:[function(require,module,exports){
+},{"./exceptions":41,"events":7,"lodash.debounce":47,"mapbox/lib/services/geocoding":57,"suggestions":88,"xtend":105}],43:[function(require,module,exports){
 (function (global,Buffer){
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -9870,7 +10028,7 @@ d,e))}}(c,d,e))};da("shadow.umd_helper.get_exports",function(){return rK});
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
-},{"buffer":4,"xmlhttprequest":90,"xregexp":98}],43:[function(require,module,exports){
+},{"buffer":4,"xmlhttprequest":91,"xregexp":99}],44:[function(require,module,exports){
 
 /**
  * @license
@@ -12613,7 +12771,7 @@ d,e))}}(c,d,e))};da("shadow.umd_helper.get_exports",function(){return rK});
 
 }).call(this);
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.
@@ -13800,7 +13958,7 @@ return Promise$1;
 
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":14}],45:[function(require,module,exports){
+},{"_process":14}],46:[function(require,module,exports){
 /*
  * Fuzzy
  * https://github.com/myork/fuzzy
@@ -13946,7 +14104,7 @@ fuzzy.filter = function(pattern, arr, opts) {
 }());
 
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (global){
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -14327,7 +14485,7 @@ function toNumber(value) {
 module.exports = debounce;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -31438,7 +31596,7 @@ module.exports = debounce;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /* Mapbox GL JS is licensed under the 3-Clause BSD License. Full text of license: https://github.com/mapbox/mapbox-gl-js/blob/v0.52.0-beta.1/LICENSE.txt */
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -31480,7 +31638,7 @@ return mapboxgl;
 })));
 
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict';
 
 // install ES6 Promise polyfill
@@ -31513,7 +31671,7 @@ var callbackify = interceptor({
 
 module.exports = callbackify;
 
-},{"./promise":55,"rest/interceptor":64}],50:[function(require,module,exports){
+},{"./promise":56,"rest/interceptor":65}],51:[function(require,module,exports){
 'use strict';
 
 // install ES6 Promise polyfill
@@ -31536,11 +31694,11 @@ module.exports = function(config) {
     .wrap(require('./callbackify'));
 };
 
-},{"./callbackify":49,"./paginator":54,"./promise":55,"./standard_response":57,"rest":60,"rest/interceptor/defaultRequest":65,"rest/interceptor/errorCode":66,"rest/interceptor/mime":67,"rest/interceptor/pathPrefix":68,"rest/interceptor/template":69}],51:[function(require,module,exports){
+},{"./callbackify":50,"./paginator":55,"./promise":56,"./standard_response":58,"rest":61,"rest/interceptor/defaultRequest":66,"rest/interceptor/errorCode":67,"rest/interceptor/mime":68,"rest/interceptor/pathPrefix":69,"rest/interceptor/template":70}],52:[function(require,module,exports){
 
 module.exports.DEFAULT_ENDPOINT = 'https://api.mapbox.com';
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 var b64 = require('rest/util/base64');
@@ -31574,7 +31732,7 @@ function getUser(token) {
 
 module.exports = getUser;
 
-},{"rest/util/base64":79}],53:[function(require,module,exports){
+},{"rest/util/base64":80}],54:[function(require,module,exports){
 'use strict';
 
 var invariant = require('../vendor/invariant');
@@ -31632,7 +31790,7 @@ function makeService(name) {
 
 module.exports = makeService;
 
-},{"../vendor/invariant":58,"./client":50,"./constants":51,"./get_user":52}],54:[function(require,module,exports){
+},{"../vendor/invariant":59,"./client":51,"./constants":52,"./get_user":53}],55:[function(require,module,exports){
 'use strict';
 
 // install ES6 Promise polyfill
@@ -31673,7 +31831,7 @@ var paginator = interceptor({
 
 module.exports = paginator;
 
-},{"./promise":55,"querystring":18,"rest/interceptor":64,"rest/parsers/rfc5988":77,"url":36}],55:[function(require,module,exports){
+},{"./promise":56,"querystring":18,"rest/interceptor":65,"rest/parsers/rfc5988":78,"url":36}],56:[function(require,module,exports){
 'use strict';
 
 // Installs ES6 Promise polyfill if a native Promise is not available
@@ -31684,7 +31842,7 @@ if (typeof Promise === 'undefined') {
 
 module.export = Promise;
 
-},{"es6-promise":44}],56:[function(require,module,exports){
+},{"es6-promise":45}],57:[function(require,module,exports){
 'use strict';
 
 var invariant = require('../../vendor/invariant');
@@ -31937,7 +32095,7 @@ MapboxGeocoding.prototype.geocodeReverse = function(location, options, callback)
 
 module.exports = MapboxGeocoding;
 
-},{"../../vendor/invariant":58,"../make_service":53}],57:[function(require,module,exports){
+},{"../../vendor/invariant":59,"../make_service":54}],58:[function(require,module,exports){
 var interceptor = require('rest/interceptor');
 
 var standardResponse = interceptor({
@@ -31958,7 +32116,7 @@ function transform(response) {
 
 module.exports = standardResponse;
 
-},{"rest/interceptor":64}],58:[function(require,module,exports){
+},{"rest/interceptor":65}],59:[function(require,module,exports){
 (function (process){
 /*
  * Copyright 2013-2015, Facebook, Inc.
@@ -32015,7 +32173,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 module.exports = invariant;
 
 }).call(this,require('_process'))
-},{"_process":14}],59:[function(require,module,exports){
+},{"_process":14}],60:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32233,7 +32391,7 @@ origin = typeof location !== 'undefined' ? new UrlBuilder(location.href).parts()
 
 module.exports = UrlBuilder;
 
-},{"./mime/type/application/x-www-form-urlencoded":74,"./util/mixin":82}],60:[function(require,module,exports){
+},{"./mime/type/application/x-www-form-urlencoded":75,"./util/mixin":83}],61:[function(require,module,exports){
 /*
  * Copyright 2014-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32250,7 +32408,7 @@ rest.setPlatformDefaultClient(browser);
 
 module.exports = rest;
 
-},{"./client/default":62,"./client/xhr":63}],61:[function(require,module,exports){
+},{"./client/default":63,"./client/xhr":64}],62:[function(require,module,exports){
 /*
  * Copyright 2014-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32306,7 +32464,7 @@ module.exports = function client(impl, target) {
 
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 /*
  * Copyright 2014-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32424,7 +32582,7 @@ defaultClient.setPlatformDefaultClient = function setPlatformDefaultClient(clien
 
 module.exports = client(defaultClient);
 
-},{"../client":61}],63:[function(require,module,exports){
+},{"../client":62}],64:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32593,7 +32751,7 @@ module.exports = client(function xhr(request) {
 	});
 });
 
-},{"../client":61,"../util/normalizeHeaderName":83,"../util/responsePromise":84}],64:[function(require,module,exports){
+},{"../client":62,"../util/normalizeHeaderName":84,"../util/responsePromise":85}],65:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32740,7 +32898,7 @@ interceptor.ComplexRequest = ComplexRequest;
 
 module.exports = interceptor;
 
-},{"./client":61,"./client/default":62,"./util/mixin":82,"./util/responsePromise":84}],65:[function(require,module,exports){
+},{"./client":62,"./client/default":63,"./util/mixin":83,"./util/responsePromise":85}],66:[function(require,module,exports){
 /*
  * Copyright 2013-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32811,7 +32969,7 @@ module.exports = interceptor({
 	}
 });
 
-},{"../interceptor":64,"../util/mixin":82}],66:[function(require,module,exports){
+},{"../interceptor":65,"../util/mixin":83}],67:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32849,7 +33007,7 @@ module.exports = interceptor({
 	}
 });
 
-},{"../interceptor":64}],67:[function(require,module,exports){
+},{"../interceptor":65}],68:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -32960,7 +33118,7 @@ module.exports = interceptor({
 	}
 });
 
-},{"../interceptor":64,"../mime":70,"../mime/registry":71,"../util/attempt":78}],68:[function(require,module,exports){
+},{"../interceptor":65,"../mime":71,"../mime/registry":72,"../util/attempt":79}],69:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33011,7 +33169,7 @@ module.exports = interceptor({
 	}
 });
 
-},{"../UrlBuilder":59,"../interceptor":64}],69:[function(require,module,exports){
+},{"../UrlBuilder":60,"../interceptor":65}],70:[function(require,module,exports){
 /*
  * Copyright 2015-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33059,7 +33217,7 @@ module.exports = interceptor({
 	}
 });
 
-},{"../interceptor":64,"../util/mixin":82,"../util/uriTemplate":86}],70:[function(require,module,exports){
+},{"../interceptor":65,"../util/mixin":83,"../util/uriTemplate":87}],71:[function(require,module,exports){
 /*
 * Copyright 2014-2016 the original author or authors
 * @license MIT, see LICENSE.txt for details
@@ -33102,7 +33260,7 @@ module.exports = {
 	parse: parse
 };
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33208,7 +33366,7 @@ registry.register('+json', registry.delegate('application/json'));
 
 module.exports = registry;
 
-},{"../mime":70,"./type/application/hal":72,"./type/application/json":73,"./type/application/x-www-form-urlencoded":74,"./type/multipart/form-data":75,"./type/text/plain":76}],72:[function(require,module,exports){
+},{"../mime":71,"./type/application/hal":73,"./type/application/json":74,"./type/application/x-www-form-urlencoded":75,"./type/multipart/form-data":76,"./type/text/plain":77}],73:[function(require,module,exports){
 /*
  * Copyright 2013-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33338,7 +33496,7 @@ module.exports = {
 
 };
 
-},{"../../../interceptor/pathPrefix":68,"../../../interceptor/template":69,"../../../util/find":80,"../../../util/lazyPromise":81,"../../../util/responsePromise":84}],73:[function(require,module,exports){
+},{"../../../interceptor/pathPrefix":69,"../../../interceptor/template":70,"../../../util/find":81,"../../../util/lazyPromise":82,"../../../util/responsePromise":85}],74:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33377,7 +33535,7 @@ function createConverter(reviver, replacer) {
 
 module.exports = createConverter();
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33460,7 +33618,7 @@ module.exports = {
 
 };
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 /*
  * Copyright 2014-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33526,7 +33684,7 @@ module.exports = {
 
 };
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -33548,7 +33706,7 @@ module.exports = {
 
 };
 
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 module.exports = (function(){
   /*
    * Generated by PEG.js 0.7.0.
@@ -34737,7 +34895,7 @@ module.exports = (function(){
   return result;
 })();
 
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 /*
  * Copyright 2015-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -34766,7 +34924,7 @@ function attempt(work) {
 
 module.exports = attempt;
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /*
  * Copyright (c) 2009 Nicholas C. Zakas. All rights reserved.
  *
@@ -34914,7 +35072,7 @@ module.exports = {
 	decode: base64Decode
 };
 
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 /*
  * Copyright 2013-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -34947,7 +35105,7 @@ module.exports = {
 
 };
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 /*
  * Copyright 2013-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -34995,7 +35153,7 @@ function lazyPromise(work) {
 
 module.exports = lazyPromise;
 
-},{"./attempt":78}],82:[function(require,module,exports){
+},{"./attempt":79}],83:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -35034,7 +35192,7 @@ function mixin(dest /*, sources... */) {
 
 module.exports = mixin;
 
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 /*
  * Copyright 2012-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -35064,7 +35222,7 @@ function normalizeHeaderName(name) {
 
 module.exports = normalizeHeaderName;
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 /*
  * Copyright 2014-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -35200,7 +35358,7 @@ responsePromise.promise = function (func) {
 
 module.exports = responsePromise;
 
-},{"./normalizeHeaderName":83}],85:[function(require,module,exports){
+},{"./normalizeHeaderName":84}],86:[function(require,module,exports){
 /*
  * Copyright 2015-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -35372,7 +35530,7 @@ module.exports = {
 
 };
 
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 /*
  * Copyright 2015-2016 the original author or authors
  * @license MIT, see LICENSE.txt for details
@@ -35534,7 +35692,7 @@ module.exports = {
 
 };
 
-},{"./uriEncoder":85}],87:[function(require,module,exports){
+},{"./uriEncoder":86}],88:[function(require,module,exports){
 'use strict';
 
 /**
@@ -35593,7 +35751,7 @@ module.exports = {
 var Suggestions = require('./src/suggestions');
 window.Suggestions = module.exports = Suggestions;
 
-},{"./src/suggestions":89}],88:[function(require,module,exports){
+},{"./src/suggestions":90}],89:[function(require,module,exports){
 'Use strict';
 
 var List = function(component) {
@@ -35690,7 +35848,7 @@ List.prototype.next = function() {
 
 module.exports = List;
 
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 'use strict';
 
 var extend = require('xtend');
@@ -35909,7 +36067,7 @@ Suggestions.prototype.getItemValue = function(item) {
 
 module.exports = Suggestions;
 
-},{"./list":88,"fuzzy":45,"xtend":104}],90:[function(require,module,exports){
+},{"./list":89,"fuzzy":46,"xtend":105}],91:[function(require,module,exports){
 (function (process,Buffer){
 /**
  * Wrapper for built-in http.js to emulate the browser XMLHttpRequest object.
@@ -36533,7 +36691,7 @@ exports.XMLHttpRequest = function() {
 };
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":14,"buffer":4,"child_process":1,"fs":1,"http":30,"https":8,"url":36}],91:[function(require,module,exports){
+},{"_process":14,"buffer":4,"child_process":1,"fs":1,"http":30,"https":8,"url":36}],92:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36777,7 +36935,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{}],92:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36994,7 +37152,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{}],93:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37268,7 +37426,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{}],94:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37305,7 +37463,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{"../../tools/output/blocks":100}],95:[function(require,module,exports){
+},{"../../tools/output/blocks":101}],96:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37342,7 +37500,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{"../../tools/output/categories":101}],96:[function(require,module,exports){
+},{"../../tools/output/categories":102}],97:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37416,7 +37574,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{"../../tools/output/properties":102}],97:[function(require,module,exports){
+},{"../../tools/output/properties":103}],98:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37452,7 +37610,7 @@ var _default = function _default(XRegExp) {
 
 exports.default = _default;
 module.exports = exports["default"];
-},{"../../tools/output/scripts":103}],98:[function(require,module,exports){
+},{"../../tools/output/scripts":104}],99:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37488,7 +37646,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = _xregexp.default;
 exports.default = _default;
 module.exports = exports["default"];
-},{"./addons/build":91,"./addons/matchrecursive":92,"./addons/unicode-base":93,"./addons/unicode-blocks":94,"./addons/unicode-categories":95,"./addons/unicode-properties":96,"./addons/unicode-scripts":97,"./xregexp":99}],99:[function(require,module,exports){
+},{"./addons/build":92,"./addons/matchrecursive":93,"./addons/unicode-base":94,"./addons/unicode-blocks":95,"./addons/unicode-categories":96,"./addons/unicode-properties":97,"./addons/unicode-scripts":98,"./xregexp":100}],100:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39502,7 +39660,7 @@ XRegExp.addToken(/\((?!\?)/, function (match, scope, flags) {
 var _default = XRegExp;
 exports.default = _default;
 module.exports = exports["default"];
-},{}],100:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 module.exports = [
     {
         'name': 'InAdlam',
@@ -40670,7 +40828,7 @@ module.exports = [
     }
 ];
 
-},{}],101:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 module.exports = [
     {
         'name': 'C',
@@ -40889,7 +41047,7 @@ module.exports = [
     }
 ];
 
-},{}],102:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 module.exports = [
     {
         'name': 'ASCII',
@@ -40932,7 +41090,7 @@ module.exports = [
     }
 ];
 
-},{}],103:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 module.exports = [
     {
         'name': 'Adlam',
@@ -41539,164 +41697,6 @@ module.exports = [
     }
 ];
 
-},{}],104:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 arguments[4][39][0].apply(exports,arguments)
-},{"dup":39}],105:[function(require,module,exports){
-let census = require("census-js");
-let mapboxgl = require("mapbox-gl");
-let MapboxGeocoder = require("@mapbox/mapbox-gl-geocoder");
-let chroma = require("chroma-js");
-let _ = require("lodash");
-
-
-// === CENSUS PREP === //
-let logger = function(json) {
-  document.getElementById("console").innerHTML = `${JSON.stringify(json,null,2)}`;
-};
-
-let setAndLog = function(res) {
-  try {
-    let json = JSON.parse(res);
-    logger(json);
-    return json;
-  } catch (e) {
-    logger(res);
-    return {};
-  }
-};
-
-let censusPromise = function(args) {
-  return new Promise(function(resolve, reject) {
-    census(args, function(err, json) {
-      if (!err) {
-        resolve(setAndLog(json));
-      } else {
-        reject(err);
-      }
-    });
-  });
-};
-
-// === TUNE DATA PARAMETERS === //
-let center = { lat: 28.2639, lng: -80.7214 };
-let values = ["B00001_001E"];
-let valueSelection = 0;
-let selection = values[valueSelection];
-let zoom = 9.0;
-
-// === CENSUS ARGUMENTS === //
-let Args = {
-  vintage: "2016",
-  geoHierarchy: {
-    county: center,
-    tract: "*"
-  },
-  sourcePath: ["acs", "acs5"],
-  values: values,
-  geoResolution: "500k"
-};
-
-// === TUNE CHOROPLETH VALUES  === //
-let quantiles = 5;
-// let colorScale = chroma.scale(["#ffffff", "#000000"]).domain([0, 1]);
-// let colorScale = chroma.scale('OrRd').domain([0, 1]);
-let colorScale = chroma.scale('PuBu').domain([0, 1]);
-
-
-// === MAPBOX FUNCTIONS === //
-
-mapboxgl.accessToken =
-  "pk.eyJ1Ijoib3BlbmlkZW8iLCJhIjoiY2pnemR0dmwyMHVhdDJ2bGV1bnl6amJqaiJ9._G3sOFQoJZklpO9pscg1mw";
-
-const map = new mapboxgl.Map({
-  container: "map",
-  style: "mapbox://styles/openideo/cj48m1z521vzo2rqws9kwesra",
-  center,
-  zoom,
-  // pitch: 60
-});
-let geocoder = new MapboxGeocoder({
-  accessToken: mapboxgl.accessToken
-});
-
-
-
-map.addControl(geocoder, "top-left");
-
-let scale = [];
-
-let quantileMaker = function(min, max) {
-  let diff = max - min;
-  let bucket = diff / quantiles;
-  let dataScale = Array.apply(null, { length: quantiles + 1 })
-    .map(Number.prototype.valueOf, 0)
-    .map(function(val, idx) { return idx === 0 ? min : (this.acc += bucket)},{ acc: min });
-  let normalScale = dataScale
-    .map(function(val, idx) { return idx === 0 ? Math.round((min + 1 / max) * 100) / 100 : val / max });
-  let chromaScale = normalScale.map(function(val) { return colorScale(val).hex() });
-  scale = _.zip(dataScale, chromaScale);
-};
-
-let getCensusData = async function(args) {
-  let censusGeoJSON = await censusPromise(args);
-  let features = censusGeoJSON.features;
-  let maxStat = _.maxBy(features, function(o) {
-    return o.properties[selection];
-  });
-  let maxVal = maxStat.properties[selection];
-  let minStat = _.minBy(features, function(o) {
-    return o.properties[selection];
-  });
-  let minVal = minStat.properties[selection];
-  quantileMaker(minVal, maxVal);
-  return { data: censusGeoJSON, stops: scale };
-};
-
-// Random ID maker for each mapbox geocoder-rendered data view to be unique
-let makeid = function() {
-  console.log("In makeID");
-  let text = "";
-  let possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 5; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  return text;
-};
-
-map.on("style.load", function() {
-  geocoder.on("result", function(ev) {
-    let sourceUID = makeid();
-    let layerUID = makeid();
-    let point = {
-      lng: ev.result.geometry.coordinates[0],
-      lat: ev.result.geometry.coordinates[1]
-    };
-    let newGeoHierarchy = Args.geoHierarchy;
-    _.set(Args, ["geoHierarchy", Object.keys(newGeoHierarchy)[0]], point);
-    getCensusData(Args).then(function(res) {
-      map.addSource(sourceUID, {
-        type: "geojson",
-        data: res.data
-      });
-      map.addLayer({
-        id: layerUID,
-        type: "fill",
-        source: sourceUID,
-        paint: {
-          "fill-color": {
-            property: selection,
-            stops: res.stops
-          },
-          "fill-outline-color": "#ffffff",
-          "fill-opacity": 0.5
-        }
-      });
-    })
-  });
-});
-
-
-// TODO: legend: https://www.mapbox.com/help/choropleth-studio-gl-pt-2/
-// TODO: https://www.mapbox.com/mapbox-gl-js/example/updating-choropleth/
-
-},{"@mapbox/mapbox-gl-geocoder":41,"census-js":42,"chroma-js":43,"lodash":47,"mapbox-gl":48}]},{},[105]);
+},{"dup":39}]},{},[40]);
