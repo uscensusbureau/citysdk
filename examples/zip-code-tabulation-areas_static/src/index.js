@@ -8,8 +8,8 @@ let valueSelection = 0;
 let selection = values[valueSelection];
 
 // === TUNE CHOROPLETH VALUES  === //
-let quantiles = 4;
-let colorScale = chroma.scale('RdBu').domain([1, 0]);
+let quantiles = 5;
+// let colorScale = chroma.scale('RdBu').domain([1, 0]);
 // let colorScale = chroma.scale('OrRd').domain([0, 1]);
 // let colorScale = chroma.scale('PuBu').domain([0, 1]);
 
@@ -28,12 +28,11 @@ const map = new mapboxgl.Map({
 });
 
 
-let quantileMaker = function(min, max) {
-  let diff = max - min;
-  let bucket = diff / quantiles;
-  let dataScale = Array.apply(null, { length: quantiles + 1 })
-    .map(Number.prototype.valueOf, 0)
-    .map(function(val, idx) { return idx === 0 ? min : (this.acc += bucket)},{ acc: min });
+let quantileMaker = function(vec) {
+  let dataScale = chroma.limits(vec, 'q', quantiles);
+  let colorScale =
+    chroma.scale(['white', 'black'])
+    .padding([dataScale[1]*-1-1, dataScale[dataScale.length -1]*-1-1])
   let chromaScale = dataScale.map(function(val) { return colorScale(val).hex() });
   return _.zip(dataScale, chromaScale);
 };
@@ -46,7 +45,10 @@ let getCensusData = async function(url) {
   let response = await fetch(url);
   let json = await response.json()
   let censusGeoJSON = JSON.parse(json);
-  let scale = quantileMaker(0, 1)
+  let dataVec = censusGeoJSON.features.map(function(feature){
+    return feature.properties[selection]
+  });
+  let scale = quantileMaker(dataVec);
   return { data: censusGeoJSON, stops: scale };
 };
 
@@ -59,7 +61,7 @@ map.on("style.load", async function() {
   getCensusData(DATA_URL).then(function(result){
     let data = result.data;
     let stops = result.stops;
-    console.log("stops: " + stops)
+    console.table(stops)
     map.addSource("census-gini", {
       type: "geojson",
       data: data,
@@ -74,7 +76,7 @@ map.on("style.load", async function() {
           stops: stops
         },
         // "fill-outline-color": "#f7f7f7",
-        // "fill-opacity": 0.8
+        "fill-opacity": 0.8
       }
     });
   });

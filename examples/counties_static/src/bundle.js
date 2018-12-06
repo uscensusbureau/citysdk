@@ -9,10 +9,13 @@ let valueSelection = 0;
 let selection = values[valueSelection];
 
 // === TUNE CHOROPLETH VALUES  === //
-let quantiles = 4;
-let colorScale = chroma.scale('RdBu').domain([1, 0]);
-// let colorScale = chroma.scale('OrRd').domain([0, 1]);
-// let colorScale = chroma.scale('PuBu').domain([0, 1]);
+let quantiles = 5;
+// let colorScale = chroma.scale('RdYlBu').domain([1, 0]).padding(-0.4)
+// let colorScale = chroma.scale('BrBg').domain([1, 0]).padding(-0.5)
+// let colorScale = chroma.bezier(['white', 'orange', 'black']).scale().padding([padBtm, padTop])
+// let colorScale = chroma.scale('PuBu')
+// let colorScale = chroma.scale('YlGnBu').padding(-0.6);
+
 
 
 // === MAPBOX FUNCTIONS === //
@@ -29,38 +32,38 @@ const map = new mapboxgl.Map({
 });
 
 
-let quantileMaker = function(min, max) {
-  let diff = max - min;
-  let bucket = diff / quantiles;
-  let dataScale = Array.apply(null, { length: quantiles + 1 })
-    .map(Number.prototype.valueOf, 0)
-    .map(function(val, idx) { return idx === 0 ? min : (this.acc += bucket)},{ acc: min });
+let quantileMaker = function(vec) {
+  let dataScale = chroma.limits(vec, 'q', quantiles);
+  let colorScale = // chroma.bezier(['white', 'orange', 'black'])
+                   //       .scale()
+    // chroma.scale('YlGnBu')
+    chroma.scale(['white', 'black'])
+    .padding([dataScale[0]*-1-1, dataScale[dataScale.length -1]*-1-1])
   let chromaScale = dataScale.map(function(val) { return colorScale(val).hex() });
   return _.zip(dataScale, chromaScale);
 };
 
-function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 let getCensusData = async function(url) {
   let response = await fetch(url);
-  let json = await response.json()
+  let json = await response.json();
   let censusGeoJSON = JSON.parse(json);
-  let scale = quantileMaker(0, 1)
+  let dataVec = censusGeoJSON.features.map(function(feature){
+    return feature.properties[selection]
+  });
+  let scale = quantileMaker(dataVec);
   return { data: censusGeoJSON, stops: scale };
 };
 
 // ZCTAS
 // const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-examples/master/data/ZCTAs-acs-acs5-B19083_001E-GINI.json"
 // COUNTIES
-const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-examples/master/data/county-acs-acs5-B19083_001E.json"
+const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-examples/master/data/county-acs-acs5-B19083_001E.json";
 
 map.on("style.load", async function() {
   getCensusData(DATA_URL).then(function(result){
     let data = result.data;
     let stops = result.stops;
-    console.log("stops: " + stops)
+    console.table(stops);
     map.addSource("census-gini", {
       type: "geojson",
       data: data,
@@ -75,7 +78,7 @@ map.on("style.load", async function() {
           stops: stops
         },
         // "fill-outline-color": "#f7f7f7",
-        // "fill-opacity": 0.8
+        "fill-opacity": 0.7
       }
     });
   });
