@@ -93,7 +93,7 @@
             url   (C-S-args->url args)]
         ($GET$-C-stats (to-chan [url]) =O= =E=))))
 
-(defn IOE-C-S->JSON
+(defn IOE-C-S->JS
   "
   Internal function for calling the Census API using a Clojure Map. Returns stats
   from Census API unaltered.
@@ -105,22 +105,25 @@
             =JSON= (chan 1)]
         ($GET$-C-stats (to-chan [url]) =JSON= =E=)
         (pipeline 1 =O= (comp (educt<< (xf-stats->js args))
-                              (map to-array)
-                              (map js/JSON.stringify)) =JSON=)))))
+                              (map to-array))
+                        ;(comp (educt<< (xf-stats->js args)))
+                              ;(map to-array))
+                              ;(map js/JSON.stringify))
+                  =JSON=)))))
 
-(defn censusStatsJSON
-  "
-  Solo function to just get Census stats back as conventional JSON instead of
-  csv-like output of 'raw' Census API. Not to be coordinated with other functions.
-  Note on channels: (cb-<O?=) closes =O= and =E= on completing the callback
-  "
-  [I cb]
-  (let [args (->args I)
-        =O= (chan 1 (comp (educt<< (xf-stats->js args))
-                          (map to-array)
-                          (map js/JSON.stringify)))
-        =E= (chan 1 (map throw-err))]
-    (=O?>-cb IOE-C-S->JSON cb (to-chan [args]) =O= =E=)))
+;(defn censusStatsJSON
+;  "
+;  Solo function to just get Census stats back as conventional JSON instead of
+;  csv-like output of 'raw' Census API. Not to be coordinated with other functions.
+;  Note on channels: (cb-<O?=) closes =O= and =E= on completing the callback
+;  "
+;  [I cb]
+;  (let [args (->args I)
+;        =O= (chan 1 (comp (educt<< (xf-stats->js args))))
+;                          ;(map to-array)
+;                          ;(map js/JSON.stringify)))
+;        =E= (chan 1 (map throw-err))]
+;    (=O?>-cb IOE-C-S->JSON cb (to-chan [args]) =O= =E=)))
 
 
 ;      e            888                       d8

@@ -161,8 +161,8 @@
   [IDS]
   (comp (x/by-key keys (xf<-Grands->JS IDS))
         (remove   (fn [[_ v]] (nil? v)))
-        (map      #(get % 1))
-        (map      js/JSON.stringify)))
+        (map      #(get % 1))))
+        ;(map      js/JSON.stringify)))
 
 (defn I=OE-M-spooler
   [$g$ =arg= cfgs]
@@ -180,8 +180,10 @@
                         (as-> (persistent! acc) coll
                               (reduce concat coll)
                               (eduction (xf-Grands-M->JSON @$ids$) coll)
-                              (s/join "," coll)
-                              (istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
+                              ;(s/join "," coll)
+                              ;(istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
+                              (into-array coll)
+                              (js-obj "type" "FeatureCollection" "features" coll)))
                     (close! =cfg=)
                     (close! =args=))
                 (do (if ?=$g$

@@ -71,9 +71,9 @@
   "
   Takes a pattern of maps and triggers the URL builder accordingly
   "
-  ([$g$ ["500k"         vin _   [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
+  ([$g$ ["500k"         vin nil [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
-  ([$g$ [res            vin _   [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
+  ([$g$ [res            vin nil [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
   ([$g$ [res            vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
   ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
   ([$g$ [res            vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
@@ -131,8 +131,8 @@
     "
   [I cb]
   (let [args (->args I)
-        =O= (chan 1 (comp (map clj->js)
-                          (map js/JSON.stringify)))
+        =O= (chan 1 (comp (map clj->js)))
+                          ;(map js/JSON.stringify)))
         =E= (chan 1 (map throw-err))
         =GKM= (promise-chan)]
     ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)

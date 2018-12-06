@@ -186,46 +186,30 @@
                 :geometry {:bbox        [777 888],
                            :coordinates [[[999 000]]]}}]}])
 
+(def actual-nested-> [({"4400420" {:type "Feature",
+                                   :properties {:STATEFP "44",
+                                                :SCSDLEA "00420",
+                                                :GEOID "4400420",
+                                                :NAME "Foster-Glocester Regional School District",
+                                                :ALAND 271895236,
+                                                :AWATER 9727071},
+                                   :geometry {:bbox [111 222],
+                                              :coordinates [[[333 444]]]}}}
+                       {"4400420" {:type "Feature",
+                                   :properties {:STATEFP "555",
+                                                :SCSDLEA "666",
+                                                :GEOID "4400420",
+                                                :NAME "Foster-Glocester Regional School District",
+                                                :ALAND 271895236,
+                                                :AWATER 9727071},
+                                   :geometry {:bbox [777 888],
+                                              :coordinates [[[999 0]]]}}})])
+
 (deftest xf-mergeable<-GeoCLJS-test
   (is (= (transduce (xf-mergeable<-GeoCLJS *g* TEST-ARGS-2)
                     conj
                     GEOJSON-SMALL)
-         [{"4400420" {:type "Feature",
-                      :properties {:STATEFP "44",
-                                   :SCSDLEA "00420",
-                                   :GEOID "4400420",
-                                   :NAME "Foster-Glocester Regional School District",
-                                   :ALAND 271895236,
-                                   :AWATER 9727071},
-                      :geometry {:bbox [111 222], :coordinates [[[333 444]]]}}}
-          {"4400420" {:type "Feature",
-                      :properties {:STATEFP "555",
-                                   :SCSDLEA "666",
-                                   :GEOID "4400420",
-                                   :NAME "Foster-Glocester Regional School District",
-                                   :ALAND 271895236,
-                                   :AWATER 9727071},
-                      :geometry {:bbox [777 888], :coordinates [[[999 0]]]}}}])))
-
-(def actual-nested-> [({"4400420"
-                        {:type "Feature",
-                         :properties {:STATEFP "44",
-                                      :SCSDLEA "00420",
-                                      :GEOID "4400420",
-                                      :NAME "Foster-Glocester Regional School District",
-                                      :ALAND 271895236,
-                                      :AWATER 9727071},
-                         :geometry {:bbox [111 222],
-                                    :coordinates [[[333 444]]]}}
-                        {"4400420" {:type "Feature",
-                                    :properties {:STATEFP "555",
-                                                 :SCSDLEA "666",
-                                                 :GEOID "4400420",
-                                                 :NAME "Foster-Glocester Regional School District",
-                                                 :ALAND 271895236,
-                                                 :AWATER 9727071},
-                                    :geometry {:bbox [777 888],
-                                               :coordinates [[[999 0]]]}}}})])
+         actual-nested->)))
 
 (def TEST-ARGS-BIG
   {:vintage      "2016"

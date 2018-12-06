@@ -7,7 +7,7 @@
                                   $GET$ URL-GEOKEYMAP amap-type]]
     [census.wmsAPI.core   :refer [=>args=GIS=args=> I-<wms=I=]]
     [census.geoAPI.core   :refer [IOE-C-GeoJSON cfg>cfg=C-GeoCLJ]]
-    [census.statsAPI.core :refer [IOE-C-S->JSON cfg>cfg=C-Stats]]
+    [census.statsAPI.core :refer [IOE-C-S->JS cfg>cfg=C-Stats]]
                                   ;IOE-C->stats ]]
     [census.merger.core   :refer [I=OE-M-spooler]]))
 
@@ -51,7 +51,7 @@
           (prn deploy)
           (case deploy
             :stats+geos ((I=OE-M-spooler $g$ (to-chan [args]) [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ]) =O= =E=)
-            :stats-only (IOE-C-S->JSON       (to-chan [args]) =O= =E=)
+            :stats-only (IOE-C-S->JS (to-chan [args]) =O= =E=)
             :geos-only  ((IOE-C-GeoJSON $g$) (to-chan [args]) =O= =E=)
             :geocodes   (put! =O= (args->js args))
             :no-values  (put! =E= err-no-vals)
