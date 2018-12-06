@@ -10,23 +10,14 @@ let logger = function(json) {
   document.getElementById("console").innerHTML = `${JSON.stringify(json,null,2)}`;
 };
 
-let setAndLog = function(res) {
-  try {
-    let json = JSON.parse(res);
-    logger(json);
-    return json;
-  } catch (e) {
-    logger(res);
-    return {};
-  }
-};
-
 let censusPromise = function(args) {
   return new Promise(function(resolve, reject) {
     census(args, function(err, json) {
       if (!err) {
-        resolve(setAndLog(json));
+        logger(json)
+        resolve(json);
       } else {
+        logger(err)
         reject(err);
       }
     });
