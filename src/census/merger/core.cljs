@@ -175,39 +175,42 @@
                    [cfg ?=$g$] (first cfgs)
                    acc (transient [])]
               (if (nil? (first todo))
-                (do (prn "Working on it ...")
-                    (>! =O=
-                        (as-> (persistent! acc) coll
-                              (reduce concat coll)
-                              (eduction (xf-Grands-M->JSON @$ids$) coll)
-                              ;(s/join "," coll)
-                              ;(istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
-                              (into-array coll)
-                              (js-obj "type" "FeatureCollection" "features" coll)))
-                    (close! =cfg=)
-                    (close! =args=))
-                (do (if ?=$g$
-                        ((cfg $g$) =args= =cfg=)
-                        (cfg =args= =cfg=))
-                    (let [{:keys [getter url xform filter-id]} (<! =cfg=)]
-                      (if getter
-                        (let [=xform= (chan 1 xform)
-                              =err=   (chan 1 (map throw-err))]
-                          (swap! $ids$ conj filter-id)
-                          (getter (to-chan [url]) =xform= =err=)
-                          (alt! =xform= ([data] (do (close! =xform=)
-                                                    (close! =err=)
-                                                    (recur (rest todo)
-                                                           (second todo)
-                                                           (conj! acc data))))
-                                =err=    ([err] (do (close! =xform=)
-                                                    (close! =err=)
-                                                    (>! =E= err))))))
-                      (do (>! =E= cfg)
-                          (close! =cfg=)
-                          (close! =O=)
-                          (close! =args=) ; Close up shop...
-                          (close! =E=)))))))))))
+                  (do (prn "Working on it ...")
+                      (>! =O=
+                          (->> (persistent! acc)
+                               (reduce concat)
+                               (eduction (xf-Grands-M->JSON @$ids$))
+                               ;(s/join "," )
+                               ;(istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
+                               into-array
+                               (js-obj "type" "FeatureCollection" "features")))
+                      (close! =cfg=)
+                      (close! =args=))
+                  (do (if ?=$g$
+                          ((cfg $g$) =args= =cfg=)
+                          (cfg =args= =cfg=))
+                      (let [{:keys [getter url xform filter-id] :as cfg} (<! =cfg=)]
+                        (if (= (type cfg) amap-type)
+                            (let [=xform= (chan 1 xform)
+                                  =err=   (chan 1)]
+                              (swap! $ids$ conj filter-id)
+                              (getter (to-chan [url]) =xform= =err=)
+                              (alt! =xform= ([data] (do (close! =xform=)
+                                                        (close! =err=)
+                                                        (recur (rest todo)
+                                                               (second todo)
+                                                               (conj! acc data))))
+                                    =err=    ([err] (do (>! =E= err)
+                                                        (close! =cfg=)
+                                                        (close! =O=)
+                                                        (close! =args=)
+                                                        (close! =xform=)
+                                                        (close! =err=))))))
+                        (do (>! =E= cfg)
+                            (close! =cfg=)
+                            (close! =O=)
+                            (close! =args=) ; Close up shop...
+                            (close! =E=)))))))))))
 
 
 

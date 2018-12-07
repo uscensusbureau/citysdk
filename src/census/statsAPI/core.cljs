@@ -106,8 +106,6 @@
         ($GET$-C-stats (to-chan [url]) =JSON= =E=)
         (pipeline 1 =O= (comp (educt<< (xf-stats->js args))
                               (map to-array))
-                        ;(comp (educt<< (xf-stats->js args)))
-                              ;(map to-array))
                               ;(map js/JSON.stringify))
                   =JSON=)))))
 

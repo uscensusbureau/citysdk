@@ -13,8 +13,6 @@
                                   IOE-Census
                                   census]]))
 
-
-
 (defn test-async-time
   [args f]
   (let [time-in (js/Date.)]
@@ -43,11 +41,12 @@
                     :geoResolution "4k"
                     :statsKey ts/stats-key}
                    prn)
-  (test-async-time {:vintage 2016                      ; :stats-only ms = 158
+  (test-async-time {:vintage 2016                      ; ERROR
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:state "42"
-                                   :county "*"}
+                                   :block-group "*"}
+                    :geoResolution "500k"
                     :statsKey ts/stats-key}
                    prn)
 
