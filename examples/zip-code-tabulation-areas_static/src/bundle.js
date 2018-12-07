@@ -38,6 +38,15 @@ let quantileMaker = function(vec) {
   return _.zip(dataScale, chromaScale);
 };
 
+/* Actual scale:
+let scale  = [[-666666666, rgba(250, 250, 250, 0.0)],
+              [0.363, #ffffff],
+              [0.400, #BDBDBD],
+              [0.429, #757575],
+              [0.466, #424242],
+              [0.848, #212121]];
+ */
+
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

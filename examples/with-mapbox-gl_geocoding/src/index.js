@@ -25,29 +25,30 @@ let censusPromise = function(args) {
 };
 
 // === TUNE DATA PARAMETERS === //
-let center = { lat: 28.2639, lng: -80.7214 };
-let values = ["B00001_001E"];
+let center = { lat: 30.4213, lng: -87.2169 };
+let values = ["B00001_001E", "B01001_001E", "B08303_001E"]; // Detailed Tables : unweighted count, estimate-total, travel-time aggregate
+// let values = ["DP04_0003PE"]; // Profiles: vacant housing uints %,
 let valueSelection = 0;
 let selection = values[valueSelection];
 let zoom = 9.0;
 
 // === CENSUS ARGUMENTS === //
 let Args = {
-  vintage: "2016",
-  geoHierarchy: {
-    county: center,
-    tract: "*"
+  "vintage": 2016,
+  "geoHierarchy": {
+    "county": center,
+    "block group": "*"
   },
-  sourcePath: ["acs", "acs5"],
-  values: values,
-  geoResolution: "500k"
+  "sourcePath": ["acs", "acs5"],
+  "values": values,
+  "geoResolution": "500k"
 };
 
 // === TUNE CHOROPLETH VALUES  === //
 let quantiles = 5;
-// let colorScale = chroma.scale(["#ffffff", "#000000"]).domain([0, 1]);
+let colorScale = chroma.scale(["#ffffff", "#000000"]).domain([0, 1]);
 // let colorScale = chroma.scale('OrRd').domain([0, 1]);
-let colorScale = chroma.scale('PuBu').domain([0, 1]);
+// let colorScale = chroma.scale('PuBu').domain([0, 1]);
 
 
 // === MAPBOX FUNCTIONS === //
@@ -70,18 +71,18 @@ let geocoder = new MapboxGeocoder({
 
 map.addControl(geocoder, "top-left");
 
-let scale = [];
+// manual equidistant quantile calculation:
 
 let quantileMaker = function(min, max) {
   let diff = max - min;
   let bucket = diff / quantiles;
-  let dataScale = Array.apply(null, { length: quantiles + 1 })
+  let dataScale = Array.apply(null, { length: quantiles })
     .map(Number.prototype.valueOf, 0)
     .map(function(val, idx) { return idx === 0 ? min : (this.acc += bucket)},{ acc: min });
   let normalScale = dataScale
     .map(function(val, idx) { return idx === 0 ? Math.round((min + 1 / max) * 100) / 100 : val / max });
   let chromaScale = normalScale.map(function(val) { return colorScale(val).hex() });
-  scale = _.zip(dataScale, chromaScale);
+  return _.zip(dataScale, chromaScale);
 };
 
 let getCensusData = async function(args) {
@@ -95,9 +96,10 @@ let getCensusData = async function(args) {
     return o.properties[selection];
   });
   let minVal = minStat.properties[selection];
-  quantileMaker(minVal, maxVal);
+  let scale = quantileMaker(minVal, maxVal);
   return { data: censusGeoJSON, stops: scale };
 };
+
 
 // Random ID maker for each mapbox geocoder-rendered data view to be unique
 let makeid = function() {
@@ -121,6 +123,7 @@ map.on("style.load", function() {
     let newGeoHierarchy = Args.geoHierarchy;
     _.set(Args, ["geoHierarchy", Object.keys(newGeoHierarchy)[0]], point);
     getCensusData(Args).then(function(res) {
+      console.table(res.stops)
       map.addSource(sourceUID, {
         type: "geojson",
         data: res.data
@@ -135,7 +138,7 @@ map.on("style.load", function() {
             stops: res.stops
           },
           "fill-outline-color": "#ffffff",
-          "fill-opacity": 0.5
+          "fill-opacity": 0.8
         }
       });
     })
