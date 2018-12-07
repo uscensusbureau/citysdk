@@ -11,7 +11,8 @@
                                    xf-stats->js
                                    xf-mergeable<-stats
                                    IOE-C->stats
-                                   censusStatsJSON
+                                   IOE-C-S->JS
+                                   ;censusStatsJSON
                                    =cfg=C-Stats]]))
 
 (deftest stats-url-builder-test
@@ -64,9 +65,9 @@
         input [["B01001_001E" "B01001_001M" "state" "county" "tract"]
                ["3111" "369" "01" "073" "000100"]
                ["3111" "222" "21" "0223" "000100"]]]
-    (is (= (eduction (xf-stats->js args) input))
-        '("{\"B01001_001E\":3111,\"B01001_001M\":369,\"state\":\"01\",\"county\":\"073\",\"tract\":\"000100\"}"
-          "{\"B01001_001E\":3111,\"B01001_001M\":222,\"state\":\"21\",\"county\":\"0223\",\"tract\":\"000100\"}"))))
+    (is (= (eduction (xf-stats->js args) input)
+           '(#js {:B01001_001E 3111, :B01001_001M 369, :state "01", :county "073", :tract "000100"}
+             #js {:B01001_001E 3111, :B01001_001M 222, :state "21", :county "0223", :tract "000100"})))))
 
 (deftest xf-geoid+<-stat-test
   (let [input '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
@@ -106,49 +107,71 @@
                 :county "073"
                 :tract "000100"}}})))))
 
-(def ARGS-2 {:vintage      "2016"
-             :sourcePath   ["acs" "acs5"]
+(def ARGS-2 {:vintage      "2017"
+             :sourcePath   ["acs" "acs1"]
              :geoHierarchy {:state "44" :county "*"}
              :values       ["B01001_001E" "B01001_001M"]})
 
-(deftest IOE->census-stats-test
+(deftest IOE-C->stats-test
   (let [=I= (chan 1)
         =O= (chan 1)
         =E= (chan 1)
         time-in (js/Date.)]
     (test-async-timed
-      "IOE->census-stats-test"
+      "IOE-C->stats-test"
       time-in
       (go (>! =I= ARGS-2)
           (IOE-C->stats =I= =O= =E=)
           (is (= (alt! =O= ([res] res)
                        =E= ([err] err))
                  [["B01001_001E" "B01001_001M" "state" "county"]
-                  ["49228" "-555555555" "44" "001"]
-                  ["164886" "-555555555" "44" "003"]
-                  ["82714" "-555555555" "44" "005"]
-                  ["631344" "-555555555" "44" "007"]
-                  ["126319" "-555555555" "44" "009"]]))
+                  ["163760" "-555555555" "44" "003"]
+                  ["83460" "-555555555" "44" "005"]
+                  ["637357" "-555555555" "44" "007"]
+                  ["126150" "-555555555" "44" "009"]]))
           (close! =I=)
           (close! =O=)
           (close! =E=)))))
 
-(deftest censusStatsJSON-test
-  (let [$S$ (atom "")
-        cb  (fn [E O] (if-let [err E]
-                        (reset! $S$ err)
-                        (reset! $S$ O)))
-        time-in (js/Date.)
-        heap-in (heap-spot)]
+(deftest IOE-C-S->JS-test
+  (let [=I= (chan 1)
+        =O= (chan 1)
+        =E= (chan 1)
+        time-in (js/Date.)]
     (test-async-timed
-      "censusStatsJSON-test"
+      "IOE-C-S->JS-test"
       time-in
-      heap-in
-      (go (censusStatsJSON ARGS-2 cb)
-          (<! (timeout 500))
-          ;(js/console.log @$S$)))))
-          (is (= @$S$
-                 "[{\"B01001_001E\":49228,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"001\"},{\"B01001_001E\":164886,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"003\"},{\"B01001_001E\":82714,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"005\"},{\"B01001_001E\":631344,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"007\"},{\"B01001_001E\":126319,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"009\"}]"))))))
+      (go (>! =I= ARGS-2)
+          (IOE-C-S->JS =I= =O= =E=)
+          (is (= (-> (alt! =O= ([res] res)
+                           =E= ([err] err))
+                     str)
+                 (-> #js [#js {:B01001_001E 163760, :B01001_001M -555555555, :state "44", :county "003"}
+                          #js {:B01001_001E 83460, :B01001_001M -555555555, :state "44", :county "005"}
+                          #js {:B01001_001E 637357, :B01001_001M -555555555, :state "44", :county "007"}
+                          #js {:B01001_001E 126150, :B01001_001M -555555555, :state "44", :county "009"}]
+                     str)))
+          (close! =I=)
+          (close! =O=)
+          (close! =E=)))))
+
+;
+;(deftest censusStatsJSON-test
+;  (let [$S$ (atom "")
+;        cb  (fn [E O] (if-let [err E]
+;                        (reset! $S$ err)
+;                        (reset! $S$ O)))
+;        time-in (js/Date.)
+;        heap-in (heap-spot)]
+;    (test-async-timed
+;      "censusStatsJSON-test"
+;      time-in
+;      heap-in
+;      (go (censusStatsJSON ARGS-2 cb)
+;          (<! (timeout 2000))
+;          (prn @$S$)
+;          (is (= @$S$
+;                 "[{\"B01001_001E\":49228,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"001\"},{\"B01001_001E\":164886,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"003\"},{\"B01001_001E\":82714,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"005\"},{\"B01001_001E\":631344,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"007\"},{\"B01001_001E\":126319,\"B01001_001M\":-555555555,\"state\":\"44\",\"county\":\"009\"}]"))))))
 
 ; With eduction:
 ; "$GET$ data from source:"

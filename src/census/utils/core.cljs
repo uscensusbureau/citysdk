@@ -175,11 +175,10 @@
                           (fn [{:keys [status status-text]}]
                             (do (prn (str "Unsuccessful: " log-name " request"))
                                 (reset! $url$ url)
-                                (put! =res= {})
                                 (->> (reset! $err$
-                                              (str "ERROR status: " status
-                                                   " " status-text
-                                                   " for URL " url))
+                                             (str "STATUS: " status
+                                                  " " status-text
+                                                  " for: " url))
                                      (put! =err=))))}]
                  (case format
                    :json
