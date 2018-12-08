@@ -1,7 +1,7 @@
 (ns census.statsAPI.core
   (:require
     [cljs.core.async    :refer [>! <! chan promise-chan close! take! to-chan
-                                pipeline timeout put!]
+                                pipe timeout put!]
      :refer-macros [go alt!]]
     [cuerdas.core       :refer [join numeric? parse-number]]
     [net.cgrand.xforms  :as x]
@@ -81,7 +81,7 @@
 (def $res$ (atom []))
 (def $err$ (atom {}))
 
-(def $GET$-C-stats ($GET$ :json "Census statistics" $url$ $res$ $err$))
+(def $GET$-C-stats ($GET$ :raw "Census statistics" $url$ $res$ $err$))
 
 (defn IOE-C->stats
   "
@@ -89,9 +89,11 @@
   from Census API unaltered.
   "
   [=I= =O= =E=]
-  (go (let [args  (<! =I=)
-            url   (C-S-args->url args)]
-        ($GET$-C-stats (to-chan [url]) =O= =E=))))
+  (go (let [args (<! =I=)
+            url  (C-S-args->url args)]
+        (if (= "" url)
+            (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
+            ($GET$-C-stats (to-chan [url]) =O= =E=)))))
 
 (defn IOE-C-S->JS
   "
@@ -102,12 +104,12 @@
   (take! =I=
     (fn [args]
       (let [url    (C-S-args->url args)
-            =JSON= (chan 1)]
-        ($GET$-C-stats (to-chan [url]) =JSON= =E=)
-        (pipeline 1 =O= (comp (educt<< (xf-stats->js args))
-                              (map to-array))
-                              ;(map js/JSON.stringify))
-                  =JSON=)))))
+            =JSON= (chan 1 (comp (educt<< (xf-stats->js args))
+                                 (map to-array)))]
+        (if (= "" url)
+            (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
+            (do ($GET$-C-stats (to-chan [url]) =JSON= =E=)
+                (pipe =JSON= =O=)))))))
 
 ;(defn censusStatsJSON
 ;  "

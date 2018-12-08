@@ -29,6 +29,7 @@
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274
   (test-async-time ts/args-ok-s+g-vals prn)            ; :stats+geos ms = 1852
+  (test-async-time ts/args-ok-geo-only js/console.log) ; :geos-only  ms = 20907
   (test-async-time ts/args-na-sts-pred prn)            ; :no-values
   (test-async-time ts/args-ok-sts-v+ps prn)            ; :stats-only ms = 384
   (test-async-time ts/args-ok-sts-vals prn)            ; :stats-only ms = 757

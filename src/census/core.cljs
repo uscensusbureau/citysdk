@@ -8,7 +8,6 @@
     [census.wmsAPI.core   :refer [=>args=GIS=args=> I-<wms=I=]]
     [census.geoAPI.core   :refer [IOE-C-GeoJSON cfg>cfg=C-GeoCLJ]]
     [census.statsAPI.core :refer [IOE-C-S->JS cfg>cfg=C-Stats]]
-                                  ;IOE-C->stats ]]
     [census.merger.core   :refer [I=OE-M-spooler]]))
 
 
