@@ -1,7 +1,7 @@
 (ns census.geoAPI.core
   (:require
     [cljs.core.async    :refer [chan close! to-chan onto-chan take! put!
-                                promise-chan]]
+                                promise-chan pipeline pipe]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
     [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
@@ -62,8 +62,7 @@
          ["Warning, you are about to make a large GeoJSON request."
           "This may take some time -> consider local data caching."
           "The response may also cause VM heap capacity overflow."
-          "Node heap may be increased via `--max-old-space-size=`"
-          "For all ZCTAs: Use `--max-old-space-size=4096"]]
+          "On Node - for ZCTAs - Use `--max-old-space-size=4096"]]
      (do (doseq [s strs] (prn s))
          (scope $g$ res vin lev USr STr st)))))
 
@@ -110,10 +109,12 @@
   (fn [=I= =O= =E=]
     (take! =I=
       (fn [args]
-        (let [url (C-G-pattern->url $g$ args)]
+        (let [url (C-G-pattern->url $g$ args)
+              =str= (chan 1 (map js/JSON.parse))]
           (if (= "" url)
-            (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
-            ($GET$-C-GeoJSON (to-chan [url]) =O= =E=)))))))
+              (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
+              (do ($GET$-C-GeoJSON (to-chan [url]) =str= =E=)
+                  (pipe =str= =O=))))))))
 
 
 
