@@ -1,10 +1,10 @@
 # CitySDK v2.0 (Beta)
 
-## Thank Yous:
+#### Thank Yous Due to some very generous Clojurians:
 - @thheller 
 - @cgrand
-- @swannodette
-- 
+- @mfikes
+
 
 ## Installation
 ```
