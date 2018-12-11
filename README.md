@@ -269,8 +269,11 @@ census({
 ```
 
 This query would actually return the `raw` file associated with this URL:
+
 https://github.com/loganpowell/census-geojson/blob/master/GeoJSON/20m/2017/metropolitan-statistical-area!micropolitan-statistical-area.json
+
 or:
+
 https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/20m/2017/metropolitan-statistical-area!micropolitan-statistical-area.json
 
 
@@ -312,6 +315,7 @@ A more dynamic example of using stats merged with geojson on the fly with citysd
 TYPE IN A COUNTY AND SEE THE UNWEIGHTED SAMPLE COUNT OF ALL BLOCK GROUPS THEREIN (CHROME):
 
 https://loganpowell.github.io/census-js-examples/examples/with-mapbox-gl_geocoding/index.html
+
 source code: https://github.com/loganpowell/census-js-examples/tree/master/examples/with-mapbox-gl_geocoding
 
 
@@ -339,6 +343,7 @@ In this example, we use `citysdk` to create the payload and then save it via Nod
 === INSERT IMAGE ===
 
 https://loganpowell.github.io/census-js-examples/examples/counties_static/index.html
+
 source code: https://github.com/loganpowell/census-js-examples/tree/master/examples/counties_static
 
 ### Notable Example:
