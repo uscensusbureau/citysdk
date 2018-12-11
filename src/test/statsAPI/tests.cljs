@@ -5,7 +5,7 @@
     [cljs.test             :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core    :refer [test-async test-async-timed heap-spot time-spot]]
     [census.statsAPI.core  :refer [C-S-args->url
-                                   ->num?->#
+                                   ->valid#?->#
                                    xf!-CSV->CLJ
                                    xf-'key'<w-stat
                                    xf-stats->js
@@ -32,12 +32,14 @@
            "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*"))))
 
 (deftest parse-if-number-test
-  (is (= (->num?-># "30")
+  (is (= (->valid#?-># "30")
          30))
   (is (= (->num?-># "string")
          "string"))
-  (is (= (->num?-># "0.5")
-         0.5)))
+  (is (= (->valid#?-># "0.5")
+         0.5))
+  (is (= (->valid#?-># "-666666666")
+         "-666666666")))
 
 (deftest xf!-csv->clj-test
   (let [args {:values     ["B01001_001E" "NAME"]

@@ -39,15 +39,21 @@
     ""))
 
 
-(defn ->num?->#
+(defn ->valid#?->#
   "
   Conditionally translates a string into an integer or float if so coercible.
-  If not, returns the original string.
+  If matches any Census error codes or isn't coericble returns the string.
   "
   [s]
-  (if (numeric? s)
-    (parse-number s)
-    s))
+  (if (and (numeric? s)
+           (not-any? #(= s %) ["-222222222"
+                               "-333333333"
+                               "-555555555"
+                               "-666666666"
+                               "-888888888"
+                               "-999999999"]))
+      (parse-number s)
+      s))
 
 (defn xf!-CSV->CLJ
   "
@@ -67,7 +73,7 @@
                 nil)
             (rf acc
                 (zipmap (mapv keyword @state)
-                        (map-idcs-range ->num?->#
+                        (map-idcs-range ->valid#?->#
                                         parse-range
                                         this)))))))))
 
