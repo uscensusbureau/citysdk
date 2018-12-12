@@ -12,7 +12,25 @@ let quantiles = 5;
 // let colorScale = chroma.scale('RdBu').domain([1, 0]);
 // let colorScale = chroma.scale('OrRd').domain([0, 1]);
 // let colorScale = chroma.scale('PuBu').domain([0, 1]);
+/*
+To create some merged stats+geojson:
+in terminal:
 
+node --max-old-space-size=4096
+
+let census = require("census-js")
+
+census({
+  "vintage": 2016,
+  "geoHierarchy": {"zip code tabulation area": "*"},
+  "geoResolution": "500k",
+  "values": ["B00001_001E", "B01001_001E", "B08303_001E", "B19083_001E"],
+  "sourcePath": ["acs", "acs5"]
+}, (err, data) => {
+  fs.writeFileSync("./zctas.json", JSON.stringify(data))
+})
+
+*/
 
 // === MAPBOX FUNCTIONS === //
 
@@ -66,10 +84,14 @@ const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-exampl
 // COUNTIES
 // const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-examples/master/data/county-acs-acs5-B19083_001E.json"
 
+const US_URL = "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/20m/2017/state.json"
+
 map.on("style.load", async function() {
-  getCensusData(DATA_URL).then(function(result){
+  getCensusData(DATA_URL).then(async function(result){
     let data = result.data;
     let stops = result.stops;
+    let ustr = await fetch(US_URL)
+    let us = await ustr.json()
     console.table(stops)
     map.addSource("census-gini", {
       type: "geojson",
@@ -88,6 +110,22 @@ map.on("style.load", async function() {
         "fill-opacity": 0.8
       }
     });
+    map.addLayer({
+      id: "us",
+      type: "line",
+      source: {
+        type: "geojson",
+        data: us
+      },
+      layout: {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      paint: {
+        "line-color": "#ffffff",
+        "line-width": 1
+      }
+    })
   });
 });
 

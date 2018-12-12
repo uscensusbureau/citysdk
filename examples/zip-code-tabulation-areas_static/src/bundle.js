@@ -67,10 +67,14 @@ const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-exampl
 // COUNTIES
 // const DATA_URL = "https://raw.githubusercontent.com/loganpowell/census-js-examples/master/data/county-acs-acs5-B19083_001E.json"
 
+const US_URL = "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/20m/2017/state.json"
+
 map.on("style.load", async function() {
-  getCensusData(DATA_URL).then(function(result){
+  getCensusData(DATA_URL).then(async function(result){
     let data = result.data;
     let stops = result.stops;
+    let ustr = await fetch(US_URL)
+    let us = await ustr.json()
     console.table(stops)
     map.addSource("census-gini", {
       type: "geojson",
@@ -89,6 +93,22 @@ map.on("style.load", async function() {
         "fill-opacity": 0.8
       }
     });
+    map.addLayer({
+      id: "us",
+      type: "line",
+      source: {
+        type: "geojson",
+        data: us
+      },
+      layout: {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      paint: {
+        "line-color": "#ffffff",
+        "line-width": 1
+      }
+    })
   });
 });
 

@@ -27,7 +27,7 @@
   "homepage": "https://github.com/loganpowell/census-js-examples#readme",
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^2.3.0",
-    "census-js": "^1.0.22",
+    "census-js": "^1.0.23",
     "chroma-js": "^1.4.1",
     "lodash": "^4.17.11",
     "mapbox-gl": "^0.52.0-beta.1"
