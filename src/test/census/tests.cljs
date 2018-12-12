@@ -100,3 +100,14 @@
                   :geoResolution "500k"
                   :statsKey ts/stats-key}
                  prn)
+; TEST error codes (NAN: )
+(test-async-time {:vintage 2017                       ; :stats+geos ms = 258
+                  :sourcePath ["acs" "acs5"]
+                  :values ["B00001_001E","B01001_001E", "B08303_001E", "B19083_001E"]
+                  :geoHierarchy {:state "01"
+                                 ;:tract "*"}
+                                 :county "015"
+                                 :tract "981902"}
+                  ;:geoResolution "500k"
+                  :statsKey ts/stats-key}
+                 prn)

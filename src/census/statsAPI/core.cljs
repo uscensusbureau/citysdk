@@ -3,7 +3,7 @@
     [cljs.core.async    :refer [>! <! chan promise-chan close! take! to-chan
                                 pipe timeout put!]
      :refer-macros [go alt!]]
-    [cuerdas.core       :refer [join numeric? parse-number]]
+    [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
     [net.cgrand.xforms  :as x]
     ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
     [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
@@ -45,14 +45,15 @@
   If matches any Census error codes or isn't coericble returns the string.
   "
   [s]
-  (cond (some #(= s %) ["-222222222"
-                        "-333333333"
-                        "-555555555"
-                        "-666666666"
-                        "-888888888"
-                        "-999999999"])
-        (str "NAN code: " s)
+  (cond (some #(= s %) ["-222222222.0000"
+                        "-333333333.0000"
+                        "-555555555.0000"
+                        "-666666666.0000"
+                        "-888888888.0000"
+                        "-999999999.0000"])
+        (str "NAN: " (strip-suffix s ".0000"))
         (numeric? s)
+        ;(str "parsed: " s)
         (parse-number s)
         :else s))
 
