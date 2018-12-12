@@ -34,12 +34,12 @@
 (deftest parse-if-number-test
   (is (= (->valid#?-># "30")
          30))
-  (is (= (->num?-># "string")
+  (is (= (->valid#?-># "string")
          "string"))
   (is (= (->valid#?-># "0.5")
          0.5))
   (is (= (->valid#?-># "-666666666")
-         "-666666666")))
+         "NAN code: -666666666")))
 
 (deftest xf!-csv->clj-test
   (let [args {:values     ["B01001_001E" "NAME"]

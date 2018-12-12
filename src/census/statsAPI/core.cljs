@@ -45,15 +45,16 @@
   If matches any Census error codes or isn't coericble returns the string.
   "
   [s]
-  (if (and (numeric? s)
-           (not-any? #(= s %) ["-222222222"
-                               "-333333333"
-                               "-555555555"
-                               "-666666666"
-                               "-888888888"
-                               "-999999999"]))
-      (parse-number s)
-      s))
+  (cond (some #(= s %) ["-222222222"
+                        "-333333333"
+                        "-555555555"
+                        "-666666666"
+                        "-888888888"
+                        "-999999999"])
+        (str "NAN code: " s)
+        (numeric? s)
+        (parse-number s)
+        :else s))
 
 (defn xf!-CSV->CLJ
   "
