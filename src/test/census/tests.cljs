@@ -1,7 +1,7 @@
 (ns test.census.tests
   (:require
     [cljs.core.async      :refer [chan close! >! <! timeout to-chan promise-chan]
-     :refer-macros [go alt!]]
+                          :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core   :refer [*g* test-async test-async-timed
                                   time-spot heap-spot]
@@ -12,6 +12,12 @@
     [census.core          :refer [core-pattern
                                   IOE-Census
                                   census]]))
+
+
+(comment
+  ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
+  (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=4096"]}))
+;; or in Node: node --max-old-space-size=4096
 
 (defn test-async-time
   [args f]
@@ -110,4 +116,30 @@
                                  :tract "981902"}
                   ;:geoResolution "500k"
                   :statsKey ts/stats-key}
+                 prn)
+
+; 	https://api.census.gov/data/timeseries/asm/industry?get=EMP,NAICS_TTL,GEO_TTL&for=us:*&time=2016&NAICS=31-33&key=YOUR_KEY_GOES_HERE
+(test-async-time {:vintage "timeseries"
+                  :sourcePath ["asm" "industry"]
+                  :values ["EMP" "NAICS_TTL" "GEO_TTL"]
+                  :geoHierarchy {:us "*"}
+                  :predicates {:time "2016"
+                               :NAICS "31-33"}}
+                 prn)
+; 	https://api.census.gov/data/timeseries/healthins/sahie?get=NIC_PT,NAME,NUI_PT&for=county:*&time=2016&key=YOUR_KEY_GOES_HERE
+(test-async-time {:vintage "timeseries"
+                  :sourcePath ["healthins" "sahie"]
+                  :values ["NIC_PT" "NAME" "NUI_PT"]
+                  :geoHierarchy {:county "*"}
+                  :predicates {:time "2016"}}
+                 prn)
+
+; https://api.census.gov/data/timeseries/qwi/se?get=year,quarter,sex&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:*&in=state:24&time=2010-Q1
+
+(test-async-time {:vintage "timeseries"
+                  :sourcePath ["qwi" "se"]
+                  :values ["year" "quarter" "sex"]
+                  :geoHierarchy {:state "24"
+                                 :metropolitan-statistical-area!micropolitan-statistical-area "*"}
+                  :predicates {:time "2010-Q1"}}
                  prn)

@@ -27,12 +27,12 @@
                  :lng            lng
                  :sub-level      sub-level}]
         (if (instance? vec-type lookup)
-          (merge-with assoc config
-                {:geo          lookup
-                 :looked-up-in (keyword vintage)})
-          (merge-with assoc config
-                {:geo          (get-in $g$ [scope lookup :id<-json])
-                 :lookup-up-in lookup})))))
+            (merge-with assoc config
+                {:geo            lookup
+                 :looked-up-in   (keyword vintage)})
+            (merge-with assoc config
+                {:geo            (get-in $g$ [scope lookup :id<-json])
+                 :lookup-up-in   lookup})))))
 
 
 (defn lookup-id->match?
@@ -104,7 +104,7 @@
         wms-vals (select MAP-VALS attrs)
         geo-keys (map #(search-id->match? $g$ %)
                       wms-keys)]
-    (loop [idx 0
+    (loop [idx    0
            result {}]
       (if (= nil (get wms-keys idx))
         result
@@ -128,9 +128,8 @@
   `configed-map` into the channel if successful.
   "
   [$g$ args server-idx =res=]
-  (let [=args=> (chan 1 (map #(configed-map $g$
-                                (get-in % [:features 0 :attributes]))))
-        url     (C->GIS-url $g$ args server-idx)]
+  (let [=args=> (chan 1 (map #(configed-map $g$ (get-in % [:features 0 :attributes]))))
+        url (C->GIS-url $g$ args server-idx)]
     ($GET$-wms (to-chan [url]) =args=> =args=>)
     (take! =args=> (fn [args->] (do (put! =res= args->)
                                     (close! =args=>))))))
@@ -149,14 +148,15 @@
       false)))
 
 
+; TODO: can this be cleaned up?
 
 (defn =>args=GIS=args=>
   "
-  Fetches a remote geoKeyMap resource and caches it to local atom ($geoKeyMap$)
-  then tries to find the appropriate geographic identifiers for a provided
+  Tries to find the appropriate geographic identifiers for a provided
   geoHierarchy argument, which contains a {:lat <float> :lng <float>} coordinate
   instead of an actual FIPS code set. If FIPS are already provided, this step is
-  skipped.
+  skipped. If not, the users' arguments are augmented with FIPS codes from the
+  Census Tiger WMS.
   "
   [$g$]
   (fn [=>args= =args=>]
@@ -192,20 +192,4 @@
   [$g$]
   (fn [I =args=>]
     ((=>args=GIS=args=> $g$) (to-chan [(->args I)]) =args=>)))
-
-;(defn censusWMS
-;  "
-;  Provided a synchronous input and callback API to IO-census-wms. If JSON is
-;  supplied, converts it to clj construct for internal use.
-;  "
-;  [$g$]    ; takes an async I/O function
-;  (fn [I cb]
-;    (let [=>args= (promise-chan (map ->args))
-;          =args=> (chan 1)]
-;      (go (>! =>args= I)
-;          ((=>args=census-wms=args=> $g$) =>args= =args=>)
-;          (cb (<! =args=>))
-;          (close! =>args=)
-;          (close! =args=>)))))
-
 

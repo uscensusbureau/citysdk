@@ -12,7 +12,6 @@
                                    xf-mergeable<-stats
                                    IOE-C->stats
                                    IOE-C-S->JS
-                                   ;censusStatsJSON
                                    =cfg=C-Stats]]))
 
 (deftest stats-url-builder-test

@@ -13,6 +13,8 @@
                                 URL-WMS URL-STATS]]))
 
 (defn kv-pair->str [[k v] separator]
+  "Takes a key and a value and converts it to a string concatenated together with
+  a given separator"
   (join separator [(name k) (str v)]))
 
 (defn C-S-args->url
@@ -53,7 +55,6 @@
                         "-999999999.0000"])
         (str "NAN: " (strip-suffix s ".0000"))
         (numeric? s)
-        ;(str "parsed: " s)
         (parse-number s)
         :else s))
 
@@ -80,6 +81,8 @@
                                         this)))))))))
 
 (defn xf-stats->js
+  "Transducer, which converts results from the 'raw' Census statistical API into
+  JSON (objects instead of nested arrays) with correctly parsed numbers"
   [args]
   (comp
     (xf!-CSV->CLJ args)
@@ -91,23 +94,19 @@
 
 (def $GET$-C-stats ($GET$ :raw "Census statistics" $url$ $res$ $err$))
 
-(defn IOE-C->stats
-  "
-  Internal function for calling the Census API using a Clojure Map. Returns stats
-  from Census API unaltered.
-  "
-  [=I= =O= =E=]
-  (go (let [args (<! =I=)
-            url  (C-S-args->url args)]
-        (if (= "" url)
-            (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
-            ($GET$-C-stats (to-chan [url]) =O= =E=)))))
+;(defn IOE-C->stats
+;  "Internal function for calling the Census API using a Clojure Map. Returns stats
+;  from Census API unaltered."
+;  [=I= =O= =E=]
+;  (go (let [args (<! =I=)
+;            url  (C-S-args->url args)]
+;        (if (= "" url)
+;            (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
+;            ($GET$-C-stats (to-chan [url]) =O= =E=)))))
 
 (defn IOE-C-S->JS
-  "
-  Internal function for calling the Census API using a Clojure Map. Returns stats
-  from Census API unaltered.
-  "
+  "Internal function for calling the Census API using a Clojure Map. Returns stats
+  from Census API translated into a more verbose, but accurately typed format."
   [=I= =O= =E=]
   (take! =I=
     (fn [args]
@@ -118,20 +117,6 @@
             (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
             (do ($GET$-C-stats (to-chan [url]) =JSON= =E=)
                 (pipe =JSON= =O=)))))))
-
-;(defn censusStatsJSON
-;  "
-;  Solo function to just get Census stats back as conventional JSON instead of
-;  csv-like output of 'raw' Census API. Not to be coordinated with other functions.
-;  Note on channels: (cb-<O?=) closes =O= and =E= on completing the callback
-;  "
-;  [I cb]
-;  (let [args (->args I)
-;        =O= (chan 1 (comp (educt<< (xf-stats->js args))))
-;                          ;(map to-array)
-;                          ;(map js/JSON.stringify)))
-;        =E= (chan 1 (map throw-err))]
-;    (=O?>-cb IOE-C-S->JSON cb (to-chan [args]) =O= =E=)))
 
 
 ;      e            888                       d8
@@ -158,6 +143,9 @@
 ;; Examples ==============================
 
 (defn xf-mergeable<-stats
+  "Takes users' arguments and returns a composed transducer, which converts
+  the results from the Census API into a shape that allows it to be merged
+  together with other data."
   [args vars#]
   (comp
     (xf!-CSV->CLJ args)
@@ -165,9 +153,7 @@
 
 
 (defn =cfg=C-Stats
-  "
-  Internal function for calling Github cartography 'API' for GeoJSON
-  "
+  "Internal function for calling Github cartography 'API' for GeoJSON"
   [=args= =cfg=]
   (take! =args=
     (fn [args]
