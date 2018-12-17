@@ -10,7 +10,7 @@
                        :refer-macros [select transform traverse setval]]
     [census.utils.core :refer [=O?>-cb $GET$
                                amap-type vec-type throw-err ->args
-                               URL-WMS URL-GEOKEYMAP $geoKeyMap$]]))
+                               URL-WMS URL-GEOKEYMAP]]))
 
 (defn $g$->wms-cfg
   "

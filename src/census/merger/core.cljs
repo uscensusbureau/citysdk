@@ -81,15 +81,13 @@
                    acc (transient [])]
               (if (nil? (first todo))
                   (do (prn "Working on it ...")
-                      (>! =O=
-                          (->> (persistent! acc)
-                               (reduce concat)
-                               (eduction (xf-Grands-M->JSON @$ids$))
-                               ;(s/join "," )
-                               ;(istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
-                               into-array
-                               (js-obj "type" "FeatureCollection" "features")))
-                      (prn "Done.")
+                      (>! =O= (->> (persistent! acc)
+                                   (reduce concat)
+                                   (eduction (xf-Grands-M->JSON @$ids$))
+                                   ;(s/join "," )
+                                   ;(istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
+                                   into-array
+                                   (js-obj "type" "FeatureCollection" "features")))
                       (close! =cfg=)
                       (close! =args=))
                   (do (if ?=$g$

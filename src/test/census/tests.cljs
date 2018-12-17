@@ -11,7 +11,8 @@
     [census.geoAPI.core   :refer [cfg>cfg=C-GeoCLJ]]
     [census.core          :refer [core-pattern
                                   IOE-Census
-                                  census]]))
+                                  census]]
+    ["fs"                 :as fs]))
 
 
 (comment
@@ -64,7 +65,18 @@
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
                    js/console.log)
-
+  (test-async-time {:vintage 2016                      ; :stats+geos ms = 22034
+                    :sourcePath ["acs" "acs5"]
+                    :values ["B25001_001E"]
+                    :geoHierarchy {:county "*"}
+                    :geoResolution "500k"
+                    :statsKey ts/stats-key}
+                   (fn [json] ; <- include err in cb (test-async-time handles here)
+                     (let [jsStr (js/JSON.stringify json)]
+                       (fs/writeFile
+                         "./json/stats_w_geos.json"
+                         jsStr
+                         #(prn "Done")))))
   (test-async-time {:vintage 2016                       ; :stats+geos ms = 2316
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]

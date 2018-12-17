@@ -4,7 +4,7 @@
                                 promise-chan pipeline pipe]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
-    [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
+    [census.utils.core  :refer [URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type ->args]]))
