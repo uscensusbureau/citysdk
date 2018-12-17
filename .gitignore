@@ -1,4 +1,6 @@
 node_modules
+package-lock.json
+shadow-idea-notes.md
 .idea
 .shadow-cljs
 .env
