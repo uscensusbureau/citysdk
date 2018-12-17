@@ -5,3 +5,4 @@ node_modules
 .gitattributes
 .nrepl-port
 pom.xml
+*cljs-runtime

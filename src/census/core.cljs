@@ -28,20 +28,10 @@
   ([{:vintage _ :geoHierarchy _                                                       }] :geocodes)
   ([& anything-else] nil))
 
-#_(core-pattern
-    ts/args-ok-wms-only)
-    ;ts/args-ok-geo-only
-    ;ts/args-ok-s+g-v+ps
-    ;ts/args-ok-s+g-vals
-    ;ts/args-ok-sts-pred
-    ;ts/args-ok-sts-v+ps
-    ;ts/args-ok-sts-vals
-    ;ts/args-na-geo-only)
-
-#_(prn ts/args-ok-wms-only)
-
 
 (defn IOE-Census
+  "Deploys the core functionality of this package. Deployment is case-based and
+  determined by the `core-pattern` function."
   [$g$]
   (fn [=I= =O= =E=]
     (take! =I=
@@ -49,7 +39,8 @@
         (let [deploy (core-pattern args)]
           (prn deploy)
           (case deploy
-            :stats+geos ((I=OE-M-spooler $g$ (to-chan [args])
+            :stats+geos ((I=OE-M-spooler $g$
+                           (to-chan [args])
                            [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ])
                          =O= =E=)
             :stats-only (IOE-C-S->JS (to-chan [args]) =O= =E=)
@@ -67,11 +58,11 @@
 
 (def =GKM= (promise-chan))
 
-; TODO: Calling the function "releases" $GET$'s local state into the global scope
-; HOW do we achieve this for the other functions?
 ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
 
 (defn census
+  "Provides a Node.js conventional synchronous and callback [function(error, result)]
+  API over the internal channel-based implementation."
   [I cb]
   (let [=args=> (chan 1)
         =O=     (chan 1)
@@ -80,14 +71,17 @@
       (fn [$g$]
         ((I-<wms=I= $g$) I =args=>)
         (take! =args=>
-               (fn [?args]
-                 (if (= (type ?args) amap-type)
-                     (do ((IOE-Census $g$) (to-chan [?args]) =O= =E=)
-                         (take! =E= (fn [e] (cb e nil)))
-                         (take! =O= (fn [r] (cb nil r))))
-                     (cb ?args nil))))))))
+          (fn [?args]
+            (if (= (type ?args) amap-type)
+                (do ((IOE-Census $g$) (to-chan [?args]) =O= =E=)
+                    (take! =E= (fn [e] (cb e nil)))
+                    (take! =O= (fn [r] (cb nil r))))
+                (cb ?args nil))))))))
 
 ;(defn citySDK []
 ;  #js {:citySDK census})
+
+
+
 
 

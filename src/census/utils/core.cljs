@@ -4,50 +4,32 @@
                                  onto-chan to-chan]
                          :refer-macros [go go-loop alt!]]
     [ajax.core           :refer [GET POST]]
-    [cljs-promises.async :refer [pair-port value-port]]
+    ;[cljs-promises.async :refer [pair-port value-port]]
     [cuerdas.core        :as s]
     [oops.core           :refer [oget oset!]]
     [cljs.reader         :refer [read-string]]
-    [linked.core         :as -=-]
+    ;[linked.core         :as -=-]
     [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
                                  if-path continue-then-stay selected?]
                          :refer-macros [select transform traverse setval recursive-path]]))
-
-(def $geoKeyMap$ (atom {}))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
 (def URL-GEOJSON "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON")
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/loganpowell/census-geojson/master/src/configs/geojson/index.edn")
 
-;FIXME === !!! ===
-(def base-url-database "TODO?")
+;TODO
+(def base-url-database "...")
 
 (def vec-type cljs.core/PersistentVector)
-
 (def amap-type cljs.core/PersistentArrayMap)
-
 (def err-type js/Error)
-
 (defn error [e] (js/Error. e))
 
-(def MAP-NODES
-  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
-  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
+;(def MAP-NODES
+;  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
+;  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
 
-(defn deep-reverse-MAP-NODES
-  "Recursively reverses the order of the key/value _pairs_ inside a map"
-  [m]
-  (transform MAP-NODES #(into {} (reverse %)) m))
-
-(defn deep-linked-map
-  "
-  Recursively converts any map into a `linked` map (preserves insertion order)
-  TODO - Testing:
-  [core.async](https://github.com/clojure/core.async/blob/master/src/test/cljs/cljs/core/async/tests.cljs)
-  "
-  [m]
-  (transform MAP-NODES #(into (-=-/map) (vec %)) m))
 
 (defn map-rename-keys
   "
@@ -82,43 +64,6 @@
   (s/replace s #" \(|\)|/| "
              {" (" "-_" ")" "_" "/" "!" " " "-"}))
 
-; Examples =======================================
-
-;(defn =IO<-js-<3-fn
-;  [<3-fn]
-;  (fn [=I= =O=]
-;    (go (let [[val err] (<! (cpa/pair-port (<3-fn (<! =I=))))]
-;                (if (= val nil)
-;                    (>! =O= err)
-;                    (>! =O= (js->clj val)))))))
-
-
-#_(defn test-promise
-    [?happy?]
-    (js/Promise. (fn [resolve reject]
-                   (let [answer "This promise was "])
-                   (if (= ?happy? "happy")
-                       (resolve (str answer "resolved!"))
-                       (reject  (js/Error. (str answer "rejected :(")))))))
-
-
-#_(-> (test-promise "happy")
-      (.then (fn [fulfilled] (prn fulfilled))))
-
-#_(-> (test-promise "poop")
-      (.then (fn [fulfilled] (prn fulfilled)))
-      (.catch (fn [error]    (prn error))))
-
-
-
-#_(let [=O= (chan 1 (map throw-err))]
-    (go ((js-I=O<<=IO= (=IO<-js-<3-fn test-promise)) "happy" =O=)
-        (prn (<! =O=))
-        (close! =O=)))
-
-; ==================================================
-
-
 (defn throw-err
   "
   Throws an error... meant to be used in transducer `comp`osed with another
@@ -129,22 +74,20 @@
     (throw x)
     x))
 
-; TODO: read up:
-; http://clojure-doc.org/articles/language/concurrency_and_parallelism.html
-;  http://java.ociweb.com/mark/stm/article.html
-
-
 (defn $GET$
   "
-  Takes two initial inputs: the response format desired and an error message,
-  which is logged in console for debugging. Takes three channel inputs
-  1: takes a =url= channel
-  2: takes a =response= channel.
-  3: takes an =err= channel (for propogation/coordination)
+  Takes five initial inputs:
+  1) the response format desired
+  2) An error message name
+  3) three atoms for the: URL, data response and or error
+  Returns a function, which takes three/four more inputs:
+  1) takes a =url= channel
+  2) takes a =response= channel.
+  3) takes an =err= channel (for propogation/coordination)
   Once first created (with format and err-log-msg) the following channel fns
-  are wrapped with some local state that stores the last url sent in, the last
-  response put out and any prior errors.
-  If url passed in === the last url (cached in an `atom`), the
+  enclosed within local state provided by the input atoms, which stores the last
+  url sent in, the last response put out and any prior errors.
+  If url passed in = the last url (cached in an `atom`), the
   function pumps a cached response (`atom`) instead of - in the case the
   url argument =/= last url - calling a cljs-ajax `GET` request.
   Any new payloads received by `GET` will replace the last response `atom` via
@@ -153,7 +96,7 @@
   [format log-name $url$ $res$ $err$]
   (fn
     ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$) =url= =res= =err= nil))
-    ([=url= =res= =err= ?silent] ; TODO: Silence logging for config
+    ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
      (take!
        =url=
        (fn [url]
@@ -230,6 +173,8 @@
             =E= ([E] (cb E nil)))))
 
 (defn ->args
+  "Converts js arguments (JSON) into a Clojure map, used internally to handle
+  functionality of this library."
   [args]
   (if (= (type args) amap-type)
     (let [{:keys [vintage]} args]
@@ -241,27 +186,12 @@
           (oset! args "geoHierarchy" (clj->js geoKeys))
           (js->clj args :keywordize-keys true)))))
 
-;; Examples ==============================
-(comment
-  (->args ts/test-js-args-1)
-  (->args ts/test-js-args-2)
-  (->args ts/test-args-6))
-
-#_(->args test.core/test-js-args-2)
-;; =>
-;;{:vintage "2016",
-;; :sourcePath ["acs" "acs5"],
-;; :geoHierarchy {:state "12", :state-legislative-district-_upper-chamber_ "*"},
-;; :values ["B01001_001E" "NAME"],
-;; :predicates {:B00001_001E "0:30000"},
-;; :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
-;; =======================================
-
 
 (defn args->js
+  "Converts Clojure map-based arguments to JSON based arguments (for external
+  use)"
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    ;(prn (clj->js geoKeys))
     (clj->js (setval :geoHierarchy geoKeys args))))
 
 
@@ -310,8 +240,6 @@
         ([acc] (rf acc))
         ([acc this] (f state rf acc this))))))
 
-;; Tested 1: working
-
 
 (defn educt<<
   "
@@ -337,7 +265,7 @@
   for a core.async chan through which data is not an item, but a collection.
   I.e., treating the collection as a single transducible item.
 
-  Uses eduction.
+  Uses transduce.
   "
   [xfn]
   (fn [rf]
@@ -357,11 +285,6 @@
     #(if (zero? (mod (inc %1) target)) (f %2) %2)
     coll))
 
-; Example ===============================
-
-;(map-target inc 2 [1 2 3 4 5])
-; => (1 3 3 5 5)
-; =======================================
 
 (defn map-target-idcs
   "
@@ -371,15 +294,6 @@
   [f targets coll]
   (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
 
-; Example ===============================
-
-#_(map-target-idcs inc [0 1 2] [1 2 3 4 5])
-; => [2 3 4 4 5]
-
-; Also works:
-;(transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
-; => [0 2 2 4 4 6 6]
-; =======================================
 
 (defn map-idcs-range
   "
@@ -388,14 +302,3 @@
   "
   [f [r-start r-end] coll]
   (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
-
-; Example ===============================
-
-;; also works: (transform (multi-path 1 3 5) inc [0 1 2 3 4 5 6])
-;=> [0 2 2 4 4 6 6]
-
-
-;(map-idcs-range inc [0 2] [1 2 3 4 5])
-;=> [2 3 3 4 5]
-; =======================================
-
