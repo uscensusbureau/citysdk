@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/loganpowell/census-geojson.git"
+    "url": "git+https://github.com/uscensusbureau/citysdk.git"
   },
   "keywords": [
     "census",
