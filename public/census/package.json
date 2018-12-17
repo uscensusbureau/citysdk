@@ -1,6 +1,6 @@
 {
-  "name": "census-js",
-  "version": "1.0.24",
+  "name": "citysdk",
+  "version": "2.0.0",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "census.js",
   "scripts": {
@@ -26,7 +26,7 @@
   "author": "Logan Powell",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/loganpowell/census-geojson/issues"
+    "url": "https://github.com/uscensusbureau/citysdk/issues"
   },
-  "homepage": "https://github.com/loganpowell/census-geojson/tree/master/public/census#readme"
+  "homepage": "https://github.com/uscensusbureau/citysdk#readme"
 }
