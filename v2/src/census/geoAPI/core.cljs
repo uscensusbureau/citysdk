@@ -4,12 +4,13 @@
                                 promise-chan pipeline pipe]]
     [cuerdas.core       :refer [join]]
     [defun.core         :refer-macros [defun]]
-    [census.utils.core  :refer [$geoKeyMap$ URL-GEOKEYMAP URL-GEOJSON
+    [census.utils.core  :refer [URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type ->args]]))
 
 (defn G-err
+  "Tries to log a useful error given a user's invalid input. Returns an empty string"
   [$g$ res vin lev]
   (let [e-gen
         [(str "No GeoJSON found for: '" (keys->strs (name lev)) "'")
@@ -40,6 +41,8 @@
      (str (join "/" [URL-GEOJSON res vin st (name lev)]) ".json"))))
 
 (defn scope
+  "Consumes the patterner's pattern and configures GeoJSON URL to use the proper
+  state scoping, if applicable."
   ([$g$ res vin lev USr]     (scope $g$ res vin lev USr nil))
   ([$g$ res vin lev USr STr] (scope $g$ res vin lev USr STr nil))
   ([$g$ res vin lev USr STr st]
@@ -53,8 +56,8 @@
        (and (and st? USr?) (not STr?)) (G-pattern->url res vin lev)    ;asks for state, state unavailable, us available
        :else (G-err $g$ res vin lev)))))
 
-; FIXME: Can we do without this?
 (defn big-G
+  "logs a warning that the request being made is large."
   ([$g$ res vin lev USr]     (big-G $g$ res vin lev USr nil))
   ([$g$ res vin lev USr STr] (big-G $g$ res vin lev USr STr nil))
   ([$g$ res vin lev USr STr st]
@@ -67,23 +70,23 @@
          (scope $g$ res vin lev USr STr st)))))
 
 (defun G-patterner
-  "
-  Takes a pattern of maps and triggers the URL builder accordingly
-  "
-  ([$g$ ["500k"         vin nil [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
+  "Takes a pattern of maps and triggers the URL builder accordingly."
+  ([$g$ ["500k" vin nil [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
-  ([$g$ [res            vin nil [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
-  ([$g$ [res            vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
-  ([$g$ [res            vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
-  ([$g$ [res            vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
-  ([$g$ [res            vin nil [lev _  ]                     {:us USr :st _   }]] (scope $g$ res vin lev USr))
-  ([$g$ [res            vin "*" [lev _  ]                     {:us USr :st _   }]] (scope $g$ res vin lev USr))
-  ([$g$ [res            vin _   [lev _  ]                     {:us USr :st nil }]] (scope $g$ res vin lev USr))
-  ([$g$ [res            vin st  [lev _  ]                     {:us USr :st STr }]] (scope $g$ res vin lev USr STr st))
-  ([$g$ & anthing-else ]                                                           ""))
+  ([$g$ [res    vin nil [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
+  ([$g$ [res    vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
+  ([$g$ [res    vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
+  ([$g$ [res    vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
+  ([$g$ [res    vin nil [lev _  ]                     {:us USr :st _   }]] (scope $g$ res vin lev USr))
+  ([$g$ [res    vin "*" [lev _  ]                     {:us USr :st _   }]] (scope $g$ res vin lev USr))
+  ([$g$ [res    vin _   [lev _  ]                     {:us USr :st nil }]] (scope $g$ res vin lev USr))
+  ([$g$ [res    vin st  [lev _  ]                     {:us USr :st STr }]] (scope $g$ res vin lev USr STr st))
+  ([$g$ & anthing-else ]                                                   ""))
 
 
 (defn G-pattern-cfg
+  "Creates a configuration for URL construction based on user input and geoKeyMap
+  configuration file (EDN)."
   [$g$ {:keys [vintage geoResolution] {:keys [state] :as geoHierarchy} :geoHierarchy}]
   (let [level     (last geoHierarchy)
         geoScopes (get-in $g$ [(key level) (keyword vintage) :scopes])
@@ -102,9 +105,7 @@
 (def $GET$-C-GeoJSON ($GET$ :raw "Census GeoJSON" $url$ $res$ $err$))
 
 (defn IOE-C-GeoJSON
-  "
-  Internal function for calling Github cartography 'API' for GeoJSON
-  "
+  "Internal function for calling Github cartography 'API' for GeoJSON"
   [$g$]
   (fn [=I= =O= =E=]
     (take! =I=
@@ -116,47 +117,6 @@
               (do ($GET$-C-GeoJSON (to-chan [url]) =str= =E=)
                   (pipe =str= =O=))))))))
 
-
-
-(def $url-2$ (atom ""))
-(def $res-2$ (atom []))
-(def $err-2$ (atom {}))
-
-
-(def $GET$-GeoKeyMap ($GET$ :edn "configuration" $url-2$ $res-2$ $err-2$))
-
-(defn getCensusGeoJSON
-  "
-    Library function, which takes a JSON object as input, constructs a call to get
-    Github raw file and returns GeoJSON.
-    "
-  [I cb]
-  (let [args (->args I)
-        =O= (chan 1 (comp (map clj->js)))
-                          ;(map js/JSON.stringify)))
-        =E= (chan 1 (map throw-err))
-        =GKM= (promise-chan)]
-    ($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
-    (take! =GKM=
-      (fn [$g$]
-        (=O?>-cb (IOE-C-GeoJSON $g$) cb (to-chan [args]) =O= =E=)))))
-
-
-
-;; Examples  ========================================
-
-#_(getCensusGeoJSON
-    ;ts/census.test-js-args-1
-    ts/test-js-args-2
-    ;ts/census.test-args-2
-    #_#(configs.utils.fixtures/FileSaver
-         {:directory "./src/json/"
-          :filepath "./src/json/legislative-only.json"
-          :json %})
-    ;#(prn %))
-    #(js/console.log %))
-;true)
-;; ===================================================
 
 
 ;      e            888                       d8
@@ -217,8 +177,8 @@
   (fn [=args= =cfg=]
     (take! =args=
       (fn [args]
-        (let [url   (C-G-pattern->url $g$ args)
-              xform (xf-mergeable<-GeoCLJS $g$ args)
+        (let [url   (C-G-pattern->url        $g$ args)
+              xform (xf-mergeable<-GeoCLJS   $g$ args)
               g-key (first (GEOIDS<-$g$+args $g$ args))]
           (if (= "" url)
               (put! =cfg= "Invalid GeoJSON request. Please check arguments against requirements.")
