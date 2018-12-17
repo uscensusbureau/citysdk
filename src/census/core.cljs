@@ -1,134 +1,87 @@
 (ns census.core
   (:require
-    [cljs.core.async :as <|]
-    [defun.core :refer-macros [defun]]
-    [cuerdas.core :as s]
-    [utils.core :as ut]
-    [test.core :as ts :refer [stats-key]]
-    [wmsAPI.core   :refer [IO-census-wms Icb<-args<<=IO=]]
-    [geoAPI.core   :refer [IO-pp->census-GeoJSON]]
-    [statsAPI.core :refer [IO-pp->census-stats]]
-    [merger.core   :refer [IO-geo+stats]]
-    [geojson.core  :refer [geo+config->mkdirp->fsW!]]))
+    [cljs.core.async      :refer [chan close! to-chan take!
+                                  put! promise-chan]]
+    [defun.core           :refer-macros [defun]]
+    [census.utils.core    :refer [throw-err err-type =O?>-cb ->args args->js
+                                  $GET$ URL-GEOKEYMAP amap-type]]
+    [census.wmsAPI.core   :refer [=>args=GIS=args=> I-<wms=I=]]
+    [census.geoAPI.core   :refer [IOE-C-GeoJSON cfg>cfg=C-GeoCLJ]]
+    [census.statsAPI.core :refer [IOE-C-S->JS cfg>cfg=C-Stats]]
+    [census.merger.core   :refer [I=OE-M-spooler]]))
 
-(def err-no-values "When using `predicates`, you must also supply at least one value to `values`")
 
-(defun deploy-census-function
+(def err-no-vals "When using `predicates`, you must also supply at least one value to `values`")
+
+(defun core-pattern
   "
   takes a pattern of args and deploys one of the various underlying functions
   of this library.
   "
-  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
-  ([{:vintage _ :geoHierarchy _               :values _ :statsKey _ :sourcePath _ :geoResolution _}] :stats+geos)
-  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :statsKey _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _ :geoHierarchy _               :values _ :statsKey _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _ :geoResolution _}] :no-values)
-  ([{:vintage _ :geoHierarchy _ :predicates _           :statsKey _ :sourcePath _                 }] :no-values)
-  ([{:vintage _ :geoHierarchy _                                                   :geoResolution _}] :geos-only)
-  ([{:vintage _ :geoHierarchy _                                                                   }] :geocodes)
+  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :sourcePath _ :geoResolution _}] :stats+geos)
+  ([{:vintage _ :geoHierarchy _               :values _ :sourcePath _ :geoResolution _}] :stats+geos)
+  ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :sourcePath _                 }] :stats-only)
+  ([{:vintage _ :geoHierarchy _               :values _ :sourcePath _                 }] :stats-only)
+  ([{:vintage _ :geoHierarchy _ :predicates _           :sourcePath _ :geoResolution _}] :no-values)
+  ([{:vintage _ :geoHierarchy _ :predicates _           :sourcePath _                 }] :no-values)
+  ([{:vintage _ :geoHierarchy _                                       :geoResolution _}] :geos-only)
+  ([{:vintage _ :geoHierarchy _                                                       }] :geocodes)
   ([& anything-else] nil))
 
-(deploy-census-function
-  ;ts/args-ok-wms-only
-  ;ts/args-ok-geo-only
-  ;ts/args-ok-s+g-v+ps
-  ;ts/args-ok-s+g-vals
-  ;ts/args-ok-sts-pred
-  ;ts/args-ok-sts-v+ps
-  ;ts/args-ok-sts-vals
-  ts/args-na-geo-only)
 
+(defn IOE-Census
+  "Deploys the core functionality of this package. Deployment is case-based and
+  determined by the `core-pattern` function."
+  [$g$]
+  (fn [=I= =O= =E=]
+    (take! =I=
+      (fn [args]
+        (let [deploy (core-pattern args)]
+          (prn deploy)
+          (case deploy
+            :stats+geos ((I=OE-M-spooler $g$
+                           (to-chan [args])
+                           [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ])
+                         =O= =E=)
+            :stats-only (IOE-C-S->JS (to-chan [args]) =O= =E=)
+            :geos-only  ((IOE-C-GeoJSON $g$) (to-chan [args]) =O= =E=)
+            :geocodes   (put! =O= (args->js args))
+            :no-values  (put! =E= err-no-vals)
+            (prn "No matching clause for the arguments provided."
+                 "Please check arguments against requirements")))))))
 
-(prn ts/args-ok-wms-only)
+(def $url$ (atom ""))
+(def $res$ (atom []))
+(def $err$ (atom {}))
 
-(defn IO-census
-  [=I= =O=]
-  (<|/go (let [args (<|/<! =I=)
-               deploy (deploy-census-function args)]
-           (prn deploy)
-           (cond
-             (= deploy :stats+geos) ((ut/I=O<<=IO= IO-geo+stats)          args =O=)
-             (= deploy :stats-only) ((ut/I=O<<=IO= IO-pp->census-stats)   args =O=)
-             (= deploy :geos-only)  ((ut/I=O<<=IO= IO-pp->census-GeoJSON) args =O=)
-             (= deploy :geocodes)   ((ut/I=O<<=IO= IO-census-wms)         args =O=)
-             (= deploy :no-values)  (<|/>! =O= err-no-values)
-             :else (prn "No matching clause for the arguments provided. Please check arguments against requirements")))))
+(def $GET$-GeoKeyMap ($GET$ :edn "configuration" $url$ $res$ $err$))
 
+(def =GKM= (promise-chan))
 
-#_(<|/go (let [=I= (<|/chan 1)
-               =O= (<|/chan 1)]
-           (<|/>! =I= ts/test-args-6)
-           (IO-census =I= =O=)
-           (prn (<|/<! =O=))
-           (<|/close! =I=)
-           (<|/close! =O=)))
+($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
 
 (defn census
-  [I cb?]
-  (if (= (type cb?) js/String)
-      (let [directory (str (s/join "/" (butlast (s/split cb? "/"))) "/")]
-        ((Icb<-args<<=IO= IO-census) I
-           #(geo+config->mkdirp->fsW!
-              {:filepath cb?
-               :directory directory
-               :json (js/JSON.stringify (clj->js %))})))
-      ((Icb<-args<<=IO= IO-census) I #(cb? (js/JSON.stringify (clj->js %))))))
+  "Provides a Node.js conventional synchronous and callback [function(error, result)]
+  API over the internal channel-based implementation."
+  [I cb]
+  (let [=args=> (chan 1)
+        =O=     (chan 1)
+        =E=     (chan 1 (map throw-err))]
+    (take! =GKM=
+      (fn [$g$]
+        ((I-<wms=I= $g$) I =args=>)
+        (take! =args=>
+          (fn [?args]
+            (if (= (type ?args) amap-type)
+                (do ((IOE-Census $g$) (to-chan [?args]) =O= =E=)
+                    (take! =E= (fn [e] (cb e nil)))
+                    (take! =O= (fn [r] (cb nil r))))
+                (cb ?args nil))))))))
+
+;(defn citySDK []
+;  #js {:citySDK census})
 
 
 
-(type (clj->js "string"))
-(type (clj->js (js/console.log "test")))
-(comment
-  (census ts/args-ok-wms-only prn)
-  (census (ts/test-args 9 3 3 0) js/console.log)
-  (census ts/args-ok-geo-only js/console.log)
-  (census ts/args-ok-s+g-v+ps "./json/s-g.json")
-  (census ts/args-ok-s+g-v+ps js/console.log)
-  (census ts/args-ok-s+g-vals "./json/s_1.json")
-  (census ts/args-na-sts-pred "./json/sts-pred.json")
-  (census ts/args-ok-sts-v+ps js/console.log)
-  (census ts/args-ok-sts-vals js/console.log)
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:state "42"
-                          :county "003"
-                          :county-subdivision "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          "./json/Census_County-and-Subdivisions_.json")
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:state "42"
-                          :county "003"
-                          :tract "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          "./json/Census_County-and-Tracts_.json")
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:state "42"
-                          :county "003"
-                          :block-group "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          "./json/Census_County-and-Block-Groups_.json")
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B01001_001E"]
-           :geoHierarchy {:state "50"
-                          :school-district-_elementary_ "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          "./json/Census_State-and-School-Districts_.json")
-  (census {:vintage 2016
-           :sourcePath ["acs" "acs5"]
-           :values ["B25001_001E"]
-           :geoHierarchy {:zip-code-tabulation-area "*"}
-           :geoResolution "500k"
-           :statsKey stats-key}
-          "./json/Census_ZCTAs_.json"))
 
 
