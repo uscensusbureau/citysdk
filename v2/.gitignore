@@ -1,0 +1,7 @@
+node_modules
+.idea
+.shadow-cljs
+.env
+.gitattributes
+.nrepl-port
+pom.xml
