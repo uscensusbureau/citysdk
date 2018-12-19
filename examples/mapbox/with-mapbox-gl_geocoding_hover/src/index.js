@@ -1,4 +1,4 @@
-let census = require("census-js");
+let census = require("citysdk");
 let mapboxgl = require("mapbox-gl");
 let MapboxGeocoder = require("@mapbox/mapbox-gl-geocoder");
 let chroma = require("chroma-js");
@@ -6,18 +6,13 @@ let _ = require("lodash");
 
 
 // === CENSUS PREP === //
-let logger = function(json) {
-  document.getElementById("console").innerHTML = `${JSON.stringify(json,null,2)}`;
-};
-
 let censusPromise = function(args) {
   return new Promise(function(resolve, reject) {
     census(args, function(err, json) {
       if (!err) {
-        logger(json)
+        // console.log(json);
         resolve(json);
       } else {
-        logger(err)
         reject(err);
       }
     });
@@ -26,7 +21,7 @@ let censusPromise = function(args) {
 
 // === TUNE DATA PARAMETERS === //
 let center = { lat: 30.4213, lng: -87.2169 };
-let values = ["B00001_001E", "B01001_001E", "B08303_001E"]; // Detailed Tables : unweighted count, estimate-total, travel-time aggregate
+let values = ["B00001_001E","B01001_001E", "B08303_001E"]; // Detailed Tables : unweighted count, estimate-total, travel-time aggregate
 // let values = ["DP04_0003PE"]; // Profiles: vacant housing uints %,
 let valueSelection = 0;
 let selection = values[valueSelection];
@@ -103,7 +98,6 @@ let getCensusData = async function(args) {
 
 // Random ID maker for each mapbox geocoder-rendered data view to be unique
 let makeid = function() {
-  console.log("In makeID");
   let text = "";
   let possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -123,7 +117,7 @@ map.on("style.load", function() {
     let newGeoHierarchy = Args.geoHierarchy;
     _.set(Args, ["geoHierarchy", Object.keys(newGeoHierarchy)[0]], point);
     getCensusData(Args).then(function(res) {
-      console.table(res.stops)
+      console.table(res.stops);
       map.addSource(sourceUID, {
         type: "geojson",
         data: res.data
@@ -140,6 +134,17 @@ map.on("style.load", function() {
           "fill-outline-color": "#ffffff",
           "fill-opacity": 0.8
         }
+      });
+      map.on("mousemove", function (e) {
+        let features = map.queryRenderedFeatures(e.point, {
+          layers: [layerUID]
+        });
+        document.getElementById('geo-name').innerHTML = "GEOID: " + features[0].properties.GEOID;
+        document.getElementById('geo-value').innerHTML = `
+          <ul>
+            ${values.map(each => `<li>${each}: ${features[0].properties[each]}</li>`).join('')}
+          </ul>
+        `
       });
     })
   });

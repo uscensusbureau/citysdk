@@ -1,7 +1,7 @@
 {
-  "name": "with-mapbox-gl_geocoding",
+  "name": "citysdk-examples",
   "version": "0.2.2",
-  "description": "Example using geocoding created with census-js/CitySDK and mapbox-gl",
+  "description": "Examples of using the @uscensusbureau citysdk",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -27,8 +27,8 @@
   "homepage": "https://github.com/loganpowell/census-js-examples#readme",
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^2.3.0",
-    "census-js": "^1.0.23",
     "chroma-js": "^1.4.1",
+    "citysdk": "^2.0.4",
     "lodash": "^4.17.11",
     "mapbox-gl": "^0.52.0-beta.1"
   },
