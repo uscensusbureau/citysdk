@@ -1,6 +1,6 @@
 {
   "name": "citysdk",
-  "version": "2.0.1",
+  "version": "2.0.4",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "census.js",
   "scripts": {
@@ -28,5 +28,5 @@
   "bugs": {
     "url": "https://github.com/uscensusbureau/citysdk/issues"
   },
-  "homepage": "https://github.com/uscensusbureau/citysdk/blob/master/README.md"
+  "homepage": "https://github.com/uscensusbureau/citysdk#readme"
 }
