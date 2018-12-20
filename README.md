@@ -52,7 +52,7 @@ With the exception of "microdata" statistics (not yet available via Census' API)
 
 Under the hood, this functionality calls the [TigerWeb Web Mapping Service] with the `lat` & `lng` provided and pipes the resulting FIPS codes into your options argument with the appropriate [GEOIDs] for identifying your geographic area of interest. 
 
-For a list of geographies currently available for geocoding with this feature, see the [Geographies Availabile by Vintage] section below.
+For a list of geographies currently available for geocoding with this feature, see the [Geographies Available by Vintage] section below.
 
 There are two ways to scope your geography using this functionality:
 1. Request a single geographic area
@@ -125,13 +125,14 @@ This parameter set will call the Census Statistics API and reformat the results 
 - Statistical values are translated into properly typed numbers (Integers and Floats instead of strings), whereas all values are returned as strings via the "raw" API
 - Annotation values (e.g., error codes) that are returned (e.g., [American Community Survey error codes]) in places where data would be expected are returned as strings (rather than numbers) to make differentiating them from values a simple type check.
 
-[American Community Survey error codes]: https://www.census.gov/data/developers/data-sets/acs-1year/notes-on-acs-estimate-and-annotation-values.html
-
 There are two ways to request Census statistics using `citysdk`:
 1) Calling for `values` of estimates and other statistical values (required)
 2) Apply a filter by using `predicates` (optional)
 
 For both of these options, a `sourcePath` needs to be supplied. This is the fully qualified path to the product. For more information about how to find the `sourcePath` to your product of interest, go to the [Developers' Microsite] and - in any of the examples of making a call - take the path between `<vintage>/` and the `?get`. For example, for [American Community Survey 1-year] you'll the first example (2017) shows:
+
+[American Community Survey error codes]: https://www.census.gov/data/developers/data-sets/acs-1year/notes-on-acs-estimate-and-annotation-values.html
+[American Community Survey 1-year]: https://www.census.gov/data/developers/data-sets/acs-1year.html
 
 ```
 https://api.census.gov/data/2017/acs/acs1?get=NAME,group(B01001)&for=us:1
@@ -140,7 +141,7 @@ https://api.census.gov/data/2017/acs/acs1?get=NAME,group(B01001)&for=us:1
 ```
 The corresponding `sourcePath` for this endpoint is `["acs", "acs1"]`
 
-[American Community Survey 1-year]: https://www.census.gov/data/developers/data-sets/acs-1year.html
+
 
 #### Example: get `"values"` by ID:
 RETURN TYPE: `JSON`
@@ -168,7 +169,7 @@ census({
 Here, we added the parameters for `sourcePath` (the path to the survey and/or source of the statistics) and `values` (the identifiers of the statistics we're interested in). By including these parameters within your argument object, you trigger the `census` function to get statistics. This "deploy on parameter set" strategy is how the `census` function determines your intent.
 
 ---
-# 🤔 Help for Discovering Census data
+### 🤔 Help for Discovering Census data
 
 
 You're probably thinking: "How am I supposed to know what codes to use inside those parameters?" - or - "Where did that `"cbp"` & `"ESTAB"` stuff come from?" The data sets covered by the CitySDK are vast. As such, this is the steepest part of the learning curve. But, don't worry, there are a number of different resources available to assist you in your quest:
@@ -297,16 +298,16 @@ Resolution | Map Scale    | Benefits                                            
 [5m]       | 1:5,000,000  | Balance between size and detectable area size          | lowest variety of available area types              
 [20m]      | 1:20,000,000 | Smallest file sizes                                    | lowest level of detail
 
-[500k]: https://github.com/loganpowell/census-geojson/tree/master/GeoJSON/500k
-[5m]: https://github.com/loganpowell/census-geojson/tree/master/GeoJSON/5m
-[20m]: https://github.com/loganpowell/census-geojson/tree/master/GeoJSON/20m
+[500k]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
+[5m]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/5m
+[20m]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/20m
 
 ---
-See the full available Cartographic GeoJSON in the [Geographies Availabile by Vintage] section
+See the full available Cartographic GeoJSON in the [Geographies Available by Vintage] section
 
 ---
 
-[Geographies Availabile by Vintage]: #geographies-available-by-vintage
+[Geographies Available by Vintage]: #geographies-available-by-vintage
 
 #### Example: Saving the file locally in Node.js using [`fs`]
 RETURN TYPE: `JSON STRING`
@@ -357,21 +358,22 @@ RETURN TYPE: `JSON`
 There are a number of reasons you might want to merge your statistics into their GeoJSON/geographic boundaries, all of which are relevant when seeking to map Census data:
 
 1) Creating [choropleth] maps of statistics (e.g., using `values`)
-2) Mapping only those geographies that meet a certain set of criteria (i.e., using `predicates`)
+2) Mapping only those geographies that meet a certain set of criteria
 3) Showing a user their current Census geographic context (i.e., leveraging the Geocoding capabilities of CitySDK)
 
+[choropleth]: https://en.wikipedia.org/wiki/Choropleth_map
 
 ### Dynamic Use Example
 
-A more dynamic example of using stats merged with geojson on the fly with citysdk can be found here
+A more dynamic example of using stats merged with GeoJSON on the fly with `citysdk` can be found here:
 
-=== INSERT IMAGE ===
+[![mapbox-geocoding](./examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html)
 
-TYPE IN A COUNTY AND SEE THE UNWEIGHTED SAMPLE COUNT OF ALL BLOCK GROUPS THEREIN (CHROME):
+Type in a county name and see the unweighted sample count of the population (ACS) for all the Block Groups within that County.
 
-https://loganpowell.github.io/census-js-examples/examples/with-mapbox-gl_geocoding/index.html
+Use Chrome for best results (mapbox-gl geocoder caveat)
 
-source code: https://github.com/loganpowell/census-js-examples/tree/master/examples/with-mapbox-gl_geocoding
+[source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/with-mapbox-gl_geocoding)
 
 
 ## All Counties
@@ -395,11 +397,10 @@ In this example, we use `citysdk` to create the payload and then save it via Nod
 [`fs.writeFileSync`]: https://nodejs.org/api/fs.html#fs_fs_writefilesync_file_data_options
 [Mapbox-GL]: https://www.mapbox.com/mapbox-gl-js/api/
 
-=== INSERT IMAGE ===
 
-https://loganpowell.github.io/census-js-examples/examples/counties_static/index.html
+[![counties](./examples/assets/images/counties.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/counties_static/index.html)
 
-source code: https://github.com/loganpowell/census-js-examples/tree/master/examples/counties_static
+[source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/counties_static)
 
 ### Notable Example:
 
@@ -419,13 +420,12 @@ census({
 )
 ```
 
-This is a very large request, in fact, one of the largest you could possibly make in a single `citysdk` function call. It is so large, in fact that it currently only works on Node and only if you increase your `node --max-old-space-size=4096`. With large merges (such as all counties or zctas), it is recommended not to try to use citysdk dynamically, but - rather - to munge your geojson before hand and then serve it statically to your mapping library, as was done here:
+This is a very large request, in fact, one of the largest you could possibly make in a single `citysdk` function call. It is so large, in fact that it currently only works on Node and only if you increase your `node --max-old-space-size=4096`. With large merges (such as all counties or zctas), it is recommended not to try to use `citysdk` dynamically, but - rather - to munge your data before hand with `citysdk` and then serve it statically to your mapping library, as was done here:
 
-=== INSERT IMAGE ===
 
-https://loganpowell.github.io/census-js-examples/examples/zip-code-tabulation-areas_static/index.html
-source code: https://github.com/loganpowell/census-js-examples/tree/master/examples/zip-code-tabulation-areas_static
+[![Zip Code Tabulation Areas](./examples/assets/images/zctas.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/zip-code-tabulation-areas_static/index.html)
 
+[source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/zip-code-tabulation-areas_static)
 
 
 #### Other Argument Examples:
@@ -475,13 +475,19 @@ source code: https://github.com/loganpowell/census-js-examples/tree/master/examp
 
 The Census Bureau publishes both high and low accuracy geographic area files to accommodate the widest possible variety of user needs (within feasibility). Cartography Files are simplified representations of selected geographic areas from the Census Bureau’s Master Address File/Topologically Integrated Geographic Encoding and Referencing (MAF/TIGER) system. _These boundary files are specifically designed for small scale thematic mapping (i.e., for visualizations)_.
 
-For a while now, we have published our cartography files in the [`.shp`](https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html) format. More recently, we expanded our portfolio of available formats to [`.kml`](https://www.census.gov/geo/maps-data/data/tiger-kml.html). It is with this release that we follow suit with the community at large to release these boundaries in `.json` (GeoJSON) format.
+For a while now, we have published our cartography files in the [`.shp`] format. More recently, we expanded our portfolio of available formats to [`.kml`]. It is with this release that we follow suit with the community at large to release these boundaries in `.json` (GeoJSON) format.
 
-### Geographies Availabile by Vintage
+[`.shp`]: https://www.census.gov/geo/maps-data/data/tiger-cart-boundary.html
+[`.kml`]: https://www.census.gov/geo/maps-data/data/tiger-kml.html
 
-The most comprehensive set of geographies and vintages can be found within the [500k set](https://github.com/loganpowell/census-geojson/tree/master/GeoJSON/500k).
-Some vintages - [`103` through `110`](https://github.com/loganpowell/census-geojson/tree/master/GeoJSON/500k) - are references to sessions of Congress and only contain a single geographic summary level: `"congressional district"`
+### Geographies Available by Vintage
+
+The most comprehensive set of geographies and vintages can be found within the [500k set].
+Some vintages - [`103` through `110`] - are references to sessions of Congress and only contain a single geographic summary level: `"congressional district"`
 The following tables represent the availability of various geographic summary levels through the remaining vintages:
+
+[500k set]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
+[`103` through `110`]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 
 Geographic Area Type                                          | 1990  | 2000  | 2010 |  2012 | 2013 - 2015 | 2016 - 2017                             
 ------------------------------------------------------------- | :---: | :---: |:---: | :---: | :---------: | :---------:    
