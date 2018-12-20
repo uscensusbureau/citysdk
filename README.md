@@ -423,7 +423,7 @@ census({
 This is a very large request, in fact, one of the largest you could possibly make in a single `citysdk` function call. It is so large, in fact that it currently only works on Node and only if you increase your `node --max-old-space-size=4096`. With large merges (such as all counties or zctas), it is recommended not to try to use `citysdk` dynamically, but - rather - to munge your data before hand with `citysdk` and then serve it statically to your mapping library, as was done here:
 
 
-[![Zip Code Tabulation Areas](./examples/assets/images/zctas.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/zip-code-tabulation-areas_static/index.html)
+[![Zip Code Tabulation Areas](./examples/assets/images/zctas.PNG)](https://uscensusbureau.github.io/citysdk/examples/mapbox/zip-code-tabulation-areas_static/index.html)
 
 [source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/zip-code-tabulation-areas_static)
 

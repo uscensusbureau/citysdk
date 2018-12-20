@@ -70,13 +70,13 @@
         <counts>
           <entry key="gitignore" value="1" />
           <entry key="html" value="27" />
-          <entry key="md" value="683" />
+          <entry key="md" value="692" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="27" />
-          <entry key="Markdown" value="683" />
+          <entry key="Markdown" value="692" />
           <entry key="PLAIN_TEXT" value="1" />
         </counts>
       </usages-collector>
@@ -88,8 +88,8 @@
         <entry file="file://$PROJECT_DIR$/../README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="FIRST">
-              <first_editor relative-caret-position="1092">
-                <caret line="386" column="37" lean-forward="true" selection-end-line="537" />
+              <first_editor relative-caret-position="1239">
+                <caret line="431" selection-start-line="431" selection-end-line="431" />
               </first_editor>
               <second_editor />
             </state>
@@ -158,30 +158,6 @@
               <item name="." type="b2602c69:ProjectViewProjectNode" />
               <item name="citysdk" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="." type="b2602c69:ProjectViewProjectNode" />
-              <item name="citysdk" type="462c0819:PsiDirectoryNode" />
-              <item name="examples" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="." type="b2602c69:ProjectViewProjectNode" />
-              <item name="citysdk" type="462c0819:PsiDirectoryNode" />
-              <item name="examples" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="." type="b2602c69:ProjectViewProjectNode" />
-              <item name="citysdk" type="462c0819:PsiDirectoryNode" />
-              <item name="examples" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="images" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="." type="b2602c69:ProjectViewProjectNode" />
-              <item name="citysdk" type="462c0819:PsiDirectoryNode" />
-              <item name="examples" type="462c0819:PsiDirectoryNode" />
-              <item name="mapbox" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -245,12 +221,12 @@
       <workItem from="1545227496169" duration="698000" />
       <workItem from="1545228200557" duration="3057000" />
       <workItem from="1545313134350" duration="2497000" />
-      <workItem from="1545316465092" duration="320000" />
+      <workItem from="1545316465092" duration="991000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9001000" />
+    <option name="totallyTimeSpent" value="9672000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="162" y="-1600" width="1686" height="1607" extended-state="0" />
@@ -308,8 +284,8 @@
     <entry file="file://$PROJECT_DIR$/../README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="FIRST">
-          <first_editor relative-caret-position="1092">
-            <caret line="386" column="37" lean-forward="true" selection-end-line="537" />
+          <first_editor relative-caret-position="1239">
+            <caret line="431" selection-start-line="431" selection-end-line="431" />
           </first_editor>
           <second_editor />
         </state>
