@@ -365,9 +365,9 @@ There are a number of reasons you might want to merge your statistics into their
 
 ### Dynamic Use Example
 
-A more dynamic example of using stats merged with GeoJSON on the fly with `citysdk` can be found here
+A more dynamic example of using stats merged with GeoJSON on the fly with `citysdk` can be found here:
 
-[![mapbox-geocoding](./examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding/index.html)
+[![mapbox-geocoding](./examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html)
 
 Type in a county name and see the unweighted sample count of the population (ACS) for all the Block Groups within that County.
 
