@@ -398,7 +398,7 @@ In this example, we use `citysdk` to create the payload and then save it via Nod
 [Mapbox-GL]: https://www.mapbox.com/mapbox-gl-js/api/
 
 
-[![counties](./examples/assets/images/counties.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/counties_static/index.html)
+[![counties](./examples/assets/images/counties.PNG)](https://uscensusbureau.github.io/citysdk/examples/mapbox/counties_static/index.html)
 
 [source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/counties_static)
 
