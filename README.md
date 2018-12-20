@@ -367,7 +367,7 @@ There are a number of reasons you might want to merge your statistics into their
 
 A more dynamic example of using stats merged with GeoJSON on the fly with `citysdk` can be found here:
 
-[![mapbox-geocoding](./examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html)
+[![mapbox-geocoding](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html)
 
 Type in a county name and see the unweighted sample count of the population (ACS) for all the Block Groups within that County.
 
@@ -398,7 +398,7 @@ In this example, we use `citysdk` to create the payload and then save it via Nod
 [Mapbox-GL]: https://www.mapbox.com/mapbox-gl-js/api/
 
 
-[![counties](./examples/assets/images/counties.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/counties_static/index.html)
+[![counties](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/examples/assets/images/counties.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/counties_static/index.html)
 
 [source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/counties_static)
 
@@ -423,7 +423,7 @@ census({
 This is a very large request, in fact, one of the largest you could possibly make in a single `citysdk` function call. It is so large, in fact that it currently only works on Node and only if you increase your `node --max-old-space-size=4096`. With large merges (such as all counties or zctas), it is recommended not to try to use `citysdk` dynamically, but - rather - to munge your data before hand with `citysdk` and then serve it statically to your mapping library, as was done here:
 
 
-[![Zip Code Tabulation Areas](./examples/assets/images/zctas.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/zip-code-tabulation-areas_static/index.html)
+[![Zip Code Tabulation Areas](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/examples/assets/images/zctas.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/zip-code-tabulation-areas_static/index.html)
 
 [source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/zip-code-tabulation-areas_static)
 
