@@ -2,7 +2,7 @@
   (:require
     [cljs.core.async    :refer [>! <! chan promise-chan close! take! to-chan
                                 pipe timeout put!]
-     :refer-macros [go alt!]]
+                        :refer-macros [go alt!]]
     [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
     [net.cgrand.xforms  :as x]
     ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
