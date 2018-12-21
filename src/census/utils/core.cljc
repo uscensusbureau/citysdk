@@ -186,6 +186,8 @@
             =E= ([E] (cb E nil)))))
 
 (defn ->args
+  "Converts js arguments (JSON) into a Clojure map, used internally to handle
+  functionality of this library."
   [args]
   (if (= (type args) amap-type)
       (let [{:keys [vintage]} args]
@@ -197,9 +199,10 @@
                 (transform [MAP-NODES MAP-KEYS] keyword)))))
 
 (defn args->
+  "Converts Clojure arguments to JavaScript (for external use)"
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    (clj->js (setval :geoHierarchy geoKeys args) :keys #(s/capital %))))
+    (clj->js (setval :geoHierarchy geoKeys args))))
 
 
 
