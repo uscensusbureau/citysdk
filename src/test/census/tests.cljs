@@ -31,7 +31,7 @@
             (prn "Error: " err))))))
 
 (comment
-  (test-async-time ts/args-ok-wms-only js/console.log) ; :geocodes   ms = 275
+  (test-async-time ts/args-ok-wms-only prn) ; :geocodes   ms = 275
   (test-async-time (ts/test-args 9 3 3 0) prn)         ; :geocodes   ms = 362
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274
@@ -40,15 +40,24 @@
   (test-async-time ts/args-na-sts-pred prn)            ; :no-values
   (test-async-time ts/args-ok-sts-v+ps prn)            ; :stats-only ms = 384
   (test-async-time ts/args-ok-sts-vals prn)            ; :stats-only ms = 757
+  (test-async-time ts/test-js-args-1 prn)              ; :stats-only ms = 757
+  (test-async-time #js {"vintage"     "2016"
+                        "geoHierarchy"  #js {"state" "12" "state legislative district (upper chamber)" "*"}
+                        "sourcePath"    #js ["acs" "acs5"]
+                        "values"        #js ["B01001_001E" "NAME"]
+                        "predicates"    #js {"B00001_001E" "0:30000"}
+                        "geoResolution" "500k"
+                        "statsKey"      stats-key}
+                   prn)
   (test-async-time {:vintage 2016                      ; :stats+geos NA
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:state "42"
                                    :county "003"
                                    :county-subdivision "*"}
-                    :geoResolution "4k"
+                    :geoResolution "50k"
                     :statsKey ts/stats-key}
-                   prn)
+                   js/console.log)
   (test-async-time {:vintage 2016                      ; ERROR
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]

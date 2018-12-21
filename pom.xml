@@ -39,12 +39,12 @@
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>core.async</artifactId>
-            <version>0.4.474</version>
+            <version>0.4.490</version>
         </dependency>
         <dependency>
             <groupId>cljs-ajax</groupId>
             <artifactId>cljs-ajax</artifactId>
-            <version>0.7.4</version>
+            <version>0.8.0</version>
         </dependency>
         <dependency>
             <groupId>funcool</groupId>
@@ -52,19 +52,9 @@
             <version>2.0.5</version>
         </dependency>
         <dependency>
-            <groupId>binaryage</groupId>
-            <artifactId>oops</artifactId>
-            <version>0.6.3</version>
-        </dependency>
-        <dependency>
             <groupId>defun</groupId>
             <artifactId>defun</artifactId>
             <version>0.3.0-RC1</version>
-        </dependency>
-        <dependency>
-            <groupId>jamesmacaulay</groupId>
-            <artifactId>cljs-promises</artifactId>
-            <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.rpl</groupId>
@@ -79,7 +69,7 @@
         <dependency>
             <groupId>net.cgrand</groupId>
             <artifactId>xforms</artifactId>
-            <version>0.18.2</version>
+            <version>0.19.0</version>
         </dependency>
     </dependencies>
     <build>

@@ -1,17 +1,19 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
-                                 onto-chan to-chan]
-                         :refer-macros [go go-loop alt!]]
     [ajax.core           :refer [GET POST]]
-    ;[cljs-promises.async :refer [pair-port value-port]]
     [cuerdas.core        :as s]
-    [oops.core           :refer [oget oset!]]
     [cljs.reader         :refer [read-string]]
-    ;[linked.core         :as -=-]
-    [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-                                 if-path continue-then-stay selected?]
-                         :refer-macros [select transform traverse setval recursive-path]]))
+    #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
+                                        onto-chan to-chan]
+                                :refer-macros [go go-loop alt!]]
+       :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
+                                        onto-chan to-chan go go-loop alt!]])
+    #?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+                                        if-path continue-then-stay selected?]
+                                :refer-macros [select transform traverse setval recursive-path]]
+       :clj [com.rpl.specter    :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+                                        if-path continue-then-stay selected? select
+                                        transform traverse setval recursive-path]])))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
@@ -21,14 +23,25 @@
 ;TODO
 (def base-url-database "...")
 
-(def vec-type cljs.core/PersistentVector)
-(def amap-type cljs.core/PersistentArrayMap)
-(def err-type js/Error)
-(defn error [e] (js/Error. e))
+(def vec-type
+  #?(:cljs cljs.core/PersistentVector
+     :clj clojure.lang.PersistentVector))
 
-;(def MAP-NODES
-;  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
-;  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
+(def amap-type
+  #?(:cljs cljs.core/PersistentArrayMap
+     :clj clojure.lang.PersistentArrayMap))
+
+(def err-type
+  #?(:cljs js/Error
+     :clj java.lang.Error))
+
+(defn error [e]
+  #?(:cljs (js/Error. e)
+     :clj (java.lang.Error e)))
+
+(def MAP-NODES
+  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
+  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
 
 
 (defn map-rename-keys
@@ -173,26 +186,20 @@
             =E= ([E] (cb E nil)))))
 
 (defn ->args
-  "Converts js arguments (JSON) into a Clojure map, used internally to handle
-  functionality of this library."
   [args]
   (if (= (type args) amap-type)
-    (let [{:keys [vintage]} args]
-      (setval :vintage (str vintage) args))
-    (let [geoCljs (js->clj (oget args "geoHierarchy"))
-          vintage (oget args "vintage")
-          geoKeys (map-rename-keys strs->keys geoCljs)]
-      (do (oset! args "vintage"      (clj->js (str vintage)))
-          (oset! args "geoHierarchy" (clj->js geoKeys))
-          (js->clj args :keywordize-keys true)))))
+      (let [{:keys [vintage]} args]
+           (setval :vintage (str vintage) args))
+      (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
+           (->> (merge clj-args
+                       {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                        "vintage" (str vintage)})
+                (transform [MAP-NODES MAP-KEYS] keyword)))))
 
-
-(defn args->js
-  "Converts Clojure map-based arguments to JSON based arguments (for external
-  use)"
+(defn args->
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    (clj->js (setval :geoHierarchy geoKeys args))))
+    (clj->js (setval :geoHierarchy geoKeys args) :keys #(s/capital %))))
 
 
 
