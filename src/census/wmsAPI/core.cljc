@@ -1,13 +1,16 @@
 (ns census.wmsAPI.core
   (:require
-    [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
-                               timeout]
-                       :refer-macros [go alt!]]
+    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
+                                        timeout]
+                                :refer-macros [go alt!]]
+       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan
+                                        timeout go alt!]])
+    #?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
+                                :refer-macros [select transform traverse setval]]
+       :clj  [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL select transform traverse setval]])
     [clojure.set       :refer [map-invert]]
     [cuerdas.core      :refer [join]]
     [linked.core       :as -=-]
-    [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
-                       :refer-macros [select transform traverse setval]]
     [census.utils.core :refer [=O?>-cb $GET$
                                amap-type vec-type throw-err ->args
                                URL-WMS URL-GEOKEYMAP]]))

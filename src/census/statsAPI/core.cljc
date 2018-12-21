@@ -1,11 +1,11 @@
 (ns census.statsAPI.core
   (:require
-    [cljs.core.async    :refer [>! <! chan promise-chan close! take! to-chan
-                                pipe timeout put!]
-                        :refer-macros [go alt!]]
+    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! to-chan
+                                        pipe timeout put!]
+                                :refer-macros [go alt!]]
+       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! to-chan
+                                        pipe timeout put! go alt!]])
     [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
-    [net.cgrand.xforms  :as x]
-    ;[census.wmsAPI.core :refer [Icb<-wms-args<<=IO=]]
     [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
                                 transduct<<
                                 amap-type vec-type throw-err map-idcs-range

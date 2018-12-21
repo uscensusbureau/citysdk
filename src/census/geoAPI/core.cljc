@@ -1,26 +1,30 @@
 (ns census.geoAPI.core
   (:require
-    [cljs.core.async    :refer [chan close! to-chan onto-chan take! put!
-                                promise-chan pipeline pipe]]
+    #?(:cljs [cljs.core.async   :refer [chan close! to-chan onto-chan take! put!
+                                        promise-chan pipeline pipe]]
+       :clj [clojure.core.async :refer [chan close! to-chan onto-chan take! put!
+                                        promise-chan pipeline pipe]])
     [cuerdas.core       :refer [join]]
-    [defun.core         :refer-macros [defun]]
+    #?(:cljs [defun.core :refer-macros [defun]]
+       :clj [defun.core  :refer [defun]])
     [census.utils.core  :refer [URL-GEOKEYMAP URL-GEOJSON
                                 xf<< educt<< transduct<< =O?>-cb $GET$
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type ->args]]))
 
 (defn G-err
-  "Tries to log a useful error given a user's invalid input. Returns an empty string"
+  "Tries to log a useful error given a user's invalid input. Sends empty string
+  downstream."
   [$g$ res vin lev]
-  (let [e-gen
-        [(str "No GeoJSON found for: '" (keys->strs (name lev)) "'")
-         (str "at this scope in vintage: " vin)
-         (str "at resolution: " res)]]
+  (let [js-name (keys->strs (name lev))
+        e-gen [(str "No GeoJSON found for: '" js-name "'")
+               (str "at this scope in vintage: " vin)
+               (str "at resolution: " res)]]
     (if-let [vins (get-in $g$ [lev])]
       (let [e-try
-            [(str "For '" (keys->strs (name lev)) "' try of of the following:")
-             (str "=== :us = nation-level '" (name lev) "' geoResolutions ===")
-             (str "=== :st = state-levels '" (name lev) "' geoResolutions ===")]]
+            [(str "For '" js-name "' try of of the following:")
+             (str "=== :us = nation-level '" js-name "' geoResolutions ===")
+             (str "=== :st = state-levels '" js-name "' geoResolutions ===")]]
         (do (doseq [e e-gen] (prn e))
             (doseq [t e-try] (prn t))
             (doseq [s (vec (map-over-keys #(get-in % [:scopes]) vins))] (prn s))
@@ -74,13 +78,13 @@
   ([$g$ ["500k" vin nil [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
   ([$g$ [res    vin nil [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
-  ([$g$ [res    vin _   [lev _  ]                     nil               ]] (G-err $g$ res vin lev))
-  ([$g$ [res    vin nil [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
-  ([$g$ [res    vin "*" [lev _  ]                     {:us nil :st _   }]] (G-err $g$ res vin lev))
-  ([$g$ [res    vin nil [lev _  ]                     {:us USr :st _   }]] (scope $g$ res vin lev USr))
-  ([$g$ [res    vin "*" [lev _  ]                     {:us USr :st _   }]] (scope $g$ res vin lev USr))
-  ([$g$ [res    vin _   [lev _  ]                     {:us USr :st nil }]] (scope $g$ res vin lev USr))
-  ([$g$ [res    vin st  [lev _  ]                     {:us USr :st STr }]] (scope $g$ res vin lev USr STr st))
+  ([$g$ [res    vin _   [lev _    ]                   nil               ]] (G-err $g$ res vin lev))
+  ([$g$ [res    vin nil [lev _    ]                   {:us nil :st _   }]] (G-err $g$ res vin lev))
+  ([$g$ [res    vin "*" [lev _    ]                   {:us nil :st _   }]] (G-err $g$ res vin lev))
+  ([$g$ [res    vin nil [lev _    ]                   {:us USr :st _   }]] (scope $g$ res vin lev USr))
+  ([$g$ [res    vin "*" [lev _    ]                   {:us USr :st _   }]] (scope $g$ res vin lev USr))
+  ([$g$ [res    vin _   [lev _    ]                   {:us USr :st nil }]] (scope $g$ res vin lev USr))
+  ([$g$ [res    vin st  [lev _    ]                   {:us USr :st STr }]] (scope $g$ res vin lev USr STr st))
   ([$g$ & anthing-else ]                                                   ""))
 
 
