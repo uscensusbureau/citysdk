@@ -33,11 +33,11 @@
 
 (def err-type
   #?(:cljs js/Error
-     :clj java.lang.Error))
+     :clj Exception))
 
 (defn error [e]
   #?(:cljs (js/Error. e)
-     :clj (java.lang.Error e)))
+     :clj (Exception e)))
 
 (def MAP-NODES
   "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
@@ -115,7 +115,7 @@
        (fn [url]
          (cond
            (and (= url @$url$) (not (empty? @$err$)))
-           (do (prn (str "Unsuccessful: " log-name " request."))
+           (do (prn (str "Unsuccessful " log-name " request."))
                (put! =err= @$err$)
                (reset! $err$ {})) ; <- if internets have failed, allow retry
            (and (= url @$url$) (empty? @$err$))
