@@ -1,13 +1,16 @@
 (ns census.wmsAPI.core
   (:require
-    [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
-                               timeout]
-                       :refer-macros [go alt!]]
+    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
+                                        timeout]
+                                :refer-macros [go alt!]]
+       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan
+                                        timeout go alt!]])
+    ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
+    ;                            :refer-macros [select transform traverse setval]]
+    ;   :clj  [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL select transform traverse setval]])
     [clojure.set       :refer [map-invert]]
     [cuerdas.core      :refer [join]]
     [linked.core       :as -=-]
-    [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
-                       :refer-macros [select transform traverse setval]]
     [census.utils.core :refer [=O?>-cb $GET$
                                amap-type vec-type throw-err ->args
                                URL-WMS URL-GEOKEYMAP]]))
@@ -100,20 +103,20 @@
   data API).
   "
   [$g$ attrs]
-  (let [wms-keys (select MAP-KEYS attrs)
-        wms-vals (select MAP-VALS attrs)
-        geo-keys (map #(search-id->match? $g$ %)
-                      wms-keys)]
+  (let [wms-keys (into [] (keys attrs))
+        wms-vals (into [] (vals attrs))
+        geo-keys (map #(search-id->match? $g$ %) wms-keys)]
     (loop [idx    0
            result {}]
       (if (= nil (get wms-keys idx))
         result
         (recur (inc idx)
-               (assoc result
+               (assoc result ; TODO: `revert` if no bueno
                       (get wms-keys idx)
                       ;; returns an empty map ({}) if invalid
-                      {(get (select [ALL ALL] geo-keys) idx)
+                      {(get (mapv #(first %) geo-keys) idx)
                        (get wms-vals idx)}))))))
+
 (def $url$ (atom ""))
 (def $res$ (atom []))
 (def $err$ (atom {}))
@@ -160,12 +163,12 @@
   "
   [$g$]
   (fn [=>args= =args=>]
-    (go (let [args-in (<! =>args=)
+    (go (let [->args (<! =>args=)
               =res= (chan 1)]
-          (if (not (wms-engage? args-in))
-            (do (>! =args=> args-in)
+          (if (not (wms-engage? ->args))
+            (do (>! =args=> ->args)
                 (close! =res=))
-            (loop [args args-in
+            (loop [args ->args
                    idx 0]
               (try-census-wms $g$ args idx =res=)
               (let [{:keys [layers sub-level]} ($g$->wms-cfg $g$ args)
@@ -173,15 +176,14 @@
                 (cond
                   (not (empty? res))
                   (do (>! =args=>
-                        (transform :geoHierarchy #(into {} %)
-                          (setval :geoHierarchy
+                        (merge args
+                          (assoc {} :geoHierarchy
                             (conj (-=-/map)
-                              (into (-=-/map) (traverse MAP-VALS res))
-                              (into (-=-/map) [sub-level]))
-                            args)))
+                                  (into (-=-/map) (vals res))
+                                  (into (-=-/map) [sub-level])))))
                       (close! =res=))
                   (and (empty? res) (not (nil? (get layers (inc idx)))))
-                  (recur args-in (inc idx))
+                  (recur ->args (inc idx))
                   :else
                   (do (>! =args=> "No FIPS (Census geocodes) found for given arguments")
                       (close! =res=))))))))))

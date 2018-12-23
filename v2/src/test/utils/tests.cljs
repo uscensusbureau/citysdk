@@ -7,43 +7,37 @@
     [cljs.test           :refer-macros [async deftest is are testing run-tests]]
     [cljs.reader         :refer [read-string]]
     [test.fixtures.core  :refer [test-async]]
-    [census.utils.core   :refer [deep-reverse-MAP-NODES
-                                 deep-linked-map
-                                 map-rename-keys
+    [census.utils.core   :refer [map-rename-keys
                                  map-over-keys
                                  keys->strs
                                  strs->keys
                                  ->args
-                                 args->js
+                                 args->
                                  xf<<
                                  xf!<<
                                  educt<<
                                  map-target
-                                 map-target-idcs
+                                 ;map-target-idcs
                                  map-idcs-range
                                  $GET$
-                                 I-<I=
-                                 =O?>-cb
-                                 Icb-<IO?=
-                                 $GET$-json
-                                 $GET$-edn]]))
+                                 =O?>-cb]]))
 
-(deftest deep-reverse-MAP-NODES-test
-  (is (= (deep-reverse-MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
-         {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7})))
+;(deftest MAP-NODES-test
+;  (is (= (MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+;         {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7})))
 
 ; Rationalle: Inside a go-block, it seems that any map literals are immediately
 ; changed into `hash-map`, so the only way to preserve an `array-map` is to
 ; `let` bind the args into a variable before invoking the go-block
 
-(deftest deep-linked-map-test
-  (is (= (read-string
-           (pr-str
-             (deep-linked-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})))
-         (read-string
-           "#linked/map[[:i 7]
-                        [:c #linked/map[[:e #linked/map[[:h 6] [:g 5] [:f 4]]] [:d 3]]]
-                        [:a #linked/map[[:b 2]]]]"))))
+;(deftest deep-linked-map-test
+;  (is (= (read-string
+;           (pr-str
+;             (deep-linked-map {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})))
+;         (read-string
+;           "#linked/map[[:i 7]
+;                        [:c #linked/map[[:e #linked/map[[:h 6] [:g 5] [:f 4]]] [:d 3]]]
+;                        [:a #linked/map[[:b 2]]]]"))))
 
 (deftest map-rename-keys-test
   (is (= (map-rename-keys name {:a "b" :c "d"})
@@ -51,7 +45,12 @@
 
 (deftest map-over-keys-test
   (is (= (map-over-keys inc {:a 1 :b 2})
-         {:a 2 :b 3})))
+         {:a 2 :b 3}))
+  (is (= (map-over-keys #(get-in % [:scopes]) {:k1 {:scopes [1 2]
+                                                    :butt {:k "v"}}
+                                               :k2 {:scopes [3 4]
+                                                    :bottom {:k "s"}}})
+         {:k1 [1 2], :k2 [3 4]}))){:k1 [1 2], :k2 [3 4]}
 
 (deftest keys->strs-test
   (is (= (keys->strs (name :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))
@@ -75,10 +74,13 @@
 (deftest $GET$-test
   (let [=url= (chan 1)
         =res= (chan 1)
-        =err= (chan 1)]
+        =err= (chan 1)
+        url (atom "")
+        res (atom [])
+        err (atom {})]
     (test-async
       (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (($GET$ :json "nope") =url= =res= =err=)
+          (($GET$ :json "nope" url res err) =url= =res= =err=)
           (close! =url=)
           (is (= (<! =res=)
                  {:name "NAME",
@@ -87,48 +89,6 @@
                   :limit 0}))
           (close! =err=)
           (close! =res=)))))
-
-(deftest $GET$-json-ok-test
-  (let [=url= (chan 1)
-        =res= (chan 1)
-        =err= (chan 1)]
-    (test-async
-      (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          ($GET$-json =url= =res= =err=)
-          (let [res (<! =res=)]
-            (is (= res
-                   {:name "NAME",
-                    :label "Canonical Name for Geography",
-                    :group "N/A",
-                    :limit 0}))
-            (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-            ($GET$-json =url= =res= =err=)
-            (is (identical?
-                  (<! =res=)
-                  res))
-            (close! =url=)
-            (close! =err=)
-            (close! =res=))))))
-
-(deftest $GET$-json-err-test
-  (let [=url= (chan 1)
-        =res= (chan 1)
-        =err= (chan 1)]
-    (test-async
-      (go (>! =url= "/data/bad.json")
-          ($GET$-json =url= =res= =err=)
-          (let [err (<! =err=)]
-            (prn err)
-            (is (= err
-                   "ERROR status: 0 Request failed. for URL /data/bad.json ... output empty `{}`"))
-            (>! =url= "/data/bad.json")
-            ($GET$-json =url= =res= =err=)
-            (is (identical?
-                  (<! =err=)
-                  err))
-            (close! =url=)
-            (close! =err=)
-            (close! =res=))))))
 
 
 (deftest =O?>-cb-test
@@ -156,42 +116,67 @@
           (close! =O=)
           (close! =E=)))))
 
-; TODO:
+(deftest ->args-test
+  (is (= (->args #js{"vintage" 2010,
+                     "values" #js["H001001" "NAME"],
+                     "sourcePath" #js["dec" "cd113"],
+                     "geoHierarchy" #js{"american indian area/alaska native area (reservation or statistical entity only) (or part)" "R",
+                                        "state" "01",
+                                        "county subdivision" "93",
+                                        "congressional district" "01",
+                                        "american indian area/alaska native area/hawaiian home land (or part)" "2865"}})
+         {:vintage "2010",
+          :values ["H001001" "NAME"],
+          :sourcePath ["dec" "cd113"],
+          :geoHierarchy {:american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_ "R",
+                         :state "01",
+                         :county-subdivision "93",
+                         :congressional-district "01",
+                         :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}}))
+  (is (= (->args #js{"vintage" 2015
+                     "geoHierarchy" #js{"lat" 23.33
+                                        "lng" -90.02}})
+         {:vintage "2015", :geoHierarchy {:lat 23.33, :lng -90.02}}))
+  (is (= (->args {:vintage 2010,
+                  :values ["H001001" "NAME"],
+                  :sourcePath ["dec" "cd113"],
+                  :geoHierarchy {:county-subdivision "93",
+                                 :congressional-district "01"}})
+         {:vintage "2010"
+          :values ["H001001" "NAME"]
+          :sourcePath ["dec" "cd113"]
+          :geoHierarchy {:county-subdivision "93"
+                         :congressional-district "01"}})))
 
-#_(args->js  {:vintage "2010",
-              :values ["H001001" "NAME"],
-              :sourcePath ["dec" "cd113"],
-              :geoHierarchy {:american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_ "R",
-                             :state "01",
-                             :county-subdivision "93"
-                             :congressional-district "01",
-                             :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}})
+(deftest args->test
+  (is (= (js->clj (args-> {:vintage "2010",
+                           :values ["H001001" "NAME"],
+                           :sourcePath ["dec" "cd113"],
+                           :geoHierarchy {:american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_ "R",
+                                          :state "01",
+                                          :county-subdivision "93",
+                                          :congressional-district "01",
+                                          :american-indian-area!alaska-native-area!hawaiian-home-land-_or-part_ "2865"}}))
+         (js->clj #js {"vintage" "2010"
+                       "values" #js ["H001001" "NAME"]
+                       "sourcePath" #js ["dec" "cd113"]
+                       "geoHierarchy" #js {"american indian area/alaska native area (reservation or statistical entity only) (or part)" "R"
+                                           "state" "01"
+                                           "county subdivision" "93"
+                                           "congressional district" "01"
+                                           "american indian area/alaska native area/hawaiian home land (or part)" "2865"}}))))
 
+(deftest map-target-test
+  (is (= (map-target inc 0 [1 2 3])
+         [2 2 3]))
+  (is (= (map-target inc 1 [1 2 3])
+         [1 3 3]))
+  (is (= (map-target inc 2 [1 2 3])
+         [1 2 4])))
 
-; FIXME: delete?
-
-(deftest cb-<-$GET$-json-test
-  (let [=url= (chan 1)
-        =res= (chan 1)
-        =err= (chan 1)
-        $r$ (atom "")
-        tcb (fn [E O] (if-let [err E]
-                        (reset! $r$ err)
-                        (reset! $r$ O)))]
-    (test-async
-      (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (=O?>-cb $GET$-json tcb =url= =res= =err=)
-          (<! (timeout 500))
-          (is (= @$r$
-                 {:name "NAME",
-                  :label "Canonical Name for Geography",
-                  :group "N/A",
-                  :limit 0}))
-          (close! =url=)
-          (close! =err=)
-          (close! =res=)))))
-
-
+(deftest map-idcs-range-test
+  (is (= (map-idcs-range keyword [2 4] ["a" "b" "c" "d" "e" "f"])
+         ["a" "b" :c :d "e" "f"])))
 (run-tests)
 
 

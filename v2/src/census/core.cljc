@@ -1,9 +1,9 @@
 (ns census.core
   (:require
-    [cljs.core.async      :refer [chan close! to-chan take!
-                                  put! promise-chan]]
-    [defun.core           :refer-macros [defun]]
-    [census.utils.core    :refer [throw-err err-type =O?>-cb ->args args->js
+    [cljs.core.async      :refer [chan close! to-chan take! put! promise-chan]]
+    #?(:cljs [defun.core   :refer-macros [defun]]
+       :clj [defun.core   :refer [defun]])
+    [census.utils.core    :refer [throw-err err-type =O?>-cb ->args args->
                                   $GET$ URL-GEOKEYMAP amap-type]]
     [census.wmsAPI.core   :refer [=>args=GIS=args=> I-<wms=I=]]
     [census.geoAPI.core   :refer [IOE-C-GeoJSON cfg>cfg=C-GeoCLJ]]
@@ -41,11 +41,11 @@
           (case deploy
             :stats+geos ((I=OE-M-spooler $g$
                            (to-chan [args])
-                           [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ])
+                           [cfg>cfg=C-GeoCLJ cfg>cfg=C-Stats])
                          =O= =E=)
             :stats-only (IOE-C-S->JS (to-chan [args]) =O= =E=)
             :geos-only  ((IOE-C-GeoJSON $g$) (to-chan [args]) =O= =E=)
-            :geocodes   (put! =O= (args->js args))
+            :geocodes   (put! =O= (args-> args))
             :no-values  (put! =E= err-no-vals)
             (prn "No matching clause for the arguments provided."
                  "Please check arguments against requirements")))))))

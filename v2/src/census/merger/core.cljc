@@ -1,14 +1,14 @@
 (ns census.merger.core
   (:require
-    [cljs.core.async       :refer [>! <! chan promise-chan close! pipeline put!
-                                   to-chan take!]
-                           :refer-macros [go alt! go-loop]]
-    [cuerdas.core          :refer-macros [istr]
-                           :as s]
-    [net.cgrand.xforms     :as x]
-    [census.utils.core     :refer [URL-GEOKEYMAP xf<< educt<<
-                                   throw-err err-type ->args map-over-keys
-                                   amap-type $GET$]]))
+    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! pipeline put!
+                                        to-chan take!]
+                                :refer-macros [go alt! go-loop]]
+       :clj [clojure.core.async :refer [>! <! chan promise-chan close! pipeline put!
+                                        to-chan take! go alt! go-loop]])
+    [net.cgrand.xforms :as x]
+    [census.utils.core :refer [URL-GEOKEYMAP xf<< educt<<
+                               throw-err err-type ->args
+                               amap-type $GET$]]))
 
 
 (defn deep-merge-a-coll
@@ -84,8 +84,6 @@
                       (>! =O= (->> (persistent! acc)
                                    (reduce concat)
                                    (eduction (xf-Grands-M->JSON @$ids$))
-                                   ;(s/join "," )
-                                   ;(istr "{\"type\":\"FeatureCollection\",\"features\":[~{coll}]}")))
                                    into-array
                                    (js-obj "type" "FeatureCollection" "features")))
                       (close! =cfg=)

@@ -1,17 +1,20 @@
 (ns census.utils.core
   (:require
-    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
-                                 onto-chan to-chan]
-                         :refer-macros [go go-loop alt!]]
     [ajax.core           :refer [GET POST]]
-    ;[cljs-promises.async :refer [pair-port value-port]]
     [cuerdas.core        :as s]
-    [oops.core           :refer [oget oset!]]
     [cljs.reader         :refer [read-string]]
-    ;[linked.core         :as -=-]
-    [com.rpl.specter     :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-                                 if-path continue-then-stay selected?]
-                         :refer-macros [select transform traverse setval recursive-path]]))
+    #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
+                                        onto-chan to-chan]
+                                :refer-macros [go go-loop alt!]]
+       :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
+                                        onto-chan to-chan go go-loop alt!]])
+    ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+    ;                                    if-path continue-then-stay selected?]
+    ;                            :refer-macros [select transform traverse setval recursive-path]]
+    ;   :clj [com.rpl.specter    :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+    ;                                    if-path continue-then-stay selected? select
+    ;                                    transform traverse setval recursive-path]])
+    [clojure.walk         :refer [keywordize-keys]]))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
@@ -21,10 +24,21 @@
 ;TODO
 (def base-url-database "...")
 
-(def vec-type cljs.core/PersistentVector)
-(def amap-type cljs.core/PersistentArrayMap)
-(def err-type js/Error)
-(defn error [e] (js/Error. e))
+(def vec-type
+  #?(:cljs cljs.core/PersistentVector
+     :clj clojure.lang.PersistentVector))
+
+(def amap-type
+  #?(:cljs cljs.core/PersistentArrayMap
+     :clj clojure.lang.PersistentArrayMap))
+
+(def err-type
+  #?(:cljs js/Error
+     :clj Exception))
+
+(defn error [e]
+  #?(:cljs (js/Error. e)
+     :clj (Exception e)))
 
 ;(def MAP-NODES
 ;  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
@@ -36,14 +50,20 @@
   Applies a function over the keys in a provided map
   "
   [f m]
-  (transform MAP-KEYS f m))
+  (reduce-kv (fn [m k v]
+               (assoc m (f k) v)) {} m))
+
+(defn update-map [m f]
+  (reduce-kv (fn [m k v]
+               (assoc m k (f v))) {} m))
 
 (defn map-over-keys
   "
   Applies a function to all values of a provided map
   "
   [f m]
-  (transform MAP-VALS f m))
+  (reduce-kv (fn [m k v]
+               (assoc m k (f v))) {} m))
 
 (defn keys->strs
   "
@@ -102,7 +122,7 @@
        (fn [url]
          (cond
            (and (= url @$url$) (not (empty? @$err$)))
-           (do (prn (str "Unsuccessful: " log-name " request."))
+           (do (prn (str "Unsuccessful " log-name " request."))
                (put! =err= @$err$)
                (reset! $err$ {})) ; <- if internets have failed, allow retry
            (and (= url @$url$) (empty? @$err$))
@@ -177,22 +197,22 @@
   functionality of this library."
   [args]
   (if (= (type args) amap-type)
-    (let [{:keys [vintage]} args]
-      (setval :vintage (str vintage) args))
-    (let [geoCljs (js->clj (oget args "geoHierarchy"))
-          vintage (oget args "vintage")
-          geoKeys (map-rename-keys strs->keys geoCljs)]
-      (do (oset! args "vintage"      (clj->js (str vintage)))
-          (oset! args "geoHierarchy" (clj->js geoKeys))
-          (js->clj args :keywordize-keys true)))))
+      (let [{:keys [vintage]} args]
+           #_(setval :vintage (str vintage) args)
+           (merge args {:vintage (str vintage)}))
+      (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
+           (->> (merge clj-args
+                       {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                        "vintage" (str vintage)})
+                (keywordize-keys)))))
 
-
-(defn args->js
-  "Converts Clojure map-based arguments to JSON based arguments (for external
-  use)"
+(defn args->
+  "Converts Clojure arguments to JavaScript (for external use)"
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    (clj->js (setval :geoHierarchy geoKeys args))))
+    (clj->js
+      #_(setval :geoHierarchy geoKeys args)
+      (merge args {:geoHierarchy geoKeys}))))
 
 
 
@@ -278,21 +298,23 @@
 
 (defn map-target
   "
-  Maps a provided function to a specific index + 1 of a provided collection.
+  Maps a provided function to a specific index of a provided collection.
   "
   [f target coll]
-  (map-indexed
-    #(if (zero? (mod (inc %1) target)) (f %2) %2)
-    coll))
+  (reduce-kv
+    (fn [m k v] (if (= k target)
+                    (conj m (f v))
+                    (conj m v)))
+    [] coll))
 
-
-(defn map-target-idcs
-  "
-  Maps a provided function over a given vector of indeces of a provided
-  collection.
-  "
-  [f targets coll]
-  (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
+;
+;(defn map-target-idcs
+;  "
+;  Maps a provided function over a given vector of indeces of a provided
+;  collection.
+;  "
+;  [f targets coll]
+;  (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
 
 
 (defn map-idcs-range
@@ -301,4 +323,10 @@
   to end) of a provided collection.
   "
   [f [r-start r-end] coll]
-  (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
+  #_(transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll)
+  (let [span (range r-start r-end)]
+    (reduce-kv
+      (fn [m k v] (if (some #(= k %) span)
+                      (conj m (f v))
+                      (conj m v)))
+      [] coll)))
