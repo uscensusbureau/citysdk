@@ -7,7 +7,8 @@
     [cljs.test           :refer-macros [async deftest is are testing run-tests]]
     [cljs.reader         :refer [read-string]]
     [test.fixtures.core  :refer [test-async]]
-    [census.utils.core   :refer [map-rename-keys
+    [census.utils.core   :refer [MAP-NODES
+                                 map-rename-keys
                                  map-over-keys
                                  keys->strs
                                  strs->keys
@@ -21,15 +22,15 @@
                                  map-idcs-range
                                  $GET$
                                  =O?>-cb]]))
-;
-;(deftest deep-reverse-MAP-NODES-test
-;  (is (= (deep-reverse-MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
-;         {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7})))
-;
-;; Rationalle: Inside a go-block, it seems that any map literals are immediately
-;; changed into `hash-map`, so the only way to preserve an `array-map` is to
-;; `let` bind the args into a variable before invoking the go-block
-;
+
+(deftest MAP-NODES-test
+  (is (= (MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+         {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7})))
+
+; Rationalle: Inside a go-block, it seems that any map literals are immediately
+; changed into `hash-map`, so the only way to preserve an `array-map` is to
+; `let` bind the args into a variable before invoking the go-block
+
 ;(deftest deep-linked-map-test
 ;  (is (= (read-string
 ;           (pr-str
@@ -45,7 +46,12 @@
 
 (deftest map-over-keys-test
   (is (= (map-over-keys inc {:a 1 :b 2})
-         {:a 2 :b 3})))
+         {:a 2 :b 3}))
+  (is (= (map-over-keys #(get-in % [:scopes]) {:k1 {:scopes [1 2]
+                                                    :butt {:k "v"}}
+                                               :k2 {:scopes [3 4]
+                                                    :bottom {:k "s"}}})
+         {:k1 [1 2], :k2 [3 4]}))){:k1 [1 2], :k2 [3 4]}
 
 (deftest keys->strs-test
   (is (= (keys->strs (name :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))
@@ -161,8 +167,17 @@
                                            "congressional district" "01"
                                            "american indian area/alaska native area/hawaiian home land (or part)" "2865"}}))))
 
+(deftest map-target-test
+  (is (= (map-target inc 0 [1 2 3])
+         [2 2 3]))
+  (is (= (map-target inc 1 [1 2 3])
+         [1 3 3]))
+  (is (= (map-target inc 2 [1 2 3])
+         [1 2 4])))
 
-
+(deftest map-idcs-range-test
+  (is (= (map-idcs-range keyword [2 4] ["a" "b" "c" "d" "e" "f"])
+         ["a" "b" :c :d "e" "f"])))
 (run-tests)
 
 

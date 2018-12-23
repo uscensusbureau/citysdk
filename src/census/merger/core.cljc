@@ -7,7 +7,7 @@
                                         to-chan take! go alt! go-loop]])
     [net.cgrand.xforms :as x]
     [census.utils.core :refer [URL-GEOKEYMAP xf<< educt<<
-                               throw-err err-type ->args map-over-keys
+                               throw-err err-type ->args
                                amap-type $GET$]]))
 
 

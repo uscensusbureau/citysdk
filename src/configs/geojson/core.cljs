@@ -7,7 +7,7 @@
                                :as s]
     [clojure.set               :refer [map-invert]]
     [defun.core                :refer-macros [defun]]
-    [cljs-promises.async       :refer [value-port]]
+    ;[cljs-promises.async       :refer [value-port]] ; Fixme: Need this dependecy -< move configs to separate project
     [census.utils.core         :refer [map-target error err-type]]
     [configs.utils.fixtures    :refer [read-edn FileSaver]]
     [configs.geojson.filepaths :as geos]
@@ -36,11 +36,11 @@
   "
   Map over a collection to transform 2-digit vintages to their 4-digit codes.
   "
-  [vtr]
+  [v]
   (map #(cond (= "90" %) "1990"
               (= "00" %) "2000"
               :else %)
-       vtr))
+       v))
 
 (defn filename->>pattern
   "
@@ -57,11 +57,11 @@
   [string]
   (->> (s/split string #"_|\.")
        (map #(re-seq #"[a-z]+|[0-9]+" %))
-       (map (fn [y] (remove #(= "d" %) y)))
-       (map-target map-xx->vin 2)
+       (mapv (fn [y] (remove #(= "d" %) y)))
+       (map-target map-xx->vin 1)
        (map #(vec %))))
 
-#_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
+;(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
 
 ; TODO: If geoKeyMap requires additional config to enable pattern matching for
 ; TODO: API + GeoJSON census.merger, update this:

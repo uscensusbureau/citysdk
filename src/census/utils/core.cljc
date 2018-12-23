@@ -8,12 +8,13 @@
                                 :refer-macros [go go-loop alt!]]
        :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
                                         onto-chan to-chan go go-loop alt!]])
-    #?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-                                        if-path continue-then-stay selected?]
-                                :refer-macros [select transform traverse setval recursive-path]]
-       :clj [com.rpl.specter    :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-                                        if-path continue-then-stay selected? select
-                                        transform traverse setval recursive-path]])))
+    ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+    ;                                    if-path continue-then-stay selected?]
+    ;                            :refer-macros [select transform traverse setval recursive-path]]
+    ;   :clj [com.rpl.specter    :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
+    ;                                    if-path continue-then-stay selected? select
+    ;                                    transform traverse setval recursive-path]])
+    [clojure.walk         :refer [keywordize-keys]]))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
@@ -39,9 +40,9 @@
   #?(:cljs (js/Error. e)
      :clj (Exception e)))
 
-(def MAP-NODES
-  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
-  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
+;(def MAP-NODES
+;  "From [specter's help page](https://github.com/nathanmarz/specter/wiki/Using-Specter-Recursively#recursively-navigate-to-every-map-in-a-map-of-maps)"
+;  (recursive-path [] p (if-path map? (continue-then-stay MAP-VALS p))))
 
 
 (defn map-rename-keys
@@ -49,14 +50,20 @@
   Applies a function over the keys in a provided map
   "
   [f m]
-  (transform MAP-KEYS f m))
+  (reduce-kv (fn [m k v]
+               (assoc m (f k) v)) {} m))
+
+(defn update-map [m f]
+  (reduce-kv (fn [m k v]
+               (assoc m k (f v))) {} m))
 
 (defn map-over-keys
   "
   Applies a function to all values of a provided map
   "
   [f m]
-  (transform MAP-VALS f m))
+  (reduce-kv (fn [m k v]
+               (assoc m k (f v))) {} m))
 
 (defn keys->strs
   "
@@ -196,7 +203,7 @@
            (->> (merge clj-args
                        {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
                         "vintage" (str vintage)})
-                (transform [MAP-NODES MAP-KEYS] keyword)))))
+                (keywordize-keys)))))
 
 (defn args->
   "Converts Clojure arguments to JavaScript (for external use)"
@@ -291,18 +298,20 @@
   Maps a provided function to a specific index + 1 of a provided collection.
   "
   [f target coll]
-  (map-indexed
-    #(if (zero? (mod (inc %1) target)) (f %2) %2)
-    coll))
+  (reduce-kv
+    (fn [m k v] (if (= k target)
+                    (conj m (f v))
+                    (conj m v)))
+    [] coll))
 
-
-(defn map-target-idcs
-  "
-  Maps a provided function over a given vector of indeces of a provided
-  collection.
-  "
-  [f targets coll]
-  (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
+;
+;(defn map-target-idcs
+;  "
+;  Maps a provided function over a given vector of indeces of a provided
+;  collection.
+;  "
+;  [f targets coll]
+;  (transform [INDEXED-VALS (selected? FIRST (set targets)) LAST] f coll))
 
 
 (defn map-idcs-range
@@ -311,4 +320,10 @@
   to end) of a provided collection.
   "
   [f [r-start r-end] coll]
-  (transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll))
+  #_(transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll)
+  (let [span (range r-start r-end)]
+    (reduce-kv
+      (fn [m k v] (if (some #(= k %) span)
+                      (conj m (apply f v))
+                      (conj m v)))
+      [] coll)))
