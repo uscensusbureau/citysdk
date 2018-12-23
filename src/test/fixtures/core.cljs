@@ -3,10 +3,7 @@
     [cljs.core.async :refer [take! pipeline chan promise-chan]
                      :refer-macros [go]]
     [cljs.test       :refer-macros [deftest is testing run-tests async]]
-    ;[com.rpl.specter :refer [MAP-VALS]
-    ;                 :refer-macros [select setval]]
     [cljs.reader     :refer [read-string]]
-    ;[oops.core       :refer [oget]]
     ["fs"            :as fs]
     ["dotenv"        :as env]))
 
@@ -151,13 +148,13 @@
         srcs {:sourcePath    (get-path :srcP vkey)}
         prds {:predicates    (get-path :pred vkey)}
         vals {:values        (get-path :vals vkey)}
-        ge1s (if (= [:coords] (into [] (vals (get-path :geo1 geo))))
-               (conj (get-path :crds 0) (get-path :geo1 geo))
+        ge1s (if (= :coords (val (first (get-path :geo1 geo))))
+               (assoc {} (first (keys (get-path :geo1 geo))) (get-path :crds 0))
                (get-path :geo1 geo))
         ge2s (get-path :geo2 geo)
         geoH {:geoHierarchy  (conj {} ge1s ge2s)}
         ress {:geoResolution (get-path :geoR res)}]
-    (into {} (map (fn [val] (if (= [nil] (into [] (vals val))) nil val))
+    (into {} (map (fn [m] (if (= (val (first m)) nil) nil m))
                   [vins geoH srcs ress prds vals (if (= 1 s-key)
                                                      {:statsKey stats-key}
                                                      {:statsKey nil})]))))
@@ -166,7 +163,7 @@
 (def args-ok-wms-only (test-args 9 2 4 0))
 #_{:vintage     "2016",
    :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}}
-;(prn args-ok-wms-only)
+(prn args-ok-wms-only)
 
 (def args-na-wms-only (test-args 9 0 4 0))
 #_{:vintage "2016",
