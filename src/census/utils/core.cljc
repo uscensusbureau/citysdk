@@ -298,7 +298,7 @@
 
 (defn map-target
   "
-  Maps a provided function to a specific index + 1 of a provided collection.
+  Maps a provided function to a specific index of a provided collection.
   "
   [f target coll]
   (reduce-kv
