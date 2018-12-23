@@ -198,7 +198,8 @@
   [args]
   (if (= (type args) amap-type)
       (let [{:keys [vintage]} args]
-           (setval :vintage (str vintage) args))
+           #_(setval :vintage (str vintage) args)
+           (merge args {:vintage (str vintage)}))
       (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
            (->> (merge clj-args
                        {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
@@ -209,7 +210,9 @@
   "Converts Clojure arguments to JavaScript (for external use)"
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    (clj->js (setval :geoHierarchy geoKeys args))))
+    (clj->js
+      #_(setval :geoHierarchy geoKeys args)
+      (merge args {:geoHierarchy geoKeys}))))
 
 
 
@@ -324,6 +327,6 @@
   (let [span (range r-start r-end)]
     (reduce-kv
       (fn [m k v] (if (some #(= k %) span)
-                      (conj m (apply f v))
+                      (conj m (f v))
                       (conj m v)))
       [] coll)))

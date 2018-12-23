@@ -7,8 +7,7 @@
     [cljs.test           :refer-macros [async deftest is are testing run-tests]]
     [cljs.reader         :refer [read-string]]
     [test.fixtures.core  :refer [test-async]]
-    [census.utils.core   :refer [MAP-NODES
-                                 map-rename-keys
+    [census.utils.core   :refer [map-rename-keys
                                  map-over-keys
                                  keys->strs
                                  strs->keys
@@ -18,14 +17,14 @@
                                  xf!<<
                                  educt<<
                                  map-target
-                                 map-target-idcs
+                                 ;map-target-idcs
                                  map-idcs-range
                                  $GET$
                                  =O?>-cb]]))
 
-(deftest MAP-NODES-test
-  (is (= (MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
-         {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7})))
+;(deftest MAP-NODES-test
+;  (is (= (MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
+;         {:a {:b 2} :c {:d 3 :e {:f 4 :g 5 :h 6}} :i 7})))
 
 ; Rationalle: Inside a go-block, it seems that any map literals are immediately
 ; changed into `hash-map`, so the only way to preserve an `array-map` is to
