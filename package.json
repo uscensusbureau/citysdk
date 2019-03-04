@@ -33,6 +33,6 @@
     "xregexp": "^4.2.0"
   },
   "devDependencies": {
-    "shadow-cljs": "^2.7.7"
+    "shadow-cljs": "^2.8.14"
   }
 }
