@@ -189,7 +189,7 @@
                       (close! =res=))))))))))
 
 (defn I-<wms=I=
-  "Provides a syncronous input to a function that accepts a channel for args
+  "Provides a synchronous input to a function that accepts a channel for args
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [I =args=>]
