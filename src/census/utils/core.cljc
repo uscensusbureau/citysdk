@@ -1,6 +1,6 @@
 (ns census.utils.core
   (:require
-    [ajax.core           :refer [GET POST]]
+    [ajax.core           :refer [GET]]
     [cuerdas.core        :as s]
     [cljs.reader         :refer [read-string]]
     #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
@@ -8,18 +8,13 @@
                                 :refer-macros [go go-loop alt!]]
        :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
                                         onto-chan to-chan go go-loop alt!]])
-    ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-    ;                                    if-path continue-then-stay selected?]
-    ;                            :refer-macros [select transform traverse setval recursive-path]]
-    ;   :clj [com.rpl.specter    :refer [MAP-VALS MAP-KEYS INDEXED-VALS FIRST LAST
-    ;                                    if-path continue-then-stay selected? select
-    ;                                    transform traverse setval recursive-path]])
     [clojure.walk         :refer [keywordize-keys]]))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
-(def URL-GEOJSON "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON")
+(def URL-GEOJSON "https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/GeoJSON")
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
+;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
 
 ;TODO
 (def base-url-database "...")
@@ -142,7 +137,9 @@
                                              (str "STATUS: " status
                                                   " " status-text
                                                   " for: " url))
-                                     (put! =err=))))}]
+                                     (put! =err=))))
+                          :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
+                     CORS-URL (str "https://cors-e.herokuapp.com/" url)]
                  (case format
                    :json
                    (let [json
@@ -154,7 +151,7 @@
                                            (reset! $url$ url)
                                            (->> (reset! $res$ res)
                                                 (put! =res=))))})]
-                     (GET url json))
+                     (GET CORS-URL json))
                    :edn
                    (let [edn
                          (merge cfg {:handler
@@ -163,7 +160,7 @@
                                            (reset! $url$ url)
                                            (->> (reset! $res$ (read-string res))
                                                 (put! =res=))))})]
-                     (GET url edn))
+                     (GET CORS-URL edn))
                    :raw
                    (let [raw
                          (merge cfg {:handler
@@ -172,7 +169,7 @@
                                            (reset! $url$ url)
                                            (->> (reset! $res$ res)
                                                 (put! =res=))))})]
-                     (GET url raw)))))))))))
+                     (GET CORS-URL raw)))))))))))
 
 
 (defn =O?>-cb
@@ -242,7 +239,7 @@
 
   Only avails a single state container: `state`
 
-  Example of tranducer seed with contract required for this wrapper:
+  Example of transducer seed with contract required for this wrapper:
 
   (defn xf!-seed-form
     [state xf acc this]

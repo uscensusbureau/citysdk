@@ -263,10 +263,7 @@ RETURN TYPE: `JSON`
 census({
     "vintage" : "timeseries",// required
     "geoHierarchy" : {       // required  
-      "county" : {
-        "lat" : 28.2639, 
-        "lng" : -80.7214
-      }
+      "us": "*"
     },
     "sourcePath" : ["asm", "industry"],  // required 
     "values" : ["EMP","NAICS_TTL","GEO_TTL"],

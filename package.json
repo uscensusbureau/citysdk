@@ -28,12 +28,12 @@
   "dependencies": {
     "dotenv": "^5.0.1",
     "mkdirp": "^0.5.1",
-    "shpjs": "^3.4.2",
+    "shpjs": "^3.4.3",
     "xmlhttprequest": "^1.8.0",
-    "xregexp": "^4.2.0"
+    "xregexp": "^4.2.4"
   },
   "devDependencies": {
-    "shadow-cljs": "^2.8.14",
-    "source-map-support": "^0.5.10"
+    "shadow-cljs": "^2.8.36",
+    "source-map-support": "^0.5.12"
   }
 }

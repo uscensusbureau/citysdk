@@ -177,6 +177,7 @@
 (deftest map-idcs-range-test
   (is (= (map-idcs-range keyword [2 4] ["a" "b" "c" "d" "e" "f"])
          ["a" "b" :c :d "e" "f"])))
+
 (run-tests)
 
 
