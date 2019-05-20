@@ -686,4 +686,7 @@ Upload the larger files to mapshaper and use the Douglas Pueker algorithm to red
 
 Make sure the ZCTAs will fit... then...
 
+`git subtree pull --prefix=v2 census-geojson master`
+`git push origin master`
+
 ### Step 6: Remove dependencies in *Step 3* and `git push ...`
