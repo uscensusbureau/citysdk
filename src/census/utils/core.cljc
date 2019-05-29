@@ -139,7 +139,7 @@
                                                   " for: " url))
                                      (put! =err=))))
                           :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                     CORS-URL (str "https://cors-e.herokuapp.com/" url)]
+                     CORS-URL (str "https://cors.app.cloud.gov/" url)]
                  (case format
                    :json
                    (let [json
