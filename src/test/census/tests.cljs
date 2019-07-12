@@ -31,7 +31,7 @@
             (prn "Error: " err))))))
 
 (comment
-  (test-async-time ts/args-ok-wms-only prn) ; :geocodes   ms = 275
+  (test-async-time ts/args-ok-wms-only prn)            ; :geocodes   ms = 275
   (test-async-time (ts/test-args 9 3 3 0) prn)         ; :geocodes   ms = 362
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274
@@ -163,4 +163,17 @@
                   :geoHierarchy {:state "24"
                                  :metropolitan-statistical-area!micropolitan-statistical-area "*"}
                   :predicates {:time "2010-Q1"}}
+                 prn)
+
+(test-async-time {:vintage "timeseries"
+                  :sourcePath ["intltrade" "exports" "naics"]
+                  :values ["CTY_NAME",
+                           "ALL_VAL_MO",
+                           "ALL_VAL_YR",
+                           "CC_MO",
+                           "NAICS_SDESC",
+                           "DIST_NAME"]
+                  :predicates {:time "2013-01"
+                               :NAICS "111310"
+                               :DISTRICT "27"}}
                  prn)

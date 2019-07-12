@@ -20,7 +20,7 @@
 (defn C-S-args->url
   "Composes a URL to call Census' statistics API"
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
-  (if (not-any? nil? [vintage sourcePath geoHierarchy values])
+  (if (not-any? nil? [vintage sourcePath values])
     (str URL-STATS
          (str vintage)
          (join (map #(str "/" %) sourcePath))
@@ -31,11 +31,13 @@
          (if (some? predicates)
            (str "&" (str (join "&" (map #(kv-pair->str % "=") predicates))))
            "")
-         (keys->strs
-           (if (= 1 (count geoHierarchy))
-             (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-             (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
-                  "&for=" (kv-pair->str (last geoHierarchy) ":"))))
+         (if (not (nil? geoHierarchy))
+           (keys->strs
+             (if (= 1 (count geoHierarchy))
+               (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
+               (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
+                    "&for=" (kv-pair->str (last geoHierarchy) ":"))))
+           "")
          (if (not (nil? statsKey))
            (str "&key=" statsKey)))
     ""))
