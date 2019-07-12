@@ -36,7 +36,7 @@
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274
   (test-async-time ts/args-ok-s+g-vals prn)            ; :stats+geos ms = 1852
-  (test-async-time ts/args-ok-geo-only js/console.log) ; :geos-only  ms = 20907
+  (test-async-time ts/args-ok-geo-only prn) ; :geos-only  ms = 20907
   (test-async-time ts/args-na-sts-pred prn)            ; :no-values
   (test-async-time ts/args-ok-sts-v+ps prn)            ; :stats-only ms = 384
   (test-async-time ts/args-ok-sts-vals prn)            ; :stats-only ms = 757
@@ -176,4 +176,12 @@
                   :predicates {:time "2013-01"
                                :NAICS "111310"
                                :DISTRICT "27"}}
+                 prn)
+
+(test-async-time {:vintage 2017                       ; :stats+geos ms = 258
+                  :geoHierarchy {:state "01"
+                                 :county "015"
+                                 :tract "981902"}
+                  :geoResolution "500k"
+                  :statsKey ts/stats-key}
                  prn)

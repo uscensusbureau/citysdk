@@ -12,7 +12,7 @@
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
-(def URL-GEOJSON "https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/GeoJSON")
+(def URL-GEOJSON "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON")
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
 ;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
 

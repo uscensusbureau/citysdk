@@ -21,13 +21,13 @@
   ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :sourcePath _ :geoResolution _}] :stats+geos)
   ([{:vintage _ :geoHierarchy _               :values _ :sourcePath _ :geoResolution _}] :stats+geos)
   ([{:vintage _ :geoHierarchy _ :predicates _ :values _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _                 :predicates _ :values _ :sourcePath _                 }] :stats-only)
-  ([{:vintage _                               :values _ :sourcePath _                 }] :stats-only)
   ([{:vintage _ :geoHierarchy _               :values _ :sourcePath _                 }] :stats-only)
   ([{:vintage _ :geoHierarchy _ :predicates _           :sourcePath _ :geoResolution _}] :no-values)
   ([{:vintage _ :geoHierarchy _ :predicates _           :sourcePath _                 }] :no-values)
   ([{:vintage _ :geoHierarchy _                                       :geoResolution _}] :geos-only)
   ([{:vintage _ :geoHierarchy _                                                       }] :geocodes)
+  ([{:vintage _                 :predicates _ :values _ :sourcePath _                 }] :stats-only)
+  ([{:vintage _                               :values _ :sourcePath _                 }] :stats-only)
   ([& anything-else] nil))
 
 
