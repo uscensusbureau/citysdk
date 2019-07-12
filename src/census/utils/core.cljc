@@ -198,10 +198,15 @@
            #_(setval :vintage (str vintage) args)
            (merge args {:vintage (str vintage)}))
       (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
-           (->> (merge clj-args
-                       {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
-                        "vintage" (str vintage)})
-                (keywordize-keys)))))
+           (do (prn (str "geoHierarchy??: " geoHierarchy))
+               (if (not (nil? geoHierarchy))
+                   (->> (merge clj-args
+                               {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                                "vintage" (str vintage)})
+                        (keywordize-keys))
+                   (->> (merge clj-args
+                               {"vintage" (str vintage)})
+                        (keywordize-keys)))))))
 
 (defn args->
   "Converts Clojure arguments to JavaScript (for external use)"

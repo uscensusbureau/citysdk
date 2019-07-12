@@ -49,6 +49,13 @@
                         "geoResolution" "500k"
                         "statsKey"      stats-key}
                    prn)
+  (test-async-time #js {"vintage"     "2016"}
+                      "sourcePath"    #js ["acs" "acs5"]
+                      "values"        #js ["B01001_001E" "NAME"]
+                      "predicates"    #js {"B00001_001E" "0:30000"}
+                      "geoResolution" "500k"
+                      "statsKey"      stats-key
+                 prn)
   (test-async-time {:vintage 2016                      ; :stats+geos NA
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
@@ -178,10 +185,17 @@
                                :DISTRICT "27"}}
                  prn)
 
+(test-async-time #js {"vintage"     "timeseries"
+                      "sourcePath"    #js ["intltrade" "exports" "naics"]
+                      "values"        #js ["CTY_NAME" "ALL_VAL_MO" "ALL_VAL_YR" "CC_MO" "NAICS_SDESC" "DIST_NAME"]
+                      "predicates"    #js {"time" "2013-01" "NAICS" "111310" "DISTRICT" "27"}
+                      "statsKey"      ts/stats-key}
+                 prn)
+
 (test-async-time {:vintage 2017                       ; :stats+geos ms = 258
                   :geoHierarchy {:state "01"
                                  :county "015"
                                  :tract "981902"}
                   :geoResolution "500k"
                   :statsKey ts/stats-key}
-                 prn)
+                 js/console.log)

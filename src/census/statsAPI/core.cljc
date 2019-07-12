@@ -155,7 +155,7 @@
 
 
 (defn =cfg=C-Stats
-  "Internal function for calling Github cartography 'API' for GeoJSON"
+  "Internal function for calling Census Stats API"
   [=args= =cfg=]
   (take! =args=
     (fn [args]
