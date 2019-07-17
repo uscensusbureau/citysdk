@@ -199,3 +199,20 @@
                   :geoResolution "500k"
                   :statsKey ts/stats-key}
                  js/console.log)
+
+(test-async-time #js {"vintage" "timeseries"
+                      "sourcePath" #js ["intltrade", "exports","porths"]
+                      "values" #js [
+                                    "ALL_VAL_MO",
+                                    "VES_VAL_MO",
+                                    "CNT_VAL_MO",
+                                    "AIR_VAL_MO",
+                                    "VES_WGT_MO",
+                                    "CNT_WGT_MO",
+                                    "AIR_WGT_MO",
+                                    "E_COMMODITY_SDESC",
+                                    "PORT_NAME"]
+                      "predicates" #js {"PORT" "27*"
+                                        "time" "2013-01",
+                                        "E_COMMODITY" "0*"}}
+                 js/console.log)

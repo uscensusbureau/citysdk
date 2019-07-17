@@ -10,7 +10,7 @@
                                    xf-'key'<w-stat
                                    xf-stats->js
                                    xf-mergeable<-stats
-                                   IOE-C->stats
+                                   ;IOE-C->stats
                                    IOE-C-S->JS
                                    =cfg=C-Stats]]))
 
@@ -38,7 +38,12 @@
   (is (= (->valid#?-># "0.5")
          0.5))
   (is (= (->valid#?-># "-666666666.0000")
-         "NAN: -666666666")))
+         "NAN: -666666666"))
+  (is (= (->valid#?-># "0")
+         "0"))
+  (is (= (->valid#?-># "01")
+         "01")))
+
 
 (deftest xf!-csv->clj-test
   (let [args {:values     ["B01001_001E" "NAME"]
