@@ -56,11 +56,16 @@
                         "-888888888.0000"
                         "-999999999.0000"])
         (str "NAN: " (strip-suffix s ".0000"))
+        (and (= (count s) 1) (numeric? s))
+        (parse-number s)
         (and (= (subs s 0 1) "0") (not (= (subs s 1 2) ".")))
         s
         (numeric? s)
         (parse-number s)
         :else s))
+
+;(parse-number "030381")
+; Error: Invalid number: 030381
 
 (defn xf!-CSV->CLJ
   "
