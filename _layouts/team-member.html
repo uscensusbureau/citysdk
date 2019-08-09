@@ -1,0 +1,35 @@
+---
+layout: page
+---
+
+
+<aside class="usa-layout-docs-sidenav sidenav usa-sticky-sidenav">
+  <ul class="usa-sidenav-list">
+    {% for item in site.team %}
+      <li>
+        {% if page.permalink == item.permalink %}
+          <a class="usa-current" href="{{ item.permalink | prepend: site.baseurl }}">{{ item.name }}</a>
+        {% else %}
+          <a href="{{ item.permalink | prepend: site.baseurl }}">{{ item.name }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</aside>
+
+<div class="usa-width-three-fourths usa-layout-docs-main_content">
+  <h1>{{ page.name }}</h1>
+  <img src="{{ site.baseurl }}{{ page.image }}" alt="photo of {{ page.name }} ">
+  <p>
+  {{ page.job_title }}
+  {% if page.phone %}
+    <br>
+    phone: <a href="tel:{{ page.phone }}">{{ page.phone }}</a>
+  {% endif %}
+  {% if page.email %}
+    <br>
+    email: <a href="mailto:{{ page.email }}">{{ page.email }}</a>
+  {% endif %}
+  </p>
+  {{ content }}
+</div>

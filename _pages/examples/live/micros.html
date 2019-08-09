@@ -1,0 +1,215 @@
+---
+permalink: /examples/live/micros/
+---
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <script src="../../../assets/citysdk.js"></script>
+    <style>
+      #map {
+        height: 600px;
+        width: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <script>
+      //includes polyfill from mdn
+      if (!String.prototype.includes) {
+        String.prototype.includes = function(search, start) {
+          "use strict";
+          if (typeof start !== "number") {
+            start = 0;
+          }
+
+          if (start + search.length > this.length) {
+            return false;
+          } else {
+            return this.indexOf(search, start) !== -1;
+          }
+        };
+      }
+
+      var map = L.map("map").setView([38.8895, -98.4283], 4);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors | Data: ACS 2017'
+      }).addTo(map);
+      census(
+        {
+          vintage: "2017",
+          geoHierarchy: {
+            "metropolitan statistical area/micropolitan statistical area": "*"
+          },
+          sourcePath: ["acs", "acs5"],
+          values: ["NAME", "B01001_001E"],
+          geoResolution: "20m",
+          statsKey: "3c04140849164b373c8b1da7d7cc8123ef71b7ab"
+        },
+        function(error, response) {
+          //filter for only micro
+          var featureCollection = {
+            type: "FeatureCollection",
+            features: response.features.filter(function(feature) {
+              return feature.properties.NAME.includes("Micro Area");
+            })
+          };
+
+          //add to map
+          var layer = L.geoJson(featureCollection, {
+            onEachFeature: function onEachFeature(feature, layer) {
+              var name = feature.properties.NAME;
+              var population = feature.properties.B01001_001E;
+              var geoid = feature.properties.GEOID;
+              layer.bindPopup(
+                "<h3>" +
+                  formatStateName(name) +
+                  "</h1><p><b>Population (July 1, 2017):</b> " +
+                  numberWithCommas(population) +
+                  "</3>"
+              );
+            },
+            style: {
+              "stroke-width": 1,
+              "fill-opacity": 0.6,
+              color: "#0694aa"
+            }
+          }).addTo(map);
+          var group = new L.featureGroup([layer]);
+          map.fitBounds(group.getBounds());
+        }
+      );
+
+      // format popup text
+      // https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+      ("use strict");
+
+      function _slicedToArray(arr, i) {
+        return (
+          _arrayWithHoles(arr) ||
+          _iterableToArrayLimit(arr, i) ||
+          _nonIterableRest()
+        );
+      }
+
+      function _nonIterableRest() {
+        throw new TypeError(
+          "Invalid attempt to destructure non-iterable instance"
+        );
+      }
+
+      function _iterableToArrayLimit(arr, i) {
+        var _arr = [];
+        var _n = true;
+        var _d = false;
+        var _e = undefined;
+        try {
+          for (
+            var _i = arr[Symbol.iterator](), _s;
+            !(_n = (_s = _i.next()).done);
+            _n = true
+          ) {
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+          }
+        } catch (err) {
+          _d = true;
+          _e = err;
+        } finally {
+          try {
+            if (!_n && _i["return"] != null) _i["return"]();
+          } finally {
+            if (_d) throw _e;
+          }
+        }
+        return _arr;
+      }
+
+      function _arrayWithHoles(arr) {
+        if (Array.isArray(arr)) return arr;
+      }
+
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      function formatStateName(x) {
+        var name = x.replace("Micro Area", "");
+
+        var _name$split = name.split(","),
+          _name$split2 = _slicedToArray(_name$split, 2),
+          micro = _name$split2[0],
+          state = _name$split2[1];
+
+        var apStyle = {
+          AL: "Ala.",
+          AK: "Alaska",
+          AZ: "Ariz.",
+          AR: "Ark.",
+          CA: "Calif.",
+          CO: "Colo.",
+          CT: "Conn.",
+          DE: "Del.",
+          FL: "Fla.",
+          GA: "Ga.",
+          HI: "Hawaii",
+          ID: "Idaho",
+          IL: "Ill.",
+          IN: "Ind.",
+          IA: "Iowa",
+          KS: "Kan.",
+          KY: "Ky.",
+          LA: "La.",
+          ME: "Maine",
+          MD: "Md.",
+          MA: "Mass.",
+          MI: "Mich",
+          MN: "Minn.",
+          MS: "Miss.",
+          MO: "Mo.",
+          MT: "Mont.",
+          NE: "Neb.",
+          NV: "Nev.",
+          NH: "N.H.",
+          NJ: "N.J.",
+          NM: "N.M.",
+          NY: "N.Y.",
+          NC: "N.C.",
+          ND: "N.D.",
+          OH: "Ohio",
+          OK: "Okla.",
+          OR: "Ore.",
+          PA: "Pa.",
+          PR: "P.R.",
+          RI: "R.I.",
+          SC: "S.C.",
+          SD: "S.D.",
+          TN: "Tenn.",
+          TX: "Texas",
+          UT: "Utah",
+          VT: "Vt.",
+          VA: "Va.",
+          WA: "Wash.",
+          WV: "W. Va.",
+          WI: "Wis.",
+          WY: "Wyo."
+        }; //some micros contain two states
+
+        var states = state.split("-"); //replace state abbreviations with AP Style for States Abbreviations
+
+        var apStates = states.map(function(state) {
+          return apStyle[state.trim()];
+        });
+        return "".concat(micro, ", ").concat(apStates.join("-"));
+      }
+    </script>
+  </body>
+</html>

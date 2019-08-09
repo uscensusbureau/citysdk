@@ -1,0 +1,75 @@
+---
+---
+
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en-US' }}">
+  <head>
+    {% include meta.html %} {% include styles.html %} {% if
+    site.google_analytics_ua or site.dap_agency %} {% include analytics.html %}
+    {% endif %} {% if page.vue %}
+    <script
+      src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"
+      integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY="
+      crossorigin="anonymous"
+    ></script>
+    {% endif %} {%if page.citysdk %}
+    <script src="{{ '/assets/citysdk.js' | relative_url }}"></script>
+    {% endif %} {%if page.leaflet %}
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+      integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+      crossorigin=""
+    ></script>
+    {% endif %}
+  </head>
+  <body
+    class="{{ layout.class }} {{ page.class }} {% if site.site_width %}site-{{
+      site.site_width
+    }}{% endif %}"
+  >
+    {% include skipnav.html %} {% include header.html %} {% assign hero =
+    page.hero %} {% include components/hero.html %} {% if page.tagline and
+    page.intro %}
+    <section class="usa-grid usa-section">
+      <div class="usa-width-one-third">
+        <h2>{{ page.tagline }}</h2>
+      </div>
+      <div class="usa-width-two-thirds">
+        {{ page.intro | markdownify }}
+      </div>
+    </section>
+    {% endif %} {% capture _graphics %} {% include graphic-list.html
+    graphics=page.graphics %} {% endcapture %} {% if page.graphics_position !=
+    'after' %}
+    {{ _graphics }}
+    {% endif %}
+
+    <main
+      id="main-content"
+      {%
+      for
+      _attr
+      in
+      layout.main
+      %}
+      {{
+      _attr[0]
+      }}="{{ _attr[1] }}"
+      {%
+      endfor
+      %}
+    >
+      {{ content }}
+    </main>
+
+    {% if page.graphics_position == 'after' %}
+    {{ _graphics }}
+    {% endif %} {% include footer.html %} {% include scripts.html %}
+  </body>
+</html>

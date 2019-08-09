@@ -1,0 +1,3 @@
+{% assign github_info = site.github_info | default: site.github %}
+{% assign edit_link_text = include.footer.edit_page.text | default: 'Edit this page' %}
+<small><a href="https://github.com/{{ github_info.organization }}/{{ github_info.repository }}/edit/{{ github_info.default_branch }}/{{ include.path }}" class="usa-sidenav-edit" target="_blank">{{ edit_link_text }}</a></small>

@@ -1,0 +1,24 @@
+---
+layout: page
+---
+
+
+<aside class="usa-layout-docs-sidenav sidenav usa-sticky-sidenav">
+  <ul class="usa-sidenav-list">
+    {% for item in site.projects %}
+      <li>
+        {% if page.permalink == item.permalink %}
+          <a class="usa-current" href="{{ item.permalink | prepend: site.baseurl }}">{{ item.title }}</a>
+        {% else %}
+          <a href="{{ item.permalink | prepend: site.baseurl }}">{{ item.title }}</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</aside>
+
+<div class="usa-width-three-fourths usa-layout-docs-main_content">
+  <h1>{{ page.title }}</h1>
+  <img src="{{ site.baseurl }}{{ page.large_image }}" alt="{{ page.image_alt }} ">
+  {{ content }}
+</div>

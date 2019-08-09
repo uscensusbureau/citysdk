@@ -1,0 +1,68 @@
+# This is the configuration for the site navigation.
+
+# This file defines the structure of various named navigational
+# listings, any of which can be used (with some caveats) as the
+# links in your header, footer, and per-page side navigation.
+#
+# For instance, if you have a "primary" navigation list here, you
+# can use that as your header's primary navigation by setting
+# `primary.links` to "primary":
+#
+# primary:
+#   links: primary
+#
+primary:
+  - text: Documentation
+    href: /docs/
+  - text: Guides
+    href: /guides/
+  - text: Examples
+    href: /examples/
+  - text: Community
+    href: /community/
+
+secondary:
+  - text: View on Github
+    href: https://github.com/uscensusbureau/citysdk
+    external: true
+
+docs:
+  - text: Overview
+    href: /docs/
+  - text: Try it
+    href: /docs/try/
+  - text: FAQ
+    href: /docs/faq/
+  - text: CitySDK Readme
+    href: https://github.com/uscensusbureau/citysdk/blob/master/README.md
+    external: true
+
+guides:
+  - text: Overview
+    href: /guides/
+  - text: Introduction
+    href: /guides/intro/
+
+guides-intro:
+  - text: Objectives and Details
+    href: /guides/intro/
+  - text: Getting Started
+    href: /guides/intro/1/
+  - text: Source and Metrics
+    href: /guides/intro/2/
+  - text: Geographies
+    href: /guides/intro/3/
+  - text: Displaying the data
+    href: /guides/intro/4/
+
+examples:
+  - text: Overview
+    href: /examples/
+
+community:
+  - text: Overview
+    href: /community/
+  - text: Implementations
+    href: /community/implementations/
+  - text: Showcase
+    href: /community/showcase/

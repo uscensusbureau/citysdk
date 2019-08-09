@@ -1,0 +1,131 @@
+---
+permalink: /examples/live/mapbox-choropleth/
+---
+
+<html>
+  <head>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.2.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.4/chroma.min.js"></script>
+    <script src="{{ '/assets/citysdk.js' | relative_url }}"></script>
+  </head>
+
+  <body>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+    <div id="map"></div>
+    <script>
+      mapboxgl.accessToken =
+        "pk.eyJ1Ijoib3BlbmlkZW8iLCJhIjoiY2pnemR0dmwyMHVhdDJ2bGV1bnl6amJqaiJ9._G3sOFQoJZklpO9pscg1mw";
+
+      var map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: {
+          lat: 37.0902,
+          lng: -95.7129
+        },
+        zoom: 3
+      });
+
+      map.on("load", function() {
+        census(
+          {
+            vintage: 2017,
+            geoHierarchy: {
+              county: "*"
+            },
+            sourcePath: ["acs", "acs5"],
+            values: ["NAME", "B19083_001E"],
+            statsKey: "3c04140849164b373c8b1da7d7cc8123ef71b7ab"
+          },
+          function(error, response) {
+            var values = response.map(function(county) {
+              return county.B19083_001E;
+            }); //get all the GINI Index values , B19083_001E
+            var colorScale = chroma
+              .scale("OrRd")
+              .padding(0.15)
+              .domain(values, "q", 5); // 5 quantiles
+
+            function getColor(val) {
+              return colorScale(val).hex();
+            }
+
+            //generate style expression
+            var colors = {};
+
+            response.forEach(function(county) {
+              var GEOID = county.state + county.county;
+              var value = county.B19083_001E;
+              var color = getColor(value);
+              if (!colors[color]) {
+                colors[color] = [];
+              }
+              colors[color].push(GEOID);
+            });
+
+            var colorExpression = ["match", ["get", "GEOID"]];
+            var colorQuantiles = Object.entries(colors).forEach(function([
+              color,
+              GEOIDs
+            ]) {
+              colorExpression.push(GEOIDs, color);
+            });
+
+            //add else case for style expression
+            colorExpression.push("rgba(0,0,0,0)");
+
+            map.addLayer({
+              id: "counties",
+              type: "fill",
+              source: {
+                type: "vector",
+                tiles: [
+                  "https://gis-server.data.census.gov/arcgis/rest/services/Hosted/VT_2017_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"
+                ]
+              },
+              "source-layer": "County",
+              paint: {
+                "fill-opacity": 0.8,
+                "fill-color": colorExpression
+              }
+            });
+
+            //get value of click
+            map.on("click", "counties", function(e) {
+              var coordinates = e.lngLat;
+              //look up GINI value
+              var GEOID = e.features[0].properties.GEOID;
+              var details = response.find(function(county) {
+                var response_GEOID = county.state + county.county;
+                return GEOID === response_GEOID;
+              });
+
+              new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(
+                  "GINI value for" + details.NAME + ":" + details.B19083_001E
+                )
+                .addTo(map);
+            });
+          }
+        );
+      });
+    </script>
+  </body>
+</html>

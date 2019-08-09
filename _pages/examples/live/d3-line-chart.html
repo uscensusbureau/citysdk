@@ -1,0 +1,172 @@
+---
+permalink: /examples/live/d3-line-chart/
+---
+
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="{{ '/assets/citysdk.js' | relative_url }}"></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+
+      .line {
+        fill: none;
+        stroke-width: 3;
+      }
+    </style>
+  </head>
+  <body>
+    <svg id="chart"></svg>
+    <script>
+      function censusPromise(args) {
+        return new Promise((resolve, reject) => {
+          census(args, (err, json) => {
+            if (!err) {
+              resolve(json);
+            } else {
+              reject(err);
+            }
+          });
+        });
+      }
+
+      const years = Array(5)
+        .fill()
+        .map((_, i) => (i + 2015).toString()); //[2015, 2016, 2017, 2018, 2019]
+
+      const months = Array(12)
+        .fill()
+        .map((_, i) => (i + 1).toString().padStart(2, "0"));
+
+      const times = [];
+      years.forEach(year => {
+        months.forEach(month => times.push(`${year}-${month}`));
+      });
+
+      const timesQueries = times.map(time => {
+        return censusPromise({
+          vintage: "timeseries",
+          sourcePath: ["intltrade", "exports", "naics"],
+          values: ["AIR_WGT_MO", "CNT_WGT_MO", "VES_WGT_MO"],
+          predicates: { time: time, NAICS: "111" },
+          statsKey: "3c04140849164b373c8b1da7d7cc8123ef71b7ab"
+        }).then(response => response[0]); //get first array
+      });
+
+      Promise.all(timesQueries).then(responses => {
+        //filter empty responses
+        const data = responses.filter(response => !!response);
+
+        //size for chart
+        const margin = { top: 50, right: 50, bottom: 50, left: 100 },
+          width = window.innerWidth - margin.left - margin.right, // Use the window's width
+          height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
+
+        //set scale on data max and min (extents)
+        const dateFormat = d3.timeParse("%Y-%m");
+        const xScale = d3
+          .scaleTime()
+          .domain(d3.extent(data, d => dateFormat(d.time)))
+          .range([0, width]);
+        const yScale = d3
+          .scaleLinear()
+          .domain([
+            d3.min(data, d =>
+              d3.min([d.AIR_WGT_MO, d.CNT_WGT_MO, d.VES_WGT_MO])
+            ),
+            d3.max(data, d =>
+              d3.max([d.AIR_WGT_MO, d.CNT_WGT_MO, d.VES_WGT_MO])
+            )
+          ])
+          .range([height, 0]);
+
+        //set line generator
+        const line = d3
+          .line()
+          .x(d => xScale(d.time)) // set the x values for the line generator
+          .y(d => yScale(d.value)) // set the y values for the line generator
+          .curve(d3.curveMonotoneX); // apply smoothing to the line
+
+        //setup svg
+        const svg = d3
+          .select("#chart")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr(
+            "transform",
+            "translate(" + margin.left + "," + margin.top + ")"
+          );
+
+        //setup x and y axis
+        svg
+          .append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(xScale));
+
+        svg
+          .append("g")
+          .attr("class", "y axis")
+          .call(d3.axisLeft(yScale));
+
+        //for each type plot line
+        const colors = {
+          AIR_WGT_MO: {
+            hex: "#00AFE5",
+            name: "Air"
+          },
+          VES_WGT_MO: {
+            hex: "#E5DA00",
+            name: "Vessel"
+          },
+          CNT_WGT_MO: {
+            hex: "#DC0023",
+            name: "Containerized Vessel"
+          }
+        };
+
+        ["AIR_WGT_MO", "VES_WGT_MO", "CNT_WGT_MO"].forEach(type => {
+          const values = data.map(d => {
+            return {
+              value: d[type],
+              time: dateFormat(d.time)
+            };
+          });
+
+          svg
+            .append("path")
+            .datum(values)
+            .attr("class", "line")
+            .attr("d", line)
+            .attr("stroke", colors[type].hex);
+        });
+
+        //add legend
+        const legend = svg
+          .append("g")
+          .attr("class", "legend")
+          .attr("transform", `translate(50, 10)`)
+          .style("font-size", "12px");
+
+        Object.keys(colors).forEach((color, i) => {
+          legend
+            .append("text")
+            .attr("y", `${i}em`)
+            .attr("x", "1em")
+            .text(colors[color].name);
+
+          legend
+            .append("circle")
+            .attr("cy", `${i - 0.25}em`)
+            .attr("cx", 0)
+            .attr("r", "0.4em")
+            .attr("fill", colors[color].hex);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+.usa-media-block__img {
+  @include media-block-img;
+}
+
+.usa-media-block__body {
+  overflow: hidden;
+}

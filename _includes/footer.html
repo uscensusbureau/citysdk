@@ -1,0 +1,5 @@
+{% assign footer = site.data.footer %}
+
+<div class="usa-grid usa-footer-return-to-top">
+  <a href="{{ footer.top.href | default: '#' }}">{{ footer.top.text | default: 'Return to top' }}</a>
+</div>

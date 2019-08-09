@@ -1,0 +1,320 @@
+---
+title: Try it
+description: Test out CitySDK queries.
+permalink: /docs/try/
+
+layout: post
+sidenav: docs
+vue: true
+citysdk: true
+leaflet: true
+---
+
+<div id="app">
+  <div id="codebox">
+    <div class="input">
+      <textarea
+        v-model="input"
+        v-on:keyup="updateInput"
+        placeholder="add query here"
+      >
+      </textarea>
+      <div class="toggles">
+        <button v-if="error.length === 0 && !loading" v-on:click="runQuery">
+          Run Query
+        </button>
+        <span>${status}</span>
+        <span class="error">${error}</span>
+      </div>
+    </div>
+
+    <div v-bind:class="[result && result.type ? 'outputmap' : 'output']">
+      <p id="results" v-show="!(result &&result.type)">${output}</p>
+      <div id="map" v-show="showMap"></div>
+    </div>
+    <span title="Copy" class="copy" v-on:click="copyResult">📋</span>
+  </div>
+  <h3>Query Examples</h3>
+  <ul>
+    <li v-for="example in examples" v-on:click="updateExample(example)">
+      <a>${ example.description }</a>
+    </li>
+  </ul>
+  <h3>Learn more</h3>
+  <ul>
+      <li><a href="{{ '/docs/' | relative_url }}">Overview documentation</a></li>
+    <li><a href="{{ '/examples/' | relative_url }}">Example visualizations</a></li>
+    <li><a href="{{ '/guides/intro/' | relative_url }}">Quick start guide</a></li>
+  </ul>
+  <h4>Note</h4>
+  <p>
+    Running a large query, especially at a lower map scale might crash the
+    page. If this happens either reduce the resolution or select a smaller study
+    area. For larger queries we recommend using Node with
+    `--max-old-space-size=4096` flag. Also refer to our <a href={{
+      "/docs/faq/#why-is-citysdk-slow" | relative_url
+    }}>FAQ</a> on tips to load large queries.
+  </p>
+</div>
+
+<style>
+  #codebox {
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: 2px 3px;
+    border: 1px solid;
+    position: relative;
+  }
+
+  #codebox button {
+    padding: 2px 5px !important;
+  }
+
+  #codebox .input {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 340px;
+    min-width: 340px;
+  }
+
+  #codebox .input .toggles {
+    height: 35px;
+    padding: 0px 5px;
+  }
+
+  #codebox .input textarea {
+    flex: 1;
+    margin: 0 !important;
+    border: none;
+    resize: none;
+    overflow: auto;
+    background: #272822;
+    color: #f8f8f2;
+    font-family: "Roboto Mono Web", "Bitstream Vera Sans Mono", "Consolas",
+      "Courier", monospace;
+    padding: 1.2em;
+    min-width: 100%;
+  }
+
+  #codebox .output {
+    height: 400px;
+    background: rgb(241, 241, 241);
+    flex: 1 1 340px;
+    min-width: 340px;
+    overflow: auto;
+    padding: 1.2em;
+  }
+
+  #codebox .outputmap {
+    height: 400px;
+    background: rgb(241, 241, 241);
+    flex: 1 1 340px;
+    min-width: 340px;
+    padding: 0;
+  }
+
+  #map {
+    position: relative;
+    padding: 0;
+    height: 400px;
+    width: 100%;
+    z-index: 1;
+    display: block;
+  }
+
+  #map img {
+    left: initial !important;
+    box-shadow: none !important;
+  }
+
+  .leaflet-popup-content {
+    overflow: auto;
+    max-height: 150px;
+  }
+
+  .leaflet-popup-content p {
+    margin: 2px 0 !important;
+  }
+
+  .output p {
+    white-space: pre;
+  }
+
+  .toggles span {
+    font-style: italic;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+  .error {
+    color: indianred;
+  }
+
+  #codebox .copy {
+    position: absolute;
+    right: 15px;
+    bottom: 10px;
+    z-index: 2;
+  }
+
+  #codebox .copy:hover {
+    text-shadow: 2px 2px rgb(153, 153, 153);
+  }
+</style>
+
+<script src="{{ '/assets/data/try_examples.js' | relative_url }}"></script>
+
+<script>
+"use strict";
+
+var initInput = {
+  vintage: "2017",
+  geoHierarchy: {
+    state: {
+      lat: 38.8482,
+      lng: -76.9312
+    },
+    county: "*"
+  },
+  sourcePath: ["acs", "acs5"],
+  values: ["B00001_001E"],
+  geoResolution: "20m"
+};
+var app = new Vue({
+  delimiters: ["${", "}"],
+  el: "#app",
+  data: {
+    input: JSON.stringify(initInput, null, 2),
+    loading: false,
+    error: "",
+    result: {},
+    status: "",
+    layer: null,
+    map: null,
+    showMap: true,
+    examples: examples
+  },
+  computed: {
+    output: function output() {
+      return JSON.stringify(this.result, null, 2);
+    },
+    features: function features() {
+      if (this.result && this.result.features) {
+        return this.result;
+      }
+
+      return {
+        type: "FeatureCollection",
+        features: []
+      };
+    }
+  },
+  mounted: function mounted() {
+    this.intiMap();
+  },
+  watch: {
+    features: function features(val) {
+      var _this = this;
+
+      if (val.features && val.features.length) {
+        this.showMap = true;
+
+        if (this.layer) {
+          this.map.removeLayer(this.layer);
+        }
+
+        this.layer = L.geoJSON(val, {
+          onEachFeature: function onEachFeature(feature, layer) {
+            var table = Object.keys(feature.properties).map(function (key) {
+              return "<p><b>" + key + "</b>: " + feature.properties[key] + "</p>";
+            }).join("");
+            layer.bindPopup(table);
+          }
+        }).addTo(this.map);
+        setTimeout(function () {
+          _this.map.invalidateSize();
+
+          var group = new L.featureGroup([_this.layer]);
+
+          _this.map.fitBounds(group.getBounds());
+        }, 100);
+      } else {
+        this.showMap = false;
+      }
+    }
+  },
+  methods: {
+    updateExample: function updateExample(example) {
+      this.input = JSON.stringify(example.input, null, 2);
+      this.result = example.result;
+      this.loading = false;
+      this.error = "";
+    },
+    intiMap: function intiMap() {
+      //init map
+      this.map = L.map("map").setView([38.8482, -76.9312], 10);
+      L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(this.map);
+      this.showMap = false;
+    },
+    updateInput: function updateInput(event) {
+      var target = event.target;
+      var value = target.value;
+      this.error = ""; //todo: stop cursor from jumping to the end when value changes
+      //todo: use hljs.highlightBlock
+
+      try {
+        var formatted = JSON.stringify(JSON.parse(value), null, 4);
+      } catch (error) {
+        this.error = error.message;
+      }
+
+      this.input = value;
+    },
+    runQuery: function runQuery() {
+      var _this2 = this;
+      console.log("running query")
+
+      this.loading = true;
+      this.status = "loading";
+      census(JSON.parse(this.input), function (error, result) {
+        if (error) {
+          _this2.result = {};
+          _this2.error = error;
+        } else {
+
+          console.log(result)
+          _this2.result = result;
+        }
+
+        _this2.loading = false;
+        _this2.status = null;
+      });
+    },
+    copyResult: function copyResult() {
+      //https://stackoverflow.com/questions/36639681/how-to-copy-text-from-a-div-to-clipboard
+      var range = document.createRange();
+      var element = document.getElementById("results");
+      var setback = false;
+
+      if (element.style.display === "none") {
+        var setback = true;
+        element.style.display = "block";
+      }
+
+      range.selectNode(element);
+      window.getSelection().removeAllRanges(); // clear current selection
+
+      window.getSelection().addRange(range); // to select text
+
+      document.execCommand("copy");
+      window.getSelection().removeAllRanges(); // to deselect
+
+      if (setback === true) {
+        element.style.display = "none";
+      }
+    }
+  }
+});
+</script>

@@ -1,0 +1,31 @@
+---
+layout: page
+main:
+  class: usa-grid usa-section usa-content usa-layout-docs
+---
+
+{{ content }}
+
+
+{% assign sidenav = site.data.navigation[page.sidenav] | default: page.sidenav %}
+{% if sidenav %}
+    {% assign _current = -1 %}
+    {% for link in sidenav %}
+        {% if link.href == page.url or link.href == page.permalink %}
+            {% assign _current = forloop.index0 %}
+        {% endif %}
+    {% endfor %}
+    {% if _current != -1 %}
+        {% if _current > 0 %}
+            {% assign previous_page_num = _current |minus:1 %}
+            {% assign previous_page = sidenav[previous_page_num] %}
+            <a class="usa-button usa-button--outline" href="{{previous_page.href | relative_url }}">Previous: {{previous_page.text}}</a>
+        {% endif %}
+        {% assign _max_size = sidenav.size |minus:1 %}
+        {% if _current < _max_size %}
+            {% assign next_page_num = _current |plus: 1 %}
+            {% assign next_page = sidenav[next_page_num] %}
+            <a class="usa-button usa-button--outline" href="{{next_page.href | relative_url }}">Next: {{next_page.text}}</a>
+        {% endif %}
+    {% endif %}
+{% endif %}
