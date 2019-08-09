@@ -1,0 +1,55 @@
+{% assign _scripts = '' | split: '' %} {% assign _async_marker =
+'uswds_async=true' %} {% assign _site_scripts = site.scripts %} {% unless
+_site_scripts -%} {% assign _uswds_js = '/assets/uswds/js/uswds.min.js' |
+append: '?' | append: _async_marker %} {% assign _site_scripts = '' | split: ''
+| push: _uswds_js %} {% if site.anchor_js_targets %} {% assign _anchor_js =
+'/assets/js/vendor/anchor.min.js' %} {% assign _main_js = '/assets/js/main.js'
+%} {% assign _site_scripts = _site_scripts | push: _anchor_js | push: _main_js
+%} {% endif %} {% endunless %} {% assign _scripts = _scripts | push:
+_site_scripts | push: layout.scripts | push: page.scripts | uniq %} {% for _list
+in _scripts %}{% for _script in _list %} {% assign _src = _script.src | default:
+_script %}
+<script
+  src="{{ _src | replace: _async_marker, '' | relative_url }}"
+  {%
+  if
+  _script.async
+  or
+  _src
+  contains
+  _async_marker
+  %}
+  async{%
+  endif
+  %}
+></script>
+{% endfor %}{% endfor %} {% if site.search %}
+<script type="text/javascript">
+  //<![CDATA[
+  var usasearch_config = { siteHandle: "{{ site.search.site_handle }}" };
+
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src = "//search.usa.gov/javascripts/remote.loader.js";
+  document.getElementsByTagName("head")[0].appendChild(script);
+
+  //]]>
+</script>
+{% endif %} {% if page.lightbox %} {% include lightbox.html %} {% endif %}
+
+<script>
+  //fixes nav for mobile not closing
+  "use strict";
+
+  document
+    .querySelector(".usa-nav-close")
+    .addEventListener("click", function() {
+      if (
+        Array.from(document.querySelector(".usa-nav").classList).includes(
+          "is-visible"
+        )
+      ) {
+        document.querySelector(".usa-nav").classList.remove("is-visible");
+      }
+    });
+</script>

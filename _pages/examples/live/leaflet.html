@@ -1,0 +1,61 @@
+---
+permalink: /examples/live/leaflet/
+---
+
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <script src="{{ '/assets/citysdk.js' | relative_url }}"></script>
+    <style>
+      #map {
+        height: 600px;
+        width: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map = L.map("map").setView([31.6623, -99.0306], 6);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      census(
+        {
+          vintage: 2016,
+          geoHierarchy: {
+            state: 48,
+            county: "*"
+          },
+          geoResolution: "500k",
+          sourcePath: ["cbp"],
+          predicates: {
+            NAICS2012: 211
+          },
+          values: ["ESTAB"],
+          statsKey: "3c04140849164b373c8b1da7d7cc8123ef71b7ab"
+        },
+        function(error, response) {
+          L.geoJson(response, {
+            onEachFeature: function(feature, layer) {
+              layer.bindPopup(
+                "<h2>" +
+                  feature.properties.NAME +
+                  "</h2><p># of Oil and Gas Extraction businesses: " +
+                  feature.properties.ESTAB +
+                  "</p>"
+              );
+            }
+          }).addTo(map);
+        }
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,102 @@
+<!-- lightbox - adapted from https://www.w3schools.com/howto/howto_css_modal_images.asp -->
+<div id="lightbox">
+  <button id="lightbox-close" role="button" aria-label="Close image">
+    &times;
+  </button>
+  <img id="lightbox-image" />
+  <div id="lightbox-caption"></div>
+</div>
+<style>
+  #lightbox {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
+  }
+
+  #lightbox-image {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+  }
+
+  #lightbox-caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    padding: 10px 0;
+    height: 150px;
+    font-size: 1em;
+  }
+
+  #lightbox-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    padding: 0px 8px;
+  }
+
+  #lightbox-close:hover,
+  #lightbox-close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /* 100% Image Width on Smaller Screens */
+  @media only screen and (max-width: 700px) {
+    #lightbox-image {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const mainContent = document.querySelector(".usa-layout-docs-main_content");
+    if (mainContent) {
+      const lightbox = document.querySelector("#lightbox");
+      const lightboxImage = document.querySelector("#lightbox-image");
+      const lightboxCaption = document.querySelector("#lightbox-caption");
+
+      mainContent.querySelectorAll("img").forEach(image => {
+        image.onclick = function() {
+          lightbox.style.display = "block";
+          lightboxImage.src = image.src;
+          lightboxCaption.innerHTML = image.alt;
+        };
+      });
+
+      const lightboxClose = document.querySelector("#lightbox-close");
+      lightboxClose.onclick = function() {
+        lightbox.style.display = "none";
+      };
+    }
+  });
+
+  document.onkeydown = function(evt) {
+    evt = evt || window.event;
+    var isEscape = false;
+    if ("key" in evt) {
+      isEscape = evt.key === "Escape" || evt.key === "Esc";
+    } else {
+      isEscape = evt.keyCode === 27;
+    }
+    if (isEscape && lightbox.style.display === "block") {
+      lightbox.style.display = "none";
+    }
+  };
+</script>

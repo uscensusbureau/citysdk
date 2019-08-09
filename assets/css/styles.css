@@ -1,0 +1,20 @@
+.usa-layout-docs-main_content img {
+  left: -6px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  max-width: calc(100% + 12px);
+}
+
+iframe {
+  height: 400px;
+  width: 100%;
+  resize: both;
+  overflow: auto;
+}
+
+.usa-nav{
+  z-index: 1;
+}
+
+#lightbox{
+  z-index: 2;
+}

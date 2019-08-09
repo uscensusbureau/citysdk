@@ -1,0 +1,5 @@
+{% for icon in site.data.favicons %}
+<link rel="{{ icon.rel | default: 'icon' }}" type="{{ icon.type }}"
+  {% if icon.sizes -%}sizes="{{ icon.sizes }}"
+  {% endif %}href="{{ icon.href | relative_url }}">
+{% endfor %}

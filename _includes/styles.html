@@ -1,0 +1,15 @@
+{% assign _styles = '' | split: '' %} {% assign _default_styles = '' | split: ''
+| push: '/assets/css/main.css' %} {% assign _styles = _styles | push:
+_default_styles | push: site.styles | push: layout.styles | push: page.styles %}
+{% for _list in _styles %}{% for _style in _list %}
+<link
+  rel="stylesheet"
+  href="{{ _style.href | default: _style | relative_url }}"
+  media="{{ _style.media | default: 'screen' }}"
+/>
+<link rel="stylesheet" href="{{ '/assets/css/styles.css' | relative_url }}" />
+<link
+  rel="stylesheet"
+  href="{{ '/assets/css/highlight.css' | relative_url }}"
+/>
+{% endfor %}{% endfor %}

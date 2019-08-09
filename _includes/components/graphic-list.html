@@ -1,0 +1,16 @@
+{% assign graphics = include.graphics %}
+{% if graphics %}
+<section class="usa-section usa-section-dark usa-graphic_list">
+  {% for graphic in graphics %}
+    {% cycle '<div class="usa-grid usa-graphic_list-row">', '' %}
+    <div class="usa-width-one-half usa-media_block">
+      <img class="usa-media_block-img"  src="{{ graphic.image.src | relative_url }}" alt="{{ graphic.image.alt }}">
+      <div class="usa-media_block-body">
+        {% if graphic.title %}<h3>{{ graphic.title }}</h3>{% endif %}
+        {{ graphic.description | markdownify }}
+      </div>
+    </div>
+    {% cycle '', '</div>' %}
+  {% endfor %}
+</section>
+{% endif %}

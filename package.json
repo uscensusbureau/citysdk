@@ -1,0 +1,26 @@
+{
+  "name": "api-docs",
+  "version": "1.0.0",
+  "description": "Documentation, examples, guides primarily focused on using the Census API in frontend and backend Javascript applications by unitizing the CitySDK library.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZHeCensus/api-docs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZHeCensus/api-docs/issues"
+  },
+  "homepage": "https://github.com/ZHeCensus/api-docs#readme",
+  "dependencies": {
+    "prettier": "^1.18.2"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0"
+  }
+}
