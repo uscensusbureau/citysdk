@@ -1,21 +1,16 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>CitySDK Examples</title>
+---
+title: CitySDK Examples
+permalink: /examples/old/
+layout: post
+sidenav: examples
+---
+
   <link rel="stylesheet"
-        href="./assets/highlight/styles/vs.css">
-  <script src="./assets/highlight/highlight.pack.js"></script>
+        href="{{ '/assets/examples/highlight/styles/vs.css' | relative_url }}">
+  <script src="{{ '/assets/examples/highlight/highlight.pack.js' | relative_url }}"></script>
   <script>hljs.initHighlightingOnLoad();</script>
   <script src="https://embed.runkit.com"></script>
   <style>
-    body {
-      padding: 40px 60px;
-      font-family: Helvetica, sans-serif;
-    }
     .examples {
       margin: 0;
       /*width: 90%;*/
@@ -32,7 +27,7 @@
       padding: 0;
       /*height: 100%;*/
     }
-    .try-it {;
+    .try-it {
       position: absolute;
       right: 10px;
       bottom: 40px;
@@ -43,9 +38,7 @@
       color: white;
     }
   </style>
-</head>
-<body>
-<h1>CitySDK Examples</h1>
+
 <h2>Node.js</h2>
 
 <h3>Stats</h3>
@@ -154,11 +147,9 @@ census(
 
 <h2>With mapbox-gl</h2>
 <ul>
-  <li><a href="./mapbox/counties_static/index.html">All US Counties with GINI Index</a></li>
-  <li><a href="./mapbox/zip-code-tabulation-areas_static/index.html">All US Zipcode Tabulation Areas with GINI Index</a></li>
-  <li><a href="./mapbox/with-mapbox-gl_geocoding/index.html">Geocoding example (Search for a county and see Census stats by Block Group)</a></li>
-  <li><a href="./mapbox/with-mapbox-gl_geocoding_hover/index.html">Geocoding example (Search for a county, see stats and hover over any Block Group to see the stats in the reading pane)</a></li>
+  <li><a href="{{ '/assets/examples/mapbox/counties_static/index.html' | relative_url }}">All US Counties with GINI Index</a></li>
+  <li><a href="{{ '/assets/examples/mapbox/zip-code-tabulation-areas_static/index.html' | relative_url }}">All US Zipcode Tabulation Areas with GINI Index</a></li>
+  <li><a href="{{ '/assets/examples/mapbox/with-mapbox-gl_geocoding/index.html' | relative_url }} ">Geocoding example (Search for a county and see Census stats by Block Group)</a></li>
+  <li><a href="{{ '/assets/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html' | relative_url }} ">Geocoding example (Search for a county, see stats and hover over any Block Group to see the stats in the reading pane)</a></li>
 </ul>
 
-</body>
-</html>
