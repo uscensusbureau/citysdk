@@ -25,7 +25,7 @@ github_username: jekyll
 markdown: kramdown
 highlighter: rouge
 remote_theme: 18F/uswds-jekyll
-baseurl: '/api-docs'
+baseurl: '/citysdk'
 plugins:
   - jekyll-feed
 # Exclude from processing.
