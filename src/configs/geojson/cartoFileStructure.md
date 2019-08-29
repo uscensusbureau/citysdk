@@ -634,13 +634,22 @@ Codes:
 # Note: do this at your own risk. If too eager, Census will blacklist your IP address.
 ---
 
+## Prerequisits:
+
+- Install [Chocolately (Windows)](https://chocolatey.org/install)
+- Install [wget](): `choco install wget --version 1.20`
+
+### Step 1: Downloading Shape Files
+1. Create a folder into which the files will be downloaded
+2. Within the folder (`cd <folder name>`):
+
 To get a recursive search through folders (branches) and assets (leaves) in a subdomain:
 `wget -r -np -R "index.html*" -e robots=off https://www2.census.gov/geo/tiger/PREVGENZ/`
 
 To remove a specific subdomain, use the `-X` (exclusion) option:
 `wget -r -np -R "index.html*" -e robots=off -X /geo/tiger/GENZ2015/kml/,other/path/to/exclude/ https://www2.census.gov/geo/tiger/GENZ2015/`
 
-### Components
+#### Components
 - `wget`                                            (from where it was downloaded)
 - `-r`                                              (recursive)
 - `-np`                                             (no parent)
@@ -648,3 +657,36 @@ To remove a specific subdomain, use the `-X` (exclusion) option:
 - `-e robots=off`                                   (allow parsing despite blocked robots/crawlers file)
 - `-X /geo/tiger/GENZ2015/kml/,other/path/exclude/` notice in the example above that we don't include the host server in the exclusion path
 - `https://www2.census.gov/geo/tiger/PREVGENZ/`     make sure to add the trailing `/` to let wget know that this is a directory and not a file
+
+### Step 2: Making a List of Local File Paths for Conversion
+
+Create a vector (array) of filenames to use for conversion. 
+ - for [windows](https://superuser.com/questions/379499/list-files-with-path-using-windows-command-line)
+ 1. Navigate into the folder where all the downloaded files reside
+ 2. in `cmd`:
+ ```
+ dir/s/b * > paths_full.txt
+ ```
+3. Convert the lines in the text file to a vector (array) of strings (each line surrounded by `"",`)
+
+### Step 3: Batch Conversion (`./core.cljs`) of Shapefiles to GeoJSON 
+
+For the purposes of releasing the `citysdk`, dependencies needed for batch processing have been removed from the `package.json` , `shadow-cljs.edn`, and the `.../configs/geojson/core.cljs`, which will need to be restored (see `Fixme` tags):
+- ["shpjs" :as shpjs]
+- ["mkdirp" :as mkdirp]
+- [cljs-promises.async :refer [value-port]]
+
+### Step 4: Post Processing Using [mapshaper](https://mapshaper.org/)
+
+> Note: There is a limit to the filesize that Github will accept (at time of writing <100mb). For files larger than this, some post-processing will be needed
+
+Upload the larger files to mapshaper and use the Douglas Pueker algorithm to reduce the filesize (it's an iterative process)
+
+### Step 5: `git push...` the newly minted GeoJSON files
+
+Make sure the ZCTAs will fit... then...
+
+`git subtree pull --prefix=v2 census-geojson master`
+`git push origin master`
+
+### Step 6: Remove dependencies in *Step 3* and `git push ...`

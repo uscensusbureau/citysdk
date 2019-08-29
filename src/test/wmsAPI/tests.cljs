@@ -14,10 +14,9 @@
                                 try-census-wms
                                 wms-engage?
                                 =>args=GIS=args=>
-                                I-<wms=I=
-                                censusWMS]]))
+                                I-<wms=I=]]))
 
-(deftest geoKey->wms-config-test
+(deftest $g$->wms-cfg-test
   (is (= ($g$->wms-cfg *g* ts/args-ok-wms-only)
          {:vintage 2014,
           :layers ["82"],
@@ -43,7 +42,7 @@
   (is (= (search-id->match? *g* :CONCITY)
        '(:consolidated-cities))))
 
-(deftest wms-url-builder-test
+(deftest C->GIS-url-test
   (is (= (C->GIS-url *g* ts/args-ok-wms-only)
          "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/Mapserver/82/query?geometry=-80.7214,28.2639&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=pjson&outFields=STATE")))
 
@@ -97,17 +96,18 @@
               false))))
 
 
-(deftest =>args=census-wms=args=>-test
+(deftest =>args=GIS=args=>-test
   (let [args-in {:vintage     "2017",
                  :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
+        args-out {:vintage "2017",
+                  :geoHierarchy {:state "51", :county "*"}}
         =>args= (chan 1)
         =args=> (chan 1)]
     (test-async
       (go (>! =>args= args-in)
           ((=>args=GIS=args=> *g*) =>args= =args=>)
           (is (= (<! =args=>)
-                 {:vintage "2017",
-                  :geoHierarchy {:state "51", :county "*"}}))
+                 args-out))
           (close! =>args=)
           (close! =args=>)))))
 
@@ -128,25 +128,25 @@
                  "No FIPS (Census geocodes) found for given arguments"))
           (close! =args=>)))))
 
-(deftest censusWMS-test
-  (let [args-in (clj->js {:vintage     "2017",
-                          :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
-                         :keywordize-keys true)
-        args-na {:vintage     "1997"
-                 :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
-        $r$ (atom "")
-        tcb (fn [E O] (if-let [err E]
-                        (reset! $r$ err)
-                        (reset! $r$ O)))]
-    (test-async
-      (go ((censusWMS *g*) args-in tcb)
-          (<! (timeout 1000))
-          (is (= @$r$
-                 {:vintage "2017",
-                  :geoHierarchy {:state "51", :county "*"}}))
-          ((censusWMS *g*) args-na tcb)
-          (<! (timeout 1000))
-          (is (= @$r$
-                 "No FIPS (Census geocodes) found for given arguments"))))))
+#_(deftest censusWMS-test
+    (let [args-in (clj->js {:vintage     "2017",
+                            :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
+                           :keywordize-keys true)
+          args-na {:vintage     "1997"
+                   :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
+          $r$ (atom "")
+          tcb (fn [E O] (if-let [err E]
+                          (reset! $r$ err)
+                          (reset! $r$ O)))]
+      (test-async
+        (go ((censusWMS *g*) args-in tcb)
+            (<! (timeout 1000))
+            (is (= @$r$
+                   {:vintage "2017",
+                    :geoHierarchy {:state "51", :county "*"}}))
+            ((censusWMS *g*) args-na tcb)
+            (<! (timeout 1000))
+            (is (= @$r$
+                   "No FIPS (Census geocodes) found for given arguments"))))))
 
 (run-tests)

@@ -7,17 +7,18 @@
                                :as s]
     [clojure.set               :refer [map-invert]]
     [defun.core                :refer-macros [defun]]
-    [cljs-promises.async       :refer [value-port]]
+    [cljs-promises.async       :refer [value-port]] ; Fixme: Need this dependecy -< move configs to separate project
     [census.utils.core         :refer [map-target error err-type]]
     [configs.utils.fixtures    :refer [read-edn FileSaver]]
     [configs.geojson.filepaths :as geos]
     [configs.geojson.filepaths_abv :as geos_abv]
+    [configs.geojson.filepaths_2018 :as geos_2018]
     ["fs" :as fs]
     ;["path" :as path]
     ["shpjs" :as shpjs]
     ["mkdirp" :as mkdirp]))
 
-(def geoKeyMap (read-edn "./src/census/configs/geojson/index.edn"))
+(def geoKeyMap (read-edn "./src/configs/geojson/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -36,11 +37,11 @@
   "
   Map over a collection to transform 2-digit vintages to their 4-digit codes.
   "
-  [vtr]
+  [v]
   (map #(cond (= "90" %) "1990"
               (= "00" %) "2000"
               :else %)
-       vtr))
+       v))
 
 (defn filename->>pattern
   "
@@ -57,11 +58,11 @@
   [string]
   (->> (s/split string #"_|\.")
        (map #(re-seq #"[a-z]+|[0-9]+" %))
-       (map (fn [y] (remove #(= "d" %) y)))
-       (map-target map-xx->vin 2)
+       (mapv (fn [y] (remove #(= "d" %) y)))
+       (map-target map-xx->vin 1)
        (map #(vec %))))
 
-#_(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
+;(filename->>pattern 'cb_d00_01_county_within_ua_500k.zip')
 
 ; TODO: If geoKeyMap requires additional config to enable pattern matching for
 ; TODO: API + GeoJSON census.merger, update this:
@@ -297,9 +298,9 @@
 
 #_(let [c (chan 1)]
     (go (fsR-file->put!
-          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+          "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"
           c)
-        (pprint (<! c))))
+        (prn (<! c))))
 
 ;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;"fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -337,7 +338,7 @@
         =json= (chan 1)]
     (go (fsR-file->put!
           ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-          "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
+          "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"
           =zip=)
         (pipeline-async 1 =json= zip->geojson->put! =zip=)
         (js/console.log (<! =json=))))
@@ -389,15 +390,15 @@
 
 ;; Examples ========================================
 
-#_(def geotest
-    ["census.test directory 1"
-     "census.test json 1",
-     "census.test directory 2"
-     "census.test json 2",
-     "census.test directory 3"
-     "census.test json 3"])
-
-;(into [] (x-configs.geojson-config "geotest directory" "filepath") geotest)
+;(def geotest
+;  ["census.test directory 1"
+;   "census.test json 1",
+;   "census.test directory 2"
+;   "census.test json 2",
+;   "census.test directory 3"
+;   "census.test json 3"])
+;
+;(into [] (x-geojson-config "geotest directory" "filepath") geotest)
 ;; =>
 ;[{:directory "geotest directory", :json "census.test directory 1"}
 ; {:directory "geotest directory", :json "census.test json 1"}
@@ -437,19 +438,19 @@
         (do (prn (str "No :geoKeyMap match found for: " path))
             (recur))))))
 
-#_(let [path "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"]
-    (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-      (prn (str "Already existing directory: " directory " Filepath: " filepath))
-      (let [=test-path= (chan 1)
-            open-path (<! (fsCheck->put! filepath =test-path=))]
-        (if (not= "there" open-path)
-          (prn (str "Not there"))
-          (prn (str "There"))))))
-
-#_(let [=c= (chan 1)]
-    (go (>! =c= "C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_place_500k.zip")
-        (=>read=>convert=>write=>loop =c=)
-        (close! =c=)))
+;(let [path "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"]
+;  (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+;    (prn (str "Already existing directory: " directory " Filepath: " filepath))
+;    (let [=test-path= (chan 1)
+;          open-path (<! (fsCheck->put! filepath =test-path=))]
+;      (if (not= "there" open-path)
+;        (prn (str "Not there"))
+;        (prn (str "There"))))))
+;
+;(let [=c= (chan 1)]
+;  (go (>! =c= "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip")
+;      (=>read=>convert=>write=>loop =c=)
+;      (close! =c=)))
 
 
 
@@ -481,4 +482,4 @@
                                 \n === Wrapping up .... === \n
                                 \n ======================== \n")))))
 
-#_(batch=>zip-paths=>convert=>geojson geos_abv/paths)
+;(batch=>zip-paths=>convert=>geojson geos_2018/paths)

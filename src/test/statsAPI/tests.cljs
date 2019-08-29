@@ -10,9 +10,8 @@
                                    xf-'key'<w-stat
                                    xf-stats->js
                                    xf-mergeable<-stats
-                                   IOE-C->stats
+                                   ;IOE-C->stats
                                    IOE-C-S->JS
-                                   ;censusStatsJSON
                                    =cfg=C-Stats]]))
 
 (deftest stats-url-builder-test
@@ -31,21 +30,26 @@
     (is (= (C-S-args->url args-2)
            "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*"))))
 
-(deftest parse-if-number-test
+(deftest ->valid#?->#-test
   (is (= (->valid#?-># "30")
          30))
-  (is (= (->num?-># "string")
+  (is (= (->valid#?-># "string")
          "string"))
   (is (= (->valid#?-># "0.5")
          0.5))
-  (is (= (->valid#?-># "-666666666")
-         "-666666666")))
+  (is (= (->valid#?-># "-666666666.0000")
+         "NAN: -666666666"))
+  (is (= (->valid#?-># "0")
+         "0"))
+  (is (= (->valid#?-># "01")
+         "01")))
+
 
 (deftest xf!-csv->clj-test
   (let [args {:values     ["B01001_001E" "NAME"]
               :predicates {:B00001_001E "0:30000"}}
         input [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
-               ["486727","State Senate District 4 (2016), Florida","28800","12","004"],
+               ["-666666666.0000","State Senate District 4 (2016), Florida","28800","12","004"],
                ["491350","State Senate District 6 (2016), Florida","29938","12","006"]]]
     (is (= (transduce (xf!-CSV->CLJ args) conj [] input)
            [{:B01001_001E 491350,
@@ -53,7 +57,7 @@
              :B00001_001E 29938,
              :state "12",
              :state-legislative-district-_upper-chamber_ "006"}
-            {:B01001_001E 486727,
+            {:B01001_001E "NAN: -666666666",
              :NAME "State Senate District 4 (2016), Florida",
              :B00001_001E 28800,
              :state "12",
