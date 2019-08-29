@@ -1,6 +1,6 @@
 {
   "name": "citysdk",
-  "version": "2.0.34",
+  "version": "2.0.36",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "census.js",
   "scripts": {

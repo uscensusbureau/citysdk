@@ -139,7 +139,7 @@
                                                   " for: " url))
                                      (put! =err=))))
                           :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                     CORS-URL (str "https://cors.app.cloud.gov/" url)]
+                     CORS-URL (str "https://cors-e.herokuapp.com/" url)]
                  (case format
                    :json
                    (let [json
@@ -198,15 +198,15 @@
            #_(setval :vintage (str vintage) args)
            (merge args {:vintage (str vintage)}))
       (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
-           (do (prn (str "geoHierarchy??: " geoHierarchy))
-               (if (not (nil? geoHierarchy))
-                   (->> (merge clj-args
-                               {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
-                                "vintage" (str vintage)})
-                        (keywordize-keys))
-                   (->> (merge clj-args
-                               {"vintage" (str vintage)})
-                        (keywordize-keys)))))))
+           ;(do (prn (str "geoHierarchy??: " geoHierarchy))
+           (if (not (nil? geoHierarchy))
+               (->> (merge clj-args
+                           {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                            "vintage" (str vintage)})
+                    (keywordize-keys))
+               (->> (merge clj-args
+                           {"vintage" (str vintage)})
+                    (keywordize-keys))))))
 
 (defn args->
   "Converts Clojure arguments to JavaScript (for external use)"
