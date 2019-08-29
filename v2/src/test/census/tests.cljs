@@ -31,12 +31,16 @@
             (prn "Error: " err))))))
 
 (comment
+<<<<<<< HEAD
   (test-async-time ts/args-ok-wms-only prn) ; :geocodes   ms = 275
+=======
+  (test-async-time ts/args-ok-wms-only prn)            ; :geocodes   ms = 275
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
   (test-async-time (ts/test-args 9 3 3 0) prn)         ; :geocodes   ms = 362
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274
   (test-async-time ts/args-ok-s+g-vals prn)            ; :stats+geos ms = 1852
-  (test-async-time ts/args-ok-geo-only js/console.log) ; :geos-only  ms = 20907
+  (test-async-time ts/args-ok-geo-only prn) ; :geos-only  ms = 20907
   (test-async-time ts/args-na-sts-pred prn)            ; :no-values
   (test-async-time ts/args-ok-sts-v+ps prn)            ; :stats-only ms = 384
   (test-async-time ts/args-ok-sts-vals prn)            ; :stats-only ms = 757
@@ -49,6 +53,16 @@
                         "geoResolution" "500k"
                         "statsKey"      stats-key}
                    prn)
+<<<<<<< HEAD
+=======
+  (test-async-time #js {"vintage"     "2016"}
+                      "sourcePath"    #js ["acs" "acs5"]
+                      "values"        #js ["B01001_001E" "NAME"]
+                      "predicates"    #js {"B00001_001E" "0:30000"}
+                      "geoResolution" "500k"
+                      "statsKey"      stats-key
+                 prn)
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
   (test-async-time {:vintage 2016                      ; :stats+geos NA
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
@@ -163,4 +177,53 @@
                   :geoHierarchy {:state "24"
                                  :metropolitan-statistical-area!micropolitan-statistical-area "*"}
                   :predicates {:time "2010-Q1"}}
+<<<<<<< HEAD
                  prn)
+=======
+                 prn)
+
+(test-async-time {:vintage "timeseries"
+                  :sourcePath ["intltrade" "exports" "naics"]
+                  :values ["CTY_NAME",
+                           "ALL_VAL_MO",
+                           "ALL_VAL_YR",
+                           "CC_MO",
+                           "NAICS_SDESC",
+                           "DIST_NAME"]
+                  :predicates {:time "2013-01"
+                               :NAICS "111310"
+                               :DISTRICT "27"}}
+                 prn)
+
+(test-async-time #js {"vintage"     "timeseries"
+                      "sourcePath"    #js ["intltrade" "exports" "naics"]
+                      "values"        #js ["CTY_NAME" "ALL_VAL_MO" "ALL_VAL_YR" "CC_MO" "NAICS_SDESC" "DIST_NAME"]
+                      "predicates"    #js {"time" "2013-01" "NAICS" "111310" "DISTRICT" "27"}
+                      "statsKey"      ts/stats-key}
+                 prn)
+
+(test-async-time {:vintage 2017                       ; :stats+geos ms = 258
+                  :geoHierarchy {:state "01"
+                                 :county "015"
+                                 :tract "981902"}
+                  :geoResolution "500k"
+                  :statsKey ts/stats-key}
+                 js/console.log)
+
+(test-async-time #js {"vintage" "timeseries"
+                      "sourcePath" #js ["intltrade", "exports","porths"]
+                      "values" #js [
+                                    "ALL_VAL_MO",
+                                    "VES_VAL_MO",
+                                    "CNT_VAL_MO",
+                                    "AIR_VAL_MO",
+                                    "VES_WGT_MO",
+                                    "CNT_WGT_MO",
+                                    "AIR_WGT_MO",
+                                    "E_COMMODITY_SDESC",
+                                    "PORT_NAME"]
+                      "predicates" #js {"PORT" "27*"
+                                        "time" "2013-01",
+                                        "E_COMMODITY" "0*"}}
+                 js/console.log)
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539

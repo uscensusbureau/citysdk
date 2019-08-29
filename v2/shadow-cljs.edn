@@ -1,5 +1,9 @@
 {:source-paths ["src"]
+<<<<<<< HEAD
  :dependencies [[org.clojure/core.async "0.4.490"]
+=======
+ :dependencies [[org.clojure/core.async "0.4.500"]
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
                 [cljs-ajax "0.8.0"]
                 [funcool/cuerdas "2.2.0"]
                 [defun "0.3.0-RC1"]

@@ -20,7 +20,7 @@
 (defn C-S-args->url
   "Composes a URL to call Census' statistics API"
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
-  (if (not-any? nil? [vintage sourcePath geoHierarchy values])
+  (if (not-any? nil? [vintage sourcePath values])
     (str URL-STATS
          (str vintage)
          (join (map #(str "/" %) sourcePath))
@@ -31,11 +31,13 @@
          (if (some? predicates)
            (str "&" (str (join "&" (map #(kv-pair->str % "=") predicates))))
            "")
-         (keys->strs
-           (if (= 1 (count geoHierarchy))
-             (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-             (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
-                  "&for=" (kv-pair->str (last geoHierarchy) ":"))))
+         (if (not (nil? geoHierarchy))
+           (keys->strs
+             (if (= 1 (count geoHierarchy))
+               (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
+               (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
+                    "&for=" (kv-pair->str (last geoHierarchy) ":"))))
+           "")
          (if (not (nil? statsKey))
            (str "&key=" statsKey)))
     ""))
@@ -54,9 +56,22 @@
                         "-888888888.0000"
                         "-999999999.0000"])
         (str "NAN: " (strip-suffix s ".0000"))
+<<<<<<< HEAD:v2/src/census/statsAPI/core.cljc
         (numeric? s)
         (parse-number s)
         :else s))
+=======
+        (and (= (count s) 1) (numeric? s))
+        (parse-number s)
+        (and (= (subs s 0 1) "0") (not (= (subs s 1 2) ".")))
+        s
+        (numeric? s)
+        (parse-number s)
+        :else s))
+
+;(parse-number "030381")
+; Error: Invalid number: 030381
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539:v2/src/census/statsAPI/core.cljc
 
 (defn xf!-CSV->CLJ
   "
@@ -153,7 +168,11 @@
 
 
 (defn =cfg=C-Stats
+<<<<<<< HEAD:v2/src/census/statsAPI/core.cljc
   "Internal function for calling Github cartography 'API' for GeoJSON"
+=======
+  "Internal function for calling Census Stats API"
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539:v2/src/census/statsAPI/core.cljc
   [=args= =cfg=]
   (take! =args=
     (fn [args]
