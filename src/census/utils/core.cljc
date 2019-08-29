@@ -12,7 +12,11 @@
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
+<<<<<<< HEAD:v2/src/census/utils/core.cljc
 (def URL-GEOJSON "https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/GeoJSON")
+=======
+(def URL-GEOJSON "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON")
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539:v2/src/census/utils/core.cljc
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
 ;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
 
@@ -198,10 +202,22 @@
            #_(setval :vintage (str vintage) args)
            (merge args {:vintage (str vintage)}))
       (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
+<<<<<<< HEAD:v2/src/census/utils/core.cljc
            (->> (merge clj-args
                        {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
                         "vintage" (str vintage)})
                 (keywordize-keys)))))
+=======
+           ;(do (prn (str "geoHierarchy??: " geoHierarchy))
+           (if (not (nil? geoHierarchy))
+               (->> (merge clj-args
+                           {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                            "vintage" (str vintage)})
+                    (keywordize-keys))
+               (->> (merge clj-args
+                           {"vintage" (str vintage)})
+                    (keywordize-keys))))))
+>>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539:v2/src/census/utils/core.cljc
 
 (defn args->
   "Converts Clojure arguments to JavaScript (for external use)"
