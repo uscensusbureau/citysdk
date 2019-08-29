@@ -1,0 +1,8 @@
+version: "3"
+services:
+  citysdk-pages:
+    build: .
+    volumes:
+      - .:/usr/app
+    ports:
+      - 4000:4000
