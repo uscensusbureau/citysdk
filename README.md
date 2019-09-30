@@ -369,7 +369,7 @@ Type in a county name and see the unweighted sample count of the population (ACS
 
 Use Chrome for best results (mapbox-gl geocoder caveat)
 
-[source code](https://github.com/uscensusbureau/citysdk/tree/master/examples/mapbox/with-mapbox-gl_geocoding)**
+[source code](https://github.com/uscensusbureau/citysdk/tree/master/examples/mapbox/with-mapbox-gl_geocoding)
 
 
 ## All Counties
