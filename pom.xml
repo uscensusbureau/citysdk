@@ -34,10 +34,14 @@
             <groupId>thheller</groupId>
             <artifactId>shadow-cljs</artifactId>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <version>2.8.36</version>
 =======
             <version>2.8.40</version>
 >>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
+=======
+            <version>2.8.59</version>
+>>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
         </dependency>
         <dependency>
             <groupId>org.clojure</groupId>
