@@ -226,4 +226,18 @@
                                         "time" "2013-01",
                                         "E_COMMODITY" "0*"}}
                  js/console.log)
+<<<<<<< HEAD
 >>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
+=======
+
+(test-async-time #js {"vintage" 2017,
+                      "geoHierarchy"
+                        #js {"state" #js {"lat" 28.466944,
+                                          "lng" -82.498148},
+                             "county" "*"},
+                      ;"geoResolution" "5m",
+                      "sourcePath" #js["acs", "acs5", "subject"],
+                      "values" #js ["S0102_C01_001E", "S0102_C02_001E"],
+                      "statsKey" "3c04140849164b373c8b1da7d7cc8123ef71b7ab"}
+                 prn)
+>>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2

@@ -56,11 +56,16 @@
                         "-888888888.0000"
                         "-999999999.0000"])
         (str "NAN: " (strip-suffix s ".0000"))
+<<<<<<< HEAD
 <<<<<<< HEAD:v2/src/census/statsAPI/core.cljc
         (numeric? s)
         (parse-number s)
         :else s))
 =======
+=======
+        (nil? s)
+        "NAN: null"
+>>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
         (and (= (count s) 1) (numeric? s))
         (parse-number s)
         (and (= (subs s 0 1) "0") (not (= (subs s 1 2) ".")))
