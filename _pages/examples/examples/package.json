@@ -1,0 +1,40 @@
+{
+  "name": "citysdk-examples",
+  "version": "0.2.2",
+  "description": "Examples of using the @uscensusbureau citysdk",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loganpowell/census-js-examples.git"
+  },
+  "keywords": [
+    "geojson",
+    "census",
+    "shapefiles",
+    "boundaries",
+    "government",
+    "usa",
+    "cartography"
+  ],
+  "author": "Logan Powell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/loganpowell/census-js-examples/issues"
+  },
+  "homepage": "https://github.com/loganpowell/census-js-examples#readme",
+  "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^2.3.0",
+    "chroma-js": "^1.4.1",
+    "citysdk": "^2.0.4",
+    "lodash": "^4.17.11",
+    "mapbox-gl": "^0.52.0-beta.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "babelify": "^10.0.0",
+    "watchify": "^3.11.0"
+  }
+}
