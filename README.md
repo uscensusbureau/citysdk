@@ -1,4 +1,4 @@
-# CitySDK v2.0 (Beta)
+# CitySDK v2.0
 
 #### Thank You's due to some very generous Clojurians:
 - @thheller (author of the [`shadow-cljs`] build tool)
@@ -68,7 +68,7 @@ There are two ways to scope your geography using this functionality:
 You may pass a `{"lat" : <float>, "lng" : <float>}` object as the first and _only_ value for the `geoHierarchy` key:
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : 2015,    // required
@@ -91,7 +91,7 @@ Notice how the function prepends an additional geographic component (`"state" : 
 RETURN TYPE: `JSON`
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : "2015",   // required
@@ -147,7 +147,7 @@ The corresponding `sourcePath` for this endpoint is `["acs", "acs1"]`
 RETURN TYPE: `JSON`
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : 2015,        // required
@@ -313,7 +313,7 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-var fs = require("fs")
+const fs = require("fs")
 
 census({
     "vintage" : 2017,
@@ -437,7 +437,7 @@ This is a very large request, in fact, one of the largest you could possibly mak
   "geoHierarchy": { "state": { "lat": 28.2639, "lng": -80.7214 }, "county": '*' } 
 }
 
-// Getting the stats for a single county filtering out any county with population over 100,000
+// Getting the stats for a single county filtering out any county with population under 100,000
 { 
   "vintage": 2016,
   "geoHierarchy": { "county": { "lat": 28.2639, "lng": -80.7214 } },

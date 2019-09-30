@@ -83,6 +83,4 @@ census(
 
 This would convert the returned geojson to a string, which allows it to be saved via Node.js' fileSystem API.
 
-### Old examples
-
-[Link]({{ '/examples/old/' | relative_url }})
+# [More Examples]({{ '/examples/old/' | relative_url }})
