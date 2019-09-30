@@ -1,4 +1,4 @@
-# CitySDK v2.0 (Beta)
+# CitySDK v2.0
 
 #### Thank You's due to some very generous Clojurians:
 - @thheller (author of the [`shadow-cljs`] build tool)
