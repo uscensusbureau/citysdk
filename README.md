@@ -3,7 +3,7 @@
 #### Thank You's due to some very generous Clojurians:
 - @thheller (author of the [`shadow-cljs`] build tool)
 - @cgrand (author of the [`xforms`] library)
-- The Clojure community at large for being such a great place to learn
+- The Clojure community at large
 
 [`shadow-cljs`]: https://github.com/thheller/shadow-cljs
 [`xforms`]: https://github.com/cgrand/xforms
@@ -502,12 +502,12 @@ Geographic Area Type                                          | 1990  | 2000  | 
 `"place"`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
 `"public use microdata area"`                                   |       |       |      |        |  ✔         | ✔         
 `"region"`                                                      |       | ✔     | ✔   |        | ✔          | ✔         
-`"school district (elementary")`                                |       | ✔     | ✔   |        |             | ✔         
-`"school district (secondary")`                                 |       | ✔     | ✔   |        |             | ✔         
+`"school district (elementary)"`                                |       | ✔     | ✔   |        |             | ✔         
+`"school district (secondary)"`                                 |       | ✔     | ✔   |        |             | ✔         
 `"school district (unified")`                                   |       | ✔     | ✔   |        |             | ✔         
 `"state"`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
-`"state legislative district (lower chamber")`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
-`"state legislative district (upper chamber")`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
+`"state legislative district (lower chamber)"`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
+`"state legislative district (upper chamber)"`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 `"tract"`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
 `"urban area"`                                                  | ✔     | ✔    |      | ✔     | ✔           | ✔         
 `"us"`                                                          |       |       | ✔    |       | ✔           | ✔         
