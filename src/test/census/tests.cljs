@@ -216,3 +216,14 @@
                                         "time" "2013-01",
                                         "E_COMMODITY" "0*"}}
                  js/console.log)
+
+(test-async-time #js {"vintage" 2017,
+                      "geoHierarchy"
+                        #js {"state" #js {"lat" 28.466944,
+                                          "lng" -82.498148},
+                             "county" "*"},
+                      ;"geoResolution" "5m",
+                      "sourcePath" #js["acs", "acs5", "subject"],
+                      "values" #js ["S0102_C01_001E", "S0102_C02_001E"],
+                      "statsKey" "3c04140849164b373c8b1da7d7cc8123ef71b7ab"}
+                 prn)
