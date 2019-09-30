@@ -1,9 +1,9 @@
-# CitySDK v2.0 (Beta)
+# CitySDK v2.0
 
 #### Thank You's due to some very generous Clojurians:
 - @thheller (author of the [`shadow-cljs`] build tool)
 - @cgrand (author of the [`xforms`] library)
-- The Clojure community at large for being such a great place to learn
+- The Clojure community at large
 
 [`shadow-cljs`]: https://github.com/thheller/shadow-cljs
 [`xforms`]: https://github.com/cgrand/xforms
@@ -68,7 +68,7 @@ There are two ways to scope your geography using this functionality:
 You may pass a `{"lat" : <float>, "lng" : <float>}` object as the first and _only_ value for the `geoHierarchy` key:
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : 2015,    // required
@@ -91,7 +91,7 @@ Notice how the function prepends an additional geographic component (`"state" : 
 RETURN TYPE: `JSON`
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : "2015",   // required
@@ -147,7 +147,6 @@ The corresponding `sourcePath` for this endpoint is `["acs", "acs1"]`
 RETURN TYPE: `JSON`
 
 ```js
-import census from 'citysdk'
 
 census({
     "vintage" : 2015,        // required
@@ -263,7 +262,7 @@ RETURN TYPE: `JSON`
 census({
     "vintage" : "timeseries",// required
     "geoHierarchy" : {       // required  
-      "us": "*"
+      "us" : "*"
     },
     "sourcePath" : ["asm", "industry"],  // required 
     "values" : ["EMP","NAICS_TTL","GEO_TTL"],
@@ -310,7 +309,7 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-var fs = require("fs")
+const fs = require("fs")
 
 census({
     "vintage" : 2017,
@@ -364,13 +363,13 @@ There are a number of reasons you might want to merge your statistics into their
 
 A more dynamic example of using stats merged with GeoJSON on the fly with `citysdk` can be found here:
 
-[![mapbox-geocoding](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html)
+[![mapbox-geocoding](https://raw.githubusercontent.com/uscensusbureau/citysdk/master/examples/assets/images/mapbox-geocoding.png)](https://uscensusbureau.github.io/citysdk/assets/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html)
 
 Type in a county name and see the unweighted sample count of the population (ACS) for all the Block Groups within that County.
 
 Use Chrome for best results (mapbox-gl geocoder caveat)
 
-[source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/with-mapbox-gl_geocoding)
+[source code](https://github.com/uscensusbureau/citysdk/tree/master/examples/mapbox/with-mapbox-gl_geocoding)
 
 
 ## All Counties
@@ -395,9 +394,9 @@ In this example, we use `citysdk` to create the payload and then save it via Nod
 [Mapbox-GL]: https://www.mapbox.com/mapbox-gl-js/api/
 
 
-[![counties](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/examples/assets/images/counties.PNG)](https://uscensusbureau.github.io/citysdk/examples/mapbox/counties_static/index.html)
+[![counties](https://raw.githubusercontent.com/uscensusbureau/citysdk/master/examples/assets/images/counties.PNG)](https://uscensusbureau.github.io/citysdk/assets/examples/mapbox/counties_static/index.html)
 
-[source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/counties_static)
+[source code](https://github.com/uscensusbureau/citysdk/tree/master/examples/mapbox/counties_static)
 
 ### Notable Example:
 
@@ -420,9 +419,9 @@ census({
 This is a very large request, in fact, one of the largest you could possibly make in a single `citysdk` function call. It is so large, in fact that it currently only works on Node and only if you increase your `node --max-old-space-size=4096`. With large merges (such as all counties or zctas), it is recommended not to try to use `citysdk` dynamically, but - rather - to munge your data before hand with `citysdk` and then serve it statically to your mapping library, as was done here:
 
 
-[![Zip Code Tabulation Areas](https://raw.githubusercontent.com/uscensusbureau/citysdk/gh-pages/examples/assets/images/zctas.PNG)](https://uscensusbureau.github.io/citysdk/examples/mapbox/zip-code-tabulation-areas_static/index.html)
+[![Zip Code Tabulation Areas](https://raw.githubusercontent.com/uscensusbureau/citysdk/master/examples/assets/images/zctas.PNG)](https://uscensusbureau.github.io/citysdk/assets/examples/mapbox/zip-code-tabulation-areas_static/index.html)
 
-[source code](https://github.com/uscensusbureau/citysdk/tree/gh-pages/examples/mapbox/zip-code-tabulation-areas_static)
+[source code](https://github.com/uscensusbureau/citysdk/tree/master/examples/mapbox/zip-code-tabulation-areas_static)
 
 
 #### Other Argument Examples:
@@ -434,7 +433,7 @@ This is a very large request, in fact, one of the largest you could possibly mak
   "geoHierarchy": { "state": { "lat": 28.2639, "lng": -80.7214 }, "county": '*' } 
 }
 
-// Getting the stats for a single county filtering out any county with population over 100,000
+// Getting the stats for a single county filtering out any county with population under 100,000
 { 
   "vintage": 2016,
   "geoHierarchy": { "county": { "lat": 28.2639, "lng": -80.7214 } },
@@ -503,12 +502,12 @@ Geographic Area Type                                          | 1990  | 2000  | 
 `"place"`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
 `"public use microdata area"`                                   |       |       |      |        |  ✔         | ✔         
 `"region"`                                                      |       | ✔     | ✔   |        | ✔          | ✔         
-`"school district (elementary")`                                |       | ✔     | ✔   |        |             | ✔         
-`"school district (secondary")`                                 |       | ✔     | ✔   |        |             | ✔         
+`"school district (elementary)"`                                |       | ✔     | ✔   |        |             | ✔         
+`"school district (secondary)"`                                 |       | ✔     | ✔   |        |             | ✔         
 `"school district (unified")`                                   |       | ✔     | ✔   |        |             | ✔         
 `"state"`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
-`"state legislative district (lower chamber")`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
-`"state legislative district (upper chamber")`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
+`"state legislative district (lower chamber)"`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
+`"state legislative district (upper chamber)"`                  |       | ✔     |  ✔  | ✔     |  ✔          | ✔         
 `"tract"`                                                       | ✔     | ✔    | ✔    |       | ✔           | ✔         
 `"urban area"`                                                  | ✔     | ✔    |      | ✔     | ✔           | ✔         
 `"us"`                                                          |       |       | ✔    |       | ✔           | ✔         
