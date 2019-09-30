@@ -68,7 +68,7 @@ There are two ways to scope your geography using this functionality:
 You may pass a `{"lat" : <float>, "lng" : <float>}` object as the first and _only_ value for the `geoHierarchy` key:
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : 2015,    // required
@@ -91,7 +91,7 @@ Notice how the function prepends an additional geographic component (`"state" : 
 RETURN TYPE: `JSON`
 
 ```js
-import census from 'citysdk'
+const census = require('citysdk')
 
 census({
     "vintage" : "2015",   // required
@@ -147,7 +147,6 @@ The corresponding `sourcePath` for this endpoint is `["acs", "acs1"]`
 RETURN TYPE: `JSON`
 
 ```js
-import census from 'citysdk'
 
 census({
     "vintage" : 2015,        // required
@@ -310,7 +309,7 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-var fs = require("fs")
+const fs = require("fs")
 
 census({
     "vintage" : 2017,
