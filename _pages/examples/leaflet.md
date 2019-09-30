@@ -7,9 +7,9 @@ layout: post
 lightbox: true
 ---
 
-This example shows how to setup a leaflet map with popup on features when clicked. See the completed example [here]({{ '/examples/live/leaflet-choropleth/' | relative_url }}){:target="\_blank"}.
+This example shows how to setup a leaflet map with popup on features when clicked. See the completed example [here]({{ '/examples/live/leaflet/' | relative_url }}){:target="\_blank"}.
 
-The data used is the number of Oil and Gas Extraction businesses for counties in Texas, via the (County Business Patterns (CBP) API)['https://www.census.gov/data/developers/data-sets/cbp-nonemp-zbp/cbp-api.html]. The api uses North American Industry Classification System (NAICS), for Oil and Gas Extraction the NAICS is 211.
+The data used is the number of Oil and Gas Extraction businesses for counties in Texas, via the County Business Patterns ([CBP API]('https://www.census.gov/data/developers/data-sets/cbp-nonemp-zbp/cbp-api.html){:target="\_blank"}). The api uses North American Industry Classification System (NAICS), for Oil and Gas Extraction the NAICS is 211.
 
 ## Setting up
 
@@ -39,9 +39,9 @@ In the body setup a container with an id of map, with a height and width.
 In a script tag after the map div, we initialize the map. First by calling `L.map("map")` on the map div id, then running `.setView([31.6623, -99.0306], 6)` to set the center and zoom level. Next we add OpenStreetMap as a base title layer.
 
 ```js
-var map = L.map("map").setView([31.6623, -99.0306], 6);
+var map = L.map('map').setView([31.6623, -99.0306], 6);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
@@ -57,14 +57,14 @@ census(
     vintage: 2016,
     geoHierarchy: {
       state: 48,
-      county: "*"
+      county: '*'
     },
-    geoResolution: "500k",
-    sourcePath: ["cbp"],
+    geoResolution: '500k',
+    sourcePath: ['cbp'],
     predicates: {
       NAICS2012: 211 // NAICS code for Oil and Gas Extraction
     },
-    values: ["ESTAB"] // number of establishments
+    values: ['ESTAB'] // number of establishments
   },
   function(error, response) {
     L.geoJson(response).addTo(map);
@@ -82,11 +82,11 @@ To add a popup when a county is clicked we modify the L.geoJson function with an
 L.geoJson(response, {
   onEachFeature: function(feature, layer) {
     layer.bindPopup(
-      "<h2>" +
+      '<h2>' +
         feature.properties.NAME +
-        "</h2><p># of Oil and Gas Extraction businesses: " +
+        '</h2><p># of Oil and Gas Extraction businesses: ' +
         feature.properties.ESTAB +
-        "</p>"
+        '</p>'
     );
   }
 }).addTo(map);
