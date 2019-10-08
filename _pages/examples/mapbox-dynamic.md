@@ -6,7 +6,7 @@ permalink: /examples/mapbox-dynamic/
 layout: post
 ---
 
-This example shows how to setup a choropleth map using mapbox with dynamic loading. The data used is the unweighted count, estimate-total, and travel-time aggregate values for all block groups in a county. By dynamic loading for only a single county, it avoids pulling large amounts of data and crashing the browser. See the completed example [here](https://uscensusbureau.github.io/citysdk/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html){:target="\_blank"} and source code [here](https://github.com/loganpowell/census-js-examples/blob/master/mapbox/with-mapbox-gl_geocoding_hover/src/index.js){:target="\_blank"}
+This example shows how to setup a choropleth map using mapbox with dynamic loading. The data used is the unweighted count, estimate-total, and travel-time aggregate values for all block groups in a county. By dynamic loading for only a single county, it avoids pulling large amounts of data and crashing the browser. See the completed example [here](https://uscensusbureau.github.io/citysdk/assets/examples/mapbox/with-mapbox-gl_geocoding_hover/index.html){:target="\_blank"} and source code [here](https://github.com/loganpowell/census-js-examples/blob/master/mapbox/with-mapbox-gl_geocoding_hover/src/index.js){:target="\_blank"}
 
 ![Example of citysdk being used dynamically in mapbox]({{ '/assets/images/examples/example-mapbox-dyamnic-loading.png' | relative_url }})
 
