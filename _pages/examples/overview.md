@@ -40,6 +40,8 @@ lightbox: true
 
 - [D3.js Line Chart]({{ '/examples/d3-line-chart/' | relative_url }})
   ![Example of a line chart using D3.js]({{ '/assets/images/examples/example-d3-line-chart.png' | relative_url }})
+- [D3.js Map]({{ '/examples/d3-map/' | relative_url }})
+  ![Example of a map using D3.js]({{ '/assets/images/examples/example-d3-map.png' | relative_url }})
 
 ## Quick Reference Examples
 
