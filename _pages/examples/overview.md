@@ -18,6 +18,8 @@ subnav:
     href: "#saving-the-file-locally-in-nodejs-using-fs"
   - text: Getting all counties
     href: "#getting-all-counties"
+  - text: More Examples
+    href: "#more-examples"
 lightbox: true
 ---
 
@@ -85,5 +87,5 @@ census(
 
 This would convert the returned geojson to a string, which allows it to be saved via Node.js' fileSystem API.
 
-# [More Examples]({{ '/examples/old/' | relative_url }})
+## [More Examples]({{ '/examples/old/' | relative_url }})
 
