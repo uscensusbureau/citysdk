@@ -27,6 +27,6 @@ Read more about it here:
 
 If you are using CitySDK on the client and GeoJSON takes a while to load or crashes the browser, prefetch your data and service it statically to your client instead. Follow the example on[saving the file locally in Node.js using fs]({{ '/examples/#example-saving-the-file-locally-in-nodejs-using-fs' | relative_url }}).
 
-If you are suing CitySDK on the server (Node.js) and GeoJSON include the flag max-old-space-size `node --max-old-space-size=4096`.
+If you are using CitySDK on the server (Node.js) and GeoJSON include the flag max-old-space-size `node --max-old-space-size=4096`.
 
 Using current predicates or large geographic queries may also slow down queries.

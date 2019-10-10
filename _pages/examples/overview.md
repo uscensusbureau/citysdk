@@ -18,6 +18,8 @@ subnav:
     href: "#saving-the-file-locally-in-nodejs-using-fs"
   - text: Getting all counties
     href: "#getting-all-counties"
+  - text: More Examples
+    href: "#more-examples"
 lightbox: true
 ---
 
@@ -40,6 +42,8 @@ lightbox: true
 
 - [D3.js Line Chart]({{ '/examples/d3-line-chart/' | relative_url }})
   ![Example of a line chart using D3.js]({{ '/assets/images/examples/example-d3-line-chart.png' | relative_url }})
+- [D3.js Map]({{ '/examples/d3-map/' | relative_url }})
+  ![Example of a map using D3.js]({{ '/assets/images/examples/example-d3-map.png' | relative_url }})
 
 ## Quick Reference Examples
 
@@ -83,4 +87,5 @@ census(
 
 This would convert the returned geojson to a string, which allows it to be saved via Node.js' fileSystem API.
 
-# [More Examples]({{ '/examples/old/' | relative_url }})
+## [More Examples]({{ '/examples/old/' | relative_url }})
+
