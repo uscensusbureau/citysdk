@@ -33,8 +33,8 @@ lightbox: true
 
 ### Mapbox
 
-- [Mapbox choropleth map]({{ '/examples/mapbox-choropleth/' | relative_url }})
-  ![Example of a choropleth map using mapbox]({{ '/assets/images/examples/example-mapbox-choropleth.png' | relative_url }})
+- [Mapbox choropleth map using Census vector tiles]({{ '/examples/mapbox-choropleth/' | relative_url }})
+  ![Example of a choropleth map using mapbox and Census vector tiles]({{ '/assets/images/examples/example-mapbox-choropleth.png' | relative_url }})
 - [Mapbox dynamic loading]({{ '/examples/mapbox-dynamic/' | relative_url }})
   ![Example of citysdk being used dynamically in mapbox]({{ '/assets/images/examples/example-mapbox-dyamnic-loading.png' | relative_url }})
 

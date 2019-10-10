@@ -32,8 +32,8 @@ Few examples:
 - [Leaflet]({{ '/examples/leaflet/' | relative_url }})
   ![Example of a map using leaflet with a popup]({{ '/assets/images/examples/example-leaflet.png' | relative_url }})
 
-- [Mapbox choropleth map]({{ '/examples/mapbox-choropleth/' | relative_url }})
-  ![Example of a choropleth map using mapbox]({{ '/assets/images/examples/example-mapbox-choropleth.png' | relative_url }})
+- [Mapbox choropleth map using Census vector tiles]({{ '/examples/mapbox-choropleth/' | relative_url }})
+  ![Example of a choropleth map using mapbox and census vector tile server]({{ '/assets/images/examples/example-mapbox-choropleth.png' | relative_url }})
 
 - [D3.js Line Chart]({{ '/examples/d3-line-chart/' | relative_url }})
   ![Example of a line chart using D3.js]({{ '/assets/images/examples/example-d3-line-chart.png' | relative_url }})
