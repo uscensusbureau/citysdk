@@ -56,16 +56,8 @@
                         "-888888888.0000"
                         "-999999999.0000"])
         (str "NAN: " (strip-suffix s ".0000"))
-<<<<<<< HEAD
-<<<<<<< HEAD:v2/src/census/statsAPI/core.cljc
-        (numeric? s)
-        (parse-number s)
-        :else s))
-=======
-=======
         (nil? s)
         "NAN: null"
->>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
         (and (= (count s) 1) (numeric? s))
         (parse-number s)
         (and (= (subs s 0 1) "0") (not (= (subs s 1 2) ".")))
@@ -76,7 +68,6 @@
 
 ;(parse-number "030381")
 ; Error: Invalid number: 030381
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539:v2/src/census/statsAPI/core.cljc
 
 (defn xf!-CSV->CLJ
   "
@@ -173,11 +164,7 @@
 
 
 (defn =cfg=C-Stats
-<<<<<<< HEAD:v2/src/census/statsAPI/core.cljc
-  "Internal function for calling Github cartography 'API' for GeoJSON"
-=======
   "Internal function for calling Census Stats API"
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539:v2/src/census/statsAPI/core.cljc
   [=args= =cfg=]
   (take! =args=
     (fn [args]

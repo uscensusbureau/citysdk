@@ -33,24 +33,12 @@
         <dependency>
             <groupId>thheller</groupId>
             <artifactId>shadow-cljs</artifactId>
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <version>2.8.36</version>
-=======
-            <version>2.8.40</version>
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
-=======
             <version>2.8.59</version>
->>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
         </dependency>
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>core.async</artifactId>
-<<<<<<< HEAD
-            <version>0.4.490</version>
-=======
             <version>0.4.500</version>
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
         </dependency>
         <dependency>
             <groupId>cljs-ajax</groupId>
@@ -76,14 +64,6 @@
             <groupId>net.cgrand</groupId>
             <artifactId>xforms</artifactId>
             <version>0.19.0</version>
-<<<<<<< HEAD
-        </dependency>
-        <dependency>
-            <groupId>jamesmacaulay</groupId>
-            <artifactId>cljs-promises</artifactId>
-            <version>0.1.0</version>
-=======
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
         </dependency>
     </dependencies>
     <build>
