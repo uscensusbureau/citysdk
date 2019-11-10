@@ -7,17 +7,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
-<<<<<<< HEAD
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: thheller:shadow-cljs:2.8.36" level="project" />
-    <orderEntry type="library" name="Maven: org.clojure:clojure:1.10.0" level="project" />
-=======
     <orderEntry type="jdk" jdkName="11" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: thheller:shadow-cljs:2.8.59" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:clojure:1.10.1" level="project" />
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
     <orderEntry type="library" name="Maven: org.clojure:spec.alpha:0.2.176" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:core.specs.alpha:0.2.44" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:data.json:0.2.6" level="project" />
@@ -36,18 +29,8 @@
     <orderEntry type="library" name="Maven: com.cognitect:transit-js:0.8.846" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:clojurescript:1.10.520" level="project" />
     <orderEntry type="library" name="Maven: org.mozilla:rhino:1.7R5" level="project" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <orderEntry type="library" name="Maven: com.google.javascript:closure-compiler-unshaded:v20190325" level="project" />
-    <orderEntry type="library" name="Maven: com.google.javascript:closure-compiler-externs:v20190325" level="project" />
-=======
-    <orderEntry type="library" name="Maven: com.google.javascript:closure-compiler-unshaded:v20190618" level="project" />
-    <orderEntry type="library" name="Maven: com.google.javascript:closure-compiler-externs:v20190618" level="project" />
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
-=======
     <orderEntry type="library" name="Maven: com.google.javascript:closure-compiler-unshaded:v20190819" level="project" />
     <orderEntry type="library" name="Maven: com.google.javascript:closure-compiler-externs:v20190819" level="project" />
->>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
     <orderEntry type="library" name="Maven: args4j:args4j:2.0.26" level="project" />
     <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:25.1-jre" level="project" />
@@ -63,29 +46,12 @@
     <orderEntry type="library" name="Maven: org.clojure:google-closure-library-third-party:0.0-20190213-2033d5d9" level="project" />
     <orderEntry type="library" name="Maven: thheller:shadow-util:0.7.0" level="project" />
     <orderEntry type="library" name="Maven: thheller:shadow-client:1.3.2" level="project" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <orderEntry type="library" name="Maven: io.undertow:undertow-core:2.0.19.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging:3.3.2.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.jboss.xnio:xnio-api:3.7.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.wildfly.common:wildfly-common:1.3.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.wildfly.client:wildfly-client-config:1.0.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.jboss.xnio:xnio-nio:3.7.0.Final" level="project" />
-=======
-    <orderEntry type="library" name="Maven: io.undertow:undertow-core:2.0.22.Final" level="project" />
-=======
     <orderEntry type="library" name="Maven: io.undertow:undertow-core:2.0.25.Final" level="project" />
->>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
     <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging:3.4.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.jboss.xnio:xnio-api:3.7.3.Final" level="project" />
     <orderEntry type="library" name="Maven: org.wildfly.common:wildfly-common:1.3.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.wildfly.client:wildfly-client-config:1.0.0.Final" level="project" />
-<<<<<<< HEAD
-    <orderEntry type="library" name="Maven: org.jboss.xnio:xnio-nio:3.7.2.Final" level="project" />
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
-=======
     <orderEntry type="library" name="Maven: org.jboss.xnio:xnio-nio:3.7.3.Final" level="project" />
->>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
     <orderEntry type="library" name="Maven: org.jboss.threads:jboss-threads:2.3.2.Final" level="project" />
     <orderEntry type="library" name="Maven: hiccup:hiccup:1.0.5" level="project" />
     <orderEntry type="library" name="Maven: ring:ring-core:1.7.1" level="project" />
@@ -95,11 +61,7 @@
     <orderEntry type="library" name="Maven: crypto-random:crypto-random:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: crypto-equality:crypto-equality:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: expound:expound:0.7.2" level="project" />
-<<<<<<< HEAD
-    <orderEntry type="library" name="Maven: fipp:fipp:0.6.17" level="project" />
-=======
     <orderEntry type="library" name="Maven: fipp:fipp:0.6.18" level="project" />
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
     <orderEntry type="library" name="Maven: org.clojure:core.rrb-vector:0.0.14" level="project" />
     <orderEntry type="library" name="Maven: com.bhauman:cljs-test-display:0.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.wsscode:pathom:2.2.7" level="project" />
@@ -110,17 +72,8 @@
     <orderEntry type="library" name="Maven: hawk:hawk:0.2.11" level="project" />
     <orderEntry type="library" name="Maven: net.incongru.watchservice:barbary-watchservice:1.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jna:jna:3.2.2" level="project" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <orderEntry type="library" name="Maven: thheller:shadow-cljsjs:0.0.17" level="project" />
-    <orderEntry type="library" name="Maven: org.clojure:core.async:0.4.490" level="project" />
-=======
-    <orderEntry type="library" name="Maven: thheller:shadow-cljsjs:0.0.18" level="project" />
-=======
     <orderEntry type="library" name="Maven: thheller:shadow-cljsjs:0.0.20" level="project" />
->>>>>>> 28b43ad4e0e2f520cf8653df64486d42da6771e2
     <orderEntry type="library" name="Maven: org.clojure:core.async:0.4.500" level="project" />
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
     <orderEntry type="library" name="Maven: org.clojure:tools.analyzer.jvm:0.7.2" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:tools.analyzer:0.6.9" level="project" />
     <orderEntry type="library" name="Maven: org.clojure:core.memoize:0.5.9" level="project" />
@@ -145,9 +98,5 @@
     <orderEntry type="library" name="Maven: frankiesardo:linked:1.3.0" level="project" />
     <orderEntry type="library" name="Maven: net.cgrand:xforms:0.19.0" level="project" />
     <orderEntry type="library" name="Maven: net.cgrand:macrovich:0.2.0" level="project" />
-<<<<<<< HEAD
-    <orderEntry type="library" name="Maven: jamesmacaulay:cljs-promises:0.1.0" level="project" />
-=======
->>>>>>> 380538e89d3b1324449e3a70a4c929f4f1266539
   </component>
 </module>
