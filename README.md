@@ -111,9 +111,9 @@ census({
 
 All Census-defined geographic areas are composed of Census "Blocks". Some of these composed areas - themselves - compose into higher-order areas. These nested relationships between certain geographic areas allows the Census data user to request all [descendants] of a particular type. 
 
-##### Caveats
-1) In this example, we added a second geographic level to our `geoHierarchy` object (`"county" : "*"`). It is important to use the `"*"` expression signifying that you want _all_ of the specified level of [descendants] within the geography for which you supply a coordinate. No other expression will work.
-2) Internally, the CitySDK converts the `geoHierarchy` object to an ordered set, so this part of your request object must be in descending hierarchical order from parent -> descendant. E.g. - in the above - an object that contained `{"county" : "*", "state" : {"lat" <lat> "lng" <lng>}}` will not work.
+## 👀 Caveats
+1) __Internally, the CitySDK converts the `geoHierarchy` object to an ordered set__, so this part of your request object must be in descending hierarchical order from parent -> descendant. E.g. - in the above - an object that contained `{"county" : "*", "state" : {"lat" <lat> "lng" <lng>}}` will not work.
+2) In this example, we added a second geographic level to our `geoHierarchy` object (`"county" : "*"`). It is important to use the `"*"` expression signifying that you want _all_ of the specified level of [descendants] within the geography for which you supply a coordinate. No other expression will work.
 
 [descendants]: https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf
 
