@@ -1,5 +1,7 @@
-FROM ruby:latest
+FROM ruby:2.6.5-alpine3.11
 
+RUN apk add --no-cache g++ musl-dev make git \
+	&& gem install eventmachine
 RUN mkdir /usr/app
 WORKDIR /usr/app
 
