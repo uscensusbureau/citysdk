@@ -6,12 +6,6 @@
   <head>
     {% include meta.html %} {% include styles.html %} {% if
     site.google_analytics_ua or site.dap_agency %} {% include analytics.html %}
-    {% endif %} {% if page.vue %}
-    <script
-      src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"
-      integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY="
-      crossorigin="anonymous"
-    ></script>
     {% endif %} {%if page.citysdk %}
     <script src="{{ '/assets/citysdk.js' | relative_url }}"></script>
     {% endif %} {%if page.leaflet %}
