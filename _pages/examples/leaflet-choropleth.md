@@ -197,7 +197,7 @@ grades.forEach(function(grade, i) {
     '"></i> ' +
     grades[i] +
     "%" +
-    (grades[i + 1] ? "&ndash;" + grades[i + 1] + "%" : "+") +
+    (grades[i - 1] ? "&ndash;" + grades[i - 1] + "%" : "+") +
     "<br/>";
 });
 ```
