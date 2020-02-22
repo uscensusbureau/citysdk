@@ -4,7 +4,7 @@
                                 take! put! timeout to-chan]
                         :refer-macros [go alt!]]
     [cljs.test          :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core :refer [*g* test-async Icb<==IO=fixture]
+    [test.fixtures.core :refer [GG test-async Icb<==IO=fixture]
                         :as ts]
     [census.wmsAPI.core :refer [$g$->wms-cfg
                                 lookup-id->match?
@@ -17,7 +17,7 @@
                                 I-<wms=I=]]))
 
 (deftest $g$->wms-cfg-test
-  (is (= ($g$->wms-cfg *g* ts/args-ok-wms-only)
+  (is (= ($g$->wms-cfg GG ts/args-ok-wms-only)
          {:vintage 2014,
           :layers ["82"],
           :cur-layer-idx 0,
@@ -39,20 +39,20 @@
          :consolidated-cities)))
 
 (deftest search-id->match?-test
-  (is (= (search-id->match? *g* :CONCITY)
+  (is (= (search-id->match? GG :CONCITY)
        '(:consolidated-cities))))
 
 (deftest C->GIS-url-test
-  (is (= (C->GIS-url *g* ts/args-ok-wms-only)
+  (is (= (C->GIS-url GG ts/args-ok-wms-only)
          "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/Mapserver/82/query?geometry=-80.7214,28.2639&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=pjson&outFields=STATE")))
 
 (deftest configed-map-test
-  (is (= (configed-map *g* {:STATE "51", :COUNTY "013"})
+  (is (= (configed-map GG {:STATE "51", :COUNTY "013"})
          {:STATE {:state "51"}, :COUNTY {:county "013"}})))
 
 (comment "Got by getting in response from WMS api (below converted to edn from json)"
   (configed-map
-    *g*
+    GG
     (get-in
       {:displayFieldName "BASENAME",
        :fieldAliases     {:STATE "STATE", :COUNTY "COUNTY"},
@@ -70,7 +70,7 @@
 (deftest try-census-wms-test
   (let [=O= (chan 1)]
     (test-async
-      (go (try-census-wms *g* ts/args-ok-wms-only 0 =O=)
+      (go (try-census-wms GG ts/args-ok-wms-only 0 =O=)
           (let [res (<! =O=)]
             (is (= res
                    {:STATE {:state "12"}}))
@@ -105,7 +105,7 @@
         =args=> (chan 1)]
     (test-async
       (go (>! =>args= args-in)
-          ((=>args=GIS=args=> *g*) =>args= =args=>)
+          ((=>args=GIS=args=> GG) =>args= =args=>)
           (is (= (<! =args=>)
                  args-out))
           (close! =>args=)
@@ -119,11 +119,11 @@
                  :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
         =args=> (chan 1)]
     (test-async
-      (go ((I-<wms=I= *g*) args-in =args=>)
+      (go ((I-<wms=I= GG) args-in =args=>)
           (is (= (<! =args=>)
                  {:vintage "2017",
                   :geoHierarchy {:state "51", :county "*"}}))
-          ((I-<wms=I= *g*) args-na =args=>)
+          ((I-<wms=I= GG) args-na =args=>)
           (is (= (<! =args=>)
                  "No FIPS (Census geocodes) found for given arguments"))
           (close! =args=>)))))
@@ -139,12 +139,12 @@
                           (reset! $r$ err)
                           (reset! $r$ O)))]
       (test-async
-        (go ((censusWMS *g*) args-in tcb)
+        (go ((censusWMS GG) args-in tcb)
             (<! (timeout 1000))
             (is (= @$r$
                    {:vintage "2017",
                     :geoHierarchy {:state "51", :county "*"}}))
-            ((censusWMS *g*) args-na tcb)
+            ((censusWMS GG) args-na tcb)
             (<! (timeout 1000))
             (is (= @$r$
                    "No FIPS (Census geocodes) found for given arguments"))))))
