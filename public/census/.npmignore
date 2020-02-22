@@ -1,2 +1,4 @@
 test/
+node_modules/
+*.md
 census.js.map
