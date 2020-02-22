@@ -11,7 +11,7 @@
 
 (def stats-key (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
 ;(prn stats-key)
-(def *g* (read-edn "./src/configs/geojson/index.edn"))
+(def GG (read-edn "./src/configs/geojson/index.edn"))
 
 (defn time-spot [] (js/Date.))
 

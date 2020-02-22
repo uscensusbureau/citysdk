@@ -3,7 +3,7 @@
     [cljs.core.async      :refer [chan close! >! <! timeout to-chan promise-chan]
                           :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [*g* test-async test-async-timed
+    [test.fixtures.core   :refer [GG test-async test-async-timed
                                   time-spot heap-spot]]
     [census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
     [census.statsAPI.core :refer [cfg>cfg=C-Stats]]
@@ -282,7 +282,7 @@
                 =O=    (chan 1)
                 =E=    (chan 1)]
             (>! =args= args-4)
-            ((I=OE-M-spooler *g* =args= [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ]) =O= =E=)
+            ((I=OE-M-spooler GG =args= [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ]) =O= =E=)
             (is (= (alt! =O= ([data] data)
                          =E= ([err]  err))
                    JSON-school-secondary))
@@ -330,7 +330,7 @@
                 =O=    (chan 1)
                 =E=    (chan 1)]
             (>! =args= args-2)
-            ((I=OE-M-spooler *g* =args= [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ ]) =O= =E=)
+            ((I=OE-M-spooler GG =args= [cfg>cfg=C-Stats cfg>cfg=C-GeoCLJ ]) =O= =E=)
             (alt! =O= ([data] (prn data))
                   =E= ([err]  (prn err)))
             (close! =args=)
