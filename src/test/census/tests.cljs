@@ -3,7 +3,7 @@
     [cljs.core.async      :refer [chan close! >! <! timeout to-chan promise-chan]
                           :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [*g* test-async test-async-timed
+    [test.fixtures.core   :refer [GG test-async test-async-timed
                                   time-spot heap-spot]
                           :as ts]
     [census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
@@ -217,13 +217,13 @@
                                         "E_COMMODITY" "0*"}}
                  js/console.log)
 
-(test-async-time #js {"vintage" 2017,
+(test-async-time #js {"vintage" 2018,
                       "geoHierarchy"
                         #js {"state" #js {"lat" 28.466944,
                                           "lng" -82.498148},
                              "county" "*"},
-                      ;"geoResolution" "5m",
-                      "sourcePath" #js["acs", "acs5", "subject"],
-                      "values" #js ["S0102_C01_001E", "S0102_C02_001E"],
+                      "geoResolution" "500k",
+                      "sourcePath" #js["acs", "acs5",]
+                      "values" #js ["NAME"],
                       "statsKey" "3c04140849164b373c8b1da7d7cc8123ef71b7ab"}
                  prn)

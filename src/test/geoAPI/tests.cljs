@@ -3,7 +3,7 @@
     [cljs.core.async    :refer [chan close! >! <! timeout to-chan]
                         :refer-macros [go alt!]]
     [cljs.test          :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core :refer [*g* test-async test-async-timed
+    [test.fixtures.core :refer [GG test-async test-async-timed
                                 time-spot heap-spot]]
     [census.geoAPI.core :refer [G-err
                                 G-pattern->url
@@ -36,7 +36,7 @@
   (let [vin 2022
         res "500k"
         lev :county]
-    (is (= (G-err *g* res vin lev)
+    (is (= (G-err GG res vin lev)
            ["No GeoJSON found for county at this scope" "in vintage: 2022" "at resolution: 500k" "For :county try one of the following `{:<vintage> {:<scopes> ...`"
             [{:2017 {:us ["5m" "20m" "500k"], :st nil},
               :2016 {:us ["5m" "20m" "500k"], :st nil},
@@ -64,11 +64,11 @@
         USr ["5m" "20m" "500k"]
         STr nil
         st "01"]
-    (is (= (scope *g* res vin lev USr)
+    (is (= (scope GG res vin lev USr)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))
-    (is (= (scope *g* res vin lev USr STr)
+    (is (= (scope GG res vin lev USr STr)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))
-    (is (= (scope *g* res vin lev USr STr st)
+    (is (= (scope GG res vin lev USr STr st)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))))
 
 (deftest lg-warn->geo-test ;; TESTS SIDE EFFECT: Logs warning to console
@@ -78,18 +78,18 @@
         USr ["5m" "20m" "500k"]
         STr nil
         st "01"]
-    (is (= (big-G *g* res vin lev USr STr st)
+    (is (= (big-G GG res vin lev USr STr st)
            "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/county.json"))))
 
 (deftest geo-pattern-maker-test
-  (is (= (G-pattern-cfg *g* TEST-ARGS-1)
+  (is (= (G-pattern-cfg GG TEST-ARGS-1)
          ["500k" "2016" "12"
           [:state-legislative-district-_upper-chamber_ "*"]
           {:us nil,
            :st ["500k"]}])))
 
 (deftest geo-url-composer-test
-  (is (= (C-G-pattern->url *g* TEST-ARGS-1)
+  (is (= (C-G-pattern->url GG TEST-ARGS-1)
          "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/12/state-legislative-district-_upper-chamber_.json")))
 
 (def TEST-ARGS-2
@@ -110,7 +110,7 @@
       "IOE-census-GeoJSON-test"
       time-in
       heap-in
-      (go ((IOE-C-GeoJSON *g*) (to-chan [TEST-ARGS-2]) =O= =E=)
+      (go ((IOE-C-GeoJSON GG) (to-chan [TEST-ARGS-2]) =O= =E=)
           (is (= (alt! =O= ([O] O)
                        =E= ([E] (do (prn "Error:")
                                     E)))
@@ -119,7 +119,7 @@
           (close! =E=)))))
 
 (deftest ids<-$g$<-args-test
-  (is (= (GEOIDS<-$g$+args *g* TEST-ARGS-2)
+  (is (= (GEOIDS<-$g$+args GG TEST-ARGS-2)
          '(:GEOID))))
 
 
@@ -158,7 +158,7 @@
                       :AWATER 9727071}}}])
 
 (deftest xf-mergeable-features-test
-  (is (= (transduce (xf-mergeable-features *g* TEST-ARGS-2)
+  (is (= (transduce (xf-mergeable-features GG TEST-ARGS-2)
                     conj
                     (get GEOJSON-2 :features))
          GEOJSON-4-MERGE)))
@@ -206,7 +206,7 @@
                                               :coordinates [[[999 0]]]}}})])
 
 (deftest xf-mergeable<-GeoCLJS-test
-  (is (= (transduce (xf-mergeable<-GeoCLJS *g* TEST-ARGS-2)
+  (is (= (transduce (xf-mergeable<-GeoCLJS GG TEST-ARGS-2)
                     conj
                     GEOJSON-SMALL)
          actual-nested->)))
@@ -261,7 +261,7 @@
       time-in
       heap-in
       (go (>! =args= args-1)
-          ((=cfg=C-GeoCLJ *g*) =args= =cfg=)
+          ((=cfg=C-GeoCLJ GG) =args= =cfg=)
           (let [{:keys [url xform getter filter-id]} (<! =cfg=)]
             (is (= url
                    "https://raw.githubusercontent.com/loganpowell/census-geojson/master/GeoJSON/500k/2016/01/tract.json"))

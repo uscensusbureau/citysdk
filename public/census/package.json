@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "xmlhttprequest": "^1.8.0",
-    "xregexp": "^4.2.0"
+    "xregexp": "^4.3.0"
   },
   "author": "Logan Powell",
   "license": "MIT",
