@@ -1,7 +1,6 @@
 (ns configs.geojson.core
   (:require
-    [cljs.core.async           :refer [>! <! chan promise-chan close! take! put!
-                                       pipeline-async]
+    [cljs.core.async           :refer [>! <! chan promise-chan close! take! put! pipeline-async]
                                :refer-macros [go go-loop]]
     [cuerdas.core              :refer [join]
                                :as s]
@@ -10,9 +9,10 @@
     [cljs-promises.async       :refer [value-port]] ; Fixme: Need this dependecy -< move configs to separate project
     [census.utils.core         :refer [map-target error err-type]]
     [configs.utils.fixtures    :refer [read-edn FileSaver]]
-    [configs.geojson.filepaths :as geos]
-    [configs.geojson.filepaths_abv :as geos_abv]
-    [configs.geojson.filepaths_2018 :as geos_2018]
+    ;[configs.geojson.filepaths :as geos]
+    ;[configs.geojson.filepaths_abv :as geos_abv]
+    ;[configs.geojson.filepaths_2018 :as geos_2018]
+    [configs.geojson.filepaths_2019 :as geos_2019]
     ["fs" :as fs]
     ;["path" :as path]
     ["shpjs" :as shpjs]
@@ -242,7 +242,7 @@
   ;; => "500k/2012/congressional-district.json"
 
   (filename->>geopath "cb_2013_01_cousub_500k.zip"))
-  ;; => "500k/2012/congressional-district.json"
+;; => "500k/2012/congressional-district.json"
 
 
 ;            ,e,                     888 ,e,
@@ -298,7 +298,7 @@
 
 #_(let [c (chan 1)]
     (go (fsR-file->put!
-          "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"
+          "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"
           c)
         (prn (<! c))))
 
@@ -329,8 +329,8 @@
   (prn (str "zip->json'ing..."))
   (take! (value-port (shpjs val))
          (fn [res] (put! =port=
-                            (js/JSON.stringify res)
-                            #(close! =port=)))))
+                         (js/JSON.stringify res)
+                         #(close! =port=)))))
 
 ;; Examples ========================================
 
@@ -338,7 +338,7 @@
         =json= (chan 1)]
     (go (fsR-file->put!
           ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-          "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"
+          "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"
           =zip=)
         (pipeline-async 1 =json= zip->geojson->put! =zip=)
         (js/console.log (<! =json=))))
@@ -422,23 +422,23 @@
   "
   [=path=]
   (go-loop []
-    (let [path (<! =path=)]
-      (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-        (let [=test-path= (chan 1)]
-          (do (fsCheck->put! filepath =test-path=)
-              (if (not= "there" (<! =test-path=))
-                  (let [=zip=  (chan 1)
-                        =json= (chan 1 (x-geojson-config directory filepath))]
-                    (do (fsR-file->put! path =zip=)
-                        (pipeline-async 1 =json= zip->geojson->put! =zip=)
-                        (FileSaver (<! =json=))
-                        (recur)))
-                  (do (prn (str "File already exists: " path))
-                      (recur)))))
-        (do (prn (str "No :geoKeyMap match found for: " path))
-            (recur))))))
+           (let [path (<! =path=)]
+             (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+               (let [=test-path= (chan 1)]
+                 (do (fsCheck->put! filepath =test-path=)
+                     (if (not= "there" (<! =test-path=))
+                         (let [=zip=  (chan 1)
+                               =json= (chan 1 (x-geojson-config directory filepath))]
+                           (do (fsR-file->put! path =zip=)
+                               (pipeline-async 1 =json= zip->geojson->put! =zip=)
+                               (FileSaver (<! =json=))
+                               (recur)))
+                         (do (prn (str "File already exists: " path))
+                             (recur)))))
+               (do (prn (str "No :geoKeyMap match found for: " path))
+                   (recur))))))
 
-;(let [path "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"]
+;(let [path "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"]
 ;  (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
 ;    (prn (str "Already existing directory: " directory " Filepath: " filepath))
 ;    (let [=test-path= (chan 1)
@@ -448,7 +448,7 @@
 ;        (prn (str "There"))))))
 ;
 ;(let [=c= (chan 1)]
-;  (go (>! =c= "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip")
+;  (go (>! =c= "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip")
 ;      (=>read=>convert=>write=>loop =c=)
 ;      (close! =c=)))
 
@@ -477,9 +477,9 @@
   (let [=path= (chan 1)]
     (=>read=>convert=>write=>loop =path=)
     (go (if (= nil (doseq [path paths-vec] (>! =path= path)))
-            (js/console.log "\n ======================== \n
+          (js/console.log "\n ======================== \n
                                 \n === FINISHED PARSING === \n
                                 \n === Wrapping up .... === \n
                                 \n ======================== \n")))))
 
-;(batch=>zip-paths=>convert=>geojson geos_2018/paths)
+(batch=>zip-paths=>convert=>geojson geos_2019/paths)

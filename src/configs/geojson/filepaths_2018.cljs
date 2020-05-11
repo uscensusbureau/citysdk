@@ -561,6 +561,4 @@
    "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_us_state_500k.zip",
    "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_us_state_5m.zip",
    "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_us_ua10_500k.zip",
-   "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_us_zcta510_500k.zip",
-   "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\paths.txt",
-   "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\paths_full.txt"])
+   "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_us_zcta510_500k.zip"])
