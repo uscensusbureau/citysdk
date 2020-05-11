@@ -16,6 +16,7 @@
 
 
 (comment
+  (shadow.cljs.devtools.api/node-repl)
   ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=4096"]}))
 ;; or in Node: node --max-old-space-size=4096
@@ -227,3 +228,12 @@
                       "values" #js ["NAME"],
                       "statsKey" "3c04140849164b373c8b1da7d7cc8123ef71b7ab"}
                  prn)
+
+(test-async-time #js {
+                      "vintage" 2016,
+                      "geoHierarchy" #js { "state" #js { "lat" 40.741919 "lng" -73.875504}
+                                           "county" "*"}
+                      "sourcePath" #js ["acs", "acs5"]
+                      "values" #js ["B00001_001E", "B01001_001E", "B08303_001E"]
+                      "geoResolution" "500k"}
+                 js/console.log)

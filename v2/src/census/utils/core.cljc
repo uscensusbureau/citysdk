@@ -16,6 +16,21 @@
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
 ;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
 
+(def isNode
+  "returns false if environment is not Node"
+  (and (exists? js/process)
+       (exists? js/process.versions)
+       (exists? js/process.versions.node)))
+
+;(prn js/process.versions.node)
+
+(def cors-proxy
+  "URL proxy string prereq if not node"
+  (cond isNode ""
+        :else "https://cors-e.herokuapp.com/"))
+
+;(prn cors-proxy)
+
 ;TODO
 (def base-url-database "...")
 
@@ -139,7 +154,7 @@
                                                   " for: " url))
                                      (put! =err=))))
                           :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                     CORS-URL (str "https://cors-e.herokuapp.com/" url)]
+                     CORS-URL (str cors-proxy url)]
                  (case format
                    :json
                    (let [json

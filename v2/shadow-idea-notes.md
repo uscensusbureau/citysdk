@@ -11,3 +11,9 @@
 8) watch build with `(shadow/watch :<build name>)` in REPL (<build name> comes from `shadow-cljs.edn` under `:builds`)
 9) in REPL `(shadow.cljs.devtools.api/node-repl)` (or other if for figwheel or lein, etc.)
 10) whenever dependencies change in `shadow-cljs.edn` file, `shadow-cljs pom` in terminal to keep dependencies synced up
+
+## For CLJS projects with shadow-cljs in VSCode
+
+1) Install "Calva" Plugin
+2) use ctrl/cmd+shift+p (command selector menu): choose Calva: Start a Project REPL and Connect (aka jack-in)
+3) 
