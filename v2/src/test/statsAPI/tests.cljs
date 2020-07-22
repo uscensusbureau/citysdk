@@ -10,7 +10,7 @@
                                    xf-'key'<w-stat
                                    xf-stats->js
                                    xf-mergeable<-stats
-                                   ;IOE-C->stats
+                                ;;   IOE-C->stats
                                    IOE-C-S->JS
                                    =cfg=C-Stats]]))
 
@@ -40,10 +40,9 @@
   (is (= (->valid#?-># "-666666666.0000")
          "NAN: -666666666"))
   (is (= (->valid#?-># "0")
-         "0"))
+         0))
   (is (= (->valid#?-># "01")
          "01")))
-
 
 (deftest xf!-csv->clj-test
   (let [args {:values     ["B01001_001E" "NAME"]
@@ -76,17 +75,22 @@
              #js {:B01001_001E 3111, :B01001_001M 222, :state "21", :county "0223", :tract "000100"})))))
 
 (deftest xf-geoid+<-stat-test
-  (let [input '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
+  (let [input '({:B01001_001E 55049,:state "01", :B01001_001M -555555555,  :county "001"}
                 {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
                 {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
                 {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
                 {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"})]
-       (is (= (transduce (xf-'key'<w-stat 2) conj input)
+       (is (= (transduce (xf-'key'<w-stat {:state "01" :county "*"}) conj input)
               [{"01001" {:properties {:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}}}
                {"01003" {:properties {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}}}
                {"01005" {:properties {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}}}
                {"01007" {:properties {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}}}
                {"01009" {:properties {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"}}}]))))
+
+;;(prn (let [geo {:state "01" :county "200" :tract "*"}
+;;           inp {:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001" :tract "001"}] 
+;;       (apply str (map #(get inp %) (vec (keys geo))))))
+    ;;   (get-in inp []:state))))
 
 (deftest xf-stats-mergeable-test
   (let [args {:vintage      "2016"
@@ -113,31 +117,31 @@
                 :county "073"
                 :tract "000100"}}})))))
 
-(def ARGS-2 {:vintage      "2017"
-             :sourcePath   ["acs" "acs1"]
-             :geoHierarchy {:state "44" :county "*"}
-             :values       ["B01001_001E" "B01001_001M"]})
+ (def ARGS-2 {:vintage      "2017"
+              :sourcePath   ["acs" "acs1"]
+              :geoHierarchy {:state "44" :county "*"}
+              :values       ["B01001_001E" "B01001_001M"]})
 
-(deftest IOE-C->stats-test
-  (let [=I= (chan 1)
-        =O= (chan 1)
-        =E= (chan 1)
-        time-in (js/Date.)]
-    (test-async-timed
-      "IOE-C->stats-test"
-      time-in
-      (go (>! =I= ARGS-2)
-          (IOE-C->stats =I= =O= =E=)
-          (is (= (alt! =O= ([res] res)
-                       =E= ([err] err))
-                 [["B01001_001E" "B01001_001M" "state" "county"]
-                  ["163760" "-555555555" "44" "003"]
-                  ["83460" "-555555555" "44" "005"]
-                  ["637357" "-555555555" "44" "007"]
-                  ["126150" "-555555555" "44" "009"]]))
-          (close! =I=)
-          (close! =O=)
-          (close! =E=)))))
+;; (deftest IOE-C->stats-test
+;;   (let [=I= (chan 1)
+;;         =O= (chan 1)
+;;         =E= (chan 1)
+;;         time-in (js/Date.)]
+;;     (test-async-timed
+;;      "IOE-C->stats-test"
+;;      time-in
+;;      (go (>! =I= ARGS-2)
+;;          (IOE-C->stats =I= =O= =E=)
+;;          (is (= (alt! =O= ([res] res)
+;;                       =E= ([err] err))
+;;                 [["B01001_001E" "B01001_001M" "state" "county"]
+;;                  ["163760" "-555555555" "44" "003"]
+;;                  ["83460" "-555555555" "44" "005"]
+;;                  ["637357" "-555555555" "44" "007"]
+;;                  ["126150" "-555555555" "44" "009"]]))
+;;          (close! =I=)
+;;          (close! =O=)
+;;          (close! =E=)))))
 
 (deftest IOE-C-S->JS-test
   (let [=I= (chan 1)
