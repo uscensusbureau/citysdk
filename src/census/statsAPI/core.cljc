@@ -1,16 +1,16 @@
 (ns census.statsAPI.core
   (:require
-    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! to-chan
-                                        pipe timeout put!]
-                                :refer-macros [go alt!]]
-       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! to-chan
-                                        pipe timeout put! go alt!]])
-    [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
-    [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
-                                transduct<<
-                                amap-type vec-type throw-err map-idcs-range
-                                keys->strs ->args strs->keys
-                                URL-WMS URL-STATS]]))
+   #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! to-chan
+                                       pipe timeout put!]
+             :refer-macros [go alt!]]
+      :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! to-chan
+                                       pipe timeout put! go alt!]])
+   [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
+   [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
+                               transduct<<
+                               amap-type vec-type throw-err map-idcs-range
+                               keys->strs ->args strs->keys
+                               URL-WMS URL-STATS]]))
 
 (defn kv-pair->str [[k v] separator]
   "Takes a key and a value and converts it to a string concatenated together with
@@ -33,10 +33,10 @@
            "")
          (if (not (nil? geoHierarchy))
            (keys->strs
-             (if (= 1 (count geoHierarchy))
-               (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-               (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
-                    "&for=" (kv-pair->str (last geoHierarchy) ":"))))
+            (if (= 1 (count geoHierarchy))
+              (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
+              (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
+                   "&for=" (kv-pair->str (last geoHierarchy) ":"))))
            "")
          (if (not (nil? statsKey))
            (str "&key=" statsKey)))
@@ -80,24 +80,24 @@
   [{:keys [values predicates]}]
   (let [parse-range [0 (+ (count values) (count predicates))]]
     (xf!<<
-      (fn [state rf acc this]
-        (let [prev @state]
-          (if (nil? prev)
-            (do (vreset! state (mapv strs->keys this))
-                nil)
-            (rf acc
-                (zipmap (mapv keyword @state)
-                        (map-idcs-range ->valid#?->#
-                                        parse-range
-                                        this)))))))))
+     (fn [state rf acc this]
+       (let [prev @state]
+         (if (nil? prev)
+           (do (vreset! state (mapv strs->keys this))
+               nil)
+           (rf acc
+               (zipmap (mapv keyword @state)
+                       (map-idcs-range ->valid#?->#
+                                       parse-range
+                                       this)))))))))
 
 (defn xf-stats->js
   "Transducer, which converts results from the 'raw' Census statistical API into
   JSON (objects instead of nested arrays) with correctly parsed numbers"
   [args]
   (comp
-    (xf!-CSV->CLJ args)
-    (map #(clj->js % :keywordize-keys true))))
+   (xf!-CSV->CLJ args)
+   (map #(clj->js % :keywordize-keys true))))
 
 (def $url$ (atom ""))
 (def $res$ (atom []))
@@ -120,14 +120,14 @@
   from Census API translated into a more verbose, but accurately typed format."
   [=I= =O= =E=]
   (take! =I=
-    (fn [args]
-      (let [url    (C-S-args->url args)
-            =JSON= (chan 1 (comp (educt<< (xf-stats->js args))
-                                 (map to-array)))]
-        (if (= "" url)
-            (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
-            (do ($GET$-C-stats (to-chan [url]) =JSON= =E=)
-                (pipe =JSON= =O=)))))))
+         (fn [args]
+           (let [url    (C-S-args->url args)
+                 =JSON= (chan 1 (comp (educt<< (xf-stats->js args))
+                                      (map to-array)))]
+             (if (= "" url)
+               (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
+               (do ($GET$-C-stats (to-chan [url]) =JSON= =E=)
+                   (pipe =JSON= =O=)))))))
 
 
 ;      e            888                       d8
@@ -139,6 +139,23 @@
 ;                                 888
 
 
+;; FIXME: take geoHierachy arg keys and pull the values out in order, then to str
+;;(defn xf-'key'<w-stat
+;;  "
+;;  Takes an integer argument denoting the number of stat vars the user requested.
+;;  Returns a function of one item (from the Census API response
+;;  collection) to a new map with a hierarchy that will enable deep-merging of
+;;  the stats with a GeoJSON `feature`s `:properties` map.
+;;  "
+;;  [vars#]
+;;  (xf<< (fn [rf acc this]
+;;          (rf acc {(apply str (vals (take-last (- (count this) vars#) this)))
+;;                   {:properties this}}))))
+
+;;  (xf<< (fn [rf acc this]
+;;          (rf acc {(apply str (vals (get (- (count this) vars#) this)))
+;;                   {:properties this}}))))
+;;                   
 (defn xf-'key'<w-stat
   "
   Takes an integer argument denoting the number of stat vars the user requested.
@@ -146,39 +163,44 @@
   collection) to a new map with a hierarchy that will enable deep-merging of
   the stats with a GeoJSON `feature`s `:properties` map.
   "
-  [vars#]
+  [geo]
   (xf<< (fn [rf acc this]
-          (rf acc {(apply str (vals (take-last (- (count this) vars#) this)))
+          (rf acc {(apply str (map #(get this %) (vec (keys geo))))
                    {:properties this}}))))
 
+;;(let [input '({:B01001_001E 55049,:state "01", :B01001_001M -555555555, :county "001"}
+;;                {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
+;;                {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
+;;                {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
+;;                {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"})]
+;;       (transduce (xf-'key'<w-stat {:state "01" :county "001"}) conj input))
 ;; Examples ==============================
 
 (defn xf-mergeable<-stats
   "Takes users' arguments and returns a composed transducer, which converts
   the results from the Census API into a shape that allows it to be merged
   together with other data."
-  [args vars#]
+  [args geo]
   (comp
-    (xf!-CSV->CLJ args)
-    (xf-'key'<w-stat vars#)))
+   (xf!-CSV->CLJ args)
+   (xf-'key'<w-stat geo)))
 
 
 (defn =cfg=C-Stats
   "Internal function for calling Census Stats API"
   [=args= =cfg=]
   (take! =args=
-    (fn [args]
-      (let [vars# (+ (count (get args :values))
-                     (count (get args :predicates)))
-            url   (C-S-args->url args)
-            xform (educt<< (xf-mergeable<-stats args vars#))
-            s-key (keyword (first (get args :values)))]
-        (if (= "" url)
-            (put! =cfg= "Invalid Census Statistics request. Please check arguments against requirements.")
-            (put! =cfg= {:url       url
-                         :xform     xform
-                         :getter    $GET$-C-stats
-                         :filter-id s-key}))))))
+         (fn [args]
+           (let [geo (get args :geoHierarchy)
+                 url   (C-S-args->url args)
+                 xform (educt<< (xf-mergeable<-stats args geo))
+                 s-key (keyword (first (get args :values)))]
+             (if (= "" url)
+               (put! =cfg= "Invalid Census Statistics request. Please check arguments against requirements.")
+               (put! =cfg= {:url       url
+                            :xform     xform
+                            :getter    $GET$-C-stats
+                            :filter-id s-key}))))))
 
 
 (def cfg>cfg=C-Stats [=cfg=C-Stats false])
