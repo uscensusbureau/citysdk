@@ -1,4 +1,4 @@
-# CitySDK v2.1
+# CitySDK v2
 
 #### Thank You's due to some very generous Clojurians:
 
