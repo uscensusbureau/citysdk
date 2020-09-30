@@ -2288,7 +2288,7 @@ SHADOW_IMPORT("ajax.core.js");
 SHADOW_IMPORT("census.utils.core.js");
 SHADOW_IMPORT("shadow.js.shim.module$fs.js");
 SHADOW_IMPORT("shadow.js.shim.module$mkdirp.js");
-SHADOW_IMPORT("configs.utils.fixtures.js");
+SHADOW_IMPORT("configs.utils.core.js");
 SHADOW_IMPORT("configs.geojson.filepaths_2019.js");
 SHADOW_IMPORT("shadow.js.shim.module$shpjs.js");
 SHADOW_IMPORT("configs.geojson.core.js");

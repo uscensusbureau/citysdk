@@ -1,6 +1,6 @@
 (ns test.census.tests
   (:require
-    [cljs.core.async      :refer [chan close! >! <! timeout to-chan promise-chan]
+    [cljs.core.async      :refer [chan close! >! <! timeout to-chan! promise-chan]
                           :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core   :refer [GG test-async test-async-timed

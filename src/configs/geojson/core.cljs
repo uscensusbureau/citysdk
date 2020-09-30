@@ -1,27 +1,32 @@
 (ns configs.geojson.core
   (:require
-    [cljs.core.async           :refer [>! <! chan promise-chan close! take! put! pipeline-async]
-                               :refer-macros [go go-loop]]
-    [cuerdas.core              :refer [join]
-                               :as s]
-    [clojure.set               :refer [map-invert]]
-    [defun.core                :refer-macros [defun]]
-    [cljs-promises.async       :refer [value-port]] ; Fixme: Need this dependecy -< move configs to separate project
-    [census.utils.core         :refer [map-target error err-type]]
-    [configs.utils.fixtures    :refer [read-edn FileSaver]]
-    ;[configs.geojson.filepaths :as geos]
-    ;[configs.geojson.filepaths_abv :as geos_abv]
-    ;[configs.geojson.filepaths_2018 :as geos_2018]
-    [configs.geojson.filepaths_2019 :as geos_2019]
-    ["fs" :as fs]
-    ;["path" :as path]
-    ["shpjs" :as shpjs]
-    ["mkdirp" :as mkdirp]))
+     [cljs.core.async           :refer [>! <! chan promise-chan close! take! put! pipeline-async]
+                                :refer-macros [go go-loop]]
+     [cuerdas.core              :refer [join]
+                                :as s]
+     [clojure.set               :refer [map-invert]]
+     [defun.core                :refer-macros [defun]]
+     [configs.promised.async    :refer [value-port]] ; Fixme: Need this dependency -< move configs to separate project
+     [census.utils.core         :refer [map-target error err-type]]
+     [clojure.reader           :refer [read-string]]
+     [configs.utils.core        :refer [read-edn FileSaver]]
+     [configs.geojson.filepaths2018 :refer [paths]]
+     ;[configs.geojson.filepaths :refer [paths]]
+     ;[configs.geojson.filepathsabv :as geos_abv]
+     ;[configs.geojson.filepaths2019 :refer [paths]]
+     ;["path" :as path]
+     ["fs" :as fs]
+     ["shpjs" :as shpjs]
+     ["mkdirp" :as mkdirp]))
+
+
+(prn "hello")
+
 
 (def geoKeyMap (read-edn "./src/configs/geojson/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+;;(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
 
 
 ;; ,e,   d8                                888                               888
@@ -360,11 +365,12 @@
 ;;   /  Y88b       888    '88_-~  888    888  888  888
 
 
-(defn transducified [f]
+(defn transducified
   "
   A function that takes a standard function (taking a single argument) and
   augments it with the structure of a transducer function.
   "
+  [f]
   (fn [rf]
     (fn
       ([] (rf))
@@ -482,4 +488,4 @@
                                 \n === Wrapping up .... === \n
                                 \n ======================== \n")))))
 
-(batch=>zip-paths=>convert=>geojson geos_2019/paths)
+(batch=>zip-paths=>convert=>geojson paths)

@@ -1,7 +1,7 @@
 (ns test.wmsAPI.tests
   (:require
     [cljs.core.async    :refer [chan promise-chan close! >! <! pipeline
-                                take! put! timeout to-chan]
+                                take! put! timeout to-chan!]
                         :refer-macros [go alt!]]
     [cljs.test          :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core :refer [GG test-async Icb<==IO=fixture]
