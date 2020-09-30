@@ -1,4 +1,4 @@
-(ns configs.geojson.filepaths_2019)
+(ns configs.geojson.filepaths2019)
 
 (def paths
   [

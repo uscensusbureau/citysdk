@@ -1,9 +1,9 @@
 (ns census.statsAPI.core
   (:require
-   #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! to-chan
+   #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! to-chan!
                                        pipe timeout put!]
              :refer-macros [go alt!]]
-      :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! to-chan
+      :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! to-chan!
                                        pipe timeout put! go alt!]])
    [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
    [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
@@ -113,7 +113,7 @@
 ;            url  (C-S-args->url args)]
 ;        (if (= "" url)
 ;            (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
-;            ($GET$-C-stats (to-chan [url]) =O= =E=)))))
+;            ($GET$-C-stats (to-chan! [url]) =O= =E=)))))
 
 (defn IOE-C-S->JS
   "Internal function for calling the Census API using a Clojure Map. Returns stats
@@ -126,7 +126,7 @@
                                       (map to-array)))]
              (if (= "" url)
                (put! =E= "Invalid Census Statistics request. Please check arguments against requirements.")
-               (do ($GET$-C-stats (to-chan [url]) =JSON= =E=)
+               (do ($GET$-C-stats (to-chan! [url]) =JSON= =E=)
                    (pipe =JSON= =O=)))))))
 
 

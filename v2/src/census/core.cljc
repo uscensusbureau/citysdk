@@ -1,6 +1,6 @@
 (ns census.core
   (:require
-    [cljs.core.async      :refer [chan close! to-chan take! put! promise-chan]]
+    [cljs.core.async      :refer [chan close! to-chan! take! put! promise-chan]]
     #?(:cljs [defun.core   :refer-macros [defun]]
        :clj [defun.core   :refer [defun]])
     [census.utils.core    :refer [throw-err err-type =O?>-cb ->args args->
@@ -42,11 +42,11 @@
           (prn deploy)
           (case deploy
             :stats+geos ((I=OE-M-spooler $g$
-                           (to-chan [args])
+                           (to-chan! [args])
                            [cfg>cfg=C-GeoCLJ cfg>cfg=C-Stats])
                          =O= =E=)
-            :stats-only (IOE-C-S->JS (to-chan [args]) =O= =E=)
-            :geos-only  ((IOE-C-GeoJSON $g$) (to-chan [args]) =O= =E=)
+            :stats-only (IOE-C-S->JS (to-chan! [args]) =O= =E=)
+            :geos-only  ((IOE-C-GeoJSON $g$) (to-chan! [args]) =O= =E=)
             :geocodes   (put! =O= (args-> args))
             :no-values  (put! =E= err-no-vals)
             (prn "No matching clause for the arguments provided."
@@ -60,7 +60,7 @@
 
 (def =GKM= (promise-chan))
 
-($GET$-GeoKeyMap (to-chan [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
+($GET$-GeoKeyMap (to-chan! [URL-GEOKEYMAP]) =GKM= (chan 1 (map throw-err)) :silent)
 
 (defn census
   "Provides a Node.js conventional synchronous and callback [function(error, result)]
@@ -75,7 +75,7 @@
         (take! =args=>
           (fn [?args]
             (if (= (type ?args) amap-type)
-                (do ((IOE-Census $g$) (to-chan [?args]) =O= =E=)
+                (do ((IOE-Census $g$) (to-chan! [?args]) =O= =E=)
                     (take! =E= (fn [e] (cb e nil)))
                     (take! =O= (fn [r] (cb nil r))))
                 (cb ?args nil))))))))

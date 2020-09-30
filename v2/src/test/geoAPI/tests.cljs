@@ -1,6 +1,6 @@
 (ns test.geoAPI.tests
   (:require
-    [cljs.core.async    :refer [chan close! >! <! timeout to-chan]
+    [cljs.core.async    :refer [chan close! >! <! timeout to-chan!]
                         :refer-macros [go alt!]]
     [cljs.test          :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core :refer [GG test-async test-async-timed
@@ -110,7 +110,7 @@
       "IOE-census-GeoJSON-test"
       time-in
       heap-in
-      (go ((IOE-C-GeoJSON GG) (to-chan [TEST-ARGS-2]) =O= =E=)
+      (go ((IOE-C-GeoJSON GG) (to-chan! [TEST-ARGS-2]) =O= =E=)
           (is (= (alt! =O= ([O] O)
                        =E= ([E] (do (prn "Error:")
                                     E)))

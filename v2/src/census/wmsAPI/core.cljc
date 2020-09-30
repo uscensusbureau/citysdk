@@ -1,9 +1,9 @@
 (ns census.wmsAPI.core
   (:require
-    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
+    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan!
                                         timeout]
                                 :refer-macros [go alt!]]
-       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan
+       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan!
                                         timeout go alt!]])
     ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
     ;                            :refer-macros [select transform traverse setval]]
@@ -133,7 +133,7 @@
   [$g$ args server-idx =res=]
   (let [=args=> (chan 1 (map #(configed-map $g$ (get-in % [:features 0 :attributes]))))
         url (C->GIS-url $g$ args server-idx)]
-    ($GET$-wms (to-chan [url]) =args=> =args=>)
+    ($GET$-wms (to-chan! [url]) =args=> =args=>)
     (take! =args=> (fn [args->] (do (put! =res= args->)
                                     (close! =args=>))))))
 
@@ -193,5 +193,5 @@
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [I =args=>]
-    ((=>args=GIS=args=> $g$) (to-chan [(->args I)]) =args=>)))
+    ((=>args=GIS=args=> $g$) (to-chan! [(->args I)]) =args=>)))
 

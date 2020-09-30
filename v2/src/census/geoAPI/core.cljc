@@ -1,8 +1,8 @@
 (ns census.geoAPI.core
   (:require
-    #?(:cljs [cljs.core.async   :refer [chan close! to-chan onto-chan take! put!
+    #?(:cljs [cljs.core.async   :refer [chan close! to-chan! onto-chan! take! put!
                                         promise-chan pipeline pipe]]
-       :clj [clojure.core.async :refer [chan close! to-chan onto-chan take! put!
+       :clj [clojure.core.async :refer [chan close! to-chan! onto-chan! take! put!
                                         promise-chan pipeline pipe]])
     [cuerdas.core       :refer [join]]
     #?(:cljs [defun.core :refer-macros [defun]]
@@ -118,7 +118,7 @@
               =str= (chan 1 (map js/JSON.parse))]
           (if (= "" url)
               (put! =E= "Invalid GeoJSON request. Please check arguments against requirements.")
-              (do ($GET$-C-GeoJSON (to-chan [url]) =str= =E=)
+              (do ($GET$-C-GeoJSON (to-chan! [url]) =str= =E=)
                   (pipe =str= =O=))))))))
 
 

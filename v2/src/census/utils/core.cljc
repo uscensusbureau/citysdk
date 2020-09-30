@@ -4,10 +4,10 @@
     [cuerdas.core        :as s]
     [cljs.reader         :refer [read-string]]
     #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
-                                        onto-chan to-chan]
+                                        onto-chan! to-chan!]
                                 :refer-macros [go go-loop alt!]]
        :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
-                                        onto-chan to-chan go go-loop alt!]])
+                                        onto-chan! to-chan! go go-loop alt!]])
     [clojure.walk         :refer [keywordize-keys]]))
 
 (def URL-STATS "https://api.census.gov/data/")
