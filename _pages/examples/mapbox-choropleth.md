@@ -6,9 +6,9 @@ permalink: /examples/mapbox-choropleth/
 layout: post
 ---
 
-This example shows how to setup a choropleth map using mapbo. The data used is the [GINI Index of all US Counties](https://www.census.gov/topics/income-poverty/income-inequality/about/metrics/gini-index.html){:target="\_blank"} from ACS 5-year (2017). Mapbox vector tiles are used as it provides better performance than rendering large amount of GeoJSON polygons. This code is adapted from [Mapbox's example on Join local JSON data with vector tile geometries](https://docs.mapbox.com/mapbox-gl-js/example/data-join/){:target="\_blank"}.
+This example shows how to setup a choropleth map using Mapbox. The data used is the [Means of Transportation to Work - Table B08134](https://censusreporter.org/tables/B08134/){:target="\_blank"} from ACS 5-year (2019). Mapbox vector tiles provides better performance when rendering large amount of polygons compared to GeoJSON. This code is adapted from [Mapbox's Data Joins tutorials](https://labs.mapbox.com/education/impact-tools/data-joins){:target="\_blank"}.
 
-If you would like to use GeoJSON with mapbox check out the [Additional Notes below](#using-geojson). It is much simpler than using vector tiles but it is discouraged to load all counties via GeoJSON due to the large size.
+If you would like to use GeoJSON with Mapbox check out the [Additional Notes below](#using-geojson). It is much simpler than using vector tiles but it is discouraged to load all counties or small geographies via GeoJSON due to the large size of such files.
 
 ![Completed choropleth]({{ '/assets/images/examples/example-mapbox-choropleth.png' | relative_url }})
 
@@ -59,10 +59,11 @@ var map = new mapboxgl.Map({
 
 ## Adding the Vector tiles
 
-Census Bureau provides vector tiles via [ArcGIS REST Services](https://gis-server.data.census.gov/arcgis/rest/services/Hosted){:target="\_blank"} for various years and geographic levels.
+Census Bureau provides vector tiles via ArcGIS REST Services for various years and geographic levels. 
 
-To locate the vector layer we want first find the year then the geography level id. So for 2017 and county level we can look for
-`2017` and `050` using find in your browser.
+Currently the directory for the available services is disabled, but you can use the mapdata API to find your vector layers. [`https://data.census.gov/api/mapdata?vintage=2019`](https://data.census.gov/api/mapdata?vintage=2019){:target="\_blank"}. Modify the vintage year to match your query.
+
+To locate the vector layer look for your geography level id or geography name. So for county level we can look for `VT_2019_050` using find (ctrl + f) in your browser, or look for where `displayName:County`.
 
 Here are a few geographic level ids for common levels:
 
@@ -82,33 +83,34 @@ Here are a few geographic level ids for common levels:
 >
 > 860 = ..... 5-Digit ZIP Code Tabulation Area
 
-Find more [here](https://factfinder.census.gov/service/GeographyIds.html){:target="\_blank"}
+<!-- Find more [here](https://factfinder.census.gov/service/GeographyIds.html){:target="\_blank"} -->
 
-![Vector tile for 2017 counties (050)]({{ '/assets/images/examples/example-mapbox-choropleth1.png' | relative_url }})
+![Vector tile for 2019 counties (050)]({{ '/assets/images/examples/example-mapbox-choropleth1.png' | relative_url }})
 
-The layer is [Hosted/VT_2017_050_00_PY_D1](https://gis-server.data.census.gov/arcgis/rest/services/Hosted/VT_2017_050_00_PY_D1/VectorTileServer). Lastly we have to get the source-layer name. Click into the Styles and find the source-layer value. (in this case it is "County")
+The layer that we need is [Hosted/VT_2019_050_00_PY_D1](https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_050_00_PY_D1/VectorTileServer). Next we have to get the source-layer name. Click into the Styles and find the source-layer value. (in this case it is "County")
 
 ![Vector tile's page, with style link underlined]({{ '/assets/images/examples/example-mapbox-choropleth2.png' | relative_url }})
 
 !["source-layer" : "County"]({{ '/assets/images/examples/example-mapbox-choropleth3.png' | relative_url }})
 
-Now lets load the vector tiles layer.
+Now lets load the vector tiles layer, then add a simple grey fill layer. Notice that we also put in the parameter of `promoteId` to be `GEOID`, this will be used as a foreign key to join to our CitySdk response.
 
 ```js
 map.on("load", function() {
+  map.addSource("counties", {
+    type: "vector",
+    tiles: ["https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"],
+    promoteId: "GEOID" // promote field to be used as a foreign key
+  })
+
   map.addLayer({
-    id: "counties",
+    id: "counties-fill",
     type: "fill",
-    source: {
-      type: "vector",
-      tiles: [
-        "https://gis-server.data.census.gov/arcgis/rest/services/Hosted/VT_2017_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"
-      ]
-    },
+    source: "counties",
     "source-layer": "County",
     paint: {
-      "fill-opacity": 0.6,
-      "fill-color": "blue"
+      "fill-opacity": 0.8,
+      "fill-color": "grey"
     }
   });
 });
@@ -118,19 +120,19 @@ map.on("load", function() {
 
 ## Query data
 
-We use CitySDK to query for the GINI Index from the ACS 5-year.
+We use CitySDK to query for variable B08134_001E (est Total) and B08134_011E (est Car, truck, or van)
 
 ```js
 census(
   {
-    vintage: 2017,
+    vintage: 2019,
     geoHierarchy: {
       county: "*"
     },
     sourcePath: ["acs", "acs5"],
-    values: ["B19083_001E"]
+    values: ["NAME", "B08134_001E", "B08134_011E"]
   },
-  function(error, response) {
+  (error, response) => {
     console.log(response);
   }
 );
@@ -138,82 +140,69 @@ census(
 
 ## Merging data with vector tiles
 
-Vector tiles do not originally contain the GINI data, so we need to "merge" the CitySDK data to the vector tiles. But the since the vector tiles and CitySDK data are from two different sources and types, the method used appends the CitySDK data with the fill color value to a mapbox style expression.
+Vector tiles do not contain any values other than GEOID and Name, so we need to join the CitySDK data to the vector tiles using the `setFeatureState` method in Mapbox. `setFeatureState` needs to be run on each county (row) of your response.
 
-We refactor the map.on function to first load the CitySDK data, then generate the style expression, lastly load the vector tiles layer with styles.
-
-To generate a color expression, we first create a function to generate the colors using Chroma.js. Add load Chroma.js via script tag in the head, then in the CitySDK callback get all the GINI Index values into an array to pass into chroma.js to domain (range of values)
-
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.4/chroma.min.js"></script>
-```
-
-`chroma.scale('OrRd').padding(.15)` will specific the color scale (Orange to Red) , `.domain(values, 'q', 5)` will use the GINI values to generate a quantiles groups for the values.
-
-Now we can create a function that will take in any value and return a hex color code.
+In your CitySDK callback, for each row in your response create a GEOID then run the `setFeatureState` method passing in a first object with `source` (the source created using addSource), `sourceLayer` (found in the Styles json), and `id` (a value that matches with the `promoteId`). Then a second object with all other fields from your response.
 
 ```js
-var values = response.map(function(county) {
-  return county.B19083_001E;
-}); //get all the GINI Index values , B19083_001E
+(error, response) => {
+  //console.log(response);
 
-var colorScale = chroma
-  .scale("OrRd")
-  .padding(0.15)
-  .domain(values, "q", 5);
-
-function getColor(val) {
-  return colorScale(val).hex();
+  response.forEach((row) => {
+    const GEOID = row.state + row.county
+    map.setFeatureState({
+      source: "counties",
+      sourceLayer: "County",
+      //promote field to be used as the primary key
+      id: GEOID
+    }, {
+      //promote fields to be styled or interacted with
+      name,
+      car_truck_van_count: row.B08134_011E,
+      total : row.B08134_001E,
+      value: row.B08134_011E / row.B08134_001E
+    })
+  })
 }
+
 ```
 
-To generate the style expression for mapbox styling, we have to group the GEOIds that fall into the same quantile groups. So we first loop though each to create an object with color groups as keys and array of GEOIDs as values.
-
-e.g. {"#FFF" : ["04343", "04343"]}
-
-Then we generate the expression by appending the GEOIDs and colors to the main match expression in the format below.
-
-e.g. ['match', ['get', 'GEOID'], ["04343", "04343"], "#FFF"]
-
-Lastly we append 'rgba(0,0,0,0)' for any GEOIDs that is not included in the expression rules.
+We can style the layer using `feature-state`
 
 ```js
-var colors = {};
-
-response.forEach(function(county) {
-  var GEOID = county.state + county.county;
-  var value = county.B19083_001E;
-  var color = getColor(value);
-  if (!colors[color]) {
-    colors[color] = [];
-  }
-  colors[color].push(GEOID);
-});
-
-var colorExpression = ["match", ["get", "GEOID"]];
-var colorQuantiles = Object.entries(colors).forEach(function([color, GEOIDs]) {
-  colorExpression.push(GEOIDs, color);
-});
-
-colorExpression.push("rgba(0,0,0,0)");
+map.setPaintProperty("counties-fill", "fill-color", [
+  "interpolate",
+  ["linear"],
+  ["feature-state", "value"],
+  0.3,
+  "#fef0d9",
+  0.6,
+  "#fdcc8a",
+  0.8,
+  "#fc8d59",
+  0.9,
+  "#e34a33",
+  1,
+  "#b30000"
+]);
 ```
 
-From that we can add the layer the same way but instead of a static fill-color we can put into our style expression.
+And add popups using `map.queryRenderedFeatures` then pulling out the `state`
+
 
 ```js
-map.addLayer({
-  id: "counties",
-  type: "fill",
-  source: {
-    type: "vector",
-    tiles: [
-      "https://gis-server.data.census.gov/arcgis/rest/services/Hosted/VT_2017_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"
-    ]
-  },
-  "source-layer": "County",
-  paint: {
-    "fill-opacity": 0.8,
-    "fill-color": colorExpression
+map.on("click", "counties-fill", e => {
+  const features = map.queryRenderedFeatures(e.point, { layers: ["counties-fill"] });
+
+  if (features.length > 0) {
+    const { state, properties } = features[0]
+
+    const percent = `${(state.value * 100).toFixed(2)}%`
+
+    new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(`Percent of people in <strong>${state.name}</strong> that travel to work using a car/truck/van: ${percent}`)
+      .addTo(map);
   }
 });
 ```
@@ -223,90 +212,85 @@ Completed map and code should look like this.
 ![Completed choropleth]({{ '/assets/images/examples/example-mapbox-choropleth5.png' | relative_url }})
 
 ```js
-map.on("load", function() {
+map.on("load", () => {
+  //setup source and layer
+  map.addSource("counties", {
+    type: "vector",
+    tiles: ["https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"],
+    promoteId: "GEOID" // promote field to be used as a foreign key
+  })
+
+  map.addLayer({
+    id: "counties-fill",
+    type: "fill",
+    source: "counties",
+    "source-layer": "County",
+    paint: {
+      "fill-opacity": 0.8,
+      "fill-color": "grey"
+    }
+  });
+
+  //query using citysdk
   census(
     {
-      vintage: 2017,
+      vintage: 2019,
       geoHierarchy: {
         county: "*"
       },
       sourcePath: ["acs", "acs5"],
-      values: ["NAME", "B19083_001E"]
+      values: ["NAME", "B08134_001E", "B08134_011E"]
     },
-    function(error, response) {
-      var values = response.map(function(county) {
-        return county.B19083_001E;
-      }); //get all the GINI Index values , B19083_001E
-      var colorScale = chroma
-        .scale("OrRd")
-        .padding(0.15)
-        .domain(values, "q", 5); // 5 quantiles
+    (error, response) => {
+      //bind data to source layer
+      response.forEach((row) => {
+        const GEOID = row.state + row.county
+        map.setFeatureState({
+          source: "counties",
+          sourceLayer: "County",
+          //promote field to be used as the primary key
+          id: GEOID
+        }, {
+          //promote fields to be styled or interacted with
+          name,
+          car_truck_van_count: row.B08134_011E,
+          total : row.B08134_001E,
+          value: row.B08134_011E / row.B08134_001E
+        })
+      })
 
-      function getColor(val) {
-        return colorScale(val).hex();
-      }
+      //update paint to display choropleth
+      map.setPaintProperty("counties-fill", "fill-color", [
+        "interpolate",
+        ["linear"],
+        ["feature-state", "value"],
+        0.3,
+        "#fef0d9",
+        0.6,
+        "#fdcc8a",
+        0.8,
+        "#fc8d59",
+        0.9,
+        "#e34a33",
+        1,
+        "#b30000"
+      ]);
 
-      //generate style expression
-      var colors = {};
+      map.on("click", "counties-fill", e => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ["counties-fill"] });
 
-      response.forEach(function(county) {
-        var GEOID = county.state + county.county;
-        var value = county.B19083_001E;
-        var color = getColor(value);
-        if (!colors[color]) {
-          colors[color] = [];
-        }
-        colors[color].push(GEOID);
-      });
+        if (features.length > 0) {
+          const { state, properties } = features[0]
 
-      var colorExpression = ["match", ["get", "GEOID"]];
-      var colorQuantiles = Object.entries(colors).forEach(function([
-        color,
-        GEOIDs
-      ]) {
-        colorExpression.push(GEOIDs, color);
-      });
+          const percent = `${(state.value * 100).toFixed(2)}%`
 
-      colorExpression.push("rgba(0,0,0,0)");
-
-      map.addLayer({
-        id: "counties",
-        type: "fill",
-        source: {
-          type: "vector",
-          tiles: [
-            "https://gis-server.data.census.gov/arcgis/rest/services/Hosted/VT_2017_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"
-          ]
-        },
-        "source-layer": "County",
-        paint: {
-          "fill-opacity": 0.8,
-          "fill-color": colorExpression
+          new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(`Percent of people in <strong>${state.name}</strong> that travel to work using a car/truck/van: ${percent}`)
+            .addTo(map);
         }
       });
-    }
-  );
-});
-```
-
-## Adding a popup
-
-Add an click listener to the counties layer, then in the callback search up the GEOID of the county of the feature that was clicked and setHTML to the response values.
-
-```js
-map.on("click", "counties", function(e) {
-  var coordinates = e.lngLat;
-  //look up GINI value
-  var GEOID = e.features[0].properties.GEOID;
-  var details = response.find(function(county) {
-    var response_GEOID = county.state + county.county;
-    return GEOID === response_GEOID;
-  });
-
-  new mapboxgl.Popup()
-    .setLngLat(coordinates)
-    .setHTML("GINI value for " + details.NAME + ": " + details.B19083_001E)
-    .addTo(map);
+    })
 });
 ```
 
