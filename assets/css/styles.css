@@ -4,6 +4,11 @@
   max-width: calc(100% + 12px);
 }
 
+img.leaflet-tile{
+  left: initial !important;
+  box-shadow: initial !important;
+}
+
 iframe {
   height: 400px;
   width: 100%;
@@ -12,7 +17,7 @@ iframe {
 }
 
 .usa-nav{
-  z-index: 1;
+  z-index: 600;
 }
 
 #lightbox{
