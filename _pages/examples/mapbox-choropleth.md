@@ -299,7 +299,9 @@ map.on("load", () => {
 
 ![Data in tract level]({{ '/assets/images/examples/example-mapbox-choropleth6.png' | relative_url }})
 
-Since we are using tracts, we use level `140` and find the endpoint of [Hosted/VT_2019_140_00_PY_D1](https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_140_00_PY_D1/VectorTileServer). Looking at the styles we find that the `source-layer` is `CensusTract`
+Since we are using tracts, we use level `140` and find the endpoint of [Hosted/VT_2019_140_00_PY_D1](https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_140_00_PY_D1/VectorTileServer). Looking at the styles we find that the `source-layer` is `CensusTract`.
+
+Note: Census Tract Vector Tiles will only load for zoom levels 9 and above. If you don't see anything zoom in!
 
 ```js
 map.addSource("tracts", {
