@@ -6,7 +6,7 @@ permalink: /examples/mapbox-choropleth/
 layout: post
 ---
 
-This example shows how to setup a choropleth map using Mapbox. The data used is the [Means of Transportation to Work - Table B08134](https://censusreporter.org/tables/B08134/){:target="\_blank"} from ACS 5-year (2019). Mapbox vector tiles provides better performance when rendering large amount of polygons compared to GeoJSON. This code is adapted from [Mapbox's Data Joins tutorials](https://labs.mapbox.com/education/impact-tools/data-joins){:target="\_blank"}.
+This example shows how to setup a choropleth map using Mapbox. The data used is the [Means of Transportation to Work - Table B08134](https://censusreporter.org/tables/B08134/){:target="\_blank"} from ACS 5-year (2019). Mapbox vector tiles provides better performance when rendering large amount of polygons compared to GeoJSON. This code is adapted from [Mapbox's Data Joins tutorial](https://labs.mapbox.com/education/impact-tools/data-joins){:target="\_blank"}.
 
 If you would like to use GeoJSON with Mapbox check out the [Additional Notes below](#using-geojson). It is much simpler than using vector tiles but it is discouraged to load all counties or small geographies via GeoJSON due to the large size of such files.
 

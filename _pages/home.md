@@ -7,11 +7,54 @@ layout: home
 
 This site provides documentation, examples, and guides focused on using the Census Data API in frontend and backend Javascript applications by unitizing CitySDK, which streamlines, and enhances the usability and access to the data.
 
-Try out CitySDK in your browser [here]({{ '/docs/try/' | relative_url }}).
+### Browser Quick start
+You can download citysdk.js [here]({{ '/assets/citysdk.js' | relative_url }}){:download="citysdk.js"} or build it using browserify.
 
-![Try it section]({{ '/assets/images/tryit.png' | relative_url }})
+```html
+<script src="./citysdk.js"></script>
+<script>
+//Web developers in the US 2017
+census(
+  {
+  vintage: '2017',
+  geoHierarchy: {
+    us: '*',
+  },
+  sourcePath: ['acs','acs5',],
+  values: ['B24121_065E'],
+  }
+  (err, res) => console.log(res) // [{"B24121_065E": 62792,"us": "1"}]
+)
+</script>
+```
+
+### Node.js quick start
+
+`npm install citysdk`
+
+```js
+const census = require("citysdk")
+
+//get the ACS5 2017 population for all counties in the California
+census(
+  {
+    vintage: '2017',
+    geoHierarchy: {
+      state: "06",
+      county: '*',
+    },
+    sourcePath: ['acs','acs5'],
+    values: ['B00001_001E'],
+  },
+  (err, res) => console.log(res) // [{"B00001_001E": 889,"state": "06","county": "049"}, ...
+)
+```
 
 ## Sections
+
+### [Interactive Example]({{ '/docs/try/' | relative_url }})
+
+![Try it section]({{ '/assets/images/tryit.png' | relative_url }})
 
 ### [Documentation]({{ '/docs/' | relative_url }})
 
