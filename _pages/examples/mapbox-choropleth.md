@@ -13,6 +13,7 @@ If you would like to use GeoJSON with Mapbox check out the [Additional Notes bel
 ![Completed choropleth]({{ '/assets/images/examples/example-mapbox-choropleth.png' | relative_url }})
 
 See the completed example [here]({{ '/examples/live/mapbox-choropleth/' | relative_url }}){:target="\_blank"}.
+See additional example for tracts [here]({{ '/examples/live/mapbox-choropleth-tracts/' | relative_url }}){:target="\_blank"}.
 
 ## Setting up
 
@@ -157,7 +158,7 @@ In your CitySDK callback, for each row in your response create a GEOID then run 
       id: GEOID
     }, {
       //promote fields to be styled or interacted with
-      name,
+      name: row.NAME,
       car_truck_van_count: row.B08134_011E,
       total : row.B08134_001E,
       value: row.B08134_011E / row.B08134_001E
@@ -252,7 +253,7 @@ map.on("load", () => {
           id: GEOID
         }, {
           //promote fields to be styled or interacted with
-          name,
+          name: row.NAME,
           car_truck_van_count: row.B08134_011E,
           total : row.B08134_001E,
           value: row.B08134_011E / row.B08134_001E
@@ -293,6 +294,93 @@ map.on("load", () => {
     })
 });
 ```
+
+## Census Tract Example
+
+![Data in tract level]({{ '/assets/images/examples/example-mapbox-choropleth6.png' | relative_url }})
+
+Since we are using tracts, we use level `140` and find the endpoint of [Hosted/VT_2019_140_00_PY_D1](https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_140_00_PY_D1/VectorTileServer). Looking at the styles we find that the `source-layer` is `CensusTract`
+
+```js
+map.addSource("tracts", {
+  type: "vector",
+  tiles: ["https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_140_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"],
+  promoteId: "GEOID" // promote field to be used as a foreign key
+})
+
+map.addLayer({
+  id: "tracts-fill",
+  type: "fill",
+  source: "tracts",
+  "source-layer": "CensusTract",
+  paint: {
+    "fill-opacity": 0.8,
+    "fill-color": "grey"
+  }
+});
+```
+
+Then we query CitySDK for all the tracts in state of California, calculate the GEOID, and lastly use the `setFeatureState` on the response. Lastly the tracts base on the values. I added an `fill-opacity` rule to hide ones without values (out of state or no population).
+
+```js
+census(
+{
+  vintage: 2019,
+  geoHierarchy: {
+    state: "06",
+    tract: "*"
+  },
+  sourcePath: ["acs", "acs5"],
+  values: ["NAME", "B08134_001E", "B08134_011E"],
+  statsKey: "3c04140849164b373c8b1da7d7cc8123ef71b7ab"
+},
+(error, response) => {
+  response.forEach((row) => {
+    const GEOID = row.state + row.county + row.tract
+    map.setFeatureState({
+      source: "tracts",
+      sourceLayer: "CensusTract",
+      id: GEOID
+    }, {
+      name: row.NAME,
+      car_truck_van_count: row.B08134_011E,
+      total: row.B08134_001E,
+      value: row.B08134_011E / row.B08134_001E
+    })
+})
+
+  //update paint to display choropleth
+  map.setPaintProperty("tracts-fill", "fill-color", [
+    "interpolate",
+    ["linear"],
+    ["feature-state", "value"],
+    0.3,
+    "#fef0d9",
+    0.6,
+    "#fdcc8a",
+    0.8,
+    "#fc8d59",
+    0.9,
+    "#e34a33",
+    1,
+    "#b30000"
+  ]);
+
+  //hide tracts without values
+  map.setPaintProperty("tracts-fill", "fill-opacity", [
+    "case",
+    ["to-boolean", ["feature-state", "value"]],
+    0.6,
+    0
+  ]);
+
+}
+
+```
+Tip: If you want tracts in other states, you can run this block/ convert this into a function to take in a different [FIPS code](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standard_state_code).
+
+
+See the full code and example [here]({{ '/examples/live/mapbox-choropleth-tracts/' | relative_url }}){:target="\_blank"}.
 
 ## Additional Notes
 

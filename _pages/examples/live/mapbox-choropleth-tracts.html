@@ -1,5 +1,5 @@
 ---
-permalink: /examples/live/mapbox-choropleth/
+permalink: /examples/live/mapbox-choropleth-tracts/
 ---
 
 <html>
@@ -33,28 +33,40 @@ permalink: /examples/live/mapbox-choropleth/
       container: "map",
       style: "mapbox://styles/mapbox/streets-v11",
       center: {
-        lat: 37.0902,
-        lng: -95.7129
+        lat: 38.5118,
+        lng: -120.67006
       },
-      zoom: 3
+      zoom: 8.5
     });
 
     map.on("load", () => {
       //setup source and layer
-      map.addSource("counties", {
+      map.addSource("tracts", {
         type: "vector",
-        tiles: ["https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_050_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"],
+        tiles: ["https://gis.data.census.gov/arcgis/rest/services/Hosted/VT_2019_140_00_PY_D1/VectorTileServer/tile/{z}/{y}/{x}.pbf"],
         promoteId: "GEOID" // promote field to be used as a foreign key
       })
 
       map.addLayer({
-        id: "counties-fill",
+        id: "tracts-fill",
         type: "fill",
-        source: "counties",
-        "source-layer": "County",
+        source: "tracts",
+        "source-layer": "CensusTract",
         paint: {
           "fill-opacity": 0.8,
           "fill-color": "grey"
+        }
+      });
+
+      map.addLayer({
+        id: "tracts-outline",
+        type: "line",
+        source: "tracts",
+        "source-layer": "CensusTract",
+        paint: {
+          "line-color": "grey",
+          "line-width": 1,
+          "line-opacity": 0.3
         }
       });
 
@@ -63,7 +75,8 @@ permalink: /examples/live/mapbox-choropleth/
         {
           vintage: 2019,
           geoHierarchy: {
-            county: "*"
+            state: "06",
+            tract: "*"
           },
           sourcePath: ["acs", "acs5"],
           values: ["NAME", "B08134_001E", "B08134_011E"],
@@ -71,12 +84,11 @@ permalink: /examples/live/mapbox-choropleth/
         },
         (error, response) => {
           //bind data to source layer
-
           response.forEach((row) => {
-            const GEOID = row.state + row.county
+            const GEOID = row.state + row.county + row.tract
             map.setFeatureState({
-              source: "counties",
-              sourceLayer: "County",
+              source: "tracts",
+              sourceLayer: "CensusTract",
               //promote field to be used as the primary key
               id: GEOID
             }, {
@@ -89,7 +101,7 @@ permalink: /examples/live/mapbox-choropleth/
           })
 
           //update paint to display choropleth
-          map.setPaintProperty("counties-fill", "fill-color", [
+          map.setPaintProperty("tracts-fill", "fill-color", [
             "interpolate",
             ["linear"],
             ["feature-state", "value"],
@@ -105,18 +117,28 @@ permalink: /examples/live/mapbox-choropleth/
             "#b30000"
           ]);
 
-          map.on("click", "counties-fill", e => {
-            const features = map.queryRenderedFeatures(e.point, { layers: ["counties-fill"] });
+          //hide tracts without values
+          map.setPaintProperty("tracts-fill", "fill-opacity", [
+            "case",
+            ["to-boolean", ["feature-state", "value"]],
+            0.6,
+            0
+          ]);
+
+          map.on("click", "tracts-fill", e => {
+            const features = map.queryRenderedFeatures(e.point, { layers: ["tracts-fill"] });
 
             if (features.length > 0) {
               const { state, properties } = features[0]
 
               const percent = `${(state.value * 100).toFixed(2)}%`
 
-              new mapboxgl.Popup()
-                .setLngLat(e.lngLat)
-                .setHTML(`Percent of people in <strong>${state.name}</strong> that travel to work using a car/truck/van: ${percent}`)
-                .addTo(map);
+              if (state.value) { //only show popup if there is a value
+                new mapboxgl.Popup()
+                  .setLngLat(e.lngLat)
+                  .setHTML(`Percent of people in <strong>${state.name}</strong> that travel to work using a car/truck/van: ${percent}`)
+                  .addTo(map);
+              }
             }
           });
 
