@@ -58,7 +58,10 @@
 (defn search-id->match?
   "
   Searches the entire geoKeyMap (inverted) for a geo key match provided a given
-  WMS geographic identifier.
+  WMS geographic identifier. Returned values are used in combination with a
+  response from the TigerWeb WMS geocoding response to determine the geographic
+  hierarchy of a geography for filling-in the data API request geography for
+  geocoding requests
   "
   [$g$ GEO]
   (let [inverted-geoKeyMap (seq (map-invert $g$))]
@@ -78,8 +81,9 @@
          ($g$->wms-cfg $g$ args server-index)]
      (str URL-WMS
           (cond
+            (= "2020" (str vintage)) (str "TIGERweb/tigerWMS_Census2020")
             (= "2010" (str vintage)) (str "TIGERweb/tigerWMS_Census2010")
-            (= "2000" (str vintage)) (str "Census2010/tigerWMS_Census2000")
+            ;(= "2000" (str vintage)) (str "Census2010/tigerWMS_Census2000") ; deprecated
             :else                    (str "TIGERweb/tigerWMS_ACS" vintage))
           "/Mapserver/"
           (get layers cur-layer-idx)
