@@ -25,7 +25,7 @@
           :lng -80.7214,
           :sub-level [:county "*"],
           :geo [:STATE],
-          :lookup-up-in :2010})))
+          :looked-up-in :2010})))
 
 
 (deftest lookup-id->match?-test

@@ -18,6 +18,9 @@
 (defn $g$->wms-cfg
   "
   Creates a configuration map for the WMS url-builder from the geoHierarchy map.
+
+  if  : lookup key is a vec -> direct looked up
+  else: lookup at :id<-json key
   "
   ([$g$ args] ($g$->wms-cfg $g$ args 0))
   ([$g$ {:keys [geoHierarchy vintage]} server-index]
@@ -35,7 +38,7 @@
                  :looked-up-in   (keyword vintage)})
             (merge-with assoc config
                 {:geo            (get-in $g$ [scope lookup :id<-json])
-                 :lookup-up-in   lookup})))))
+                 :looked-up-in   lookup})))))
 
 
 (defn lookup-id->match?
@@ -69,7 +72,8 @@
       (map #(lookup-id->match? GEO %)
            inverted-geoKeyMap))))
 
-
+; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2012/MapServer
+; https://tigerweb.geo.census.gov/arcgis/rest/services/Census2020/tigerWMS_Census2000/MapServer
 (defn C->GIS-url
   "
   Constructs a URL for the TigerWeb Web Mapping Service (WMS) using a lookup
@@ -81,11 +85,9 @@
          ($g$->wms-cfg $g$ args server-index)]
      (str URL-WMS
           (cond
-            (= "2020" (str vintage)) (str "TIGERweb/tigerWMS_Census2020")
-            (= "2010" (str vintage)) (str "TIGERweb/tigerWMS_Census2010")
-            ;(= "2000" (str vintage)) (str "Census2010/tigerWMS_Census2000") ; deprecated
-            :else                    (str "TIGERweb/tigerWMS_ACS" vintage))
-          "/Mapserver/"
+            (= 0 (mod vintage 10)) (str "Census2020/tigerWMS_Census" vintage)
+            :else                  (str "TIGERweb/tigerWMS_ACS" vintage))
+          "/MapServer/"
           (get layers cur-layer-idx)
           "/query?"
           (join "&"
@@ -186,6 +188,7 @@
                                   (into (-=-/map) (vals res))
                                   (into (-=-/map) [sub-level])))))
                       (close! =res=))
+                  ; if another layer is available: recur
                   (and (empty? res) (not (nil? (get layers (inc idx)))))
                   (recur ->args (inc idx))
                   :else
