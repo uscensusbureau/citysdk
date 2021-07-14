@@ -89,8 +89,10 @@
 
 
 (defn G-pattern-cfg
-  "Creates a configuration for URL construction based on user input and geoKeyMap
-  configuration file (EDN)."
+  "
+  Creates a configuration for GeoJSON URL construction based on user input and geoKeyMap
+  configuration file (EDN).
+  "
   [$g$ {:keys [vintage geoResolution] {:keys [state] :as geoHierarchy} :geoHierarchy}]
   (let [level     (last geoHierarchy)
         geoScopes (get-in $g$ [(key level) (keyword vintage) :scopes])
@@ -139,6 +141,9 @@
   Takes the request argument and pulls out a vector of the component identifiers
   from the geoKeyMap, which is used to construct the UID for the GeoJSON. Used
   in deep-merging with statistics.
+
+  Returns a list of keys to lookup (:id<-json) within the returned GeoJSON to
+  concatenate into the GEOID
   "
   [$g$ {:keys [geoHierarchy vintage]}]
   (let [[& GEOIDS] (get-in $g$ [(key (last geoHierarchy)) (keyword vintage) :id<-json])]
