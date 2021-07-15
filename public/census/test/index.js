@@ -15,15 +15,15 @@ const census = require("../census.js")
 // )
 
 census(
-  {
-    vintage: 2018,
-    geoHierarchy: {
-      state: "27",
-      county: "123"
+    {
+        vintage       : 2018,
+        geoHierarchy  : {
+            state  : "27",
+            county : "123",
+        },
+        sourcePath    : [ "acs", "acs1" ],
+        values        : [ "NAME" ],
+        geoResolution : "500k",
     },
-    sourcePath: ["acs", "acs1"],
-    values: ["GEOCOMP"],
-    geoResolution: "500k"
-  },
-  (err, res) => console.log(JSON.stringify(res))
-)
+    (err, res) => console.log(JSON.stringify(res)),
+) //?

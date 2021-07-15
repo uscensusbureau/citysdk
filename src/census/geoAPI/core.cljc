@@ -151,8 +151,8 @@
 
 (defn xf-mergeable-features
   "
-  Takes the component GEOIDS from with the GeoJSON and a single feature to
-  generate a :GEOID if not available within the GeoJSON.
+  Takes the component GEOIDS from with a GeoJSON feature ('properties' key)
+  to generate the GEOID string for the GeoJSON feature.
   "
   [$g$ args]
   (let [GEOIDS (GEOIDS<-$g$+args $g$ args)]
