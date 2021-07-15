@@ -21,6 +21,20 @@
 
   if  : lookup key is a vec -> direct looked up
   else: lookup at :id<-json key
+
+  ($g$->wms-cfg
+    $g$
+    {:vintage     2014,
+     :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county '*'}})
+  ;=>
+  {:vintage 2014,
+   :layers ['84'],
+   :cur-layer-idx 0,
+   :lat 28.2639,
+   :lng -80.7214,
+   :sub-level [:county '*'],
+   :geo [:STATE],
+   :looked-up-in :2010}
   "
   ([$g$ args] ($g$->wms-cfg $g$ args 0))
   ([$g$ {:keys [geoHierarchy vintage]} server-index]
@@ -38,6 +52,7 @@
                  :looked-up-in   (keyword vintage)})
             (merge-with assoc config
                 {:geo            (get-in $g$ [scope lookup :id<-json])
+                 ; lookup-up-in
                  :looked-up-in   lookup})))))
 
 
