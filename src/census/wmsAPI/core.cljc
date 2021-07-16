@@ -48,19 +48,29 @@
                  :sub-level      sub-level}]
         (if (instance? vec-type lookup)
             (merge-with assoc config
-                {:geo            lookup
-                 :looked-up-in   (keyword vintage)})
+              {:geo            lookup
+               :looked-up-in   (keyword vintage)})
             (merge-with assoc config
-                {:geo            (get-in $g$ [scope lookup :id<-json])
-                 ; lookup-up-in
-                 :looked-up-in   lookup})))))
-
+              {:geo            (get-in $g$ [scope lookup :id<-json])
+               ; lookup-up-in
+               :looked-up-in   lookup})))))
 
 (defn lookup-id->match?
   "
+  :id<-json
+
   Looks in a single entry from the inverted geoKeyMap for a matching geoKey via
   `some`ing through each of its vintages for a match with a provided WMS
   geographic identifier.
+
+  (lookup-id->match? :CONCITY    ;; ↓ seq'd inverted geoKeyMap | looks up ↓
+                     [{:2017 {:wms {:layers ['24'], :lookup [:STATE :CONCITY]}}
+                       :2016 {:wms {:layers ['24'], :lookup [:STATE :CONCITY]}}}
+                      :consolidated-cities
+                      {:2014 {:wms {:layers ['24'], :lookup [:BLOOP]}}
+                       :2016 {:wms {:layers ['24'], :lookup [:BLOOP]}}}
+                      :something-else])
+  ; => :consolidated-cities
   "
   [GEO [geo-val geo-key]]
   (let [vins (map (fn [[_ {:keys [id<-json] {:keys [lookup]} :wms}]]
@@ -72,7 +82,6 @@
            geo-key
            nil)))
 
-
 (defn search-id->match?
   "
   Searches the entire geoKeyMap (inverted) for a geo key match provided a given
@@ -80,6 +89,9 @@
   response from the TigerWeb WMS geocoding response to determine the geographic
   hierarchy of a geography for filling-in the data API request geography for
   geocoding requests
+
+  (search-id->match? $g$ :CONCITY)
+  ; => :consolidated-cities
   "
   [$g$ GEO]
   (let [inverted-geoKeyMap (seq (map-invert $g$))]
@@ -117,7 +129,14 @@
 
 
 (defn configed-map
-  "
+
+  "IMPORTANT!
+  The :id<-json key in index.edn is double loaded, to both pull ids from GeoJSON
+  as well as configure the API call
+
+  (configed-map $g$ {:STATE '51', :COUNTY '013'})
+  ;=> {:STATE {:state '51'}, :COUNTY {:county '013'}}
+
   Takes the geoKeyMap configuration and the attributes from the WMS service
   API (js->cljs response) and returns a config map (:key = attribute ; value =
   corresponding configured map with (:geography 'value') needed to call Census'
