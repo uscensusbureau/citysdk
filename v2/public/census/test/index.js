@@ -14,16 +14,29 @@ const census = require("../census.js")
 //   (err, res) => console.log(res)
 // )
 
+//census(
+//    {
+//        vintage       : 2018,
+//        geoHierarchy  : {
+//            state  : "27",
+//            county : "123",
+//        },
+//        sourcePath    : [ "acs", "acs1" ],
+//        values        : [ "NAME" ],
+//        geoResolution : "500k",
+//    },
+//    (err, res) => console.log(JSON.stringify(res)),
+//) //?
+
 census(
     {
-        vintage       : 2018,
-        geoHierarchy  : {
-            state  : "27",
-            county : "123",
+        vintage      : 2019,
+        geoHierarchy : {
+            county : { lat: 42.3601, lng: -71.0589 },
+            //"county subdivision" : "07000",
         },
-        sourcePath    : [ "acs", "acs1" ],
-        values        : [ "NAME" ],
-        geoResolution : "500k",
+        sourcePath   : [ "acs", "acs5" ],
+        values       : [ "group(B15003)" ],
     },
     (err, res) => console.log(JSON.stringify(res)),
 ) //?

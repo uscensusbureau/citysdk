@@ -71,8 +71,8 @@
                ["3111" "369" "01" "073" "000100"]
                ["3111" "222" "21" "0223" "000100"]]]
     (is (= (eduction (xf-stats->js args) input)
-           '(#js {:B01001_001E 3111, :B01001_001M 369, :state "01", :county "073", :tract "000100"}
-             #js {:B01001_001E 3111, :B01001_001M 222, :state "21", :county "0223", :tract "000100"})))))
+           '({:B01001_001E 3111, :B01001_001M 369, :state "01", :county "073", :tract "000100"}
+             {:B01001_001E 3111, :B01001_001M 222, :state "21", :county "0223", :tract "000100"})))))
 
 (deftest xf-geoid+<-stat-test
   (let [input '({:B01001_001E 55049,:state "01", :B01001_001M -555555555,  :county "001"}
@@ -117,10 +117,10 @@
                 :county "073"
                 :tract "000100"}}})))))
 
- (def ARGS-2 {:vintage      "2017"
-              :sourcePath   ["acs" "acs1"]
-              :geoHierarchy {:state "44" :county "*"}
-              :values       ["B01001_001E" "B01001_001M"]})
+(def ARGS-2 {:vintage      "2017"
+             :sourcePath   ["acs" "acs1"]
+             :geoHierarchy {:state "44" :county "*"}
+             :values       ["B01001_001E" "B01001_001M"]})
 
 ;; (deftest IOE-C->stats-test
 ;;   (let [=I= (chan 1)
