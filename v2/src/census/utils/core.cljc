@@ -27,7 +27,7 @@
 (def cors-proxy
   "URL proxy string prereq if not node"
   (cond isNode ""
-        :else "https://cors-e.herokuapp.com/"))
+        :else "https://4dvj5dcxge.execute-api.us-east-1.amazonaws.com/staging/"))
 
 ;(prn cors-proxy)
 
