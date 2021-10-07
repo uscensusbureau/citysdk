@@ -1,5 +1,5 @@
 {
-  "name": "citysdk",
+  "name": "census-geojson",
   "version": "2.0.0",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "scripts": {
@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/uscensusbureau/citysdk.git"
+    "url": "git+https://github.com/loganpowell/census-geojson.git"
   },
   "keywords": [
     "geojson",
@@ -21,12 +21,15 @@
   "author": "Logan Powell",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/uscensusbureau/citysdk/issues"
+    "url": "https://github.com/loganpowell/census-geojson/issues"
   },
-  "homepage": "https://github.com/uscensusbureau/citysdk#readme",
+  "homepage": "https://github.com/loganpowell/census-geojson#readme",
   "dependencies": {
     "xmlhttprequest": "^1.8.0",
     "xregexp": "^4.3.0"
+  },
+  "scripts": {
+    "build": "shadow-cljs release lib"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
