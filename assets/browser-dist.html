@@ -29,9 +29,22 @@
         },
         (err, res) => {
             const json = JSON.stringify(res, null, 4);
-            console.log(json);
             target.innerHTML = `<pre>${json}</pre>`;
         })
+
+    censusPromise({
+        vintage: "2017",
+        geoHierarchy: {
+            state: {
+                lat: 38.8482,
+                lng: -76.9312
+            },
+            county: "*"
+        },
+        sourcePath: ["acs", "acs5"],
+        values: ["B00001_001E"],
+        geoResolution: "20m"
+    }).then(d => console.log(d))
 </script>
 
 </html>
