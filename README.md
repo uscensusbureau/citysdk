@@ -45,6 +45,17 @@ When adding images or assets make sure to include relative_url. This is so baseu
 {{ '/assets/something.png' | relative_url }}
 ```
 
+To update ./assets/citysdk.js
+
+```
+cd assets
+npm install
+npm update citysdk
+npm run build
+```
+
+Test by opening `./assets/browser-dist.html`
+
 ---
 
 If you would like to add features and content, report an issue, or suggest changes submit a pull request on Github.

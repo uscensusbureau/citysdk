@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script src="./citysdk.js"></script>
+<script>
+    const target = document.body
+    census({
+            vintage: "2017",
+            geoHierarchy: {
+                state: {
+                    lat: 38.8482,
+                    lng: -76.9312
+                },
+                county: "*"
+            },
+            sourcePath: ["acs", "acs5"],
+            values: ["B00001_001E"],
+            geoResolution: "20m"
+        },
+        (err, res) => {
+            const json = JSON.stringify(res, null, 4);
+            console.log(json);
+            target.innerHTML = `<pre>${json}</pre>`;
+        })
+</script>
+
+</html>

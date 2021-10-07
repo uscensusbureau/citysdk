@@ -1,0 +1,21 @@
+{
+    "name": "browser-dist",
+    "version": "1.0.0",
+    "description": "",
+    "main": "browser-dist.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "browserify ./browser-dist.js -o ./citysdk.js -t [ babelify --presets [ @babel/preset-env ] ]"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@babel/core": "^7.15.8",
+        "@babel/preset-env": "^7.15.8",
+        "babelify": "^10.0.0",
+        "browserify": "^17.0.0"
+    },
+    "dependencies": {
+        "citysdk": "^2.1.10"
+    }
+}
