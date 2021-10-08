@@ -5,7 +5,8 @@
     "main": "browser-dist.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "browserify ./browser-dist.js -o ./citysdk.js -t [ babelify --presets [ @babel/preset-env ] ]"
+        "build": "browserify ./browser-dist.js -o ./citysdk.js -t [ babelify --presets [ @babel/preset-env ] ]",
+        "build:min": "browserify ./browser-dist.js -t [ babelify --presets [ @babel/preset-env ] ] | uglifyjs > citysdk.min.js"
     },
     "author": "",
     "license": "ISC",
@@ -16,6 +17,6 @@
         "browserify": "^17.0.0"
     },
     "dependencies": {
-        "citysdk": "^2.1.10"
+        "citysdk": "^2.1.11"
     }
 }
