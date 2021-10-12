@@ -35,7 +35,7 @@
            (keys->strs
             (if (= 1 (count geoHierarchy))
               (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-              (str "&in="  (join "%20" (map #(kv-pair->str % ":") (butlast geoHierarchy)))
+              (str "&in="  (join "%20" (map #(kv-pair->str % ":") (filter #(not (= nil (last %))) (butlast geoHierarchy))))
                    "&for=" (kv-pair->str (last geoHierarchy) ":"))))
            "")
          (if (not (nil? statsKey))
@@ -158,7 +158,8 @@
 ;;                   
 (defn xf-'key'<w-stat
   "
-  Takes an integer argument denoting the number of stat vars the user requested.
+  Takes the geoHierarchy portion of args and pulls out the keys, which
+  is used as a path to get the values from incoming maps
   Returns a function of one item (from the Census API response
   collection) to a new map with a hierarchy that will enable deep-merging of
   the stats with a GeoJSON `feature`s `:properties` map.
@@ -168,22 +169,24 @@
           (rf acc {(apply str (map #(get this %) (vec (keys geo))))
                    {:properties this}}))))
 
-;;(let [input '({:B01001_001E 55049,:state "01", :B01001_001M -555555555, :county "001"}
-;;                {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
-;;                {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
-;;                {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
-;;                {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"})]
-;;       (transduce (xf-'key'<w-stat {:state "01" :county "001"}) conj input))
+#_(let [input '({:B01001_001E 55049,:state "01", :county "001"}
+                {:B01001_001E 199510, :state "01", :county "003"})]
+       (transduce (xf-'key'<w-stat {:state "01" :county "001"}) conj input))
+; RESULT:
+#_[{"01001" {:properties {:B01001_001E 55049, :state "01", :county "001"}}}
+   {"01003" {:properties {:B01001_001E 199510, :state "01", :county "003"}}}]
 ;; Examples ==============================
+
+
 
 (defn xf-mergeable<-stats
   "Takes users' arguments and returns a composed transducer, which converts
   the results from the Census API into a shape that allows it to be merged
   together with other data."
-  [args geo]
+  [args]
   (comp
    (xf!-CSV->CLJ args)
-   (xf-'key'<w-stat geo)))
+   (xf-'key'<w-stat (get-in args [:geoHierarchy]))))
 
 
 (defn =cfg=C-Stats
@@ -193,7 +196,7 @@
          (fn [args]
            (let [geo (get args :geoHierarchy)
                  url   (C-S-args->url args)
-                 xform (educt<< (xf-mergeable<-stats args geo))
+                 xform (educt<< (xf-mergeable<-stats args))
                  s-key (keyword (first (get args :values)))]
              (if (= "" url)
                (put! =cfg= "Invalid Census Statistics request. Please check arguments against requirements.")
