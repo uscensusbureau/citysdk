@@ -335,7 +335,6 @@
   :2000 {:lev<-file "tr"       :scopes {:us nil                 :st ["500k"] } :wms {:layers ["6" ] :lookup :2010}   :id<-json [:STATE :COUNTY :TRACT]} ; "44","007","011402"
   :1990 {:lev<-file "tr"       :scopes {:us nil                 :st ["500k"] } :wms nil                              :id<-json [:ST :CO :TRACTBASE :TRACTSUF]}} ; "01","077","0113","" ="00" TODO
 
-
  :urban-area
  {
   :2020 {:lev<-file "ua"       :scopes {:us nil                 :st nil      } :wms nil                              :id<-json [:GEOID10]}       ; "58600"

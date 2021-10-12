@@ -41,18 +41,35 @@ const census = require("../census.js");
 //    (err, res) => console.log(JSON.stringify(res)),
 //) //?
 
+//census(
+//  {
+//    vintage: "2018",
+//    geoHierarchy: {
+//      state: {
+//        lat: 38.8482,
+//        lng: -76.932,
+//      },
+//      county: "*",
+//    },
+//    sourcePath: ["acs", "acs5"],
+//    values: ["B00001_001E"],
+//    geoResolution: "500k",
+//  },
+//  (err, res) => console.log(res)
+//); //?
+
 census(
   {
-    vintage: "2018",
+    vintage: 2018,
     geoHierarchy: {
-      state: {
-        lat: 38.8482,
-        lng: -76.932,
-      },
-      county: "*",
+      // required
+      state: "01",
+      county: null,
+      tract: "*",
     },
     sourcePath: ["acs", "acs5"],
-    values: ["B00001_001E"],
+    values: ["B01001_001E"],
+    // "statsKey": censusAccessToken,
     geoResolution: "500k",
   },
   (err, res) => console.log(res)

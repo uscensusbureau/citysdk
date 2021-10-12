@@ -12,9 +12,8 @@
                                 map-over-keys keys->strs error throw-err
                                 err-type amap-type ->args]]))
 
-(defn G-err
-  "Tries to log a useful error given a user's invalid input. Sends empty string
-  downstream."
+(defn G-err-payload
+  "Payload for G-err function"
   [$g$ res vin lev]
   (let [js-name (keys->strs (name lev))
         e-gen [(str "No GeoJSON found for: '" js-name "'")
@@ -22,19 +21,27 @@
                (str "at resolution: " res)]]
     (if-let [vins (get-in $g$ [lev])]
       (let [e-try
-            [(str "For '" js-name "' try of of the following:")
+            [""
+             (str "For '" js-name "' try one of the following:")
              (str "=== :us = nation-level '" js-name "' geoResolutions ===")
-             (str "=== :st = state-levels '" js-name "' geoResolutions ===")]]
-        (do (doseq [e e-gen] (prn e))
-            (doseq [t e-try] (prn t))
-            (doseq [s (vec (map-over-keys #(get-in % [:scopes]) vins))] (prn s))
-            ""))
-      (let [e-NA "=== available geoHierarchy levels ==="]
-        (do (doseq [e e-gen] (prn e))
-            (prn e-NA)
-            (doseq [s (vec (map #(keys->strs (name (key %))) $g$))] (prn s))
-            "")))))
+             (str "=== :st = state-levels '" js-name "' geoResolutions ===")]
 
+            e-scopes (->> (vec (map-over-keys #(get-in % [:scopes]) vins))
+                          sort)
+            e-NA ["" "=== available geoHierarchy levels ==="]
+            e-avail (vec (map #(keys->strs (name (key %))) $g$))]
+        {:intro e-gen
+         :try-next e-try
+         :scopes-available e-scopes
+         :outro e-NA
+         :geos-available e-avail}))))
+
+(defn G-err
+  "Tries to log a useful error given a user's invalid input. Sends empty string
+  downstream."
+  [$g$ res vin lev]
+  (let [todo (G-err-payload $g$ res vin lev)]
+    (doseq [[k v] todo] (doseq [_v v] (prn _v)))))
 
 (defn G-pattern->url
   "Composes a URL to call raw GeoJSON files hosted on Github"
@@ -69,14 +76,14 @@
          ["Warning, you are about to make a large GeoJSON request."
           "This may take some time -> consider local data caching."
           "The response may also cause VM heap capacity overflow."
-          "On Node - for ZCTAs - Use `--max-old-space-size=4096"]]
+          "On Node use `--max-old-space-size=4096`"]]
      (do (doseq [s strs] (prn s))
          (scope $g$ res vin lev USr STr st)))))
 
 (defun G-patterner
   "Takes a pattern of maps and triggers the URL builder accordingly."
   ([$g$ ["500k" vin nil [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
-  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _ ]] (G-err $g$ res vin :zip-code-tabulation-area))
+  ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _]] (G-err $g$ res vin :zip-code-tabulation-area))
   ([$g$ [res    vin nil [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
   ([$g$ [res    vin _   [lev _    ]                   nil               ]] (G-err $g$ res vin lev))
   ([$g$ [res    vin nil [lev _    ]                   {:us nil :st _   }]] (G-err $g$ res vin lev))
@@ -159,7 +166,6 @@
     (xf<< (fn [rf acc this]
             (rf acc {(apply str (map (:properties this) GEOIDS))
                      this})))))
-
 
 (defn xf-mergeable<-GeoCLJS
   "
