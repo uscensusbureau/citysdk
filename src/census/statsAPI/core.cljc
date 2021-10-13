@@ -8,6 +8,7 @@
    [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
    [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
                                transduct<<
+                               filter-nil-tails
                                amap-type vec-type throw-err map-idcs-range
                                keys->strs ->args strs->keys
                                URL-WMS URL-STATS]]))
@@ -35,7 +36,7 @@
            (keys->strs
             (if (= 1 (count geoHierarchy))
               (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-              (str "&in="  (join "%20" (map #(kv-pair->str % ":") (filter #(not (= nil (last %))) (butlast geoHierarchy))))
+              (str "&in="  (join "%20" (map #(kv-pair->str % ":") (filter-nil-tails (butlast geoHierarchy))))
                    "&for=" (kv-pair->str (last geoHierarchy) ":"))))
            "")
          (if (not (nil? statsKey))
@@ -81,12 +82,12 @@
   (let [parse-range [0 (+ (count values) (count predicates))]]
     (xf!<<
      (fn [state rf acc this]
-       (let [prev @state]
-         (if (nil? prev)
+       (let [Keys @state]
+         (if (nil? Keys)
            (do (vreset! state (mapv strs->keys this))
                nil)
            (rf acc
-               (zipmap (mapv keyword @state)
+               (zipmap (mapv keyword Keys)
                        (map-idcs-range ->valid#?->#
                                        parse-range
                                        this)))))))))
@@ -155,7 +156,7 @@
 ;;  (xf<< (fn [rf acc this]
 ;;          (rf acc {(apply str (vals (get (- (count this) vars#) this)))
 ;;                   {:properties this}}))))
-;;                   
+;;
 (defn xf-'key'<w-stat
   "
   Takes the geoHierarchy portion of args and pulls out the keys, which
