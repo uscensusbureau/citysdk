@@ -80,7 +80,7 @@
                    [cfg ?=$g$] (first cfgs)
                    acc (transient [])]
               (if (nil? (first todo))
-                  (do (prn "Working on it ...")
+                  (do (prn "Merging GeoJSON with Statistics...")
                       (>! =O= (->> (persistent! acc)
                                    (reduce concat)
                                    (eduction (xf-Grands-M->JSON @$ids$))

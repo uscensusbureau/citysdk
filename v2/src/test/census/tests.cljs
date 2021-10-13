@@ -32,7 +32,7 @@
             (prn "Error: " err))))))
 
 (comment
-  (test-async-time ts/args-ok-wms-only prn)            ; :geocodes   ms = 275
+  (test-async-time ts/args-ok-wms-only js/console.log)            ; :geocodes   ms = 275
   (test-async-time (ts/test-args 9 3 3 0) prn)         ; :geocodes   ms = 362
   (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos No GeoJSON
   (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos No GeoJSON
@@ -99,7 +99,7 @@
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:state "42"
-                                   :county "003"
+                                   :county nil
                                    :tract "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}

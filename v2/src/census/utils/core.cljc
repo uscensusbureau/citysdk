@@ -347,3 +347,5 @@
                       (conj m (f v))
                       (conj m v)))
       [] coll)))
+
+(defn filter-nil-tails [coll] (filter #(not (= nil (last %))) coll))

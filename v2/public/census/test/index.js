@@ -63,9 +63,14 @@ census(
     vintage: 2018,
     geoHierarchy: {
       // required
-      state: "01",
-      county: null,
-      tract: "*",
+      state: {
+        lat: 38.8482,
+        lng: -76.9312,
+      },
+      //  state: "24",
+      //  county: null,
+      county: "*",
+      //  tract: "*",
     },
     sourcePath: ["acs", "acs5"],
     values: ["B01001_001E"],
@@ -74,3 +79,25 @@ census(
   },
   (err, res) => console.log(res)
 ); //?
+/*
+"Getting Census FIPS Geocoding data from source:" 
+"https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2018/MapServer/84/query?geometry=-76.9312,38.8482&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=pjson&outFields=STATE" 
+:stats+geos 
+"Getting Census GeoJSON (for merge) data from source:" 
+"https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2018/24/tract.json" 
+"Getting Census statistics data from source:" 
+"https://api.census.gov/data/2018/acs/acs5?get=B01001_001E&in=state:24&for=tract:*" 
+"Merging GeoJSON with Statistics..." 
+{ type: 'FeatureCollection', features: [] }
+
+:stats+geos 
+"Getting Census GeoJSON (for merge) data from source:" 
+"https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2018/01/tract.json" 
+"Getting Census statistics data from source:" 
+"https://api.census.gov/data/2018/acs/acs5?get=B01001_001E&in=state:01&for=tract:*" 
+"Merging GeoJSON with Statistics..." 
+{ type: 'FeatureCollection',
+  features: 
+   [ { type: 'Feature', geometry: [Object], properties: [Object] },
+
+*/

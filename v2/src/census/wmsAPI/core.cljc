@@ -12,6 +12,7 @@
     [cuerdas.core      :refer [join]]
     [linked.core       :as -=-]
     [census.utils.core :refer [=O?>-cb $GET$
+                               filter-nil-tails
                                amap-type vec-type throw-err ->args
                                URL-WMS URL-GEOKEYMAP]]))
 
@@ -38,14 +39,14 @@
   "
   ([$g$ args] ($g$->wms-cfg $g$ args 0))
   ([$g$ {:keys [geoHierarchy vintage]} server-index]
-   (let [[[scope {:keys [lat lng]}] sub-level] (vec geoHierarchy)
+   (let [[[scope {:keys [lat lng]}] & sub-levels] (vec geoHierarchy)
          {:keys [lookup layers]} (get-in $g$ [scope (keyword (str vintage)) :wms])
          config {:vintage        vintage
                  :layers         layers
                  :cur-layer-idx  server-index
                  :lat            lat
                  :lng            lng
-                 :sub-level      sub-level}]
+                 :sub-levels     sub-levels}]
         (if (instance? vec-type lookup)
             (merge-with assoc config
               {:geo            lookup
@@ -54,6 +55,8 @@
               {:geo            (get-in $g$ [scope lookup :id<-json])
                ; lookup-up-in
                :looked-up-in   lookup})))))
+
+;(filter-nil-tails (vec {:state { :lat 1 :lng 2 } :county nil :tract "*"}))
 
 (defn lookup-id->match?
   "
@@ -68,7 +71,7 @@
                        :2016 {:wms {:layers ['24'], :lookup [:STATE :CONCITY]}}}
                       :consolidated-cities
                       {:2014 {:wms {:layers ['24'], :lookup [:BLOOP]}}
-                       :2016 {:wms {:layers ['24'], :lookup [:BLOOP]}}}
+                       :2016 {:wms {:layers ['24'], :lookup :2010}}}
                       :something-else])
   ; => :consolidated-cities
   "
@@ -211,7 +214,7 @@
             (loop [args ->args
                    idx 0]
               (try-census-wms $g$ args idx =res=)
-              (let [{:keys [layers sub-level]} ($g$->wms-cfg $g$ args)
+              (let [{:keys [layers sub-levels]} ($g$->wms-cfg $g$ args)
                     res (<! =res=)]
                 (cond
                   (not (empty? res))
@@ -220,7 +223,7 @@
                           (assoc {} :geoHierarchy
                             (conj (-=-/map)
                                   (into (-=-/map) (vals res))
-                                  (into (-=-/map) [sub-level])))))
+                                  (into (-=-/map) sub-levels)))))
                       (close! =res=))
                   ; if another layer is available: recur
                   (and (empty? res) (not (nil? (get layers (inc idx)))))
