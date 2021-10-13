@@ -81,7 +81,7 @@ You may pass a `{"lat" : <float>, "lng" : <float>}` object as the first and _onl
 `geoHierarchy` key:
 
 ```js
-const census = require("citysdk")
+const census = require("citysdk");
 
 census(
   {
@@ -90,12 +90,12 @@ census(
       // required
       county: {
         lat: 28.2639,
-        lng: -80.7214
-      }
-    }
+        lng: -80.7214,
+      },
+    },
   },
   (err, res) => console.log(res)
-)
+);
 
 // result -> {"vintage":"2015","geoHierarchy":{"state":"12","county":"009"}}
 ```
@@ -111,7 +111,7 @@ appropriate geographic hierarchy creation is handled by the function for you.
 RETURN TYPE: `JSON`
 
 ```js
-const census = require("citysdk")
+const census = require("citysdk");
 
 census(
   {
@@ -120,13 +120,13 @@ census(
       // required
       state: {
         lat: 28.2639,
-        lng: -80.7214
+        lng: -80.7214,
       },
-      county: "*" // <- syntax = "<descendant>" : "*"
-    }
+      county: "*", // <- syntax = "<descendant>" : "*"
+    },
   },
   (err, res) => console.log(res)
-)
+);
 
 // result -> {"vintage":"2015","geoHierarchy":{"state":"12","county":"*"}}
 ```
@@ -145,6 +145,35 @@ areas allows the Census data user to request all [descendants] of a particular t
    (`"county" : "*"`). It is important to use the `"*"` expression signifying that you want _all_ of
    the specified level of [descendants] within the geography for which you supply a coordinate. No
    other expression will work.
+3. For some wildcard (`"*"`) geographies, the Census API can
+   accept a skipped or "leapfrogged" wildcard. For example:
+
+```js
+geoHierarchy: {
+  state: "01",
+  tract: "*"
+}
+```
+
+However, the fully qualified geographic id requires an
+intermediary scope (in the above case `county`). You can
+tell when an intermediary scope has been skipped by checking the payload of the stats request logged by CitySDK.
+
+Another indicator that you might be hitting this issue is if you get back an empty `features` list in your GeoJSON:
+
+```js
+{ type: 'FeatureCollection', features: [ ] }
+```
+
+The solution to this problem is to add the skipped scope as a `null` property, e.g.:
+
+```js
+geoHierarchy: {
+  state: "01",
+  county: null, // <- leapfrog fix
+  tract: "*"
+}
+```
 
 [descendants]: https://www2.census.gov/geo/pdfs/reference/geodiagram.pdf
 
@@ -172,8 +201,7 @@ to the [Developers' Microsite] and - in any of the examples of making a call - t
 `<vintage>/` and the `?get`. For example, for [American Community Survey 1-year] you'll the first
 example (2017) shows:
 
-[american community survey error codes]:
-  https://www.census.gov/data/developers/data-sets/acs-1year/notes-on-acs-estimate-and-annotation-values.html
+[american community survey error codes]: https://www.census.gov/data/developers/data-sets/acs-1year/notes-on-acs-estimate-and-annotation-values.html
 [american community survey 1-year]: https://www.census.gov/data/developers/data-sets/acs-1year.html
 
 ```
@@ -196,14 +224,14 @@ census(
       // required
       county: {
         lat: 28.2639,
-        lng: -80.7214
-      }
+        lng: -80.7214,
+      },
     },
     sourcePath: ["cbp"], // required
-    values: ["ESTAB"] // required
+    values: ["ESTAB"], // required
   },
   (err, res) => console.log(res)
-)
+);
 
 // result -> [{"ESTAB":13648,"state":"12","county":"009"}]
 ```
@@ -246,15 +274,15 @@ census(
       // required
       county: {
         lat: 28.2639,
-        lng: -80.7214
-      }
+        lng: -80.7214,
+      },
     },
     sourcePath: ["cbp"], // required
     values: ["ESTAB"], // required
-    statsKey: "<your key here>" // required for > 500 calls per day
+    statsKey: "<your key here>", // required for > 500 calls per day
   },
   (err, res) => console.log(res)
-)
+);
 
 // result -> [{"ESTAB":13648,"state":"12","county":"009"}]
 ```
@@ -274,17 +302,17 @@ census(
     vintage: "2017",
     geoHierarchy: {
       state: "51",
-      county: "*"
+      county: "*",
     },
     sourcePath: ["acs", "acs1"],
     values: ["NAME"],
     predicates: {
-      B01001_001E: "0:100000" // number range separated by `:`
+      B01001_001E: "0:100000", // number range separated by `:`
     },
-    statsKey: "<your key here>"
+    statsKey: "<your key here>",
   },
   (err, res) => console.log(res)
-)
+);
 
 /* result:
     [
@@ -321,14 +349,14 @@ census(
     vintage: "timeseries", // required
     geoHierarchy: {
       // required
-      us: "*"
+      us: "*",
     },
     sourcePath: ["asm", "industry"], // required
     values: ["EMP", "NAICS_TTL", "GEO_TTL"],
-    predicates: { time: "2016", NAICS: "31-33" }
+    predicates: { time: "2016", NAICS: "31-33" },
   },
   (err, res) => console.log(res)
-)
+);
 
 /* result:
 [{"EMP": 11112764, 
@@ -373,20 +401,22 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-const fs = require("fs")
+const fs = require("fs");
 
 census(
   {
     vintage: 2017,
     geoHierarchy: {
-      "metropolitan statistical area/micropolitan statistical area": "*"
+      "metropolitan statistical area/micropolitan statistical area": "*",
     },
-    geoResolution: "500k" // required
+    geoResolution: "500k", // required
   },
   (err, res) => {
-    fs.writeFile("./directory/filename.json", JSON.stringify(res), () => console.log("done"))
+    fs.writeFile("./directory/filename.json", JSON.stringify(res), () =>
+      console.log("done")
+    );
   }
-)
+);
 ```
 
 [`fs`]: https://nodejs.org/api/fs.html
@@ -402,12 +432,12 @@ census(
     vintage: "2017",
     geoHierarchy: {
       state: "51",
-      county: "*"
+      county: "*",
     },
-    geoResolution: "500k" // required
+    geoResolution: "500k", // required
   },
   (err, res) => console.log(res)
-)
+);
 ```
 
 It's important to note that - when querying for these GeoJSON files - you may retrieve a larger area
@@ -454,13 +484,13 @@ Use Chrome for best results (mapbox-gl geocoder caveat)
 census({
   vintage: "2017",
   geoHierarchy: {
-    county: "*"
+    county: "*",
   },
   sourcePath: ["acs", "acs5"],
   values: ["B19083_001E"], // GINI index
   statsKey: "<your key here>",
-  geoResolution: "500k"
-})
+  geoResolution: "500k",
+});
 ```
 
 In this example, we use `citysdk` to create the payload and then save it via Nodes
@@ -481,13 +511,13 @@ In this example, we use `citysdk` to create the payload and then save it via Nod
 census({
   vintage: "2017",
   geoHierarchy: {
-    "zip-code-tabulation-area": "*"
+    "zip-code-tabulation-area": "*",
   },
   sourcePath: ["acs", "acs5"],
   values: ["B19083_001E"], // GINI index
   statsKey: "<your key here>",
-  geoResolution: "500k"
-})
+  geoResolution: "500k",
+});
 ```
 
 This is a very large request, in fact, one of the largest you could possibly make in a single
