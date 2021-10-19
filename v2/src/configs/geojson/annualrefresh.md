@@ -48,9 +48,9 @@ Create a vector (array) of filenames to use for conversion.
 For the purposes of releasing the `citysdk`, dependencies needed for batch processing have been removed from the `package.json` , `shadow-cljs.edn`, and the `.../configs/geojson/core.cljs`, which will need to be restored (see `Fixme` tags):
 - ["shpjs" :as shpjs]
 - ["mkdirp" :as mkdirp]
-- [cljs-promises.async :refer [value-port]]
 
-Note that you should not update [mkdirp](https://github.com/isaacs/node-mkdirp/issues/3) as the latest version changes the API from a callback to a promise and I'm just too lazy to update the code as such 
+[comment]: <> (- [cljs-promises.async :refer [value-port]] -> moved to local dep)
+[comment]: <> (Note that you should not update [mkdirp]&#40;https://github.com/isaacs/node-mkdirp/issues/3&#41; as the latest version changes the API from a callback to a promise and I'm just too lazy to update the code as such -> I ended up updating this)
 
 ### Step 4: Post Processing Using [mapshaper](https://mapshaper.org/)
 

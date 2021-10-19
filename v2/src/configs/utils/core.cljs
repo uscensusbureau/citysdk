@@ -17,14 +17,19 @@
   "
   [{:keys [directory filepath json]}]
   (prn (str "Ensuring Directory: " directory))
-  (mkdirp directory
-    (fn [err]
-      (if (= (type err) err-type)
-          (prn (str "Error creating directory: " filepath))
-          (fs/writeFile
-             filepath
-             json
-             (fn [err]
-               (if (= (type err) err-type)
-                   (prn (str "Error writing file: " filepath))
-                   (prn (str "Wrote file to: " filepath)))))))))
+  (-> (mkdirp directory)
+      (.then (fn [res]
+               (do (prn (str "res " res))
+                   (fs/writeFile
+                      filepath
+                      json
+                      (fn [res]
+                        (if (= (type res) err-type)
+                            (prn (str "Error writing file: " filepath))
+                            (prn (str "Wrote file to: " filepath))))))))
+      (.catch (fn [err] (prn (str "Error creating directory: " err " for " filepath))))))
+
+
+(FileSaver {:directory "./bloop/bleep"
+            :filepath "./bloop/bleep/stuff.json"
+            :json "['hello']"})
