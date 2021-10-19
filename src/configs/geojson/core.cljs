@@ -16,8 +16,8 @@
      ;[configs.geojson.filepaths2019 :refer [paths]]
      ;["path" :as path]
      ["fs" :as fs]
-     ["shpjs" :as shpjs]
-     ["mkdirp" :as mkdirp]))
+     ["shpjs" :as shpjs]))
+     ;["mkdirp" :as mkdirp]))
 
 
 (prn "hello")
