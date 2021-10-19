@@ -6,21 +6,6 @@
 ;      - if :lookup isn't a vector -> the :<vintage>'s :id<-json field it points to is used for 'outFields'
 {
 
- :american-indian-area!alaska-native-area!hawaiian-home-land
- {
-  :2020 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2019 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["52"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2018 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["52"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2017 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2016 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2015 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2014 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2013 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2012 {:lev<-file nil        :scopes nil                                     :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
-  :2010 {:lev<-file "250"      :scopes {:us [           "500k"] :st nil      } :wms {:layers ["54"] :lookup :2010}   :id<-json [:AIANHH]}        ; "5138"
-  :2000 {:lev<-file "na"       :scopes {:us [           "500k"] :st nil      } :wms {:layers ["48"] :lookup :2010}   :id<-json [:AIANACE]}       ; "6165"
-  :1990 {:lev<-file "ir"       :scopes {:us [           "500k"] :st ["500k"] } :wms nil                              :id<-json [:IR]}}           ; "6220"
-
  :alaska-native-regional-corporation
  {
   :2020 {:lev<-file "anrc"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["30"] :lookup :2010}   :id<-json [:GEOID]}         ; "0206370"
@@ -35,6 +20,21 @@
   :2010 {:lev<-file "230"      :scopes {:us nil                 :st ["500k"] } :wms {:layers ["34"] :lookup :2010}   :id<-json [:STATE :ANRC]}   ; "02","00590"
   :2000 {:lev<-file "an"       :scopes {:us nil                 :st ["500k"] } :wms {:layers ["28"] :lookup :2010}   :id<-json [:STATE :ANRCFP]} ; "02","03950"
   :1990 {:lev<-file "an"       :scopes {:us nil                 :st ["500k"] } :wms nil                              :id<-json [:ANRC]}}         ; "63"  bit.ly/1990-ANRC-FIPS
+
+ :american-indian-area!alaska-native-area!hawaiian-home-land
+ {
+  :2020 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2019 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["52"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2018 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["52"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2017 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2016 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2015 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2014 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2013 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2012 {:lev<-file nil        :scopes nil                                     :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2010 {:lev<-file "250"      :scopes {:us [           "500k"] :st nil      } :wms {:layers ["54"] :lookup :2010}   :id<-json [:AIANHH]}        ; "5138"
+  :2000 {:lev<-file "na"       :scopes {:us [           "500k"] :st nil      } :wms {:layers ["48"] :lookup :2010}   :id<-json [:AIANACE]}       ; "6165"
+  :1990 {:lev<-file "ir"       :scopes {:us [           "500k"] :st ["500k"] } :wms nil                              :id<-json [:IR]}}           ; "6220"
 
  :block-group
  {
