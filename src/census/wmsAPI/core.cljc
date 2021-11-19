@@ -1,9 +1,9 @@
 (ns census.wmsAPI.core
   (:require
-    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan
+    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan!
                                         timeout]
                                 :refer-macros [go alt!]]
-       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan
+       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan!
                                         timeout go alt!]])
     ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
     ;                            :refer-macros [select transform traverse setval]]
@@ -12,37 +12,68 @@
     [cuerdas.core      :refer [join]]
     [linked.core       :as -=-]
     [census.utils.core :refer [=O?>-cb $GET$
+                               filter-nil-tails
                                amap-type vec-type throw-err ->args
                                URL-WMS URL-GEOKEYMAP]]))
 
 (defn $g$->wms-cfg
   "
   Creates a configuration map for the WMS url-builder from the geoHierarchy map.
+
+  if  : lookup key is a vec -> direct looked up
+  else: lookup at :id<-json key
+
+  ($g$->wms-cfg
+    $g$
+    {:vintage     2014,
+     :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county '*'}})
+  ;=>
+  {:vintage 2014,
+   :layers ['84'],
+   :cur-layer-idx 0,
+   :lat 28.2639,
+   :lng -80.7214,
+   :sub-level [:county '*'],
+   :geo [:STATE],
+   :looked-up-in :2010}
   "
   ([$g$ args] ($g$->wms-cfg $g$ args 0))
   ([$g$ {:keys [geoHierarchy vintage]} server-index]
-   (let [[[scope {:keys [lat lng]}] sub-level] (vec geoHierarchy)
+   (let [[[scope {:keys [lat lng]}] & sub-levels] (vec geoHierarchy)
          {:keys [lookup layers]} (get-in $g$ [scope (keyword (str vintage)) :wms])
          config {:vintage        vintage
                  :layers         layers
                  :cur-layer-idx  server-index
                  :lat            lat
                  :lng            lng
-                 :sub-level      sub-level}]
+                 :sub-levels     sub-levels}]
         (if (instance? vec-type lookup)
             (merge-with assoc config
-                {:geo            lookup
-                 :looked-up-in   (keyword vintage)})
+              {:geo            lookup
+               :looked-up-in   (keyword vintage)})
             (merge-with assoc config
-                {:geo            (get-in $g$ [scope lookup :id<-json])
-                 :lookup-up-in   lookup})))))
+              {:geo            (get-in $g$ [scope lookup :id<-json])
+               ; lookup-up-in
+               :looked-up-in   lookup})))))
 
+;(filter-nil-tails (vec {:state { :lat 1 :lng 2 } :county nil :tract "*"}))
 
 (defn lookup-id->match?
   "
+  :id<-json
+
   Looks in a single entry from the inverted geoKeyMap for a matching geoKey via
   `some`ing through each of its vintages for a match with a provided WMS
   geographic identifier.
+
+  (lookup-id->match? :CONCITY    ;; ↓ seq'd inverted geoKeyMap | looks up ↓
+                     [{:2017 {:wms {:layers ['24'], :lookup [:STATE :CONCITY]}}
+                       :2016 {:wms {:layers ['24'], :lookup [:STATE :CONCITY]}}}
+                      :consolidated-cities
+                      {:2014 {:wms {:layers ['24'], :lookup [:BLOOP]}}
+                       :2016 {:wms {:layers ['24'], :lookup :2010}}}
+                      :something-else])
+  ; => :consolidated-cities
   "
   [GEO [geo-val geo-key]]
   (let [vins (map (fn [[_ {:keys [id<-json] {:keys [lookup]} :wms}]]
@@ -54,11 +85,16 @@
            geo-key
            nil)))
 
-
 (defn search-id->match?
   "
   Searches the entire geoKeyMap (inverted) for a geo key match provided a given
-  WMS geographic identifier.
+  WMS geographic identifier. Returned values are used in combination with a
+  response from the TigerWeb WMS geocoding response to determine the geographic
+  hierarchy of a geography for filling-in the data API request geography for
+  geocoding requests
+
+  (search-id->match? $g$ :CONCITY)
+  ; => :consolidated-cities
   "
   [$g$ GEO]
   (let [inverted-geoKeyMap (seq (map-invert $g$))]
@@ -66,7 +102,8 @@
       (map #(lookup-id->match? GEO %)
            inverted-geoKeyMap))))
 
-
+; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2012/MapServer
+; https://tigerweb.geo.census.gov/arcgis/rest/services/Census2020/tigerWMS_Census2000/MapServer
 (defn C->GIS-url
   "
   Constructs a URL for the TigerWeb Web Mapping Service (WMS) using a lookup
@@ -78,10 +115,9 @@
          ($g$->wms-cfg $g$ args server-index)]
      (str URL-WMS
           (cond
-            (= "2010" (str vintage)) (str "TIGERweb/tigerWMS_Census2010")
-            (= "2000" (str vintage)) (str "Census2010/tigerWMS_Census2000")
-            :else                    (str "TIGERweb/tigerWMS_ACS" vintage))
-          "/Mapserver/"
+            (= 0 (mod vintage 10)) (str "Census2020/tigerWMS_Census" vintage)
+            :else                  (str "TIGERweb/tigerWMS_ACS" vintage))
+          "/MapServer/"
           (get layers cur-layer-idx)
           "/query?"
           (join "&"
@@ -96,7 +132,14 @@
 
 
 (defn configed-map
-  "
+
+  "IMPORTANT!
+  The :id<-json key in index.edn is double loaded, to both pull ids from GeoJSON
+  as well as configure the API call
+
+  (configed-map $g$ {:STATE '51', :COUNTY '013'})
+  ;=> {:STATE {:state '51'}, :COUNTY {:county '013'}}
+
   Takes the geoKeyMap configuration and the attributes from the WMS service
   API (js->cljs response) and returns a config map (:key = attribute ; value =
   corresponding configured map with (:geography 'value') needed to call Census'
@@ -133,7 +176,7 @@
   [$g$ args server-idx =res=]
   (let [=args=> (chan 1 (map #(configed-map $g$ (get-in % [:features 0 :attributes]))))
         url (C->GIS-url $g$ args server-idx)]
-    ($GET$-wms (to-chan [url]) =args=> =args=>)
+    ($GET$-wms (to-chan! [url]) =args=> =args=>)
     (take! =args=> (fn [args->] (do (put! =res= args->)
                                     (close! =args=>))))))
 
@@ -171,7 +214,7 @@
             (loop [args ->args
                    idx 0]
               (try-census-wms $g$ args idx =res=)
-              (let [{:keys [layers sub-level]} ($g$->wms-cfg $g$ args)
+              (let [{:keys [layers sub-levels]} ($g$->wms-cfg $g$ args)
                     res (<! =res=)]
                 (cond
                   (not (empty? res))
@@ -180,8 +223,9 @@
                           (assoc {} :geoHierarchy
                             (conj (-=-/map)
                                   (into (-=-/map) (vals res))
-                                  (into (-=-/map) [sub-level])))))
+                                  (into (-=-/map) sub-levels)))))
                       (close! =res=))
+                  ; if another layer is available: recur
                   (and (empty? res) (not (nil? (get layers (inc idx)))))
                   (recur ->args (inc idx))
                   :else
@@ -193,5 +237,5 @@
   and calls the Census WMS for geocoding; providing the results to the channel"
   [$g$]
   (fn [I =args=>]
-    ((=>args=GIS=args=> $g$) (to-chan [(->args I)]) =args=>)))
+    ((=>args=GIS=args=> $g$) (to-chan! [(->args I)]) =args=>)))
 

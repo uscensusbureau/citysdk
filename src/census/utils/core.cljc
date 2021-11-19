@@ -4,10 +4,10 @@
     [cuerdas.core        :as s]
     [cljs.reader         :refer [read-string]]
     #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
-                                        onto-chan to-chan]
+                                        onto-chan! to-chan!]
                                 :refer-macros [go go-loop alt!]]
        :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
-                                        onto-chan to-chan go go-loop alt!]])
+                                        onto-chan! to-chan! go go-loop alt!]])
     [clojure.walk         :refer [keywordize-keys]]))
 
 (def URL-STATS "https://api.census.gov/data/")
@@ -15,6 +15,21 @@
 (def URL-GEOJSON "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON")
 (def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
 ;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
+
+(def isNode
+  "returns false if environment is not Node"
+  (and (exists? js/process)
+       (exists? js/process.versions)
+       (exists? js/process.versions.node)))
+
+;(prn js/process.versions.node)
+
+(def cors-proxy
+  "URL proxy string prereq if not node"
+  (cond isNode ""
+        :else "https://cors-e.herokuapp.com/"))
+
+;(prn cors-proxy)
 
 ;TODO
 (def base-url-database "...")
@@ -139,7 +154,7 @@
                                                   " for: " url))
                                      (put! =err=))))
                           :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                     CORS-URL (str "https://cors-e.herokuapp.com/" url)]
+                     CORS-URL (str cors-proxy url)]
                  (case format
                    :json
                    (let [json
@@ -332,3 +347,5 @@
                       (conj m (f v))
                       (conj m v)))
       [] coll)))
+
+(defn filter-nil-tails [coll] (filter #(not (= nil (last %))) coll))

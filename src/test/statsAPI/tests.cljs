@@ -10,11 +10,11 @@
                                    xf-'key'<w-stat
                                    xf-stats->js
                                    xf-mergeable<-stats
-                                   ;IOE-C->stats
+                                ;;   IOE-C->stats
                                    IOE-C-S->JS
                                    =cfg=C-Stats]]))
 
-(deftest stats-url-builder-test
+(deftest C-S-args->url-test
   (let [args-1 {:vintage      "2016"
                 :sourcePath   ["acs" "acs5"]
                 :geoHierarchy {:state "01" :county "073" :tract "000100"}
@@ -24,11 +24,19 @@
                 :sourcePath   ["acs" "acs5"]
                 :geoHierarchy {:state "12" :state-legislative-district-_upper-chamber_ "*"}
                 :values       ["B01001_001E" "NAME"]
+                :predicates   {:B00001_001E "0:30000"}}
+        args-3 {:vintage      "2016"
+                :sourcePath   ["acs" "acs5"]
+                :geoHierarchy {:state "12" :county nil :tract "*"}
+                :values       ["B01001_001E" "NAME"]
                 :predicates   {:B00001_001E "0:30000"}}]
     (is (= (C-S-args->url args-1)
            "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,B01001_001M&in=state:01%20county:073&for=tract:000100&key=NA-key"))
     (is (= (C-S-args->url args-2)
-           "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*"))))
+           "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=state legislative district (upper chamber):*"))
+    (is (= (C-S-args->url args-3)
+           "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&in=state:12&for=tract:*"))))
+
 
 (deftest ->valid#?->#-test
   (is (= (->valid#?-># "30")
@@ -40,12 +48,11 @@
   (is (= (->valid#?-># "-666666666.0000")
          "NAN: -666666666"))
   (is (= (->valid#?-># "0")
-         "0"))
+         0))
   (is (= (->valid#?-># "01")
          "01")))
 
-
-(deftest xf!-csv->clj-test
+(deftest xf!-CSV->CLJ-test
   (let [args {:values     ["B01001_001E" "NAME"]
               :predicates {:B00001_001E "0:30000"}}
         input [["B01001_001E","NAME","B00001_001E","state","state legislative district (upper chamber)"],
@@ -70,23 +77,30 @@
               :values       ["B01001_001E" "B01001_001M"]}
         input [["B01001_001E" "B01001_001M" "state" "county" "tract"]
                ["3111" "369" "01" "073" "000100"]
-               ["3111" "222" "21" "0223" "000100"]]]
-    (is (= (eduction (xf-stats->js args) input)
-           '(#js {:B01001_001E 3111, :B01001_001M 369, :state "01", :county "073", :tract "000100"}
-             #js {:B01001_001E 3111, :B01001_001M 222, :state "21", :county "0223", :tract "000100"})))))
+               ["3111" "222" "21" "0223" "000100"]]
+        output (eduction (xf-stats->js args) input)]
+    (is (= (->> (map #(js/JSON.stringify %) output)
+                vec)
+           ["{\"B01001_001E\":3111,\"B01001_001M\":369,\"state\":\"01\",\"county\":\"073\",\"tract\":\"000100\"}"
+            "{\"B01001_001E\":3111,\"B01001_001M\":222,\"state\":\"21\",\"county\":\"0223\",\"tract\":\"000100\"}"]))))
 
 (deftest xf-geoid+<-stat-test
-  (let [input '({:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}
+  (let [input '({:B01001_001E 55049,:state "01", :B01001_001M -555555555,  :county "001"}
                 {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}
                 {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}
                 {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}
                 {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"})]
-       (is (= (transduce (xf-'key'<w-stat 2) conj input)
+       (is (= (transduce (xf-'key'<w-stat {:state "01" :county "*"}) conj input)
               [{"01001" {:properties {:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001"}}}
                {"01003" {:properties {:B01001_001E 199510, :B01001_001M -555555555, :state "01", :county "003"}}}
                {"01005" {:properties {:B01001_001E 26614, :B01001_001M -555555555, :state "01", :county "005"}}}
                {"01007" {:properties {:B01001_001E 22572, :B01001_001M -555555555, :state "01", :county "007"}}}
                {"01009" {:properties {:B01001_001E 57704, :B01001_001M -555555555, :state "01", :county "009"}}}]))))
+
+;;(prn (let [geo {:state "01" :county "200" :tract "*"}
+;;           inp {:B01001_001E 55049, :B01001_001M -555555555, :state "01", :county "001" :tract "001"}] 
+;;       (apply str (map #(get inp %) (vec (keys geo))))))
+    ;;   (get-in inp []:state))))
 
 (deftest xf-stats-mergeable-test
   (let [args {:vintage      "2016"
@@ -96,8 +110,10 @@
         input [["B01001_001E" "B01001_001M" "state" "county" "tract"]
                ["3111" "369" "01" "073" "000100"]
                ["3111" "222" "21" "0223" "000100"]]
-        vars# 2]
-    (is (= (transduce (xf-mergeable<-stats args vars#) conj input)
+        ;vars# 2
+        output (transduce (xf-mergeable<-stats args) conj input)]
+    ;(prn output)
+    (is (= output
            '({"210223000100"
               {:properties
                {:B01001_001E 3111
@@ -118,26 +134,26 @@
              :geoHierarchy {:state "44" :county "*"}
              :values       ["B01001_001E" "B01001_001M"]})
 
-(deftest IOE-C->stats-test
-  (let [=I= (chan 1)
-        =O= (chan 1)
-        =E= (chan 1)
-        time-in (js/Date.)]
-    (test-async-timed
-      "IOE-C->stats-test"
-      time-in
-      (go (>! =I= ARGS-2)
-          (IOE-C->stats =I= =O= =E=)
-          (is (= (alt! =O= ([res] res)
-                       =E= ([err] err))
-                 [["B01001_001E" "B01001_001M" "state" "county"]
-                  ["163760" "-555555555" "44" "003"]
-                  ["83460" "-555555555" "44" "005"]
-                  ["637357" "-555555555" "44" "007"]
-                  ["126150" "-555555555" "44" "009"]]))
-          (close! =I=)
-          (close! =O=)
-          (close! =E=)))))
+;; (deftest IOE-C->stats-test
+;;   (let [=I= (chan 1)
+;;         =O= (chan 1)
+;;         =E= (chan 1)
+;;         time-in (js/Date.)]
+;;     (test-async-timed
+;;      "IOE-C->stats-test"
+;;      time-in
+;;      (go (>! =I= ARGS-2)
+;;          (IOE-C->stats =I= =O= =E=)
+;;          (is (= (alt! =O= ([res] res)
+;;                       =E= ([err] err))
+;;                 [["B01001_001E" "B01001_001M" "state" "county"]
+;;                  ["163760" "-555555555" "44" "003"]
+;;                  ["83460" "-555555555" "44" "005"]
+;;                  ["637357" "-555555555" "44" "007"]
+;;                  ["126150" "-555555555" "44" "009"]]))
+;;          (close! =I=)
+;;          (close! =O=)
+;;          (close! =E=)))))
 
 (deftest IOE-C-S->JS-test
   (let [=I= (chan 1)

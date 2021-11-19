@@ -1,10 +1,10 @@
 (ns test.census.tests
   (:require
-    [cljs.core.async      :refer [chan close! >! <! timeout to-chan promise-chan]
+    [cljs.core.async      :refer [chan close! >! <! timeout to-chan! promise-chan]
                           :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [*g* test-async test-async-timed
-                                  time-spot heap-spot]
+    [test.fixtures.core   :refer [GG test-async test-async-timed
+                                  time-spot heap-spot stats-key]
                           :as ts]
     [census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
     [census.statsAPI.core :refer [cfg>cfg=C-Stats]]
@@ -16,6 +16,7 @@
 
 
 (comment
+  (shadow.cljs.devtools.api/node-repl)
   ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
   (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=4096"]}))
 ;; or in Node: node --max-old-space-size=4096
@@ -31,12 +32,12 @@
             (prn "Error: " err))))))
 
 (comment
-  (test-async-time ts/args-ok-wms-only prn)            ; :geocodes   ms = 275
+  (test-async-time ts/args-ok-wms-only js/console.log)            ; :geocodes   ms = 275
   (test-async-time (ts/test-args 9 3 3 0) prn)         ; :geocodes   ms = 362
-  (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos ms = 2747
-  (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos ms = 274
-  (test-async-time ts/args-ok-s+g-vals prn)            ; :stats+geos ms = 1852
-  (test-async-time ts/args-ok-geo-only prn) ; :geos-only  ms = 20907
+  (test-async-time ts/args-ok-s+g-v+ps js/console.log) ; :stats+geos No GeoJSON
+  (test-async-time ts/args-ok-s+g-v+ps prn)            ; :stats+geos No GeoJSON
+  (test-async-time ts/args-ok-s+g-vals prn)            ; :stats+geos No GeoJSON
+  (test-async-time ts/args-ok-geo-only prn)            ; :geos-only  ms = 13672
   (test-async-time ts/args-na-sts-pred prn)            ; :no-values
   (test-async-time ts/args-ok-sts-v+ps prn)            ; :stats-only ms = 384
   (test-async-time ts/args-ok-sts-vals prn)            ; :stats-only ms = 757
@@ -46,25 +47,26 @@
                         "sourcePath"    #js ["acs" "acs5"]
                         "values"        #js ["B01001_001E" "NAME"]
                         "predicates"    #js {"B00001_001E" "0:30000"}
-                        "geoResolution" "500k"
-                        "statsKey"      stats-key}
+                        "geoResolution" "500k"}
+                        ;"statsKey"      stats-key}
+
                    prn)
-  (test-async-time #js {"vintage"     "2016"}
-                      "sourcePath"    #js ["acs" "acs5"]
-                      "values"        #js ["B01001_001E" "NAME"]
-                      "predicates"    #js {"B00001_001E" "0:30000"}
-                      "geoResolution" "500k"
-                      "statsKey"      stats-key
-                 prn)
+  (test-async-time #js {"vintage"     "2016"
+                        "sourcePath"    #js ["acs" "acs5"]
+                        "values"        #js ["B01001_001E" "NAME"]
+                        "predicates"    #js {"B00001_001E" "0:30000"}
+                        "geoResolution" "500k"}
+                        ;"statsKey"      stats-key
+                   prn)
   (test-async-time {:vintage 2016                      ; :stats+geos NA
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:state "42"
                                    :county "003"
                                    :county-subdivision "*"}
-                    :geoResolution "50k"
+                    :geoResolution "500k"
                     :statsKey ts/stats-key}
-                   js/console.log)
+                   prn)
   (test-async-time {:vintage 2016                      ; ERROR
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
@@ -97,7 +99,7 @@
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
                     :geoHierarchy {:state "42"
-                                   :county "003"
+                                   :county nil
                                    :tract "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
@@ -217,13 +219,22 @@
                                         "E_COMMODITY" "0*"}}
                  js/console.log)
 
-(test-async-time #js {"vintage" 2017,
+(test-async-time #js {"vintage" 2018,
                       "geoHierarchy"
                         #js {"state" #js {"lat" 28.466944,
                                           "lng" -82.498148},
                              "county" "*"},
-                      ;"geoResolution" "5m",
-                      "sourcePath" #js["acs", "acs5", "subject"],
-                      "values" #js ["S0102_C01_001E", "S0102_C02_001E"],
+                      "geoResolution" "500k",
+                      "sourcePath" #js["acs", "acs5",]
+                      "values" #js ["NAME"],
                       "statsKey" "3c04140849164b373c8b1da7d7cc8123ef71b7ab"}
                  prn)
+
+(test-async-time #js {
+                      "vintage" 2016,
+                      "geoHierarchy" #js { "state" #js { "lat" 40.741919 "lng" -73.875504}
+                                           "county" "*"}
+                      "sourcePath" #js ["acs", "acs5"]
+                      "values" #js ["B00001_001E", "B01001_001E", "B08303_001E"]
+                      "geoResolution" "500k"}
+                 js/console.log)

@@ -13,6 +13,8 @@
                                  strs->keys
                                  ->args
                                  args->
+                                 isNode
+                                 cors-proxy
                                  xf<<
                                  xf!<<
                                  educt<<
@@ -39,6 +41,9 @@
 ;                        [:c #linked/map[[:e #linked/map[[:h 6] [:g 5] [:f 4]]] [:d 3]]]
 ;                        [:a #linked/map[[:b 2]]]]"))))
 
+(deftest is-node-url
+  (is (= (isNode) true)))
+
 (deftest map-rename-keys-test
   (is (= (map-rename-keys name {:a "b" :c "d"})
          {"a" "b", "c" "d"})))
@@ -50,7 +55,7 @@
                                                     :butt {:k "v"}}
                                                :k2 {:scopes [3 4]
                                                     :bottom {:k "s"}}})
-         {:k1 [1 2], :k2 [3 4]}))){:k1 [1 2], :k2 [3 4]}
+         {:k1 [1 2], :k2 [3 4]}))) ; {:k1 [1 2], :k2 [3 4]}
 
 (deftest keys->strs-test
   (is (= (keys->strs (name :american-indian-area!alaska-native-area-_reservation-or-statistical-entity-only_-_or-part_))

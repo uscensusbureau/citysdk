@@ -1,6 +1,6 @@
 {
   "name": "citysdk",
-  "version": "2.0.37",
+  "version": "2.1.13",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
   "main": "census.js",
   "scripts": {
@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "xmlhttprequest": "^1.8.0",
-    "xregexp": "^4.2.0"
+    "xregexp": "^5.1.0"
   },
   "author": "Logan Powell",
   "license": "MIT",

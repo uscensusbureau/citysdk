@@ -6,7 +6,7 @@
     [datascript.core :as d]
     [datascript.db :as db]
     [census.utils.core :refer [strs->keys ->args]]
-    [configs.utils.fixtures :refer [stats-key read-edn]]
+    [configs.utils.core :refer [stats-key read-edn]]
     [census.geoAPI.core :refer [G-pattern-cfg]]))
 
 (def geoKeyMap     (read-edn "./src/census/geojson/index.edn"))

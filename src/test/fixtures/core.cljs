@@ -9,10 +9,10 @@
 
 (defn read-edn [path] (read-string (str (fs/readFileSync path))))
 
-(def stats-key (get-in (js->clj (env/load)) ["parsed" "Census_Key_Pro"]))
+(def stats-key (get-in (js->clj (env/config)) ["parsed" "CENSUS_KEY"]))
 ;(prn stats-key)
-(def *g* (read-edn "./src/configs/geojson/index.edn"))
-
+(def GG (read-edn "./src/configs/geojson/index.edn"))
+;(prn GG)
 (defn time-spot [] (js/Date.))
 
 (defn test-async
@@ -170,14 +170,14 @@
    :geoHierarchy {:invalid "*"}}
 
 
-(def args-ok-s+g-v+ps (test-args 6 1 2 1))
+;(def args-ok-s+g-v+ps (test-args 6 1 2 1))
 #_{:vintage 2016,
    :geoHierarchy {:state "01", :county "001"},
    :sourcePath ["acs" "acs5"],
    :geoResolution "500k",
    :predicates {:B00001_001E "0:1000000"},
    :values ["NAME"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 ;(js/console.log (clj->js args-ok-s+g-v+ps))
 
@@ -186,7 +186,7 @@
    :geoHierarchy {:state "01", :county "001"},
    :sourcePath ["acs" "acs1"],
    :predicates {:B00001_001E "0:1000000"},
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 (def args-ok-geo-only (test-args 9 2 2 0))
 #_{:vintage 2014,
@@ -204,14 +204,14 @@
    :sourcePath ["cbp"],
    :geoResolution "20m",
    :values ["ESTAB"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 (def args-ok-sts-vals (test-args 5 3 3 1))
 #_{:vintage "2015",
    :geoHierarchy {:county {:lat 28.2639, :lng -80.7214}},
    :sourcePath ["cbp"],
    :values ["ESTAB"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 (def args-ok-s+g-v+ps (test-args 6 3 1 1))
 #_{:vintage 2016,
@@ -220,7 +220,7 @@
    :geoResolution "5m",
    :predicates {:B00001_001E "0:1000000"},
    :values ["NAME"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 (def args-ok-sts-v+ps (test-args 6 3 3 1))
 #_{:vintage 2016,
@@ -228,7 +228,7 @@
    :sourcePath ["acs" "acs5"],
    :predicates {:B00001_001E "0:1000000"},
    :values ["NAME"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 (def args-na-s+g-vals (test-args 5 0 0 1))
 #_{:vintage "2015",
@@ -236,14 +236,14 @@
    :sourcePath ["cbp"],
    :geoResolution "20m",
    :values ["ESTAB"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 (def args-na-sts-vals (test-args 5 0 3 1))
 #_{:vintage "2015",
    :geoHierarchy {:invalid "*"},
    :sourcePath ["cbp"],
    :values ["ESTAB"],
-   :statsKey "6980d91653a1f78acd456d9187ed28e23ea5d4e3"}
+   :statsKey "<some key>"}
 
 #_(js/console.log (clj->js {:vintage 2016
                             :sourcePath ["acs" "acs5"]

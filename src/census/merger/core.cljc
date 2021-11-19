@@ -1,10 +1,10 @@
 (ns census.merger.core
   (:require
     #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! pipeline put!
-                                        to-chan take!]
+                                        to-chan! take!]
                                 :refer-macros [go alt! go-loop]]
        :clj [clojure.core.async :refer [>! <! chan promise-chan close! pipeline put!
-                                        to-chan take! go alt! go-loop]])
+                                        to-chan! take! go alt! go-loop]])
     [net.cgrand.xforms :as x]
     [census.utils.core :refer [URL-GEOKEYMAP xf<< educt<<
                                throw-err err-type ->args
@@ -80,7 +80,7 @@
                    [cfg ?=$g$] (first cfgs)
                    acc (transient [])]
               (if (nil? (first todo))
-                  (do (prn "Working on it ...")
+                  (do (prn "Merging GeoJSON with Statistics...")
                       (>! =O= (->> (persistent! acc)
                                    (reduce concat)
                                    (eduction (xf-Grands-M->JSON @$ids$))
@@ -96,7 +96,7 @@
                             (let [=xform= (chan 1 xform)
                                   =err=   (chan 1)]
                               (swap! $ids$ conj filter-id)
-                              (getter (to-chan [url]) =xform= =err=)
+                              (getter (to-chan! [url]) =xform= =err=)
                               (alt! =xform= ([data] (do (close! =xform=)
                                                         (close! =err=)
                                                         (recur (rest todo)

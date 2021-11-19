@@ -1,27 +1,32 @@
 (ns configs.geojson.core
   (:require
-    [cljs.core.async           :refer [>! <! chan promise-chan close! take! put!
-                                       pipeline-async]
-                               :refer-macros [go go-loop]]
-    [cuerdas.core              :refer [join]
-                               :as s]
-    [clojure.set               :refer [map-invert]]
-    [defun.core                :refer-macros [defun]]
-    [cljs-promises.async       :refer [value-port]] ; Fixme: Need this dependecy -< move configs to separate project
-    [census.utils.core         :refer [map-target error err-type]]
-    [configs.utils.fixtures    :refer [read-edn FileSaver]]
-    [configs.geojson.filepaths :as geos]
-    [configs.geojson.filepaths_abv :as geos_abv]
-    [configs.geojson.filepaths_2018 :as geos_2018]
-    ["fs" :as fs]
-    ;["path" :as path]
-    ["shpjs" :as shpjs]
-    ["mkdirp" :as mkdirp]))
+     [cljs.core.async           :refer [>! <! chan promise-chan close! take! put! pipeline-async]
+                                :refer-macros [go go-loop]]
+     [cuerdas.core              :refer [join]
+                                :as s]
+     [clojure.set               :refer [map-invert]]
+     [defun.core                :refer-macros [defun]]
+     [configs.promised.async    :refer [value-port]] ; Fixme: Need this dependency -< move configs to separate project
+     [census.utils.core         :refer [map-target error err-type]]
+     [clojure.reader           :refer [read-string]]
+     [configs.utils.core        :refer [read-edn FileSaver]]
+     [configs.geojson.filepaths2018 :refer [paths]]
+     ;[configs.geojson.filepaths :refer [paths]]
+     ;[configs.geojson.filepathsabv :as geos_abv]
+     ;[configs.geojson.filepaths2019 :refer [paths]]
+     ;["path" :as path]
+     ["fs" :as fs]
+     ["shpjs" :as shpjs]))
+     ;["mkdirp" :as mkdirp]))
+
+
+(prn "hello")
+
 
 (def geoKeyMap (read-edn "./src/configs/geojson/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
-;; (shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
+;;(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
 
 
 ;; ,e,   d8                                888                               888
@@ -242,7 +247,7 @@
   ;; => "500k/2012/congressional-district.json"
 
   (filename->>geopath "cb_2013_01_cousub_500k.zip"))
-  ;; => "500k/2012/congressional-district.json"
+;; => "500k/2012/congressional-district.json"
 
 
 ;            ,e,                     888 ,e,
@@ -298,7 +303,7 @@
 
 #_(let [c (chan 1)]
     (go (fsR-file->put!
-          "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"
+          "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"
           c)
         (prn (<! c))))
 
@@ -329,8 +334,8 @@
   (prn (str "zip->json'ing..."))
   (take! (value-port (shpjs val))
          (fn [res] (put! =port=
-                            (js/JSON.stringify res)
-                            #(close! =port=)))))
+                         (js/JSON.stringify res)
+                         #(close! =port=)))))
 
 ;; Examples ========================================
 
@@ -338,7 +343,7 @@
         =json= (chan 1)]
     (go (fsR-file->put!
           ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-          "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"
+          "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"
           =zip=)
         (pipeline-async 1 =json= zip->geojson->put! =zip=)
         (js/console.log (<! =json=))))
@@ -360,11 +365,12 @@
 ;;   /  Y88b       888    '88_-~  888    888  888  888
 
 
-(defn transducified [f]
+(defn transducified
   "
   A function that takes a standard function (taking a single argument) and
   augments it with the structure of a transducer function.
   "
+  [f]
   (fn [rf]
     (fn
       ([] (rf))
@@ -422,23 +428,23 @@
   "
   [=path=]
   (go-loop []
-    (let [path (<! =path=)]
-      (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-        (let [=test-path= (chan 1)]
-          (do (fsCheck->put! filepath =test-path=)
-              (if (not= "there" (<! =test-path=))
-                  (let [=zip=  (chan 1)
-                        =json= (chan 1 (x-geojson-config directory filepath))]
-                    (do (fsR-file->put! path =zip=)
-                        (pipeline-async 1 =json= zip->geojson->put! =zip=)
-                        (FileSaver (<! =json=))
-                        (recur)))
-                  (do (prn (str "File already exists: " path))
-                      (recur)))))
-        (do (prn (str "No :geoKeyMap match found for: " path))
-            (recur))))))
+           (let [path (<! =path=)]
+             (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+               (let [=test-path= (chan 1)]
+                 (do (fsCheck->put! filepath =test-path=)
+                     (if (not= "there" (<! =test-path=))
+                         (let [=zip=  (chan 1)
+                               =json= (chan 1 (x-geojson-config directory filepath))]
+                           (do (fsR-file->put! path =zip=)
+                               (pipeline-async 1 =json= zip->geojson->put! =zip=)
+                               (FileSaver (<! =json=))
+                               (recur)))
+                         (do (prn (str "File already exists: " path))
+                             (recur)))))
+               (do (prn (str "No :geoKeyMap match found for: " path))
+                   (recur))))))
 
-;(let [path "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip"]
+;(let [path "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"]
 ;  (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
 ;    (prn (str "Already existing directory: " directory " Filepath: " filepath))
 ;    (let [=test-path= (chan 1)
@@ -448,7 +454,7 @@
 ;        (prn (str "There"))))))
 ;
 ;(let [=c= (chan 1)]
-;  (go (>! =c= "C:\\Users\\logan\\Downloads\\census-geojson\\www2.census.gov\\geo\\tiger\\GENZ2018\\shp\\cb_2018_01_bg_500k.zip")
+;  (go (>! =c= "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip")
 ;      (=>read=>convert=>write=>loop =c=)
 ;      (close! =c=)))
 
@@ -477,9 +483,9 @@
   (let [=path= (chan 1)]
     (=>read=>convert=>write=>loop =path=)
     (go (if (= nil (doseq [path paths-vec] (>! =path= path)))
-            (js/console.log "\n ======================== \n
+          (js/console.log "\n ======================== \n
                                 \n === FINISHED PARSING === \n
                                 \n === Wrapping up .... === \n
                                 \n ======================== \n")))))
 
-;(batch=>zip-paths=>convert=>geojson geos_2018/paths)
+(batch=>zip-paths=>convert=>geojson paths)
