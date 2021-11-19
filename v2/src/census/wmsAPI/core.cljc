@@ -115,7 +115,7 @@
          ($g$->wms-cfg $g$ args server-index)]
      (str URL-WMS
           (cond
-            (= 0 (mod vintage 10)) (str "Census2020/tigerWMS_Census" vintage)
+            (= 0 (mod vintage 10)) (str "TIGERweb/tigerWMS_Census" vintage)
             :else                  (str "TIGERweb/tigerWMS_ACS" vintage))
           "/MapServer/"
           (get layers cur-layer-idx)
