@@ -1,0 +1,43 @@
+; This is the Calva evaluation results output window.
+; TIPS: The keyboard shortcut `ctrl+alt+o o` shows and focuses this window
+;   when connected to a REPL session.
+; Please see https://calva.io/output/ for more info.
+; Happy coding! ♥️
+
+; Jacking in...
+; nREPL Connection was closed
+; Starting Jack-in Terminal: npx.cmd shadow-cljs -d cider/cider-nrepl:0.27.4 watch :geo
+; Hooking up nREPL sessions...
+; Connected session: clj
+; TIPS: 
+;   - You can edit the contents here. Use it as a REPL if you like.
+;   - `alt+enter` evaluates the current top level form.
+;   - `ctrl+enter` evaluates the current form.
+;   - `alt+up` and `alt+down` traverse up and down the REPL command history
+;      when the cursor is after the last contents at the prompt
+;   - Clojure lines in stack traces are peekable and clickable.
+clj꞉shadow.user꞉> 
+; Creating cljs repl session...
+; Connecting cljs repl: shadow-cljs...
+;   The Calva Connection Log might have more connection progress information.
+; Connected session: cljs, repl: node-repl
+; TIPS: You can choose which REPL to use (clj or cljs):
+;    *Calva: Toggle REPL connection*
+;    (There is a button in the status bar for this)
+; Jack-in done.
+cljs꞉cljs.user꞉> 
+nil
+cljs꞉configs.geojson.core꞉> 
+#'configs.geojson.core/geoKeyMap
+cljs꞉configs.geojson.core꞉> 
+#'configs.geojson.core/map-xx->vin
+cljs꞉configs.geojson.core꞉> 
+#'configs.geojson.core/filename->>pattern
+cljs꞉configs.geojson.core꞉> 
+nil
+; ------ WARNING - :undeclared-var -----------------------------------------------
+;  Resource: <eval>:1:2
+ Use of undeclared Var configs.geojson.core/batch=>zip-paths=>convert=>geojson
+--------------------------------------------------------------------------------
+
+cljs꞉configs.geojson.core꞉> 

@@ -390,8 +390,7 @@
 
  :zip-code-tabulation-area
  {
-  ; TODO: 2020 ZCTA published later in 2021
-  ;:2020 {:lev<-file "zcta"     :scopes {:us nil                 :st nil      } :wms nil                             :id<-json [:GEOID10]}       ; "36426"
+  :2020 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
   :2019 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
   :2018 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
   :2017 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
