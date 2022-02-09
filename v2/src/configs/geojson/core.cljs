@@ -8,19 +8,17 @@
      [defun.core                :refer-macros [defun]]
      [configs.promised.async    :refer [value-port]] ; Fixme: Need this dependency -< move configs to separate project
      [census.utils.core         :refer [map-target error err-type]]
-     [clojure.reader           :refer [read-string]]
+     [clojure.reader            :refer [read-string]]
      [configs.utils.core        :refer [read-edn FileSaver]]
-     [configs.geojson.filepaths2018 :refer [paths]]
+     [configs.geojson.filepaths :refer [paths]]
      ;[configs.geojson.filepaths :refer [paths]]
-     ;[configs.geojson.filepathsabv :as geos_abv]
-     ;[configs.geojson.filepaths2019 :refer [paths]]
      ;["path" :as path]
      ["fs" :as fs]
      ["shpjs" :as shpjs]))
      ;["mkdirp" :as mkdirp]))
 
 
-(prn "hello")
+;(prn "hello")
 
 
 (def geoKeyMap (read-edn "./src/configs/geojson/index.edn"))
@@ -78,6 +76,8 @@
   against the provided vintage/level abbreviation code pair. Returns the `name`
   of the key (string) if matched and `nil` if mismatched.
 
+  looks into the :lev<-file <value> for a level match against input level string
+
   Inputs:
   1) vintage = string
   2) level abbreviation = string
@@ -101,6 +101,8 @@
   [vintage level]
   (apply str (remove nil? (map #(vin+lev=?key vintage level %)
                                (seq (map-invert geoKeyMap))))))
+
+(keySearch "2019" "zcta")
 
 (defn config-geoPath
   "
@@ -302,10 +304,10 @@
 ;; Examples =========================================
 
 #_(let [c (chan 1)]
-    (go (fsR-file->put!
-          "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"
-          c)
-        (prn (<! c))))
+      (go (fsR-file->put!
+            "D:\\projects\\census\\cartography-files\\www2.census.gov\\geo\\tiger\\GENZ2020\\shp\\cb_2020_01_sldu_500k.zip"
+            c)
+          (prn (<! c))))
 
 ;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;"fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -331,7 +333,7 @@
   the GeoJSON is `take!`en out of the `value-port` and `put!` into a passed `chan`.
   "
   [val =port=]
-  (prn (str "zip->json'ing..."))
+  (prn (str "zip -> GeoJSON processing..."))
   (take! (value-port (shpjs val))
          (fn [res] (put! =port=
                          (js/JSON.stringify res)
@@ -428,21 +430,21 @@
   "
   [=path=]
   (go-loop []
-           (let [path (<! =path=)]
-             (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
-               (let [=test-path= (chan 1)]
-                 (do (fsCheck->put! filepath =test-path=)
-                     (if (not= "there" (<! =test-path=))
-                         (let [=zip=  (chan 1)
-                               =json= (chan 1 (x-geojson-config directory filepath))]
-                           (do (fsR-file->put! path =zip=)
-                               (pipeline-async 1 =json= zip->geojson->put! =zip=)
-                               (FileSaver (<! =json=))
-                               (recur)))
-                         (do (prn (str "File already exists: " path))
-                             (recur)))))
-               (do (prn (str "No :geoKeyMap match found for: " path))
-                   (recur))))))
+    (let [path (<! =path=)]
+      (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+        (let [=test-path= (chan 1)]
+          (do (fsCheck->put! filepath =test-path=)
+              (if (not= "there" (<! =test-path=))
+                  (let [=zip=  (chan 1)
+                        =json= (chan 1 (x-geojson-config directory filepath))]
+                    (do (fsR-file->put! path =zip=)
+                        (pipeline-async 1 =json= zip->geojson->put! =zip=)
+                        (FileSaver (<! =json=))
+                        (recur)))
+                  (do (prn (str "GeoJSON already exists: " filepath))
+                      (recur)))))
+        (do (prn (str "No :geoKeyMap match found for: " path))
+            (recur))))))
 
 ;(let [path "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"]
 ;  (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
@@ -465,7 +467,7 @@
 ;;   888   888 888  888
 ;;   888   888 888  888
 ;;   888   888 888  888
-;;   888   888 888  888
+;;   888   888 888  888Xc
 
 
 (defn batch=>zip-paths=>convert=>geojson
@@ -483,9 +485,10 @@
   (let [=path= (chan 1)]
     (=>read=>convert=>write=>loop =path=)
     (go (if (= nil (doseq [path paths-vec] (>! =path= path)))
-          (js/console.log "\n ======================== \n
-                                \n === FINISHED PARSING === \n
-                                \n === Wrapping up .... === \n
-                                \n ======================== \n")))))
+          (prn  "\n ======================== \n
+            \n === FINISHED PARSING === \n
+            \n === Wrapping up .... === \n
+            \n ======================== \n")))))
 
 (batch=>zip-paths=>convert=>geojson paths)
+;(print paths)

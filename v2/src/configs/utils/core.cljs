@@ -30,6 +30,6 @@
       (.catch (fn [err] (prn (str "Error creating directory: " err " for " filepath))))))
 
 
-(FileSaver {:directory "./bloop/bleep"
-            :filepath "./bloop/bleep/stuff.json"
-            :json "['hello']"})
+;(FileSaver {:directory "./bloop/bleep"
+;            :filepath "./bloop/bleep/stuff.json"
+;            :json "['hello']"})
