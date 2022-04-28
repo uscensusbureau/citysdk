@@ -82,6 +82,8 @@
 
 (defun G-patterner
   "Takes a pattern of maps and triggers the URL builder accordingly."
+  ; new :xref functionality (decennial cross-referencing for redundant cartographic file locations)
+  ([$g$ [res _ sta lev-tuple {:xref XRvin }]] (G-patterner $g$ [res XRvin sta lev-tuple (get-in $g$ [(first lev-tuple) (keyword XRvin) :scopes])]))
   ([$g$ ["500k" vin nil [:zip-code-tabulation-area _] {:us USr :st nil }]] (big-G $g$ "500k" vin :zip-code-tabulation-area USr))
   ([$g$ [(res :guard #(not (= "500k" %))) vin _ [:zip-code-tabulation-area _] _]] (G-err $g$ res vin :zip-code-tabulation-area))
   ([$g$ [res    vin nil [:county _]                   {:us USr :st nil }]] (big-G $g$ res vin :county USr))
@@ -91,9 +93,8 @@
   ([$g$ [res    vin nil [lev _    ]                   {:us USr :st _   }]] (scope $g$ res vin lev USr))
   ([$g$ [res    vin "*" [lev _    ]                   {:us USr :st _   }]] (scope $g$ res vin lev USr))
   ([$g$ [res    vin _   [lev _    ]                   {:us USr :st nil }]] (scope $g$ res vin lev USr))
-  ([$g$ [res    vin st  [lev _    ]                   {:us USr :st STr }]] (scope $g$ res vin lev USr STr st))
+  ([$g$ [res    vin sta [lev _    ]                   {:us USr :st STr }]] (scope $g$ res vin lev USr STr sta))
   ([$g$ & anthing-else ]                                                   ""))
-
 
 (defn G-pattern-cfg
   "
@@ -102,6 +103,8 @@
   "
   [$g$ {:keys [vintage geoResolution] {:keys [state] :as geoHierarchy} :geoHierarchy}]
   (let [level     (last geoHierarchy)
+        ; need to grab additional `:xref` data within `:scopes` to facilitate
+        ; 2021+ vintage references to decennial cartographic files
         geoScopes (get-in $g$ [(key level) (keyword vintage) :scopes])
         pattern   [geoResolution vintage state level geoScopes]]
     pattern))
