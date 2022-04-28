@@ -83,7 +83,14 @@
     (is (= (big-G GG res vin lev USr STr st)
            "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2016/county.json"))))
 
-(deftest geo-pattern-maker-test
+(deftest G-patterner-test
+  (is (= (G-patterner GG ["500k" "2019" "01" [:zip-code-tabulation-area "*"] {:us ["500k"] :st nil}])
+         "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2019/zip-code-tabulation-area.json")
+      ; tests new :xref (decennial cross-referencing functionality)
+      (= (G-patterner GG ["500k" "2021" "01" [:zip-code-tabulation-area "*"] {:us nil :st nil :xref "2020"}])
+         "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2020/zip-code-tabulation-area.json")))
+
+(deftest G-pattern-cfg-test
   (is (= (G-pattern-cfg GG TEST-ARGS-1)
          ["500k" "2016" "12"
           [:state-legislative-district-_upper-chamber_ "*"]
