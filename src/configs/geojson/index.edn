@@ -8,7 +8,7 @@
 
  :alaska-native-regional-corporation
  {
-  :2021 {:lev<-file "anrc"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["30"] :lookup :2010}   :id<-json [:GEOID]}         ; "0206370"
+  :2021 {:lev<-file "anrc"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["28"] :lookup :2010}   :id<-json [:GEOID]}         ; "0206370"
   :2020 {:lev<-file "anrc"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["30"] :lookup :2010}   :id<-json [:GEOID]}         ; "0206370"
   :2019 {:lev<-file "anrc"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["30"] :lookup :2010}   :id<-json [:GEOID]}         ; "0206370"
   :2018 {:lev<-file "anrc"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["30"] :lookup :2010}   :id<-json [:GEOID]}         ; "0206370"
@@ -25,7 +25,7 @@
 
  :american-indian-area!alaska-native-area!hawaiian-home-land
  {
-  :2021 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
+  :2021 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["48"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
   :2020 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
   :2019 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
   :2018 {:lev<-file "aiannh"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["50"] :lookup :2010}   :id<-json [:GEOID]}         ; "9560"
@@ -42,7 +42,7 @@
 
  :block-group
  {
-  :2021 {:lev<-file "bg"       :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["8" ] :lookup :2010}   :id<-json [:GEOID]}         ; "440090509011"
+  :2021 {:lev<-file "bg"       :scopes {:us nil                 :st ["500k"] } :wms {:layers ["8" ] :lookup :2010}   :id<-json [:GEOID]}         ; "440090509011"
   :2020 {:lev<-file "bg"       :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["8" ] :lookup :2010}   :id<-json [:GEOID]}         ; "440090509011"
   :2019 {:lev<-file "bg"       :scopes {:us nil                 :st ["500k"] } :wms {:layers ["10"] :lookup :2010}   :id<-json [:GEOID]}         ; "440090509011"
   :2018 {:lev<-file "bg"       :scopes {:us nil                 :st ["500k"] } :wms {:layers ["10"] :lookup :2010}   :id<-json [:GEOID]}         ; "440090509011"
@@ -59,7 +59,7 @@
 
  :combined-new-england-city-and-town-area
  {
-  :2021 {:lev<-file "cnecta"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["64"] :lookup :2010}   :id<-json [:GEOID]}         ; "710"
+  :2021 {:lev<-file "cnecta"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["60"] :lookup :2010}   :id<-json [:GEOID]}         ; "710"
   :2020 {:lev<-file "cnecta"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["64"] :lookup :2010}   :id<-json [:GEOID]}         ; "710"
   :2019 {:lev<-file "cnecta"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["66"] :lookup :2010}   :id<-json [:GEOID]}         ; "710"
   :2018 {:lev<-file "cnecta"   :scopes {:us [           "500k"] :st nil      } :wms {:layers ["66"] :lookup :2010}   :id<-json [:GEOID]}         ; "710"
@@ -73,9 +73,25 @@
   :2010 {:lev<-file "335"      :scopes {:us [     "20m" "500k"] :st nil      } :wms {:layers ["82"] :lookup :2010}   :id<-json [:CNECTA]}       ; "710"
   :2000 {:lev<-file nil        :scopes nil                                     :wms nil                              :id<-json [:CNECTA]}}       ; "710"
 
+ :combined-statistical-area
+ {
+  :2021 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["68"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2020 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["72"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2019 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2018 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2017 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2016 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2015 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2014 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+
+  :2013 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2012 {:lev<-file nil        :scopes nil                                     :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
+  :2010 {:lev<-file "330"      :scopes {:us [     "20m" "500k"] :st nil      } :wms {:layers ["90"] :lookup :2010}   :id<-json [:CSA]}}          ; "102"
+ ;:2000 {:lev<-file nil        :scopes nil                                     :wms nil                              :id<-json [:GEOID]}}         ; "430"
+
  :congressional-district
  {
-  :2021 {:lev<-file "cd"       :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["52"] :lookup [:STATE :CD116]} :id<-json [:GEOID]}    ; "0633"
+  :2021 {:lev<-file "cd"       :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["50"] :lookup [:STATE :CD116]} :id<-json [:GEOID]}    ; "0633"
   :2020 {:lev<-file "cd"       :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["52"] :lookup [:STATE :CD116]} :id<-json [:GEOID]}    ; "0633"
   :2019 {:lev<-file "cd"       :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["52"] :lookup [:STATE :CD116]} :id<-json [:GEOID]}    ; "0633"
   :2018 {:lev<-file "cd"       :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["52"] :lookup [:STATE :CD116]} :id<-json [:GEOID]}    ; "0633"
@@ -102,7 +118,7 @@
 
  :consolidated-cities
  {
-  :2021 {:lev<-file "concity"  :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
+  :2021 {:lev<-file "concity"  :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["22"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
   :2020 {:lev<-file "concity"  :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
   :2019 {:lev<-file "concity"  :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
   :2018 {:lev<-file "concity"  :scopes {:us nil                 :st ["500k"] } :wms {:layers ["24"] :lookup [:STATE :CONCITY]} :id<-json [:GEOID]}  ; "2148003"
@@ -118,7 +134,7 @@
 
  :county
  {
-  :2021 {:lev<-file "county"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["82"] :lookup :2010}   :id<-json [:GEOID]}         ; "01005"
+  :2021 {:lev<-file "county"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["78"] :lookup :2010}   :id<-json [:GEOID]}         ; "01005"
   :2020 {:lev<-file "county"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["82"] :lookup :2010}   :id<-json [:GEOID]}         ; "01005"
   :2019 {:lev<-file "county"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID]}         ; "01005"
   :2018 {:lev<-file "county"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID]}         ; "01005"
@@ -135,7 +151,7 @@
 
  :county-subdivision
  {
-  :2021 {:lev<-file "cousub"   :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["20"]  :lookup :2010}  :id<-json [:GEOID]}         ; "4400378440"
+  :2021 {:lev<-file "cousub"   :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["18"]  :lookup :2010}  :id<-json [:GEOID]}         ; "4400378440"
   :2020 {:lev<-file "cousub"   :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["20"]  :lookup :2010}  :id<-json [:GEOID]}         ; "4400378440"
   :2019 {:lev<-file "cousub"   :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["20"]  :lookup :2010}  :id<-json [:GEOID]}         ; "4400378440"
   :2018 {:lev<-file "cousub"   :scopes {:us nil                 :st ["500k"] } :wms {:layers ["20"]  :lookup :2010}  :id<-json [:GEOID]}         ; "4400378440"
@@ -150,25 +166,9 @@
   :2000 {:lev<-file "cs"       :scopes {:us nil                 :st ["500k"] } :wms nil                              :id<-json [:STATE :COUNTY :COUSUBFP]} ; "44","007","80780"
   :1990 {:lev<-file "cs"       :scopes {:us nil                 :st ["500k"] } :wms nil                              :id<-json [:GEOID]}}        ; "01077040"
 
- :combined-statistical-area
- {
-  :2021 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["72"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2020 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["72"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2019 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2018 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2017 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2016 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2015 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2014 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-
-  :2013 {:lev<-file "csa"      :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2012 {:lev<-file nil        :scopes nil                                     :wms {:layers ["74"] :lookup :2010}   :id<-json [:GEOID]}         ; "430"
-  :2010 {:lev<-file "330"      :scopes {:us [     "20m" "500k"] :st nil      } :wms {:layers ["90"] :lookup :2010}   :id<-json [:CSA]}}          ; "102"
-  ;:2000 {:lev<-file nil        :scopes nil                                     :wms nil                              :id<-json [:GEOID]}}         ; "430"
-
  :division
  {
-  :2021 {:lev<-file "division" :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["60"] :lookup :2010}   :id<-json [:GEOID]}         ; "3"
+  :2021 {:lev<-file "division" :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["58"] :lookup :2010}   :id<-json [:GEOID]}         ; "3"
   :2020 {:lev<-file "division" :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["60"] :lookup :2010}   :id<-json [:GEOID]}         ; "3"
   :2019 {:lev<-file "division" :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["58"] :lookup :2010}   :id<-json [:GEOID]}         ; "3"
   :2018 {:lev<-file "division" :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["58"] :lookup :2010}   :id<-json [:GEOID]}         ; "3"
@@ -184,7 +184,7 @@
 
  :metropolitan-statistical-area!micropolitan-statistical-area
  {
-  :2021 {:lev<-file "cbsa"     :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["76" "78"] :lookup :2010} :id<-json [:GEOID]}         ; "15660"
+  :2021 {:lev<-file "cbsa"     :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["72" "74"] :lookup :2010} :id<-json [:GEOID]}         ; "15660"
   :2020 {:lev<-file "cbsa"     :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["76" "78"] :lookup :2010} :id<-json [:GEOID]}         ; "15660"
   :2019 {:lev<-file "cbsa"     :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["78" "80"] :lookup :2010} :id<-json [:GEOID]}         ; "15660"
   :2018 {:lev<-file "cbsa"     :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["78" "80"] :lookup :2010} :id<-json [:GEOID]}         ; "15660"
@@ -201,7 +201,7 @@
 
  :new-england-city-and-town-area
  {
-  :2021 {:lev<-file "necta"    :scopes {:us [           "500k"] :st nil      } :wms {:layers ["66"] :lookup :2010}   :id<-json [:GEOID]}         ; "70450"
+  :2021 {:lev<-file "necta"    :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["62"] :lookup :2010}   :id<-json [:GEOID]}         ; "70450"
   :2020 {:lev<-file "necta"    :scopes {:us [           "500k"] :st nil      } :wms {:layers ["66"] :lookup :2010}   :id<-json [:GEOID]}         ; "70450"
   :2019 {:lev<-file "necta"    :scopes {:us [           "500k"] :st nil      } :wms {:layers ["68"] :lookup :2010}   :id<-json [:GEOID]}         ; "70450"
   :2018 {:lev<-file "necta"    :scopes {:us [           "500k"] :st nil      } :wms {:layers ["68"] :lookup :2010}   :id<-json [:GEOID]}         ; "70450"
@@ -217,7 +217,7 @@
 
  :place
  {
-  :2021 {:lev<-file "place"    :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["26" "28"] :lookup :2010} :id<-json [:GEOID]}         ; "4419180"
+  :2021 {:lev<-file "place"    :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["24" "26"] :lookup :2010} :id<-json [:GEOID]}         ; "4419180"
   :2020 {:lev<-file "place"    :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["26" "28"] :lookup :2010} :id<-json [:GEOID]}         ; "4419180"
   :2019 {:lev<-file "place"    :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["26" "28"] :lookup :2010} :id<-json [:GEOID]}         ; "4419180"
   :2018 {:lev<-file "place"    :scopes {:us nil                 :st ["500k"] } :wms {:layers ["26" "28"] :lookup :2010} :id<-json [:GEOID]}         ; "4419180"
@@ -251,7 +251,7 @@
 
  :region
  {
-  :2021 {:lev<-file "region"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["62"] :lookup :2010}   :id<-json [:GEOID]}         ; "4"
+  :2021 {:lev<-file "region"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["58"] :lookup :2010}   :id<-json [:GEOID]}         ; "4"
   :2020 {:lev<-file "region"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["62"] :lookup :2010}   :id<-json [:GEOID]}         ; "4"
   :2019 {:lev<-file "region"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["60"] :lookup :2010}   :id<-json [:GEOID]}         ; "4"
   :2018 {:lev<-file "region"   :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["60"] :lookup :2010}   :id<-json [:GEOID]}         ; "4"
@@ -267,7 +267,7 @@
 
  :school-district-_elementary_
  {
-  :2021 {:lev<-file "elsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["16"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400510"
+  :2021 {:lev<-file "elsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["14"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400510"
   :2020 {:lev<-file "elsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["16"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400510"
   :2019 {:lev<-file "elsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["16"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400510"
   :2018 {:lev<-file "elsd"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["16"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400510"
@@ -283,7 +283,7 @@
 
  :school-district-_secondary_
  {
-  :2021 {:lev<-file "scsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["14"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400420"
+  :2021 {:lev<-file "scsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["12"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400420"
   :2020 {:lev<-file "scsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["14"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400420"
   :2019 {:lev<-file "scsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["14"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400420"
   :2018 {:lev<-file "scsd"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["14"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400420"
@@ -299,7 +299,7 @@
 
  :school-district-_unified_
  {
-  :2021 {:lev<-file "unsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["12"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400990"
+  :2021 {:lev<-file "unsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["10"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400990"
   :2020 {:lev<-file "unsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["12"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400990"
   :2019 {:lev<-file "unsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["12"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400990"
   :2018 {:lev<-file "unsd"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["12"] :lookup :2010}   :id<-json [:GEOID]}         ; "4400990"
@@ -315,7 +315,7 @@
 
  :state
  {
-  :2021 {:lev<-file "state"    :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["80"] :lookup :2010}   :id<-json [:GEOID]}         ; "01"
+  :2021 {:lev<-file "state"    :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["76"] :lookup :2010}   :id<-json [:GEOID]}         ; "01"
   :2020 {:lev<-file "state"    :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["80"] :lookup :2010}   :id<-json [:GEOID]}         ; "01"
   :2019 {:lev<-file "state"    :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["82"] :lookup :2010}   :id<-json [:GEOID]}         ; "01"
   :2018 {:lev<-file "state"    :scopes {:us ["5m" "20m" "500k"] :st nil      } :wms {:layers ["82"] :lookup :2010}   :id<-json [:GEOID]}         ; "01"
@@ -332,7 +332,7 @@
 
  :state-legislative-district-_lower-chamber_
  {
-  :2021 {:lev<-file "sldl"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["56"] :lookup :2010}   :id<-json [:GEOID]}         ; "44061"
+  :2021 {:lev<-file "sldl"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["54"] :lookup :2010}   :id<-json [:GEOID]}         ; "44061"
   :2020 {:lev<-file "sldl"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["56"] :lookup :2010}   :id<-json [:GEOID]}         ; "44061"
   :2019 {:lev<-file "sldl"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["56"] :lookup :2010}   :id<-json [:GEOID]}         ; "44061"
   :2018 {:lev<-file "sldl"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["56"] :lookup :2010}   :id<-json [:GEOID]}         ; "44061"
@@ -348,7 +348,7 @@
 
  :state-legislative-district-_upper-chamber_
  {
-  :2021 {:lev<-file "sldu"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["54"] :lookup :2010}   :id<-json [:GEOID]}         ; "44038"
+  :2021 {:lev<-file "sldu"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["52"] :lookup :2010}   :id<-json [:GEOID]}         ; "44038"
   :2020 {:lev<-file "sldu"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["54"] :lookup :2010}   :id<-json [:GEOID]}         ; "44038"
   :2019 {:lev<-file "sldu"     :scopes {:us [           "500k"] :st ["500k"] } :wms {:layers ["54"] :lookup :2010}   :id<-json [:GEOID]}         ; "44038"
   :2018 {:lev<-file "sldu"     :scopes {:us nil                 :st ["500k"] } :wms {:layers ["54"] :lookup :2010}   :id<-json [:GEOID]}         ; "44038"
@@ -415,18 +415,18 @@
 
  :zip-code-tabulation-area
  {
-  :2021 {:lev<-file "zcta"     :scopes {:xref "2020"                         } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2021 {:lev<-file "zcta"     :scopes {:xref "2020"                         } :wms {:layers ["0" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
   :2020 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
-  :2019 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
-  :2018 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
-  :2017 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
-  :2016 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
-  :2015 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
-  :2014 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36426"
+  :2019 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2018 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2017 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2016 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2015 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2014 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
 
-  :2013 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}       ; "36522"
-  :2012 {:lev<-file nil        :scopes nil                                     :wms {:layers ["2"] :lookup :2010}    :id<-json [:GEOID10]}         ; "4400420"
-  :2010 {:lev<-file "860"      :scopes nil                                     :wms {:layers ["8"] :lookup :2010}    :id<-json [:ZCTA5]}         ; BFJO :(
+  :2013 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36522"
+  :2012 {:lev<-file nil        :scopes nil                                     :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}         ; "4400420"
+  :2010 {:lev<-file "860"      :scopes nil                                     :wms {:layers ["8" ] :lookup :2010}   :id<-json [:ZCTA5]}         ; BFJO :(
   :2000 {:lev<-file "zt"       :scopes {:us [           "500k"] :st ["500k"] } :wms nil                              :id<-json [:ZCTA]}}}         ; "99782"
 
 
