@@ -1,18 +1,18 @@
 const census = require("../census.js");
 
-// census(
-//   {
-//     vintage: 2015, // required
-//     geoHierarchy: {
-//       // required
-//       county: {
-//         lat: 28.2639,
-//         lng: -80.7214
-//       }
-//     }
-//   },
-//   (err, res) => console.log(res)
-// )
+//census(
+//  {
+//    vintage: 2015, // required
+//    geoHierarchy: {
+//      // required
+//      county: {
+//        lat: 28.2639,
+//        lng: -80.7214,
+//      },
+//    },
+//  },
+//  (err, res) => console.log(res)
+//);
 
 //census(
 //    {
@@ -58,27 +58,27 @@ const census = require("../census.js");
 //  (err, res) => console.log(res)
 //); //?
 
-census(
-  {
-    vintage: 2018,
-    geoHierarchy: {
-      // required
-      state: {
-        lat: 38.8482,
-        lng: -76.9312,
-      },
-      //  state: "24",
-      //  county: null,
-      county: "*",
-      //  tract: "*",
-    },
-    sourcePath: ["acs", "acs5"],
-    values: ["B01001_001E"],
-    // "statsKey": censusAccessToken,
-    geoResolution: "500k",
-  },
-  (err, res) => console.log(res)
-); //?
+//census(
+//  {
+//    vintage: 2018,
+//    geoHierarchy: {
+//      // required
+//      state: {
+//        lat: 38.8482,
+//        lng: -76.9312,
+//      },
+//      //  state: "24",
+//      //  county: null,
+//      county: "*",
+//      //  tract: "*",
+//    },
+//    sourcePath: ["acs", "acs5"],
+//    values: ["B01001_001E"],
+//    // "statsKey": censusAccessToken,
+//    geoResolution: "500k",
+//  },
+//  (err, res) => console.log(res)
+//); //?
 /*
 "Getting Census FIPS Geocoding data from source:" 
 "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2018/MapServer/84/query?geometry=-76.9312,38.8482&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=pjson&outFields=STATE" 
@@ -101,3 +101,29 @@ census(
    [ { type: 'Feature', geometry: [Object], properties: [Object] },
 
 */
+
+census(
+  {
+    vintage: 2021,
+    geoHierarchy: {
+      // required
+      //  state: null,
+      county: {
+        lat: 38.8482,
+        lng: -76.9312,
+      },
+      tract: null,
+      //  state: "24",
+      //  county: null,
+      //  "zip-code-tabulation-area": "*",
+      "block group": "*",
+    },
+    sourcePath: ["pdb", "blockgroup"],
+    values: ["State_name", "County_name"],
+    // sourcePath: ["acs", "acs5"],
+    // values: ["B01001_001E"],
+    // "statsKey": censusAccessToken,
+    geoResolution: "500k",
+  },
+  (err, res) => console.log(res /*JSON.stringify(res)*/)
+); //?
