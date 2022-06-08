@@ -131,10 +131,13 @@
        =url=
        (fn [url]
          (cond
+           ; short circuit if there's an error in the pipeline
            (and (= url @$url$) (not (empty? @$err$)))
-           (do (prn (str "Unsuccessful " log-name " request."))
-               (put! =err= @$err$)
-               (reset! $err$ {})) ; <- if internets have failed, allow retry
+           (let [err @$err$]
+             (do (prn (str "Unsuccessful " log-name " request."))
+                 (prn (str err))
+                 (put! =err= err)
+                 (reset! $err$ {}))) ; <- if internets have failed, allow retry
            (and (= url @$url$) (empty? @$err$))
            (do (when (nil? ?silent)
                      (do (prn (str "Getting " log-name " data from cache:"))
@@ -145,13 +148,21 @@
                      (do (prn (str "Getting " log-name " data from source:"))
                          (prn url)))
                (let [cfg {:error-handler
-                          (fn [{:keys [status status-text]}]
-                            (do (prn (str "Unsuccessful: " log-name " request"))
+                          (fn [{:keys [status status-text failure response original-text]}]
+                            (do (prn (str "Response: " response
+                                          " STATUS: " status
+                                          ;" Text: " status-text
+                                          " URL: " url))
+                                          ;" Failure: " failure))
+
+                                          ;" Text: " original-text))
                                 (reset! $url$ url)
                                 (->> (reset! $err$
-                                             (str "STATUS: " status
-                                                  " " status-text
-                                                  " for: " url))
+                                             (str "Response: " response
+                                                  " STATUS: " status
+                                                  ;" Text: " status-text
+                                                  " URL: " url))
+                                                  ;" Failure: " failure))
                                      (put! =err=))))
                           :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
                      CORS-URL (str cors-proxy url)]
