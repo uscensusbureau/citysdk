@@ -104,26 +104,26 @@ const census = require("../census.js");
 
 census(
   {
-    vintage: 2021,
+    vintage: 2020,
     geoHierarchy: {
       // required
       //  state: null,
+      //  state: "24",
       county: {
         lat: 38.8482,
         lng: -76.9312,
       },
-      tract: null,
-      //  state: "24",
+      //  tract: null,
       //  county: null,
       //  "zip-code-tabulation-area": "*",
-      "block group": "*",
+      //  "block group": "*",
     },
-    sourcePath: ["pdb", "blockgroup"],
-    values: ["State_name", "County_name"],
-    // sourcePath: ["acs", "acs5"],
-    // values: ["B01001_001E"],
+    //sourcePath: ["pdb", "blockgroup"],
+    //values: ["State_name", "County_name"],
+    sourcePath: ["acs", "acs5"],
+    values: ["B01001_001E", "BOOP"],
     // "statsKey": censusAccessToken,
-    geoResolution: "500k",
+    //geoResolution: "500k",
   },
   (err, res) => console.log(res /*JSON.stringify(res)*/)
 ); //?
