@@ -7,6 +7,8 @@ layout: home
 
 This site provides documentation, examples, and guides focused on using the Census Data API in frontend and backend Javascript applications by unitizing CitySDK, which streamlines, and enhances the usability and access to the data.
 
+[NPM page](https://www.npmjs.com/package/citysdk)
+
 ### Browser Quick start
 You can download citysdk.js [here]({{ '/assets/citysdk.js' | relative_url }}){:download="citysdk.js"} or build it using browserify.
 
