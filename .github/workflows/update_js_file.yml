@@ -3,20 +3,19 @@ on:
   push:
     branches:
       - master
-      - gh-pages
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        ref: gh-pages
+        run: git checkout gh-pages
 
       - name: Build
         working-directory: ./assets
         run: |
           npm install
           npm update citysdk
+          npx browserslist@latest --update-db
           npm run build
           
       - name: Commit updates
