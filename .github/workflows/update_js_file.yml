@@ -1,0 +1,30 @@
+name: Browserify build
+on:
+  push:
+    branches:
+      - master
+      - gh-pages
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        ref: gh-pages
+
+      - name: Build
+        working-directory: ./assets
+        run: |
+          npm install
+          npm update citysdk
+          npm run build
+          
+      - name: Commit updates
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: bot
+          author_email: bot@example.com
+          message: "browserify build"
+          add: "*.js*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
