@@ -58,7 +58,7 @@ We use CitySDK to query for the geojson and values for the total and 60 years an
 ```js
 census(
   {
-    vintage: 2017,
+    vintage: 2019,
     geoHierarchy: {
       state: {
         lat: 28.466944,

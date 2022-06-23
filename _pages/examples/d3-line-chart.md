@@ -13,7 +13,7 @@ This example shows how to setup line chart using D3.js See the completed example
 
 The data used is from the [Time Series International Trade: Monthly U.S. Exports by North American Industry Classification System (NAICS) Code](https://api.census.gov/data/timeseries/intltrade/exports/naics.html){:target="\_blank"} dataset, using the columns for 15-digit Air Shipping Weight, Vessel Shipping Weight, and Containerized Vessel Shipping Weight.
 
-We will use NAICS Code 111 or Crop Production, to see the effects of seasons on the crop exports of the US. See other NAICS Codes [here](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart_code=11&search=2012%20NAICS%20Search){:target="\_blank"}
+We will use NAICS Code 111 or Crop Production, to see the effects of seasons on the crop exports of in the US. See other NAICS Codes [here](https://www.census.gov/cgi-bin/sssd/naics/naicsrch?chart_code=11&search=2012%20NAICS%20Search){:target="\_blank"}
 
 ## Setting up
 
@@ -66,8 +66,8 @@ function censusPromise(args) {
 Then to setup the time variable for the query (2013-01 or YYYY-DD) we can use array generators and map functions rather than manually typing out all the times.
 
 ```js
-//["2015", "2016", "2017", "2018", "2019"]
-const years = Array(5)
+//["2015", "2016", "2017", "2018", "2019", "2020", "2021"]
+const years = Array(7)
   .fill()
   .map((_, i) => (i + 2015).toString());
 

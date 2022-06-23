@@ -43,7 +43,7 @@ const path = d3.geoPath(projection);
 
 //call data
 censusPromise({
-  vintage: 2017,
+  vintage: 2019,
   geoHierarchy: {
     county: "*"
   },

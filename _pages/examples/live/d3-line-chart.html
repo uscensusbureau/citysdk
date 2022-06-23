@@ -19,6 +19,7 @@ permalink: /examples/live/d3-line-chart/
     </style>
   </head>
   <body>
+    <p>Crop Production Exports by Mode</p>
     <svg id="chart"></svg>
     <script>
       function censusPromise(args) {
@@ -33,9 +34,9 @@ permalink: /examples/live/d3-line-chart/
         });
       }
 
-      const years = Array(5)
+      const years = Array(7)
         .fill()
-        .map((_, i) => (i + 2015).toString()); //[2015, 2016, 2017, 2018, 2019]
+        .map((_, i) => (i + 2015).toString()); //[2015, 2016, 2017, 2018, 2019, 2020, 2021]
 
       const months = Array(12)
         .fill()
