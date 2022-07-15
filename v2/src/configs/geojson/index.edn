@@ -415,8 +415,8 @@
 
  :zip-code-tabulation-area
  {
-  :2021 {:lev<-file "zcta"     :scopes {:xref "2020"                         } :wms {:layers ["0" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
-  :2020 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
+  :2021 {:lev<-file "zcta"     :scopes {:xref "2020"                         } :wms {:layers ["0" ] :lookup :2010}   :id<-json [:GEOID20]}       ; "36426"
+  :2020 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["84"] :lookup :2010}   :id<-json [:GEOID20]}       ; "36426"
   :2019 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
   :2018 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
   :2017 {:lev<-file "zcta"     :scopes {:us [           "500k"] :st nil      } :wms {:layers ["2" ] :lookup :2010}   :id<-json [:GEOID10]}       ; "36426"
