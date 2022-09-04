@@ -4,6 +4,10 @@
 # Note: do this at your own risk. If too eager, Census will blacklist your IP address.
 ---
 
+## Changes
+
+- Aug 31, 2022: Moved `index.edn` config file from `src/configs/geojson` to `GeoJSON` directory
+
 ## Prerequisits:
 
 - Install [Chocolately (Windows)](https://chocolatey.org/install)
@@ -62,3 +66,95 @@ Make sure the ZCTAs will fit... then...
 `git push origin master`
 
 ### Step 6: Remove dependencies in *Step 3* and `git push ...`
+
+## Syncing local GeoJSON files to S3 (also relieves 100mb Github file size limit)
+
+You can get your current AWS User ID in the CLI by:
+```shell
+aws sts get-caller-identity --query "Account" --output text
+```
+
+1. First, go to the AWS IAM Console and set an AWS IAM Policy with the appropriate access
+    - Service: `S3`
+    - Actions: 
+      - `List > ListBucket`
+      - `Write > PutObject`
+      - `Write > DeleteObject`
+      - `Read > GetObject`
+    - Resources: Bucket name: `census-geojson`, Object name: check "Any" box
+2. Create a IAM User and assign it the Policy
+    - "Add User"
+    - User name: "census-geojson-user"
+    - Access type: "Access key - Programmatic Access"
+    - Attach existing policy: search and select `census-geojson`
+3. Add profile of current user to your profiles
+```shell
+λ aws configure --profile census-geojson
+AWS Access Key ID [None]: <Access Key ID from AWS IAM Console>
+AWS Secret Access Key [None]: <Secret from AWS IAM Console>
+Default region name [None]: us-east-1
+Default output format [None]: json
+```
+
+4. Change default user to `census-geojson` user (You have to restart your terminal after doing this for it to take effect)
+```shell
+# Linux and MacOS
+export AWS_PROFILE=<profile-name>
+
+# Windows Command Prompt
+setx AWS_PROFILE <profile-name>
+
+# PowerShell
+$Env:AWS_PROFILE="<profile-name>"
+```
+
+Once you've restarted your terminal, you can confirm that you've changed your default AWS CLI Profile by:
+```shell
+aws configure list
+```
+
+You can view all of your AWS CLI Profiles by opening:
+```shell
+# on Linux and macOS
+~/.aws/credentials
+
+# on Windows
+C:\Users\<USERNAME>\.aws\credentials
+```
+
+The bucket policy for `census-geojson` bucket is this:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::census-geojson/*"
+        },
+        {
+            "Sid": "Stmt1546414471931",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::538069693173:user/census-geojson-user"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::census-geojson"
+        }
+    ]
+}
+```
+
+The `ListBucket` setting is an alias for the `ListObjectV2` API call, which is [needed to run the `sync` command](https://aws.amazon.com/premiumsupport/knowledge-center/s3-access-denied-listobjects-sync/)
+
+5. In your terminal, navigate to the root directory of this repo
+6. From within that directory, open your shell and `sync` the local directory to the bucket: 
+```shell
+aws s3 sync <local directory> s3://<your/bucket>
+```
+
+In this case
+```shell
+aws s3 sync ./GeoJSON s3://census-geojson
+```

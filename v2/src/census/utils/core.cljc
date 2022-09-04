@@ -1,28 +1,36 @@
 (ns census.utils.core
   (:require
-    [ajax.core           :refer [GET]]
-    [cuerdas.core        :as s]
-    [cljs.reader         :refer [read-string]]
-    #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
-                                        onto-chan! to-chan!]
-                                :refer-macros [go go-loop alt!]]
-       :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
-                                        onto-chan! to-chan! go go-loop alt!]])
-    [clojure.walk         :refer [keywordize-keys]]))
+   [ajax.core           :refer [GET]]
+   [cuerdas.core        :as s]
+   #?(:cljs [cljs.reader :refer [read-string]]
+      :clj [clojure.edn :refer [read-string]])
+   #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
+                                       onto-chan! to-chan!]
+             :refer-macros [go go-loop alt!]]
+      :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
+                                       onto-chan! to-chan! go go-loop alt!]])
+   [clojure.walk         :refer [keywordize-keys]]
+   ["xhr2" :as xhr2]))
+
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
-(def URL-GEOJSON "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON")
-(def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
+;(def URL-GEOJSON "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON")
+(def URL-GEOJSON "https://ddbc5tjh37x38.cloudfront.net")
+
+(def URL-GEOKEYMAP "https://ddbc5tjh37x38.cloudfront.net/index.edn")
+;(def URL-GEOKEYMAP "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
 ;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
 
-(def isNode
-  "returns false if environment is not Node"
-  (and (exists? js/process)
-       (exists? js/process.versions)
-       (exists? js/process.versions.node)))
+#?(:cljs (def isNode (and
+                      (exists? js/process)
+                      (exists? js/process.versions)
+                      (exists? js/process.versions.node)))
+   :clj (def isNode false))
 
-;(prn js/process.versions.node)
+(when isNode (set! js/XMLHttpRequest xhr2))
+
+;;(prn js/process.versions.node)
 
 (def cors-proxy
   "URL proxy string prereq if not node"
@@ -31,8 +39,9 @@
 
 ;(prn cors-proxy)
 
-;TODO
-(def base-url-database "...")
+(defn str->number [s]
+  #?(:clj  (read-string s)
+     :cljs (js/Number s)))
 
 (def vec-type
   #?(:cljs cljs.core/PersistentVector
@@ -123,49 +132,48 @@
   Any new payloads received by `GET` will replace the last response `atom` via
   `reset!` *and* be put into the out-bound =response= chan.
   "
-  [format log-name $url$ $res$ $err$]
-  (fn
-    ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$) =url= =res= =err= nil))
-    ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
-     (take!
+  ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
+  ([format log-name $url$ $res$ $err$ ?cors]
+   (fn
+     ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
+     ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
+      (take!
        =url=
        (fn [url]
          (cond
-           ; short circuit if there's an error in the pipeline
+            ; short circuit if there's an error in the pipeline
            (and (= url @$url$) (not (empty? @$err$)))
            (let [err @$err$]
-             (do (prn (str "Unsuccessful " log-name " request."))
+             (do (prn (str "Unsuccessful `" log-name "` request."))
                  (prn (str err))
                  (put! =err= err)
                  (reset! $err$ {}))) ; <- if internets have failed, allow retry
            (and (= url @$url$) (empty? @$err$))
            (do (when (nil? ?silent)
-                     (do (prn (str "Getting " log-name " data from cache:"))
-                         (prn url)))
+                 (do (prn (str "Getting " log-name " data from cache:"))
+                     (prn url)))
                (put! =res= @$res$))
            :else
            (do (when (nil? ?silent)
-                     (do (prn (str "Getting " log-name " data from source:"))
-                         (prn url)))
+                 (do (prn (str "Getting " log-name " data from source:"))
+                     (prn url)))
                (let [cfg {:error-handler
                           (fn [{:keys [status status-text failure response original-text]}]
                             (do (prn (str "Response: " response
                                           " STATUS: " status
-                                          ;" Text: " status-text
                                           " URL: " url))
-                                          ;" Failure: " failure))
-
-                                          ;" Text: " original-text))
                                 (reset! $url$ url)
                                 (->> (reset! $err$
                                              (str "Response: " response
                                                   " STATUS: " status
-                                                  ;" Text: " status-text
+                                                   ;" Text: " status-text
                                                   " URL: " url))
-                                                  ;" Failure: " failure))
+                                                   ;" Failure: " failure))
                                      (put! =err=))))
                           :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                     CORS-URL (str cors-proxy url)]
+                     CORS-URL (if (nil? ?cors)
+                                (str cors-proxy url)
+                                url)]
                  (case format
                    :json
                    (let [json
@@ -189,13 +197,14 @@
                      (GET CORS-URL edn))
                    :raw
                    (let [raw
-                         (merge cfg {:handler
+                         (merge cfg {:response-format :raw
+                                     :handler
                                      (fn [res]
                                        (do (reset! $err$ {})
                                            (reset! $url$ url)
                                            (->> (reset! $res$ res)
                                                 (put! =res=))))})]
-                     (GET CORS-URL raw)))))))))))
+                     (GET CORS-URL raw))))))))))))
 
 
 (defn =O?>-cb
@@ -220,27 +229,27 @@
   functionality of this library."
   [args]
   (if (= (type args) amap-type)
-      (let [{:keys [vintage]} args]
-           #_(setval :vintage (str vintage) args)
-           (merge args {:vintage (str vintage)}))
-      (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
+    (let [{:keys [vintage]} args]
+      #_(setval :vintage (str vintage) args)
+      (merge args {:vintage (str vintage)}))
+    (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
            ;(do (prn (str "geoHierarchy??: " geoHierarchy))
-           (if (not (nil? geoHierarchy))
-               (->> (merge clj-args
-                           {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
-                            "vintage" (str vintage)})
-                    (keywordize-keys))
-               (->> (merge clj-args
-                           {"vintage" (str vintage)})
-                    (keywordize-keys))))))
+      (if (not (nil? geoHierarchy))
+        (->> (merge clj-args
+                    {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                     "vintage" (str vintage)})
+             (keywordize-keys))
+        (->> (merge clj-args
+                    {"vintage" (str vintage)})
+             (keywordize-keys))))))
 
 (defn args->
   "Converts Clojure arguments to JavaScript (for external use)"
   [{:keys [geoHierarchy] :as args}]
   (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
     (clj->js
-      #_(setval :geoHierarchy geoKeys args)
-      (merge args {:geoHierarchy geoKeys}))))
+     #_(setval :geoHierarchy geoKeys args)
+     (merge args {:geoHierarchy geoKeys}))))
 
 
 
@@ -330,10 +339,10 @@
   "
   [f target coll]
   (reduce-kv
-    (fn [m k v] (if (= k target)
-                    (conj m (f v))
-                    (conj m v)))
-    [] coll))
+   (fn [m k v] (if (= k target)
+                 (conj m (f v))
+                 (conj m v)))
+   [] coll))
 
 ;
 ;(defn map-target-idcs
@@ -354,9 +363,11 @@
   #_(transform [INDEXED-VALS (selected? FIRST (set (range r-start r-end))) LAST] f coll)
   (let [span (range r-start r-end)]
     (reduce-kv
-      (fn [m k v] (if (some #(= k %) span)
-                      (conj m (f v))
-                      (conj m v)))
-      [] coll)))
+     (fn [m k v] (if (some #(= k %) span)
+                   (conj m (f v))
+                   (conj m v)))
+     [] coll)))
+
+
 
 (defn filter-nil-tails [coll] (filter #(not (= nil (last %))) coll))
