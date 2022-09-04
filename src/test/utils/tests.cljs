@@ -1,28 +1,29 @@
 (ns test.utils.tests
   (:require
-    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
-                                 timeout]
-                         :refer-macros [go alt!]]
-    [ajax.core           :refer [GET POST]]
-    [cljs.test           :refer-macros [async deftest is are testing run-tests]]
-    [cljs.reader         :refer [read-string]]
-    [test.fixtures.core  :refer [test-async]]
-    [census.utils.core   :refer [map-rename-keys
-                                 map-over-keys
-                                 keys->strs
-                                 strs->keys
-                                 ->args
-                                 args->
-                                 isNode
-                                 cors-proxy
-                                 xf<<
-                                 xf!<<
-                                 educt<<
-                                 map-target
+   [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
+                                timeout]
+    :refer-macros [go alt!]]
+   [ajax.core           :refer [GET POST]]
+   [cljs.test           :refer-macros [are deftest is are testing run-tests]]
+   [cljs.reader         :refer [read-string]]
+   [test.fixtures.core  :refer [test-async]]
+   [census.utils.core   :refer [map-rename-keys
+                                map-over-keys
+                                keys->strs
+                                strs->keys
+                                ->args
+                                args->
+                                isNode
+                                cors-proxy
+                                xf<<
+                                xf!<<
+                                educt<<
+                                map-target
                                  ;map-target-idcs
-                                 map-idcs-range
-                                 $GET$
-                                 =O?>-cb]]))
+                                map-idcs-range
+                                $GET$
+                                =O?>-cb
+                                filter-nil-tails]]))
 
 ;(deftest MAP-NODES-test
 ;  (is (= (MAP-NODES {:i 7 :c {:e {:h 6 :g 5 :f 4} :d 3} :a {:b 2}})
@@ -42,7 +43,7 @@
 ;                        [:a #linked/map[[:b 2]]]]"))))
 
 (deftest is-node-url
-  (is (= (isNode) true)))
+  (is (= isNode true)))
 
 (deftest map-rename-keys-test
   (is (= (map-rename-keys name {:a "b" :c "d"})
@@ -84,16 +85,19 @@
         res (atom [])
         err (atom {})]
     (test-async
-      (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/NAME.json")
-          (($GET$ :json "nope" url res err) =url= =res= =err=)
-          (close! =url=)
-          (is (= (<! =res=)
-                 {:name "NAME",
-                  :label "Canonical Name for Geography",
-                  :group "N/A",
-                  :limit 0}))
-          (close! =err=)
-          (close! =res=)))))
+     (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json")
+         (($GET$ :json "TEST DATA" url res err) =url= =res= =err=)
+         (close! =url=)
+         (is (= (<! =res=)
+                {:name "B00001_001E",
+                 :label "Estimate!!Total",
+                 :concept "UNWEIGHTED SAMPLE COUNT OF THE POPULATION",
+                 :predicateType "int",
+                 :group "B00001",
+                 :limit 0,
+                 :attributes "B00001_001EA"}))
+         (close! =err=)
+         (close! =res=)))))
 
 
 (deftest =O?>-cb-test
@@ -107,19 +111,19 @@
                         (reset! $r$ err)
                         (reset! $r$ O)))]
     (test-async
-      (go (>! =I= "went through internal =O=")
-          (=O?>-cb tfn tcb =I= =O= =E=)
-          (<! (timeout 500))
-          (is (= @$r$
-                 "went through internal =O="))
-          (>! =I= "error! from =E=")
-          (=O?>-cb Efn tcb =I= =O= =E=)
-          (<! (timeout 500))
-          (is (= @$r$
-                 "error! from =E="))
-          (close! =I=)
-          (close! =O=)
-          (close! =E=)))))
+     (go (>! =I= "went through internal =O=")
+         (=O?>-cb tfn tcb =I= =O= =E=)
+         (<! (timeout 500))
+         (is (= @$r$
+                "went through internal =O="))
+         (>! =I= "error! from =E=")
+         (=O?>-cb Efn tcb =I= =O= =E=)
+         (<! (timeout 500))
+         (is (= @$r$
+                "error! from =E="))
+         (close! =I=)
+         (close! =O=)
+         (close! =E=)))))
 
 (deftest ->args-test
   (is (= (->args #js{"vintage" 2010,
@@ -183,6 +187,12 @@
   (is (= (map-idcs-range keyword [2 4] ["a" "b" "c" "d" "e" "f"])
          ["a" "b" :c :d "e" "f"])))
 
+(deftest filter-nil-tails-test
+  (are [in out] (= (filter-nil-tails in) out)
+    {:state "01" :county nil :tract "*"} '([:state "01"] [:tract "*"])
+    {:state nil :county "*"} '([:county "*"])))
+
+;;(first {:state "01" :county nil :tract "*"})
 (run-tests)
 
 

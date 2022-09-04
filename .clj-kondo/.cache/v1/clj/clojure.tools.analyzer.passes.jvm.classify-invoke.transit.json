@@ -1,0 +1,1 @@
+["^ ","~$classify-invoke",["^ ","~:row",15,"~:col",1,"~:fixed-arities",["~#set",[1]],"~:name","^0","~:ns","~$clojure.tools.analyzer.passes.jvm.classify-invoke","~:top-ns","^7"],"~:filename","C:\\Users\\logan\\.m2\\repository\\org\\clojure\\tools.analyzer.jvm\\1.2.2\\tools.analyzer.jvm-1.2.2.jar:clojure/tools/analyzer/passes/jvm/classify_invoke.clj"]

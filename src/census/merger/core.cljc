@@ -1,14 +1,12 @@
 (ns census.merger.core
   (:require
-    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! pipeline put!
-                                        to-chan! take!]
-                                :refer-macros [go alt! go-loop]]
-       :clj [clojure.core.async :refer [>! <! chan promise-chan close! pipeline put!
-                                        to-chan! take! go alt! go-loop]])
-    [net.cgrand.xforms :as x]
-    [census.utils.core :refer [URL-GEOKEYMAP xf<< educt<<
-                               throw-err err-type ->args
-                               amap-type $GET$]]))
+   #?(:cljs [cljs.core.async
+             :refer [>! <! chan promise-chan close! to-chan!]
+             :refer-macros [go alt!]]
+      :clj [clojure.core.async
+            :refer [>! <! chan promise-chan close! to-chan! go alt!]])
+   [net.cgrand.xforms :as x]
+   [census.utils.core :refer [amap-type]]))
 
 
 (defn deep-merge-a-coll
@@ -26,17 +24,18 @@
   "
   Transducer, which takes 2->3 keys that serve to filter a merged list of two
   maps to return a function, which returns a list of only those maps which have
-  a key from both maps. The presence of both keys within the map signifies that
+  a key from both maps - with the key that was used to merge them omitted. 
+  The presence of both keys within the map signifies that
   the maps have merged. This ensures the returned list contains only the overlap
   between the two, i.e., excluding non-merged maps.
   "
   [IDS]
   (fn [m]
     (let [[[_ v]] (x/into [] m)]
-      (if (not-any? nil? (map (get v :properties) IDS))
-        v))))
+      (when (not-any? nil? (map (get v :properties) IDS)) v))))
 
 
+;;FIXME: Make X Platform (.cljc) compatible
 (defn xf<-Grands->JS
   "Named after @cgrand (author of the xforms library), this is a composed
   transducer, which fits into a higher-order transducer. This lower-order
@@ -62,6 +61,7 @@
         (remove   (fn [[_ v]] (nil? v)))
         (map      #(get % 1))))
 
+;;FIXME: Make X Platform (.cljc) compatible
 (defn I=OE-M-spooler
   "The heart of the merge functionality. This function has three steps:
   1) Configuration and arguments are input, which returns a function
@@ -80,39 +80,40 @@
                    [cfg ?=$g$] (first cfgs)
                    acc (transient [])]
               (if (nil? (first todo))
-                  (do (prn "Merging GeoJSON with Statistics...")
-                      (>! =O= (->> (persistent! acc)
-                                   (reduce concat)
-                                   (eduction (xf-Grands-M->JSON @$ids$))
-                                   into-array
-                                   (js-obj "type" "FeatureCollection" "features")))
-                      (close! =cfg=)
-                      (close! =args=))
-                  (do (if ?=$g$
-                          ((cfg $g$) =args= =cfg=)
-                          (cfg =args= =cfg=))
-                      (let [{:keys [getter url xform filter-id] :as cfg} (<! =cfg=)]
-                        (if (= (type cfg) amap-type)
-                            (let [=xform= (chan 1 xform)
-                                  =err=   (chan 1)]
-                              (swap! $ids$ conj filter-id)
-                              (getter (to-chan! [url]) =xform= =err=)
-                              (alt! =xform= ([data] (do (close! =xform=)
-                                                        (close! =err=)
-                                                        (recur (rest todo)
-                                                               (second todo)
-                                                               (conj! acc data))))
-                                    =err= ([err] (do (>! =E= err)
-                                                     (close! =cfg=)
-                                                     (close! =O=)
-                                                     (close! =args=)
-                                                     (close! =xform=)
-                                                     (close! =err=))))))
-                        (do (>! =E= cfg)
-                            (close! =cfg=)
-                            (close! =O=)
-                            (close! =args=) ; Close up shop...
-                            (close! =E=)))))))))))
+                (do (prn "Merging GeoJSON with Statistics...")
+                    (>! =O= (->> (persistent! acc)
+                                 (reduce concat)
+                                 (eduction (xf-Grands-M->JSON @$ids$))
+                                 into-array
+                                 (js-obj "type" "FeatureCollection" "features")))
+                    (close! =cfg=)
+                    (close! =args=))
+                (do (if ?=$g$
+                      ((cfg $g$) =args= =cfg=)
+                      (cfg =args= =cfg=))
+                    (let [{:keys [getter url xform filter-id] :as cfg} (<! =cfg=)]
+                      (if (= (type cfg) amap-type)
+                        (let [=xform= (chan 1 xform)
+                              =err=   (chan 1)]
+                          (swap! $ids$ conj filter-id)
+                          (getter (to-chan! [url]) =xform= =err=)
+                          (alt! =xform= ([data] (do
+                                                  (close! =xform=)
+                                                  (close! =err=)
+                                                  (recur (rest todo)
+                                                         (second todo)
+                                                         (conj! acc data))))
+                                =err= ([err] (do (>! =E= err)
+                                                 (close! =cfg=)
+                                                 (close! =O=)
+                                                 (close! =args=)
+                                                 (close! =xform=)
+                                                 (close! =err=))))))
+                      (do (>! =E= cfg)
+                          (close! =cfg=)
+                          (close! =O=)
+                          (close! =args=) ; Close up shop...
+                          (close! =E=)))))))))))
 
 
 

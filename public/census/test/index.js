@@ -1,5 +1,24 @@
 const census = require("../census.js");
+const { promises } = require("fs");
+const fetch = require("node-fetch");
+//census(
+//  {
+//    vintage: 2017, // required
+//    geoHierarchy: {
+//      // required
+//      state: "01",
+//      county: "*",
+//    },
+//    geoResolution: "500k",
+//  },
+//  (err, res) => console.log(res)
+//); //?
 
+//fetch(
+//  "https://census-geojson.s3.amazonaws.com/500k/2017/zip-code-tabulation-area.json"
+//)
+//  .then((r) => r.json())
+//  .then(console.log); //?
 //census(
 //  {
 //    vintage: 2015, // required
@@ -12,51 +31,62 @@ const census = require("../census.js");
 //    },
 //  },
 //  (err, res) => console.log(res)
-//);
-
-//census(
-//    {
-//        vintage       : 2018,
-//        geoHierarchy  : {
-//            state  : "27",
-//            county : "123",
-//        },
-//        sourcePath    : [ "acs", "acs1" ],
-//        values        : [ "NAME" ],
-//        geoResolution : "500k",
-//    },
-//    (err, res) => console.log(JSON.stringify(res)),
-//) //?
-
-//census(
-//    {
-//        vintage      : 2019,
-//        geoHierarchy : {
-//            county : { lat: 42.3601, lng: -71.0589 },
-//            //"county subdivision" : "07000",
-//        },
-//        sourcePath   : [ "acs", "acs5" ],
-//        values       : [ "group(B15003)" ],
-//    },
-//    (err, res) => console.log(JSON.stringify(res)),
-//) //?
+//); //?
 
 //census(
 //  {
-//    vintage: "2018",
+//    vintage: 2019,
 //    geoHierarchy: {
-//      state: {
-//        lat: 38.8482,
-//        lng: -76.932,
-//      },
-//      county: "*",
+//      state: "27",
+//      county: "123",
 //    },
-//    sourcePath: ["acs", "acs5"],
-//    values: ["B00001_001E"],
+//    sourcePath: ["acs", "acs1"],
+//    values: ["NAME"],
 //    geoResolution: "500k",
 //  },
-//  (err, res) => console.log(res)
+//  (err, res) => console.log(JSON.stringify(res))
 //); //?
+
+//census(
+//  {
+//    vintage: 2019,
+//    geoHierarchy: {
+//      county: { lat: 42.3601, lng: -71.0589 },
+//      //"county subdivision" : "07000",
+//    },
+//    sourcePath: ["acs", "acs5"],
+//    values: ["group(B15003)"],
+//  },
+//  (err, res) => console.log(JSON.stringify(res))
+//); //?
+
+census(
+  {
+    vintage: 2016,
+    geoHierarchy: {
+      //  state: {
+      //    lat: 38.8482,
+      //    lng: -76.932,
+      //  },
+      state: null,
+      // FIXME: hypothesis: needs the specified components in geoHeirarchy for lens
+      county: "*",
+    },
+    sourcePath: ["acs", "acs5", "profile"],
+
+    values: ["DP03_0007E", "DP03_0007PE"],
+    //values: ["DP03_0007E"],
+    geoResolution: "500k",
+  },
+  (err, res) => {
+    if (err) console.warn("ERROR:", err);
+    //console.log("DONE: \n");
+    //console.log(res);
+    return promises
+      .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
+      .then(console.log("COMPLETE"));
+  }
+); //?
 
 //census(
 //  {
@@ -77,7 +107,7 @@ const census = require("../census.js");
 //    // "statsKey": censusAccessToken,
 //    geoResolution: "500k",
 //  },
-//  (err, res) => console.log(res)
+//  (err, res) => console.log(JSON.stringify(res))
 //); //?
 /*
 "Getting Census FIPS Geocoding data from source:" 
@@ -102,28 +132,28 @@ const census = require("../census.js");
 
 */
 
-census(
-  {
-    vintage: 2021,
-    geoHierarchy: {
-      // required
-      //  state: null,
-      county: {
-        lat: 38.8482,
-        lng: -76.9312,
-      },
-      tract: null,
-      //  state: "24",
-      //  county: null,
-      //  "zip-code-tabulation-area": "*",
-      "block group": "*",
-    },
-    sourcePath: ["pdb", "blockgroup"],
-    values: ["State_name", "County_name"],
-    // sourcePath: ["acs", "acs5"],
-    // values: ["B01001_001E"],
-    // "statsKey": censusAccessToken,
-    geoResolution: "500k",
-  },
-  (err, res) => console.log(res /*JSON.stringify(res)*/)
-); //?
+//census(
+//  {
+//    vintage: 2020,
+//    geoHierarchy: {
+//      // required
+//      //  state: null,
+//      //  state: "24",
+//      county: {
+//        lat: 38.8482,
+//        lng: -76.9312,
+//      },
+//      //  tract: null,
+//      //  county: null,
+//      //  "zip-code-tabulation-area": "*",
+//      //  "block group": "*",
+//    },
+//    //sourcePath: ["pdb", "blockgroup"],
+//    //values: ["State_name", "County_name"],
+//    sourcePath: ["acs", "acs5"],
+//    values: ["B01001_001E", "BOOP"],
+//    // "statsKey": censusAccessToken,
+//    //geoResolution: "500k",
+//  },
+//  (err, res) => console.log(res /*JSON.stringify(res)*/)
+//); //?

@@ -5,21 +5,27 @@
              :refer-macros [go alt!]]
       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! to-chan!
                                        pipe timeout put! go alt!]])
-   [cuerdas.core       :refer [join numeric? parse-number strip-suffix]]
+   [cuerdas.core       :refer [join numeric? strip-suffix]]
    [census.utils.core  :refer [$GET$ =O?>-cb xf!<< educt<< xf<<
                                transduct<<
                                filter-nil-tails
                                amap-type vec-type throw-err map-idcs-range
                                keys->strs ->args strs->keys
-                               URL-WMS URL-STATS]]))
+                               URL-WMS URL-STATS
+                               str->number]]))
 
-(defn kv-pair->str [[k v] separator]
+(defn kv-pair->str
   "Takes a key and a value and converts it to a string concatenated together with
   a given separator"
+  [[k v] separator]
   (join separator [(name k) (str v)]))
 
 (defn C-S-args->url
-  "Composes a URL to call Census' statistics API"
+  "
+  FIXME: currently hacked to handle invisible geographic dependencies
+ 
+  Composes a URL to call Census' statistics API
+  "
   [{:keys [vintage sourcePath geoHierarchy values predicates statsKey]}]
   (if (not-any? nil? [vintage sourcePath values])
     (str URL-STATS
@@ -34,15 +40,19 @@
            "")
          (if (not (nil? geoHierarchy))
            (keys->strs
-            (if (= 1 (count geoHierarchy))
+            (cond
+              (= 1 (count geoHierarchy))
               (str "&for=" (kv-pair->str (first geoHierarchy) ":"))
-              (str "&in="  (join "%20" (map #(kv-pair->str % ":") (filter-nil-tails (butlast geoHierarchy))))
-                   "&for=" (kv-pair->str (last geoHierarchy) ":"))))
+              (and (= 2 (count geoHierarchy)) (nil? (last (first geoHierarchy))))
+              (str "&for=" (kv-pair->str (last geoHierarchy) ":"))
+              :else (str "&in="  (join "%20" (map #(kv-pair->str % ":") (filter-nil-tails (butlast geoHierarchy))))
+                         "&for=" (kv-pair->str (last geoHierarchy) ":"))))
            "")
-         (if (not (nil? statsKey))
+         (when (not (nil? statsKey))
            (str "&key=" statsKey)))
     ""))
 
+;;(join "%20" (map #(kv-pair->str % ":") (filter-nil-tails (butlast {:state "01" :county nil :tract "*"}))))
 
 (defn ->valid#?->#
   "
@@ -50,21 +60,22 @@
   If matches any Census error codes or isn't coericble returns the string.
   "
   [s]
-  (cond (some #(= s %) ["-222222222.0000"
-                        "-333333333.0000"
-                        "-555555555.0000"
-                        "-666666666.0000"
-                        "-888888888.0000"
-                        "-999999999.0000"])
-        (str "NAN: " (strip-suffix s ".0000"))
+  (cond (some #(= s %) ["-222222222"
+                        "-333333333"
+                        "-555555555"
+                        "-666666666"
+                        "-888888888"
+                        "-999999999"])
+        (str "NAN: " s)
         (nil? s)
-        "NAN: null"
+        ;;"NAN: null"
+        nil
         (and (= (count s) 1) (numeric? s))
-        (parse-number s)
+        (str->number s)
         (and (= (subs s 0 1) "0") (not (= (subs s 1 2) ".")))
         s
         (numeric? s)
-        (parse-number s)
+        (str->number s)
         :else s))
 
 ;(parse-number "030381")
@@ -104,7 +115,7 @@
 (def $res$ (atom []))
 (def $err$ (atom {}))
 
-(def $GET$-C-stats ($GET$ :raw "Census statistics" $url$ $res$ $err$))
+(def $GET$-C-stats ($GET$ :json "Census statistics" $url$ $res$ $err$))
 
 ;(defn IOE-C->stats
 ;  "Internal function for calling the Census API using a Clojure Map. Returns stats
@@ -131,14 +142,13 @@
                    (pipe =JSON= =O=)))))))
 
 
-;      e            888                       d8
-;     d8b      e88~\888   /~~~8e  888-~88e  _d88__  e88~~8e  888-~\  d88~\
-;    /Y88b    d888  888       88b 888  888b  888   d888  88b 888    C888
-;   /  Y88b   8888  888  e88~-888 888  8888  888   8888__888 888     Y88b
-;  /____Y88b  Y888  888 C888  888 888  888P  888   Y888    , 888      888D
-; /      Y88b  "88_/888  "88_-888 888-_88"   '88_/  "88___/  888    \_88P
-;                                 888
-
+;;    88~\                                                            /
+;;  _888__  e88~-_  888-~\       888-~88e-~88e  e88~~8e  888-~\ e88~88e  e88~~8e
+;;   888   d888   i 888          888  888  888 d888  88b 888    888 888 d888  88b
+;;   888   8888   | 888          888  888  888 8888__888 888    "88_88" 8888__888
+;;   888   Y888   ' 888          888  888  888 Y888    , 888     /      Y888    ,
+;;   888    "88_-~  888          888  888  888  "88___/  888    Cb       "88___/
+;;  
 
 ;; FIXME: take geoHierachy arg keys and pull the values out in order, then to str
 ;;(defn xf-'key'<w-stat
@@ -157,7 +167,7 @@
 ;;          (rf acc {(apply str (vals (get (- (count this) vars#) this)))
 ;;                   {:properties this}}))))
 ;;
-(defn xf-'key'<w-stat
+(defn xf-group-w-geo-ids
   "
   Takes the geoHierarchy portion of args and pulls out the keys, which
   is used as a path to get the values from incoming maps
@@ -172,7 +182,7 @@
 
 #_(let [input '({:B01001_001E 55049,:state "01", :county "001"}
                 {:B01001_001E 199510, :state "01", :county "003"})]
-       (transduce (xf-'key'<w-stat {:state "01" :county "001"}) conj input))
+    (transduce (xf-group-w-geo-ids {:state "01" :county "001"}) conj input))
 ; RESULT:
 #_[{"01001" {:properties {:B01001_001E 55049, :state "01", :county "001"}}}
    {"01003" {:properties {:B01001_001E 199510, :state "01", :county "003"}}}]
@@ -187,7 +197,7 @@
   [args]
   (comp
    (xf!-CSV->CLJ args)
-   (xf-'key'<w-stat (get-in args [:geoHierarchy]))))
+   (xf-group-w-geo-ids (get-in args [:geoHierarchy]))))
 
 
 (defn =cfg=C-Stats

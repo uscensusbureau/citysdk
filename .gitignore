@@ -8,3 +8,4 @@ shadow-idea-notes.md
 .nrepl-port
 pom.xml
 *cljs-runtime
+public/census/data/
