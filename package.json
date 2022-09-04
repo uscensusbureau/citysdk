@@ -25,16 +25,14 @@
   },
   "homepage": "https://github.com/loganpowell/census-geojson#readme",
   "dependencies": {
+    "xhr2": "^0.2.1",
     "xmlhttprequest": "^1.8.0",
     "xregexp": "^5.1.0"
-  },
-  "scripts": {
-    "build": "shadow-cljs release lib"
   },
   "devDependencies": {
     "dotenv": "^10.0.0",
     "mkdirp": "^1.0.4",
-    "shadow-cljs": "^2.15.10",
+    "shadow-cljs": "^2.19.9",
     "shpjs": "^4.0.2",
     "source-map-support": "^0.5.20",
     "ws": "^8.2.3"

@@ -11,7 +11,7 @@
 
 (def stats-key (get-in (js->clj (env/config)) ["parsed" "CENSUS_KEY"]))
 ;(prn stats-key)
-(def GG (read-edn "./src/configs/geojson/index.edn"))
+(def GG (read-edn "./GeoJSON/index.edn"))
 ;(prn GG)
 (defn time-spot [] (js/Date.))
 

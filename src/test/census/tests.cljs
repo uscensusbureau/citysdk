@@ -1,14 +1,14 @@
 (ns test.census.tests
   (:require
-    [cljs.core.async      :refer [chan close! >! <! timeout to-chan! promise-chan]
-                          :refer-macros [go alt!]]
+    ;[cljs.core.async      :refer [chan close! >! <! timeout to-chan! promise-chan]
+    ;                      :refer-macros [go alt!]]
     [cljs.test            :refer-macros [async deftest is testing run-tests]]
     [test.fixtures.core   :refer [GG test-async test-async-timed
                                   time-spot heap-spot stats-key]
                           :as ts]
-    [census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
-    [census.statsAPI.core :refer [cfg>cfg=C-Stats]]
-    [census.geoAPI.core   :refer [cfg>cfg=C-GeoCLJ]]
+    ;[census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
+    ;[census.statsAPI.core :refer [cfg>cfg=C-Stats]]
+    ;[census.geoAPI.core   :refer [cfg>cfg=C-GeoCLJ]]
     [census.core          :refer [core-pattern
                                   IOE-Census
                                   census]]

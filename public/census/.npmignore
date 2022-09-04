@@ -4,3 +4,4 @@ cljs-runtime/
 package-lock.json
 *.md
 census.js.map
+data/

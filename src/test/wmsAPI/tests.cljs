@@ -1,49 +1,34 @@
 (ns test.wmsAPI.tests
   (:require
-    [cljs.core.async :refer [chan promise-chan close! >! <! pipeline
-                             take! put! timeout to-chan!]
-     :refer-macros [go alt!]]
-    [cljs.test :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core :refer [GG test-async Icb<==IO=fixture]
-     :as ts]
-    [census.wmsAPI.core :refer [$g$->wms-cfg
-                                lookup-id->match?
-                                search-id->match?
-                                C->GIS-url
-                                configed-map
-                                try-census-wms
-                                wms-engage?
-                                =>args=GIS=args=>
-                                I-<wms=I=]]))
+   [cljs.core.async :refer [chan close! >! <!]
+    :refer-macros [go]]
+   [cljs.test :refer-macros [deftest is  run-tests]]
+   [test.fixtures.core :refer [GG test-async] :as ts]
+   [census.wmsAPI.core :refer [$g$->wms-cfg
+                               lookup-id->match?
+                               search-id->match?
+                               C->GIS-url
+                               configed-map
+                               try-census-wms
+                               wms-engage?
+                               =>args=GIS=args=>
+                               I-<wms=I=]]))
 
-;(prn ts/args-ok-wms-only)
+
+(def wms-only {:vintage     2014,
+               :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}})
+
 (deftest $g$->wms-cfg-test
-  (is (= ($g$->wms-cfg GG ts/args-ok-wms-only)
+  (is (= ($g$->wms-cfg GG wms-only)
          {:vintage       2014,
           :layers        ["82"],
           :cur-layer-idx 0,
           :lat           28.2639,
           :lng           -80.7214,
-          :sub-level     [:county "*"],
+          :sub-levels    '([:county "*"]), ;; don't ask
           :geo           [:STATE],
           :looked-up-in  :2010})))
-#_(= {
-      :vintage       2014,
-      :layers        ["82"],
-      :cur-layer-idx 0,
-      :lat           28.2639,
-      :lng           -80.7214,
-      :sub-level     [:county "*"],
-      :geo           [:GEOID],
-      :looked-up-in  nil}
-     {:vintage       2014,
-      :layers        ["82"],
-      :cur-layer-idx 0,
-      :lat           28.2639,
-      :lng           -80.7214,
-      :sub-level     [:county "*"],
-      :geo           [:STATE],
-      :looked-up-in  :2010})
+
 
 (deftest lookup-id->match?-test
   (is (= (lookup-id->match? :CONCITY                        ; ↓ seq'd inverted geoKeyMap ↓
@@ -67,49 +52,28 @@
   (is (= (configed-map GG {:STATE "51", :COUNTY "013"})
          {:STATE {:state "51"}, :COUNTY {:county "013"}})))
 
-#_(=
-    {:STATE {nil "51"}, :COUNTY {nil "013"}}
-    {:STATE {:state "51"}, :COUNTY {:county "013"}})
-
-
-(comment "Got by getting in response from WMS api (below converted to edn from json)"
-         (configed-map
-           GG
-           (get-in
-             {:displayFieldName "BASENAME",
-              :fieldAliases     {:STATE "STATE", :COUNTY "COUNTY"},
-              :fields           [{:name   "STATE",
-                                  :type   "esriFieldTypeString",
-                                  :alias  "STATE",
-                                  :length 2}
-                                 {:name   "COUNTY",
-                                  :type   "esriFieldTypeString",
-                                  :alias  "COUNTY",
-                                  :length 3}],
-              :features         [{:attributes {:STATE "51", :COUNTY "013"}}]}
-             [:features 0 :attributes])))
 
 (deftest try-census-wms-test
   (let [=O= (chan 1)]
     (test-async
-      (go (try-census-wms GG ts/args-ok-wms-only 0 =O=)
-          (let [res (<! =O=)]
-            (is (= res
-                   {:STATE {:state "12"}}))
-            (close! =O=))))))
+     (go (try-census-wms GG ts/args-ok-wms-only 0 =O=)
+         (let [res (<! =O=)]
+           (is (= res
+                  {:STATE {:state "12"}}))
+           (close! =O=))))))
 
 (deftest test-atom-via-chan
   (let [=O= (chan 1)
         $A$ (atom {})]
     (test-async
-      (go (>! =O= (reset! $A$ {:key "val"}))
-          (let [res (<! =O=)]
-            (is (= res
-                   {:key "val"}))
-            (>! =O= @$A$)
-            (is (identical? (<! =O=)
-                            res))
-            (close! =O=))))))
+     (go (>! =O= (reset! $A$ {:key "val"}))
+         (let [res (<! =O=)]
+           (is (= res
+                  {:key "val"}))
+           (>! =O= @$A$)
+           (is (identical? (<! =O=)
+                           res))
+           (close! =O=))))))
 
 (deftest wms-engage?-test
   (is (and (= (wms-engage? {:geoHierarchy {:county {:lat 1 :lng -7} :tract "*"}})
@@ -126,13 +90,12 @@
         =>args= (chan 1)
         =args=> (chan 1)]
     (test-async
-      (go (>! =>args= args-in)
-          ((=>args=GIS=args=> GG) =>args= =args=>)
-          (is (= (<! =args=>)
-                 args-out))
-          (close! =>args=)
-          (close! =args=>)))))
-
+     (go (>! =>args= args-in)
+         ((=>args=GIS=args=> GG) =>args= =args=>)
+         (is (= (<! =args=>)
+                args-out))
+         (close! =>args=)
+         (close! =args=>)))))
 
 (deftest I-<wms=I=-test
   (let [args-in {:vintage      "2017",
@@ -141,34 +104,14 @@
                  :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
         =args=> (chan 1)]
     (test-async
-      (go ((I-<wms=I= GG) args-in =args=>)
-          (is (= (<! =args=>)
-                 {:vintage      "2017",
-                  :geoHierarchy {:state "51", :county "*"}}))
-          ((I-<wms=I= GG) args-na =args=>)
-          (is (= (<! =args=>)
-                 "No FIPS (Census geocodes) found for given arguments"))
-          (close! =args=>)))))
+     (go ((I-<wms=I= GG) args-in =args=>)
+         (is (= (<! =args=>)
+                {:vintage      "2017",
+                 :geoHierarchy {:state "51", :county "*"}}))
+         ((I-<wms=I= GG) args-na =args=>)
+         (is (= (<! =args=>)
+                "No FIPS (Census geocodes) found for given arguments"))
+         (close! =args=>)))))
 
-#_(deftest censusWMS-test
-    (let [args-in (clj->js {:vintage      "2017",
-                            :geoHierarchy {:state {:lat 38.8816, :lng -77.0910}, :county "*"}}
-                           :keywordize-keys true)
-          args-na {:vintage      "1997"
-                   :geoHierarchy {:county {:lat 22.2222, :lng -66.6666}}}
-          $r$ (atom "")
-          tcb (fn [E O] (if-let [err E]
-                          (reset! $r$ err)
-                          (reset! $r$ O)))]
-      (test-async
-        (go ((censusWMS GG) args-in tcb)
-            (<! (timeout 1000))
-            (is (= @$r$
-                   {:vintage      "2017",
-                    :geoHierarchy {:state "51", :county "*"}}))
-            ((censusWMS GG) args-na tcb)
-            (<! (timeout 1000))
-            (is (= @$r$
-                   "No FIPS (Census geocodes) found for given arguments"))))))
 
 (run-tests)

@@ -1,20 +1,17 @@
 (ns census.wmsAPI.core
   (:require
-    #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan!
-                                        timeout]
-                                :refer-macros [go alt!]]
-       :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan!
-                                        timeout go alt!]])
-    ;#?(:cljs [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL]
-    ;                            :refer-macros [select transform traverse setval]]
-    ;   :clj  [com.rpl.specter   :refer [MAP-VALS MAP-KEYS ALL select transform traverse setval]])
-    [clojure.set       :refer [map-invert]]
-    [cuerdas.core      :refer [join]]
-    [linked.core       :as -=-]
-    [census.utils.core :refer [=O?>-cb $GET$
-                               filter-nil-tails
-                               amap-type vec-type throw-err ->args
-                               URL-WMS URL-GEOKEYMAP]]))
+   #?(:cljs [cljs.core.async   :refer [>! <! chan promise-chan close! take! put! to-chan!
+                                       timeout]
+             :refer-macros [go alt!]]
+      :clj [clojure.core.async :refer [>! <! chan promise-chan close! take! put! to-chan!
+                                       timeout go alt!]])
+   [clojure.set       :refer [map-invert]]
+   [cuerdas.core      :refer [join]]
+   [linked.core       :as -=-]
+   [census.utils.core :refer [=O?>-cb $GET$
+                              filter-nil-tails
+                              amap-type vec-type throw-err ->args
+                              URL-WMS URL-GEOKEYMAP]]))
 
 (defn $g$->wms-cfg
   "
@@ -47,14 +44,13 @@
                  :lat            lat
                  :lng            lng
                  :sub-levels     sub-levels}]
-        (if (instance? vec-type lookup)
-            (merge-with assoc config
-              {:geo            lookup
-               :looked-up-in   (keyword vintage)})
-            (merge-with assoc config
-              {:geo            (get-in $g$ [scope lookup :id<-json])
-               ; lookup-up-in
-               :looked-up-in   lookup})))))
+     (if (instance? vec-type lookup)
+       (merge-with assoc config
+                   {:geo            lookup
+                    :looked-up-in   (keyword vintage)})
+       (merge-with assoc config
+                   {:geo            (get-in $g$ [scope lookup :id<-json])
+                    :looked-up-in   lookup})))))
 
 ;(filter-nil-tails (vec {:state { :lat 1 :lng 2 } :county nil :tract "*"}))
 
@@ -77,13 +73,13 @@
   "
   [GEO [geo-val geo-key]]
   (let [vins (map (fn [[_ {:keys [id<-json] {:keys [lookup]} :wms}]]
-                      (if (instance? vec-type lookup)
-                          (last lookup)
-                          (last id<-json)))
+                    (if (instance? vec-type lookup)
+                      (last lookup)
+                      (last id<-json)))
                   (vec geo-val))]
-       (if (some #(= GEO %) vins)
-           geo-key
-           nil)))
+    (if (some #(= GEO %) vins)
+      geo-key
+      nil)))
 
 (defn search-id->match?
   "
@@ -99,8 +95,8 @@
   [$g$ GEO]
   (let [inverted-geoKeyMap (seq (map-invert $g$))]
     (remove nil?
-      (map #(lookup-id->match? GEO %)
-           inverted-geoKeyMap))))
+            (map #(lookup-id->match? GEO %)
+                 inverted-geoKeyMap))))
 
 ; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2012/MapServer
 ; https://tigerweb.geo.census.gov/arcgis/rest/services/Census2020/tigerWMS_Census2000/MapServer
@@ -121,18 +117,17 @@
           (get layers cur-layer-idx)
           "/query?"
           (join "&"
-            (map #(join "=" %)
-                 [["geometry" (str lng "," lat)]
-                  ["geometryType" "esriGeometryPoint"]
-                  ["inSR" "4269"]
-                  ["spatialRel" "esriSpatialRelIntersects"]
-                  ["returnGeometry" "false"]
-                  ["f" "pjson"]
-                  ["outFields" (join "," (map name geo))]]))))))
+                (map #(join "=" %)
+                     [["geometry" (str lng "," lat)]
+                      ["geometryType" "esriGeometryPoint"]
+                      ["inSR" "4269"]
+                      ["spatialRel" "esriSpatialRelIntersects"]
+                      ["returnGeometry" "false"]
+                      ["f" "pjson"]
+                      ["outFields" (join "," (map name geo))]]))))))
 
 
 (defn configed-map
-
   "IMPORTANT!
   The :id<-json key in index.edn is double loaded, to both pull ids from GeoJSON
   as well as configure the API call
@@ -154,7 +149,7 @@
       (if (= nil (get wms-keys idx))
         result
         (recur (inc idx)
-               (assoc result ; TODO: `revert` if no bueno
+               (assoc result
                       (get wms-keys idx)
                       ;; returns an empty map ({}) if invalid
                       {(get (mapv #(first %) geo-keys) idx)
@@ -219,11 +214,11 @@
                 (cond
                   (not (empty? res))
                   (do (>! =args=>
-                        (merge args
-                          (assoc {} :geoHierarchy
-                            (conj (-=-/map)
-                                  (into (-=-/map) (vals res))
-                                  (into (-=-/map) sub-levels)))))
+                          (merge args
+                                 (assoc {} :geoHierarchy
+                                        (conj (-=-/map)
+                                              (into (-=-/map) (vals res))
+                                              (into (-=-/map) sub-levels))))) ;; e.g.: ([:county "*"])
                       (close! =res=))
                   ; if another layer is available: recur
                   (and (empty? res) (not (nil? (get layers (inc idx)))))
