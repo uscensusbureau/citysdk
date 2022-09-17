@@ -76,15 +76,15 @@ census(
 
     values: ["DP03_0007E", "DP03_0007PE"],
     //values: ["DP03_0007E"],
-    geoResolution: "500k",
+    //geoResolution: "500k",
   },
   (err, res) => {
     if (err) console.warn("ERROR:", err);
     //console.log("DONE: \n");
-    //console.log(res);
-    return promises
-      .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
-      .then(console.log("COMPLETE"));
+    console.log(res);
+    //return promises
+    //  .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
+    //  .then(console.log("COMPLETE"));
   }
 ); //?
 

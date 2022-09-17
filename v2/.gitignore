@@ -2,10 +2,12 @@ node_modules
 package-lock.json
 shadow-idea-notes.md
 .idea
-.shadow-cljs
 .env
 .gitattributes
 .nrepl-port
+.shadow-cljs/*
+.clj-kondo/*
+.calva/*
 pom.xml
 *cljs-runtime
 public/census/data/
