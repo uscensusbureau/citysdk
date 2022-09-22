@@ -3,9 +3,9 @@
    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
                                 timeout]
     :refer-macros [go alt!]]
-   [ajax.core           :refer [GET POST]]
+;;   [ajax.core           :refer [GET POST]]
    [cljs.test           :refer-macros [are deftest is are testing run-tests]]
-   [cljs.reader         :refer [read-string]]
+;;   [cljs.reader         :refer [read-string]]
    [test.fixtures.core  :refer [test-async]]
    [census.utils.core   :refer [map-rename-keys
                                 map-over-keys
@@ -18,8 +18,8 @@
                                 xf<<
                                 xf!<<
                                 educt<<
+                                polyfetch
                                 map-target
-                                 ;map-target-idcs
                                 map-idcs-range
                                 $GET$
                                 =O?>-cb

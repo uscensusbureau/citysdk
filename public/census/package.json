@@ -25,14 +25,8 @@
     "usa",
     "boundaries"
   ],
-  "exports": {
-    ".": {
-      "require": "census.js",
-      "require": "xmlhttprequest"
-    }
-  },
   "dependencies": {
-    "xmlhttprequest": "^1.8.0"
+    "node-fetch": "^3.2.10"
   },
   "homepage": "https://github.com/uscensusbureau/citysdk#readme"
 }

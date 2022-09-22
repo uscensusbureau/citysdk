@@ -1,1 +1,0 @@
-["^ ","~$add-binding-atom",["^ ","~:row",13,"~:col",1,"~:fixed-arities",["~#set",[1,2]],"~:name","^0","~:ns","~$clojure.tools.analyzer.passes.add-binding-atom","~:top-ns","^7"],"~:filename","C:\\Users\\logan\\.m2\\repository\\org\\clojure\\tools.analyzer\\1.1.0\\tools.analyzer-1.1.0.jar:clojure/tools/analyzer/passes/add_binding_atom.clj"]

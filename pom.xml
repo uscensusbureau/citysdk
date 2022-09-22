@@ -36,11 +36,6 @@
             <version>2.20.2</version>
         </dependency>
         <dependency>
-            <groupId>cljs-ajax</groupId>
-            <artifactId>cljs-ajax</artifactId>
-            <version>0.8.4</version>
-        </dependency>
-        <dependency>
             <groupId>funcool</groupId>
             <artifactId>cuerdas</artifactId>
             <version>2022.06.16-403</version>
@@ -49,11 +44,6 @@
             <groupId>clojusc</groupId>
             <artifactId>defun</artifactId>
             <version>0.4.0</version>
-        </dependency>
-        <dependency>
-            <groupId>lambdaisland</groupId>
-            <artifactId>fetch</artifactId>
-            <version>1.1.60</version>
         </dependency>
         <dependency>
             <groupId>frankiesardo</groupId>

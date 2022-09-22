@@ -1,19 +1,15 @@
 (ns census.utils.core
   (:require
-;;   [ajax.core           :refer [GET]]
-   [lambdaisland.fetch  :as fetch]
-   ["node-fetch"        :as node-fetch]
+   #? (:cljs [cljs.core          :refer [js->clj, clj->js]])
+   #? (:cljs [cljs.reader        :refer [read-string]]
+       :clj  [clojure.edn        :refer [read-string]])
+   #? (:cljs [cljs.core.async    :refer [put! take!]
+              :refer-macros [go alt!]]
+       :clj  [clojure.core.async :refer [alt! go put! take!]])
+   #? (:clj  [ajax.core           :refer [GET]])
+   [clojure.walk                 :refer [keywordize-keys]]
    [cuerdas.core        :as s]
-   #?(:cljs [cljs.reader :refer [read-string]]
-      :clj [clojure.edn :refer [read-string]])
-   #?(:cljs [cljs.core.async   :refer [chan >! <! take! put! close! promise-chan
-                                       onto-chan! to-chan!]
-             :refer-macros [go go-loop alt!]]
-      :clj [clojure.core.async :refer [chan >! <! take! put! close! promise-chan
-                                       onto-chan! to-chan! go go-loop alt!]])
-   [clojure.walk         :refer [keywordize-keys]]))
-;;   ["xmlhttprequest" :as xmlhttprequest]))
-
+   ["node-fetch$default"         :as node-fetch]))
 
 (def URL-STATS "https://api.census.gov/data/")
 (def URL-WMS "https://tigerweb.geo.census.gov/arcgis/rest/services/")
@@ -25,21 +21,6 @@
 ;https://cdn.staticaly.com/gh/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn
 
 
-(def isNode #? (:cljs (and (exists? js/process)
-                           (exists? js/process.versions)
-                           (exists? js/process.versions.node))
-                :clj false))
-
-(def isServer
-  #?(:cljs isNode
-     :clj true))
-
-;;(prn js/process.versions.node)
-
-(def cors-proxy
-  "URL proxy string prereq if not node"
-  (cond isServer ""
-        :else "https://l4vujdq7gxgjawqx7aopizvhz40aqfxn.lambda-url.us-east-1.on.aws/"))
 
 ;(prn cors-proxy)
 
@@ -117,8 +98,25 @@
     (throw x)
     x))
 
-#_(defn $GET$
-    "
+(def isNode #? (:cljs (and (exists? js/process)
+                           (exists? js/process.versions)
+                           (exists? js/process.versions.node))
+                :clj false))
+
+(def isServer
+  #?(:cljs isNode
+     :clj true))
+
+;;(prn js/process.versions.node)
+
+(def cors-proxy
+  "URL proxy string prereq if not node"
+  (cond isServer ""
+        :else "https://l4vujdq7gxgjawqx7aopizvhz40aqfxn.lambda-url.us-east-1.on.aws/"))
+
+
+#? (:clj (defn $GET$
+           "
   Takes five initial inputs:
   1) the response format desired
   2) An error message name
@@ -136,175 +134,182 @@
   Any new payloads received by `GET` will replace the last response `atom` via
   `reset!` *and* be put into the out-bound =response= chan.
   "
-    ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
-    ([format log-name $url$ $res$ $err$ ?cors]
-     (fn
-       ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
-       ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
-        (take!
-         =url=
-         (fn [url]
-           (cond
-            ; short circuit if there's an error in the pipeline
-             (and (= url @$url$) (not (empty? @$err$)))
-             (let [err @$err$]
-               (do (prn (str "Unsuccessful `" log-name "` request."))
-                   (prn (str err))
-                   (put! =err= err)
-                   (reset! $err$ {}))) ; <- if internets have failed, allow retry
-             (and (= url @$url$) (empty? @$err$))
-             (do (when (nil? ?silent)
-                   (do (prn (str "Getting " log-name " data from cache:"))
-                       (prn url)))
-                 (put! =res= @$res$))
-             :else
-             (do (when (nil? ?silent)
-                   (do (prn (str "Getting " log-name " data from source:"))
-                       (prn url)))
-                 (let [cfg {:error-handler
-                            (fn [{:keys [status status-text failure response original-text]}]
-                              (do (prn (str "Response: " response
-                                            " STATUS: " status
-                                            " URL: " url))
-                                  (reset! $url$ url)
-                                  (->> (reset! $err$
-                                               (str "Response: " response
-                                                    " STATUS: " status
+           ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
+           ([format log-name $url$ $res$ $err$ ?cors]
+            (fn
+              ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
+              ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
+               (take!
+                =url=
+                (fn [url]
+                  (cond
+                    ;; short circuit if there's an error in the pipeline
+                    (and (= url @$url$) (seq @$err$))
+                    (let [err @$err$]
+                      (do (prn (str "Unsuccessful `" log-name "` request."))
+                          (prn (str err))
+                          (put! =err= err)
+                          (reset! $err$ {}))) ; <- if internets have failed, allow retry
+                    (and (= url @$url$) (empty? @$err$))
+                    (do (when (nil? ?silent)
+                          (do (prn (str "Getting " log-name " data from cache:"))
+                              (prn url)))
+                        (put! =res= @$res$))
+                    :else
+                    (do (when (nil? ?silent)
+                          (do (prn (str "Getting " log-name " data from source:"))
+                              (prn url)))
+                        (let [cfg {:error-handler
+                                   (fn [{:keys [status status-text failure response original-text]}]
+                                     (do (prn (str "Response: " response
+                                                   " STATUS: " status
+                                                   " URL: " url))
+                                         (reset! $url$ url)
+                                         (->> (reset! $err$
+                                                      (str "Response: " response
+                                                           " STATUS: " status
                                                    ;" Text: " status-text
-                                                    " URL: " url))
+                                                           " URL: " url))
                                                    ;" Failure: " failure))
-                                       (put! =err=))))
-                            :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                       CORS-URL (if (nil? ?cors)
-                                  (str cors-proxy url)
-                                  url)]
-                   (case format
-                     :json
-                     (let [json
-                           (merge cfg {:response-format :json
-                                       :keywords?       true
-                                       :handler
-                                       (fn [res]
-                                         (do (reset! $err$ {})
-                                             (reset! $url$ url)
-                                             (->> (reset! $res$ res)
-                                                  (put! =res=))))})]
-                       (GET CORS-URL json))
-                     :edn
-                     (let [edn
-                           (merge cfg {:handler
-                                       (fn [res]
-                                         (do (reset! $err$ {})
-                                             (reset! $url$ url)
-                                             (->> (reset! $res$ (read-string res))
-                                                  (put! =res=))))})]
-                       (GET CORS-URL edn))
-                     :raw
-                     (let [raw
-                           (merge cfg {:response-format :raw
-                                       :handler
-                                       (fn [res]
-                                         (do (reset! $err$ {})
-                                             (reset! $url$ url)
-                                             (->> (reset! $res$ res)
-                                                  (put! =res=))))})]
-                       (GET CORS-URL raw))))))))))))
+                                              (put! =err=))))
+                                   :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
+                              CORS-URL (if (nil? ?cors)
+                                         (str cors-proxy url)
+                                         url)]
+                          (case format
+                            :json
+                            (let [json
+                                  (merge cfg {:response-format :json
+                                              :keywords?       true
+                                              :handler
+                                              (fn [res]
+                                                (do (reset! $err$ {})
+                                                    (reset! $url$ url)
+                                                    (->> (reset! $res$ res)
+                                                         (put! =res=))))})]
+                              (GET CORS-URL json))
+                            :edn
+                            (let [edn
+                                  (merge cfg {:handler
+                                              (fn [res]
+                                                (do (reset! $err$ {})
+                                                    (reset! $url$ url)
+                                                    (->> (reset! $res$ (read-string res))
+                                                         (put! =res=))))})]
+                              (GET CORS-URL edn))
+                            :raw
+                            (let [raw
+                                  (merge cfg {:response-format :raw
+                                              :handler
+                                              (fn [res]
+                                                (do (reset! $err$ {})
+                                                    (reset! $url$ url)
+                                                    (->> (reset! $res$ res)
+                                                         (put! =res=))))})]
+                              (GET CORS-URL raw)))))))))))))
 
-#_(-> (.launch puppeteer)
-      (.then (fn [browser]
-               (-> (.newPage browser)
-                   (.then (fn [page]
-                            (-> (.goto page "https://clojure.org")
-                                (.then #(.screenshot page #js{:path "screenshot.png"}))
-                                (.catch js/console.error)
-                                (.then #(.close browser)))))))))
 
-;; TODO: make .clj compatible (ajax.core doesn't work with ESM... well)
-(when isNode (set! js/fetch node-fetch))
 
-(defn $GET$
-  "
-  Takes five initial inputs:
-  1) the response format desired
-  2) An error message name
-  3) three atoms for the: URL, data response and or error
-  Returns a function, which takes three/four more inputs:
-  1) takes a =url= channel
-  2) takes a =response= channel.
-  3) takes an =err= channel (for propogation/coordination)
-  Once first created (with format and err-log-msg) the following channel fns
-  enclosed within local state provided by the input atoms, which stores the last
-  url sent in, the last response put out and any prior errors.
-  If url passed in = the last url (cached in an `atom`), the
-  function pumps a cached response (`atom`) instead of - in the case the
-  url argument =/= last url - calling a cljs-ajax `GET` request.
-  Any new payloads received by `GET` will replace the last response `atom` via
-  `reset!` *and* be put into the out-bound =response= chan.
-  "
-  ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
-  ([format log-name $url$ $res$ $err$ ?cors]
-   (fn
-     ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
-     ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
-      (take! =url=
-             (fn [url]
-               (cond
-            ; short circuit if there's an error in the pipeline
-                 (and (= url @$url$) (seq @$err$))
-                 (let [err @$err$]
-                   (prn (str "Unsuccessful `" log-name "` request."))
-                   (prn (str err))
-                   (put! =err= err)
-                   (reset! $err$ {})) ; <- if internets have failed, allow retry
-                 (and (= url @$url$) (empty? @$err$))
-                 (do (when (nil? ?silent)
-                       (prn (str "Getting " log-name " data from cache:"))
-                       (prn url))
-                     (put! =res= @$res$))
-                 :else
-                 (do (when (nil? ?silent)
-                       (prn (str "Getting " log-name " data from source:"))
-                       (prn url))
-                     (let [error-handler (fn [err]
-                                           (prn (str "Error: " err))
-                                           (reset! $url$ url)
-                                           (->> (reset! $err$ (str "Error: " err))
-                                                (put! =err=)))
-                           CORS-URL (if (nil? ?cors)
-                                      (str cors-proxy url)
-                                      url)]
-                       (case format
-                         :json
-                         (-> (fetch/get CORS-URL {:accept       :json
-                                                  :content-type :json})
-                             (.then #(js->clj (:body %) :keywordize-keys true))
-                             (.then (fn [clj]
-                                      (reset! $err$ {})
-                                      (reset! $url$ url)
-                                      (->> (reset! $res$ clj)
-                                           (put! =res=))))
-                             (.catch #(error-handler %)))
-                         :edn
-                         (-> (fetch/get CORS-URL {:accept        :text
-                                                  :content-type  :text})
-                             (.then #(:body %))
-                             (.then #(read-string %))
-                             (.then (fn [edn]
-                                      (reset! $err$ {})
-                                      (reset! $url$ url)
-                                      (->> (reset! $res$ edn)
-                                           (put! =res=))))
-                             (.catch #(error-handler %)))
-                         :raw
-                         (-> (fetch/get CORS-URL {:accept        :text
-                                                  :content-type  :text})
-                             (.then #(:body %))
-                             (.then (fn [raw]
-                                      (reset! $err$ {})
-                                      (reset! $url$ url)
-                                      (->> (reset! $res$ raw)
-                                           (put! =res=))))
-                             (.catch #(error-handler %)))))))))))))
+#?(:cljs
+   (def polyfetch
+     "
+     provides cross-platform fetch impl (Browser API + node polyfill) depending
+     on context
+     "
+     (cond
+       isNode node-fetch
+       :else js/fetch)))
+
+#?(:cljs
+   (defn $GET$
+     "
+     Takes 5/6 initial inputs:
+     1) the response format desired
+     2) An error message name
+     3-5) three atoms for the: URL, data response and or error
+     6) optional: flag to skip CORS proxy even if on browser
+  
+     Returns a function, which takes three/four more inputs:
+     1) takes a =url= channel
+     2) takes a =response= channel.
+     3) takes an =err= channel (for propogation/coordination)
+     4) optional: allow silencing of logging
+      
+     Once first created (with format and err-log-msg) the following channel fns
+     enclosed within local state provided by the input atoms, which stores the last
+     url sent in, the last response put out and any prior errors.
+     If url passed in = the last url (cached in an `atom`), the
+     function pumps a cached response (`atom`) instead of - in the case the
+     url argument =/= last url - calling a cljs-ajax `GET` request.
+     Any new payloads received by `GET` will replace the last response `atom` via
+     `reset!` *and* be put into the out-bound =response= chan.
+     "
+     ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
+     ([format log-name $url$ $res$ $err$ ?cors]
+      (fn
+        ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
+        ([=url= =res= =err= ?silent]
+         (take! =url=
+                (fn [url]
+                  (cond
+                    ; short circuit if there's an error in the pipeline
+                    (and (= url @$url$) (seq @$err$))
+                    (let [err @$err$]
+                      (prn (str "Unsuccessful `" log-name "` request."))
+                      (prn (str err))
+                      (put! =err= err)
+                      (reset! $err$ {})) ; <- if internets have failed, allow retry
+                    (and (= url @$url$) (empty? @$err$))
+                    (do (when (nil? ?silent)
+                          (prn (str "Getting " log-name " data from cache:"))
+                          (prn url))
+                        (put! =res= @$res$))
+                    :else
+                    (do (when (nil? ?silent)
+                          (prn (str "Getting " log-name " data from source:"))
+                          (prn url))
+                        (let [error-handler (fn [err]
+                                              (prn (str "Error: " err))
+                                              (reset! $url$ url)
+                                              (->> (reset! $err$ (str "Error: " err))
+                                                   (put! =err=)))
+                              CORS-URL (if (nil? ?cors)
+                                         (str cors-proxy url)
+                                         url)]
+                          (case format
+                            :json
+                            (-> (polyfetch CORS-URL #js {:method "GET"
+                                                         :headers #js {"Content-Type" "application/json"}})
+                                (.then #(.json %))
+                                ;;(.then #(prn %))
+                                (.then #(js->clj % :keywordize-keys true))
+                                (.then (fn [clj]
+                                         (reset! $err$ {})
+                                         (reset! $url$ url)
+                                         (->> (reset! $res$ clj)
+                                              (put! =res=))))
+                                (.catch #(error-handler %)))
+                            :edn
+                            (-> (polyfetch CORS-URL #js {:method "GET"
+                                                         :headers #js {"Content-Type" "text/plain"}})
+                                (.then #(.text %))
+                                (.then #(read-string %))
+                                (.then (fn [edn]
+                                         (reset! $err$ {})
+                                         (reset! $url$ url)
+                                         (->> (reset! $res$ edn)
+                                              (put! =res=))))
+                                (.catch #(error-handler %)))
+                            :raw
+                            (-> (polyfetch CORS-URL #js {:method "GET"
+                                                         :headers #js {"Content-Type" "text/plain"}})
+                                (.then #(.text %))
+                                (.then (fn [raw]
+                                         (reset! $err$ {})
+                                         (reset! $url$ url)
+                                         (->> (reset! $res$ raw)
+                                              (put! =res=))))
+                                (.catch #(error-handler %))))))))))))))
 
 
 (defn =O?>-cb
@@ -324,32 +329,34 @@
       (alt! =O= ([O] (cb nil O))
             =E= ([E] (cb E nil)))))
 
-(defn ->args
-  "Converts js arguments (JSON) into a Clojure map, used internally to handle
-  functionality of this library."
-  [args]
-  (if (= (type args) amap-type)
-    (let [{:keys [vintage]} args]
-      #_(setval :vintage (str vintage) args)
-      (merge args {:vintage (str vintage)}))
-    (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
+#? (:cljs
+    (defn ->args
+      "
+      Converts js arguments (JSON) into a Clojure map, used internally to handle 
+      functionality of this library.
+      "
+      [args]
+      (if (= (type args) amap-type)
+        (let [{:keys [vintage]} args]
+          #_(setval :vintage (str vintage) args)
+          (merge args {:vintage (str vintage)}))
+        (let [{geoHierarchy "geoHierarchy" vintage "vintage" :as clj-args} (js->clj args)]
            ;(do (prn (str "geoHierarchy??: " geoHierarchy))
-      (if (not (nil? geoHierarchy))
-        (->> (merge clj-args
-                    {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
-                     "vintage" (str vintage)})
-             (keywordize-keys))
-        (->> (merge clj-args
-                    {"vintage" (str vintage)})
-             (keywordize-keys))))))
+          (if (not (nil? geoHierarchy))
+            (->> (merge clj-args
+                        {"geoHierarchy" (map-rename-keys #(strs->keys %) geoHierarchy)
+                         "vintage" (str vintage)})
+                 (keywordize-keys))
+            (->> (merge clj-args
+                        {"vintage" (str vintage)})
+                 (keywordize-keys)))))))
 
-(defn args->
-  "Converts Clojure arguments to JavaScript (for external use)"
-  [{:keys [geoHierarchy] :as args}]
-  (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
-    (clj->js
-     #_(setval :geoHierarchy geoKeys args)
-     (merge args {:geoHierarchy geoKeys}))))
+#? (:cljs
+    (defn args->
+      "Converts Clojure arguments to JavaScript (for external use)"
+      [{:keys [geoHierarchy] :as args}]
+      (let [geoKeys (map-rename-keys #(keys->strs (name %)) geoHierarchy)]
+        (clj->js (merge args {:geoHierarchy geoKeys})))))
 
 
 

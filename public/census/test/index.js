@@ -1,7 +1,11 @@
-import census from "../census.js";
+import census from '../census.js'
 //import xmlhttprequest from "xmlhttprequest";
 //import { promises } from "fs";
-//import fetch from "node-fetch";
+//import * as fetch from 'node-fetch'
+
+//fetch('https://api.census.gov/data/2018/acs/acs5?get=B01001_001E&in=state:24&for=tract:*')
+//    .then((r) => r.json())
+//    .then(console.log) //?
 //census(
 //  {
 //    vintage: 2017, // required
@@ -62,32 +66,32 @@ import census from "../census.js";
 //); //?
 
 census(
-  {
-    vintage: 2016,
-    geoHierarchy: {
-      //  state: {
-      //    lat: 38.8482,
-      //    lng: -76.932,
-      //  },
-      state: null,
-      // FIXME: hypothesis: needs the specified components in geoHeirarchy for lens
-      county: "*",
-    },
-    sourcePath: ["acs", "acs5", "profile"],
+    {
+        vintage: 2016,
+        geoHierarchy: {
+            //  state: {
+            //    lat: 38.8482,
+            //    lng: -76.932,
+            //  },
+            state: null,
+            // FIXME: hypothesis: needs the specified components in geoHeirarchy for lens
+            county: '*',
+        },
+        sourcePath: ['acs', 'acs5', 'profile'],
 
-    values: ["DP03_0007E", "DP03_0007PE"],
-    //values: ["DP03_0007E"],
-    geoResolution: "500k",
-  },
-  (err, res) => {
-    if (err) console.warn("ERROR:", err);
-    //console.log("DONE: \n");
-    console.log(res);
-    //return promises
-    //  .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
-    //  .then(console.log("COMPLETE"));
-  }
-); //?
+        values: ['DP03_0007E', 'DP03_0007PE'],
+        //values: ["DP03_0007E"],
+        geoResolution: '500k',
+    },
+    (err, res) => {
+        if (err) console.warn('ERROR:', err)
+        //console.log("DONE: \n");
+        console.log(res)
+        //return promises
+        //  .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
+        //  .then(console.log("COMPLETE"));
+    }
+) //?
 
 //census(
 //  {
