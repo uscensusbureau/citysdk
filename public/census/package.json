@@ -1,8 +1,14 @@
 {
   "name": "citysdk",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
+  "author": "Logan Powell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uscensusbureau/citysdk/issues"
+  },
   "main": "census.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,14 +25,14 @@
     "usa",
     "boundaries"
   ],
-  "dependencies": {
-    "xmlhttprequest": "^1.8.0",
-    "xregexp": "^5.1.0"
+  "exports": {
+    ".": {
+      "require": "census.js",
+      "require": "xmlhttprequest"
+    }
   },
-  "author": "Logan Powell",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/uscensusbureau/citysdk/issues"
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
   },
   "homepage": "https://github.com/uscensusbureau/citysdk#readme"
 }

@@ -1,6 +1,7 @@
-const census = require("../census.js");
-const { promises } = require("fs");
-const fetch = require("node-fetch");
+import census from "../census.js";
+//import xmlhttprequest from "xmlhttprequest";
+//import { promises } from "fs";
+//import fetch from "node-fetch";
 //census(
 //  {
 //    vintage: 2017, // required
@@ -24,7 +25,7 @@ const fetch = require("node-fetch");
 //    vintage: 2015, // required
 //    geoHierarchy: {
 //      // required
-//      county: {
+//      county: {\
 //        lat: 28.2639,
 //        lng: -80.7214,
 //      },
@@ -76,7 +77,7 @@ census(
 
     values: ["DP03_0007E", "DP03_0007PE"],
     //values: ["DP03_0007E"],
-    //geoResolution: "500k",
+    geoResolution: "500k",
   },
   (err, res) => {
     if (err) console.warn("ERROR:", err);
