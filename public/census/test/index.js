@@ -1,7 +1,7 @@
 import census from '../census.js'
 //import xmlhttprequest from "xmlhttprequest";
 //import { promises } from "fs";
-//import * as fetch from 'node-fetch'
+//import fetch from 'node-fetch'
 
 //fetch('https://api.census.gov/data/2018/acs/acs5?get=B01001_001E&in=state:24&for=tract:*')
 //    .then((r) => r.json())
@@ -67,20 +67,19 @@ import census from '../census.js'
 
 census(
     {
-        vintage: 2016,
+        vintage: 2019,
         geoHierarchy: {
-            //  state: {
-            //    lat: 38.8482,
-            //    lng: -76.932,
-            //  },
-            state: null,
-            // FIXME: hypothesis: needs the specified components in geoHeirarchy for lens
+            state: {
+                lat: 38.8482,
+                lng: -76.932,
+            },
+            //state: null,
             county: '*',
         },
         sourcePath: ['acs', 'acs5', 'profile'],
 
-        values: ['DP03_0007E', 'DP03_0007PE'],
-        //values: ["DP03_0007E"],
+        //values: ['DP03_0007E', 'DP03_0007PE'],
+        values: ['DP03_0007E'],
         geoResolution: '500k',
     },
     (err, res) => {

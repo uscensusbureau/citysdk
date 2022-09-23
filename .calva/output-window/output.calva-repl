@@ -31,32 +31,4 @@ Testing test.utils.tests
 "https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
 []
 cljs꞉test.utils.tests꞉> 
-; Evaluating file: tests.cljs
-
-Testing test.utils.tests
-"Getting JSON DATA data from source:"
-"https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
-[]
-cljs꞉test.utils.tests꞉> 
-; Evaluating file: tests.cljs
-
-Testing test.utils.tests
-"Getting JSON DATA data from source:"
-"https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
-[]
-cljs꞉test.utils.tests꞉> 
-; Evaluating file: tests.cljs
-
-Testing test.utils.tests
-"Getting JSON DATA data from source:"
-"https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
-[]
-cljs꞉test.utils.tests꞉> 
-; Evaluating file: tests.cljs
-
-Testing test.utils.tests
-"Getting JSON DATA data from source:"
-"https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
-[]
-cljs꞉test.utils.tests꞉> 
 ; nREPL Connection was closed

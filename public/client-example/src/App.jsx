@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
-import citysdk from '../../census/census.js'
+import citysdk from 'citysdk'
 
 const getSompn = new Promise((resolve, reject) => {
     try {
@@ -9,11 +9,11 @@ const getSompn = new Promise((resolve, reject) => {
             {
                 vintage: 2016,
                 geoHierarchy: {
-                    //  state: {
-                    //    lat: 38.8482,
-                    //    lng: -76.932,
-                    //  },
-                    state: null,
+                    state: {
+                        lat: 38.8482,
+                        lng: -76.932,
+                    },
+                    //state: null,
                     // FIXME: hypothesis: needs the specified components in geoHeirarchy for lens
                     county: '*',
                 },
@@ -21,14 +21,16 @@ const getSompn = new Promise((resolve, reject) => {
 
                 values: ['DP03_0007E', 'DP03_0007PE'],
                 //values: ["DP03_0007E"],
-                //geoResolution: "500k",
+                geoResolution: '500k',
             },
             (err, res) => {
-                if (err) console.warn('ERROR:', err)
-                reject(err)
+                if (err) {
+                    console.warn('ERROR:', err)
+                    throw err
+                }
                 //console.log("DONE: \n");
                 console.log(res)
-                resolve(res)
+                resolve(JSON.stringify(res, null, 2))
                 //return promises
                 //  .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
                 //  .then(console.log("COMPLETE"));
@@ -39,14 +41,16 @@ const getSompn = new Promise((resolve, reject) => {
     }
 })
 
-getSompn.then(console.log)
-
 function App() {
     const [count, setCount] = useState(0)
-    const [payload, setPayload] = useState('')
+    const [payload, setPayload] = useState('THIS IS JUST A PLACEHOLDER')
 
-    //  useEffect(() => {
-    //    , []);
+    useEffect(() => {
+        getSompn.then((res) => {
+            //console.log(res)
+            setPayload(res)
+        })
+    }, [])
     return (
         <div className="App">
             <div>

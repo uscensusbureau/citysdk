@@ -112,7 +112,7 @@
 (def cors-proxy
   "URL proxy string prereq if not node"
   (cond isServer ""
-        :else "https://l4vujdq7gxgjawqx7aopizvhz40aqfxn.lambda-url.us-east-1.on.aws/"))
+        :else "https://oggmitpm5y54hh6o6dp7ilp2vu0rejkm.lambda-url.us-east-1.on.aws/"))
 
 
 #? (:clj (defn $GET$
@@ -279,7 +279,8 @@
                           (case format
                             :json
                             (-> (polyfetch CORS-URL #js {:method "GET"
-                                                         :headers #js {"Content-Type" "application/json"}})
+                                                         :headers #js {"Content-Type" "application/json"
+                                                                       "Accept" "application/json"}})
                                 (.then #(.json %))
                                 ;;(.then #(prn %))
                                 (.then #(js->clj % :keywordize-keys true))
@@ -291,7 +292,8 @@
                                 (.catch #(error-handler %)))
                             :edn
                             (-> (polyfetch CORS-URL #js {:method "GET"
-                                                         :headers #js {"Content-Type" "text/plain"}})
+                                                         :headers #js {"Content-Type" "text/plain"
+                                                                       "Accept" "text/plain"}})
                                 (.then #(.text %))
                                 (.then #(read-string %))
                                 (.then (fn [edn]
@@ -302,7 +304,8 @@
                                 (.catch #(error-handler %)))
                             :raw
                             (-> (polyfetch CORS-URL #js {:method "GET"
-                                                         :headers #js {"Content-Type" "text/plain"}})
+                                                         :headers #js {"Content-Type" "text/plain"
+                                                                       "Accept" "text/plain"}})
                                 (.then #(.text %))
                                 (.then (fn [raw]
                                          (reset! $err$ {})

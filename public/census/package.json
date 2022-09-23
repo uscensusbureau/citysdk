@@ -1,32 +1,29 @@
 {
-  "name": "citysdk",
-  "version": "2.2.5",
-  "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
-  "author": "Logan Powell",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/uscensusbureau/citysdk/issues"
-  },
-  "main": "census.js",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/uscensusbureau/citysdk.git"
-  },
-  "keywords": [
-    "census",
-    "cartography",
-    "geojson",
-    "statistics",
-    "government",
-    "usa",
-    "boundaries"
-  ],
-  "dependencies": {
-    "node-fetch": "^3.2.10"
-  },
-  "homepage": "https://github.com/uscensusbureau/citysdk#readme"
+    "name": "citysdk",
+    "version": "2.3.0",
+    "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
+    "author": "Logan Powell",
+    "license": "MIT",
+    "type": "module",
+    "bugs": {
+        "url": "https://github.com/uscensusbureau/citysdk/issues"
+    },
+    "main": "census.js",
+    "scripts": {
+        "release": "npm version patch && npm pkg delete devDependencies && npm publish"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/uscensusbureau/citysdk.git"
+    },
+    "keywords": [
+        "census",
+        "cartography",
+        "geojson",
+        "statistics",
+        "government",
+        "usa",
+        "boundaries"
+    ],
+    "homepage": "https://github.com/uscensusbureau/citysdk#readme"
 }
