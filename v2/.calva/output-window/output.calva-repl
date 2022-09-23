@@ -1,3 +1,10 @@
+; Evaluating file: tests.cljs
+
+Testing test.utils.tests
+"Getting JSON DATA data from source:"
+"https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
+[]
+cljs꞉test.utils.tests꞉> 
 ; nREPL Connection was closed
 ; Connecting ...
 ; Hooking up nREPL sessions...
@@ -20,35 +27,8 @@ clj꞉shadow.user꞉> 
 ; Evaluating file: tests.cljs
 
 Testing test.utils.tests
-"Getting TEST DATA data from source:"
+"Getting JSON DATA data from source:"
 "https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json"
-; Discarding entity body for GET requests
 []
 cljs꞉test.utils.tests꞉> 
-; Evaluating file: tests.cljs
-
-Testing test.statsAPI.tests
-
-FAIL in (C-S-args->url-test) (:)
-expected: (= (C-S-args->url args-4) "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&for=county:*")
-  actual: (not (= "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&for=county:*" "https://api.census.gov/data/2016/acs/acs5?get=B01001_001E,NAME&B00001_001E=0:30000&for=county:*"))
-"Getting Census statistics data from source:"
-"https://api.census.gov/data/2017/acs/acs1?get=B01001_001E,B01001_001M&in=state:44&for=county:*"
-; Discarding entity body for GET requests
-[]
-cljs꞉test.statsAPI.tests꞉> 
-; Evaluating file: tests.cljs
-
-Testing test.statsAPI.tests
-"Getting Census statistics data from cache:"
-"https://api.census.gov/data/2017/acs/acs1?get=B01001_001E,B01001_001M&in=state:44&for=county:*"
-"IOE-C-S->JS-test: Elapsed ms= 4"
-"cfg-Census-Stats-test - Heap stats (MB):"
-{:rss -0.64, :heapTotal 0.5, :heapUsed -0.66, :external -0.05, :arrayBuffers 0}
-"cfg-Census-Stats-test: Elapsed ms= 9"
-
-Ran 8 tests containing 20 assertions.
-0 failures, 0 errors.
-[]
-cljs꞉test.statsAPI.tests꞉> 
 ; nREPL Connection was closed

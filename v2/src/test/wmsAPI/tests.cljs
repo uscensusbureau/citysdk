@@ -44,19 +44,22 @@
   (is (= (search-id->match? GG :CONCITY)
          '(:consolidated-cities))))
 
-(deftest C->GIS-url-test
-  (is (= (C->GIS-url GG ts/args-ok-wms-only)
-         "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/MapServer/82/query?geometry=-80.7214,28.2639&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=pjson&outFields=STATE")))
-
 (deftest configed-map-test
   (is (= (configed-map GG {:STATE "51", :COUNTY "013"})
          {:STATE {:state "51"}, :COUNTY {:county "013"}})))
 
 
+(def WMS_GO {:vintage     "2014",
+             :geoHierarchy {:state {:lat 28.2639, :lng -80.7214}, :county "*"}})
+
+(deftest C->GIS-url-test
+  (is (= (C->GIS-url GG WMS_GO)
+         "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2014/MapServer/82/query?geometry=-80.7214,28.2639&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=json&outFields=STATE")))
+
 (deftest try-census-wms-test
   (let [=O= (chan 1)]
     (test-async
-     (go (try-census-wms GG ts/args-ok-wms-only 0 =O=)
+     (go (try-census-wms GG WMS_GO 0 =O=)
          (let [res (<! =O=)]
            (is (= res
                   {:STATE {:state "12"}}))

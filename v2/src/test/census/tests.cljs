@@ -2,17 +2,17 @@
   (:require
     ;[cljs.core.async      :refer [chan close! >! <! timeout to-chan! promise-chan]
     ;                      :refer-macros [go alt!]]
-    [cljs.test            :refer-macros [async deftest is testing run-tests]]
-    [test.fixtures.core   :refer [GG test-async test-async-timed
-                                  time-spot heap-spot stats-key]
-                          :as ts]
+   [cljs.test            :refer-macros [async deftest is testing run-tests]]
+   [test.fixtures.core   :refer [GG test-async test-async-timed
+                                 time-spot heap-spot stats-key]
+    :as ts]
     ;[census.utils.core    :refer [URL-GEOKEYMAP $GET$]]
     ;[census.statsAPI.core :refer [cfg>cfg=C-Stats]]
     ;[census.geoAPI.core   :refer [cfg>cfg=C-GeoCLJ]]
-    [census.core          :refer [core-pattern
-                                  IOE-Census
-                                  census]]
-    ["fs"                 :as fs]))
+   [census.core          :refer [core-pattern
+                                 IOE-Census
+                                 census]]
+   ["fs"                 :as fs]))
 
 
 (comment
@@ -25,11 +25,11 @@
   [args f]
   (let [time-in (js/Date.)]
     (census args
-      (fn [err res]
-        (if res
-            (do (f res)
-                (prn (str "Elapsed ms: "(- (js/Date.) time-in))))
-            (prn "Error: " err))))))
+            (fn [err res]
+              (if res
+                (do (f res)
+                    (prn (str "Elapsed ms: " (- (js/Date.) time-in))))
+                (prn "Error: " err))))))
 
 (comment
   (test-async-time ts/args-ok-wms-only js/console.log)            ; :geocodes   ms = 275
@@ -59,7 +59,7 @@
                         ;"geoResolution" "500k"
                         ;"statsKey"      stats-key}
 
-                 prn)
+                   prn)
   (test-async-time #js {"vintage"     "2016"
                         "sourcePath"    #js ["acs" "acs5"]
                         "values"        #js ["B01001_001E" "NAME"]
@@ -88,7 +88,7 @@
   (test-async-time {:vintage 2016                      ; :stats+geos ms = 22034
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
-                    :geoHierarchy {:county "*"}
+                    :geoHierarchy {:state nil :county "*"}
                     :geoResolution "500k"
                     :statsKey ts/stats-key}
                    js/console.log)
@@ -101,9 +101,9 @@
                    (fn [json] ; <- include err in cb (test-async-time handles here)
                      (let [jsStr (js/JSON.stringify json)]
                        (fs/writeFile
-                         "./json/stats_w_geos.json"
-                         jsStr
-                         #(prn "Done")))))
+                        "./json/stats_w_geos.json"
+                        jsStr
+                        #(prn "Done")))))
   (test-async-time {:vintage 2016                       ; :stats+geos ms = 2316
                     :sourcePath ["acs" "acs5"]
                     :values ["B25001_001E"]
@@ -213,8 +213,7 @@
 
   (test-async-time #js {"vintage" "timeseries"
                         "sourcePath" #js ["intltrade", "exports","porths"]
-                        "values" #js [
-                                      "ALL_VAL_MO",
+                        "values" #js ["ALL_VAL_MO",
                                       "VES_VAL_MO",
                                       "CNT_VAL_MO",
                                       "AIR_VAL_MO",
@@ -230,19 +229,18 @@
 
   (test-async-time #js {"vintage" 2018,
                         "geoHierarchy"
-                          #js {"state" #js {"lat" 28.466944,
-                                            "lng" -82.498148},
-                               "county" "*"},
+                        #js {"state" #js {"lat" 28.466944,
+                                          "lng" -82.498148},
+                             "county" "*"},
                         "geoResolution" "500k",
-                        "sourcePath" #js["acs", "acs5",]
+                        "sourcePath" #js["acs", "acs5"]
                         "values" #js ["NAME"],
                         "statsKey" "3c04140849164b373c8b1da7d7cc8123ef71b7ab"}
                    prn)
 
-  (test-async-time #js {
-                        "vintage" 2016,
-                        "geoHierarchy" #js { "state" #js { "lat" 40.741919 "lng" -73.875504}
-                                             "county" "*"}
+  (test-async-time #js {"vintage" 2016,
+                        "geoHierarchy" #js {"state" #js {"lat" 40.741919 "lng" -73.875504}
+                                            "county" "*"}
                         "sourcePath" #js ["acs", "acs5"]
                         "values" #js ["B00001_001E", "B01001_001E", "B08303_001E"]
                         "geoResolution" "500k"}

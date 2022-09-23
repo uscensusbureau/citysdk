@@ -1,25 +1,25 @@
 (ns test.fixtures.core
   (:require
-    [cljs.core.async :refer [take! pipeline chan promise-chan]
-                     :refer-macros [go]]
-    [cljs.test       :refer-macros [deftest is testing run-tests async]]
-    [cljs.reader     :refer [read-string]]
-    ["fs"            :as fs]
-    ["dotenv"        :as env]))
+   [cljs.core.async :refer [take! pipeline chan promise-chan]
+    :refer-macros [go]]
+   [cljs.test       :refer-macros [deftest is testing run-tests async]]
+   [cljs.reader     :refer [read-string]]
+   ["fs"            :as fs]
+   ["dotenv"        :as env]))
 
 (defn read-edn [path] (read-string (str (fs/readFileSync path))))
 
 (def stats-key (get-in (js->clj (env/config)) ["parsed" "CENSUS_KEY"]))
 ;(prn stats-key)
 (def GG (read-edn "./GeoJSON/index.edn"))
-;(prn GG)
+;;(prn GG)
 (defn time-spot [] (js/Date.))
 
 (defn test-async
   "Asynchronous test awaiting ch to produce a value or close."
   [=test=]
   (async done
-    (take! =test= (fn [_] (done)))))
+         (take! =test= (fn [_] (done)))))
 
 (defn heap-spot
   []
@@ -34,22 +34,22 @@
              (merge-with - heap-out heap-in)))
 
 #_(merge-with -
-    {:rss 92.88, :heapTotal 53.84, :heapUsed 44.76, :external 0.05}
-    {:rss 61.88, :heapTotal 42.84, :heapUsed 31.76, :external 0.04})
+              {:rss 92.88, :heapTotal 53.84, :heapUsed 44.76, :external 0.05}
+              {:rss 61.88, :heapTotal 42.84, :heapUsed 31.76, :external 0.04})
 
 (defn test-async-timed
   "Asynchronous test awaiting ch to produce a value or close."
   ([test-name time-in =test=] (test-async-timed test-name time-in nil =test=))
   ([test-name time-in heap-in =test=]
    (async done
-     (take! =test=
-            (fn [_]
-              (do (if-let [heap-before heap-in]
-                    (do (prn (str test-name " - Heap stats (MB):"))
-                        (prn (heap-diff (heap-spot) heap-before)))
-                    nil)
-                  (prn (str test-name ": Elapsed ms= "(- (js/Date.) time-in)))
-                  (done)))))))
+          (take! =test=
+                 (fn [_]
+                   (do (if-let [heap-before heap-in]
+                         (do (prn (str test-name " - Heap stats (MB):"))
+                             (prn (heap-diff (heap-spot) heap-before)))
+                         nil)
+                       (prn (str test-name ": Elapsed ms= " (- (js/Date.) time-in)))
+                       (done)))))))
 
 
 #_(defn test-async-time
@@ -57,7 +57,7 @@
     (let [time-in (js/Date.)]
       (afn args
            (fn [res] (do (f res)
-                         (prn (str "Elapsed ms: "(- (js/Date.) time-in))))))))
+                         (prn (str "Elapsed ms: " (- (js/Date.) time-in))))))))
 
 
 (defn Icb<==IO=fixture
@@ -156,8 +156,8 @@
         ress {:geoResolution (get-path :geoR res)}]
     (into {} (map (fn [m] (if (= (val (first m)) nil) nil m))
                   [vins geoH srcs ress prds vals (if (= 1 s-key)
-                                                     {:statsKey stats-key}
-                                                     {:statsKey nil})]))))
+                                                   {:statsKey stats-key}
+                                                   {:statsKey nil})]))))
 
 
 (def args-ok-wms-only (test-args 9 2 4 0))
