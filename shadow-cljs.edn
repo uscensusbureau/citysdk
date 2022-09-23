@@ -1,37 +1,23 @@
 {:source-paths ["src"]
- :dependencies [[cljs-ajax "0.8.4"]
+ :dependencies [;[cljs-ajax "0.8.4"]
                 ;[org.clojure/core.async "1.3.610"] ; ignored by shadow-cljs (embedded)
-                ;[org.clojure/clojure "1.11.1"]
-                ;[funcool/cuerdas "2.2.0"]
-                ;[org.clojure/data.json "2.4.0"]
                 [funcool/cuerdas "2022.06.16-403"]
                 [clojusc/defun "0.4.0"]
+                ;;[lambdaisland/fetch "1.1.60"]
                 [frankiesardo/linked "1.3.0"]
                 [net.cgrand/xforms "0.19.2"]]
  :nrepl        {:port 3333}
- :builds       {:lib {:target           :node-library
+ :builds       {:lib {:target           :esm
                       :output-dir       "public/census"
-                      :output-to        "public/census/census.js"
-                      :compiler-options {:optimizations :advanced
-                                         :source-map-include-sources-content false}
-                      :exports-var      census.core/census}
-                :geo {:target           :node-library
+                      :modules {:census {:exports {default census.core/census}}}
+                      :js-options {:js-provider :import}
+                    ;;  :js-options {:keep-as-import #{"node-fetch"}}
+                      :compiler-options {:optimizations :advanced}}
+                    ;;  :output-to        "public/census/census.js"
+                    ;;  :exports-var      census.core/census}
+                :geo {:target           :esm
                       :output-dir       "public/geo"
                       :output-to        "public/geo/batch_convert.js"
-                      :compiler-options {:optimizations :simple}
+                      :compiler-options {:optimizations :simple
+                                         :cross-chunk-method-motion false}
                       :exports-var      configs.geojson.core/batch_convert}}}
-                ;:SDK    {:target           :node-library
-                ;         :output-dir       "public/citySDK"
-                ;         :output-to        "public/citySDK/citySDK.js"
-                ;         :compiler-options {:optimizations :advanced}
-                ;         ;:exports-fn       ce nsus.core/citySDK}
-                ;         :exports          {:citySDK census.core/census
-                ;                            :stats   census.statsAPI.core/censusStatsJSON
-                ;                            :geojson census.geoAPI.core/getCensusGeoJSON}}
-                ;:worker {:target           :browser
-                ;         :output-dir       "public/worker"
-                ;         :asset-path       "/worker"
-                ;         :modules         {:census {:entries [census.core]}
-                ;                           :worker {:entries [worker.core]
-                ;                                    :depends-on #{:census}
-                ;                                    :web-worker true}}}}}

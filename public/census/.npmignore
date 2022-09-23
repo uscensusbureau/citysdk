@@ -1,7 +1,9 @@
 test/
+data/
 node_modules/
 cljs-runtime/
 package-lock.json
 *.md
 census.js.map
-data/
+.quokka
+manifest.edn

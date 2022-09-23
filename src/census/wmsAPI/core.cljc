@@ -123,7 +123,7 @@
                       ["inSR" "4269"]
                       ["spatialRel" "esriSpatialRelIntersects"]
                       ["returnGeometry" "false"]
-                      ["f" "pjson"]
+                      ["f" "json"]
                       ["outFields" (join "," (map name geo))]]))))))
 
 
@@ -139,6 +139,9 @@
   API (js->cljs response) and returns a config map (:key = attribute ; value =
   corresponding configured map with (:geography 'value') needed to call Census'
   data API).
+   
+  this will also handle filling in any parent geographies left out of
+  the original geoHierarchy object when WMS is triggered
   "
   [$g$ attrs]
   (let [wms-keys (into [] (keys attrs))
@@ -172,8 +175,8 @@
   (let [=args=> (chan 1 (map #(configed-map $g$ (get-in % [:features 0 :attributes]))))
         url (C->GIS-url $g$ args server-idx)]
     ($GET$-wms (to-chan! [url]) =args=> =args=>)
-    (take! =args=> (fn [args->] (do (put! =res= args->)
-                                    (close! =args=>))))))
+    (take! =args=> (fn [args->] (put! =res= args->)
+                     (close! =args=>)))))
 
 
 

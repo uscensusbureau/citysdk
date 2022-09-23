@@ -3,9 +3,9 @@
    [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
                                 timeout]
     :refer-macros [go alt!]]
-   [ajax.core           :refer [GET POST]]
+;;   [ajax.core           :refer [GET POST]]
    [cljs.test           :refer-macros [are deftest is are testing run-tests]]
-   [cljs.reader         :refer [read-string]]
+;;   [cljs.reader         :refer [read-string]]
    [test.fixtures.core  :refer [test-async]]
    [census.utils.core   :refer [map-rename-keys
                                 map-over-keys
@@ -13,13 +13,13 @@
                                 strs->keys
                                 ->args
                                 args->
-                                isNode
+                                isServer
                                 cors-proxy
                                 xf<<
                                 xf!<<
                                 educt<<
+                                polyfetch
                                 map-target
-                                 ;map-target-idcs
                                 map-idcs-range
                                 $GET$
                                 =O?>-cb
@@ -42,12 +42,13 @@
 ;                        [:c #linked/map[[:e #linked/map[[:h 6] [:g 5] [:f 4]]] [:d 3]]]
 ;                        [:a #linked/map[[:b 2]]]]"))))
 
-(deftest is-node-url
-  (is (= isNode true)))
+(deftest is-server-url
+  (is (= isServer true)))
 
 (deftest map-rename-keys-test
   (is (= (map-rename-keys name {:a "b" :c "d"})
          {"a" "b", "c" "d"})))
+
 
 (deftest map-over-keys-test
   (is (= (map-over-keys inc {:a 1 :b 2})
@@ -77,7 +78,7 @@
           "state"
           "state-legislative-district-_upper-chamber_"])))
 
-(deftest $GET$-test
+(deftest $GET$-json-test
   (let [=url= (chan 1)
         =res= (chan 1)
         =err= (chan 1)
@@ -86,7 +87,7 @@
         err (atom {})]
     (test-async
      (go (>! =url= "https://api.census.gov/data/2016/acs/acs5/variables/B00001_001E.json")
-         (($GET$ :json "TEST DATA" url res err) =url= =res= =err=)
+         (($GET$ :json "JSON DATA" url res err) =url= =res= =err=)
          (close! =url=)
          (is (= (<! =res=)
                 {:name "B00001_001E",
@@ -99,6 +100,63 @@
          (close! =err=)
          (close! =res=)))))
 
+(deftest $GET$-json-WMS-test
+  (let [=url= (chan 1)
+        =res= (chan 1)
+        =err= (chan 1)
+        url (atom "")
+        res (atom [])
+        err (atom {})]
+    (test-async
+     (go (>! =url= "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2016/MapServer/82/query?geometry=-80.7214,28.2639&geometryType=esriGeometryPoint&inSR=4269&spatialRel=esriSpatialRelIntersects&returnGeometry=false&f=json&outFields=STATE")
+         (($GET$ :json "JSON DATA" url res err) =url= =res= =err=)
+         (close! =url=)
+         (is (= (<! =res=)
+                {:displayFieldName "BASENAME",
+                 :fieldAliases {:STATE "STATE"},
+                 :fields [{:name "STATE",
+                           :type "esriFieldTypeString",
+                           :alias "STATE",
+                           :length 2}],
+                 :features [{:attributes {:STATE "12"}}]}))
+         (close! =err=)
+         (close! =res=)))))
+
+
+(deftest $GET$-edn-test
+  (let [=url= (chan 1)
+        =res= (chan 1)
+        =err= (chan 1)
+        url (atom "")
+        res (atom [])
+        err (atom {})]
+    (test-async
+     (go (>! =url= "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/src/configs/geojson/index.edn")
+         (($GET$ :edn "EDN DATA" url res err) =url= =res= =err=)
+         (close! =url=)
+         (is (= (-> (<! =res=)
+                    :alaska-native-regional-corporation
+                    :2010
+                    :id<-json)
+                [:STATE :ANRC]))
+         (close! =err=)
+         (close! =res=)))))
+
+(deftest $GET$-raw-test
+  (let [=url= (chan 1)
+        =res= (chan 1)
+        =err= (chan 1)
+        url (atom "")
+        res (atom [])
+        err (atom {})]
+    (test-async
+     (go (>! =url= "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2021/04/school-district-_secondary_.json")
+         (($GET$ :raw "RAW DATA" url res err) =url= =res= =err=)
+         (close! =url=)
+         (is (= (:type (js->clj (js/JSON.parse (<! =res=)) :keywordize-keys true))
+                "FeatureCollection"))
+         (close! =err=)
+         (close! =res=)))))
 
 (deftest =O?>-cb-test
   (let [=I= (chan 1)
