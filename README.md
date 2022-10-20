@@ -2,9 +2,9 @@
 
 #### Thank You's due to some very generous Clojurians:
 
-- @thheller (author of the [`shadow-cljs`] build tool)
-- @cgrand (author of the [`xforms`] library)
-- The Clojure community at large
+-   @thheller (author of the [`shadow-cljs`] build tool)
+-   @cgrand (author of the [`xforms`] library)
+-   The Clojure community at large
 
 [`shadow-cljs`]: https://github.com/thheller/shadow-cljs
 [`xforms`]: https://github.com/cgrand/xforms
@@ -15,13 +15,26 @@
 npm install citysdk
 ```
 
+## V 2.3 Changes
+
+Starting with v2.3.0, CitySDK ships as an ESM export
+
+Migration:
+
+```js
+// 2.2.x or below
+const census = require('citysdk')
+// 2.3.x or above
+import census from 'citysdk'
+```
+
 ## The `citysdk` Function
 
 CitySDK exports a single function, which takes two arguments:
 
-- The first is an options object with a set of key/value pair parameters (See ["Parameters"] below)
-- The second is a conventional (error, response) node-style callback, which will be called upon
-  completion of the `census` function and applied to the response
+-   The first is an options object with a set of key/value pair parameters (See ["Parameters"] below)
+-   The second is a conventional (error, response) node-style callback, which will be called upon
+    completion of the `census` function and applied to the response
 
 ["parameters"]: #parameters
 
@@ -87,21 +100,21 @@ You may pass a `{"lat" : <float>, "lng" : <float>}` object as the first and _onl
 `geoHierarchy` key:
 
 ```js
-const census = require("citysdk");
+import census from 'citysdk'
 
 census(
-  {
-    vintage: 2015, // required
-    geoHierarchy: {
-      // required
-      county: {
-        lat: 28.2639,
-        lng: -80.7214,
-      },
+    {
+        vintage: 2015, // required
+        geoHierarchy: {
+            // required
+            county: {
+                lat: 28.2639,
+                lng: -80.7214,
+            },
+        },
     },
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 
 // result -> {"vintage":"2015","geoHierarchy":{"state":"12","county":"009"}}
 ```
@@ -120,22 +133,22 @@ creation is handled by the function for you.
 RETURN TYPE: `JSON`
 
 ```js
-const census = require("citysdk");
+import census from 'citysdk'
 
 census(
-  {
-    vintage: "2015", // required
-    geoHierarchy: {
-      // required
-      state: {
-        lat: 28.2639,
-        lng: -80.7214,
-      },
-      county: "*", // <- syntax = "<descendant>" : "*"
+    {
+        vintage: '2015', // required
+        geoHierarchy: {
+            // required
+            state: {
+                lat: 28.2639,
+                lng: -80.7214,
+            },
+            county: '*', // <- syntax = "<descendant>" : "*"
+        },
     },
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 
 // result -> {"vintage":"2015","geoHierarchy":{"state":"12","county":"*"}}
 ```
@@ -199,16 +212,16 @@ This parameter set will call the Census Statistics API and
 reformat the results with a couple highly requested
 features:
 
-- Census statistics are returned as a standard JSON object
-  rather than the csv-like format of the "raw" API
-- Statistical values are translated into properly typed
-  numbers (Integers and Floats instead of strings), whereas
-  all values are returned as strings via the "raw" API
-- Annotation values (e.g., error codes) that are returned
-  (e.g., [American Community Survey error codes]) in places
-  where data would be expected are returned as strings
-  (rather than numbers) to make differentiating them from
-  values a simple type check.
+-   Census statistics are returned as a standard JSON object
+    rather than the csv-like format of the "raw" API
+-   Statistical values are translated into properly typed
+    numbers (Integers and Floats instead of strings), whereas
+    all values are returned as strings via the "raw" API
+-   Annotation values (e.g., error codes) that are returned
+    (e.g., [American Community Survey error codes]) in places
+    where data would be expected are returned as strings
+    (rather than numbers) to make differentiating them from
+    values a simple type check.
 
 There are two ways to request Census statistics using
 `citysdk`:
@@ -243,20 +256,20 @@ RETURN TYPE: `JSON`
 
 ```js
 census(
-  {
-    vintage: 2015, // required
-    geoHierarchy: {
-      // required
-      county: {
-        lat: 28.2639,
-        lng: -80.7214,
-      },
+    {
+        vintage: 2015, // required
+        geoHierarchy: {
+            // required
+            county: {
+                lat: 28.2639,
+                lng: -80.7214,
+            },
+        },
+        sourcePath: ['cbp'], // required
+        values: ['ESTAB'], // required
     },
-    sourcePath: ["cbp"], // required
-    values: ["ESTAB"], // required
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 
 // result -> [{"ESTAB":13648,"state":"12","county":"009"}]
 ```
@@ -299,21 +312,21 @@ RETURN TYPE: `JSON`
 
 ```js
 census(
-  {
-    vintage: 2015, // required
-    geoHierarchy: {
-      // required
-      county: {
-        lat: 28.2639,
-        lng: -80.7214,
-      },
+    {
+        vintage: 2015, // required
+        geoHierarchy: {
+            // required
+            county: {
+                lat: 28.2639,
+                lng: -80.7214,
+            },
+        },
+        sourcePath: ['cbp'], // required
+        values: ['ESTAB'], // required
+        statsKey: '<your key here>', // required for > 500 calls per day
     },
-    sourcePath: ["cbp"], // required
-    values: ["ESTAB"], // required
-    statsKey: "<your key here>", // required for > 500 calls per day
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 
 // result -> [{"ESTAB":13648,"state":"12","county":"009"}]
 ```
@@ -329,21 +342,21 @@ values based on a given range or categorical qualifyer.
 
 ```js
 census(
-  {
-    vintage: "2017",
-    geoHierarchy: {
-      state: "51",
-      county: "*",
+    {
+        vintage: '2017',
+        geoHierarchy: {
+            state: '51',
+            county: '*',
+        },
+        sourcePath: ['acs', 'acs1'],
+        values: ['NAME'],
+        predicates: {
+            B01001_001E: '0:100000', // number range separated by `:`
+        },
+        statsKey: '<your key here>',
     },
-    sourcePath: ["acs", "acs1"],
-    values: ["NAME"],
-    predicates: {
-      B01001_001E: "0:100000", // number range separated by `:`
-    },
-    statsKey: "<your key here>",
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 
 /* result:
     [
@@ -377,18 +390,18 @@ RETURN TYPE: `JSON`
 
 ```js
 census(
-  {
-    vintage: "timeseries", // required
-    geoHierarchy: {
-      // required
-      us: "*",
+    {
+        vintage: 'timeseries', // required
+        geoHierarchy: {
+            // required
+            us: '*',
+        },
+        sourcePath: ['asm', 'industry'], // required
+        values: ['EMP', 'NAICS_TTL', 'GEO_TTL'],
+        predicates: { time: '2016', NAICS: '31-33' },
     },
-    sourcePath: ["asm", "industry"], // required
-    values: ["EMP", "NAICS_TTL", "GEO_TTL"],
-    predicates: { time: "2016", NAICS: "31-33" },
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 
 /* result:
 [{"EMP": 11112764, 
@@ -438,22 +451,20 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-const fs = require("fs");
+const fs = require('fs')
 
 census(
-  {
-    vintage: 2017,
-    geoHierarchy: {
-      "metropolitan statistical area/micropolitan statistical area": "*",
+    {
+        vintage: 2017,
+        geoHierarchy: {
+            'metropolitan statistical area/micropolitan statistical area': '*',
+        },
+        geoResolution: '500k', // required
     },
-    geoResolution: "500k", // required
-  },
-  (err, res) => {
-    fs.writeFile("./directory/filename.json", JSON.stringify(res), () =>
-      console.log("done")
-    );
-  }
-);
+    (err, res) => {
+        fs.writeFile('./directory/filename.json', JSON.stringify(res), () => console.log('done'))
+    }
+)
 ```
 
 [`fs`]: https://nodejs.org/api/fs.html
@@ -465,16 +476,16 @@ fileSystem API.
 
 ```js
 census(
-  {
-    vintage: "2017",
-    geoHierarchy: {
-      state: "51",
-      county: "*",
+    {
+        vintage: '2017',
+        geoHierarchy: {
+            state: '51',
+            county: '*',
+        },
+        geoResolution: '500k', // required
     },
-    geoResolution: "500k", // required
-  },
-  (err, res) => console.log(res)
-);
+    (err, res) => console.log(res)
+)
 ```
 
 It's important to note that - when querying for these
@@ -525,15 +536,15 @@ Use Chrome for best results (mapbox-gl geocoder caveat)
 
 ```js
 census({
-  vintage: "2017",
-  geoHierarchy: {
-    county: "*",
-  },
-  sourcePath: ["acs", "acs5"],
-  values: ["B19083_001E"], // GINI index
-  statsKey: "<your key here>",
-  geoResolution: "500k",
-});
+    vintage: '2017',
+    geoHierarchy: {
+        county: '*',
+    },
+    sourcePath: ['acs', 'acs5'],
+    values: ['B19083_001E'], // GINI index
+    statsKey: '<your key here>',
+    geoResolution: '500k',
+})
 ```
 
 In this example, we use `citysdk` to create the payload and
@@ -553,15 +564,15 @@ it via a [Mapbox-GL] map.
 
 ```js
 census({
-  vintage: "2017",
-  geoHierarchy: {
-    "zip-code-tabulation-area": "*",
-  },
-  sourcePath: ["acs", "acs5"],
-  values: ["B19083_001E"], // GINI index
-  statsKey: "<your key here>",
-  geoResolution: "500k",
-});
+    vintage: '2017',
+    geoHierarchy: {
+        'zip-code-tabulation-area': '*',
+    },
+    sourcePath: ['acs', 'acs5'],
+    values: ['B19083_001E'], // GINI index
+    statsKey: '<your key here>',
+    geoResolution: '500k',
+})
 ```
 
 This is a very large request, in fact, one of the largest
@@ -688,23 +699,23 @@ through the remaining vintages:
 
 ## More Information about Cartography Files
 
-- For more information about the files translated herein please visit the Census Bureau's
-  [Cartographic Boundary File Description Page](https://www.census.gov/geo/maps-data/data/cbf/cbf_description.html)
-- For a comparison of the available formats of geographic area files, please visit the Census
-  Bureau's [TIGER Products page ](https://www.census.gov/geo/maps-data/data/tiger.html)
+-   For more information about the files translated herein please visit the Census Bureau's
+    [Cartographic Boundary File Description Page](https://www.census.gov/geo/maps-data/data/cbf/cbf_description.html)
+-   For a comparison of the available formats of geographic area files, please visit the Census
+    Bureau's [TIGER Products page ](https://www.census.gov/geo/maps-data/data/tiger.html)
 
 # Community
 
-- Join us on [Gitter](https://gitter.im/uscensusbureau/citysdk)
-- Join us on
-  [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/enQtMjQ3NzUyNTM3NDU3LTZmNGI1MmQzY2Y2ZTU1ODJhNDQwMmY2YmZiNmFkNzg4YmJkYmQzZjQyNDhkNDYxN2JhYjkxZDEwMGI2OGU5NzQ)
-- Send us an email: [cnmp.developers.list@census.gov](mailto:cnmp.developers.list@census.gov)
+-   Join us on [Gitter](https://gitter.im/uscensusbureau/citysdk)
+-   Join us on
+    [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/enQtMjQ3NzUyNTM3NDU3LTZmNGI1MmQzY2Y2ZTU1ODJhNDQwMmY2YmZiNmFkNzg4YmJkYmQzZjQyNDhkNDYxN2JhYjkxZDEwMGI2OGU5NzQ)
+-   Send us an email: [cnmp.developers.list@census.gov](mailto:cnmp.developers.list@census.gov)
 
 # Dedicated Data Experts
 
 If you're new to Census data and need some help figuring out which of the many products Census
 curates for public use, don't hesitate to reach out to these contacts for help:
 
-- Ryan Dolan: ryan.s.dolan@census.gov
-- Gerson Vasquez: gerson.d.vasquez@census.gov
-- Alexandra Barker: alexandra.s.barker@census.gov
+-   Ryan Dolan: ryan.s.dolan@census.gov
+-   Gerson Vasquez: gerson.d.vasquez@census.gov
+-   Alexandra Barker: alexandra.s.barker@census.gov
