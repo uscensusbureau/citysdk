@@ -6,9 +6,9 @@ import inject from '@rollup/plugin-inject'
 export default defineConfig({
     base: '',
     define: {
-        global: {},
+        global: 'globalThis',
         //'process.version': null,
-        process: null,
+        //process: null,
     },
     resolve: {
         alias: {
