@@ -115,8 +115,8 @@
         :else "https://oggmitpm5y54hh6o6dp7ilp2vu0rejkm.lambda-url.us-east-1.on.aws/"))
 
 
-#? (:clj (defn $GET$
-           "
+#?(:clj (defn $GET$
+          "
   Takes five initial inputs:
   1) the response format desired
   2) An error message name
@@ -134,79 +134,79 @@
   Any new payloads received by `GET` will replace the last response `atom` via
   `reset!` *and* be put into the out-bound =response= chan.
   "
-           ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
-           ([format log-name $url$ $res$ $err$ ?cors]
-            (fn
-              ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
-              ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
-               (take!
-                =url=
-                (fn [url]
-                  (cond
+          ([format log-name $url$ $res$ $err$] ($GET$ format log-name $url$ $res$ $err$ nil))
+          ([format log-name $url$ $res$ $err$ ?cors]
+           (fn
+             ([=url= =res= =err=] (($GET$ format log-name $url$ $res$ $err$ ?cors) =url= =res= =err= nil))
+             ([=url= =res= =err= ?silent] ; <- Allow silencing of logging
+              (take!
+               =url=
+               (fn [url]
+                 (cond
                     ;; short circuit if there's an error in the pipeline
-                    (and (= url @$url$) (seq @$err$))
-                    (let [err @$err$]
-                      (do (prn (str "Unsuccessful `" log-name "` request."))
-                          (prn (str err))
-                          (put! =err= err)
-                          (reset! $err$ {}))) ; <- if internets have failed, allow retry
-                    (and (= url @$url$) (empty? @$err$))
-                    (do (when (nil? ?silent)
-                          (do (prn (str "Getting " log-name " data from cache:"))
-                              (prn url)))
-                        (put! =res= @$res$))
-                    :else
-                    (do (when (nil? ?silent)
-                          (do (prn (str "Getting " log-name " data from source:"))
-                              (prn url)))
-                        (let [cfg {:error-handler
-                                   (fn [{:keys [status status-text failure response original-text]}]
-                                     (do (prn (str "Response: " response
-                                                   " STATUS: " status
-                                                   " URL: " url))
-                                         (reset! $url$ url)
-                                         (->> (reset! $err$
-                                                      (str "Response: " response
-                                                           " STATUS: " status
+                   (and (= url @$url$) (seq @$err$))
+                   (let [err @$err$]
+                     (do (prn (str "Unsuccessful `" log-name "` request."))
+                         (prn (str err))
+                         (put! =err= err)
+                         (reset! $err$ {}))) ; <- if internets have failed, allow retry
+                   (and (= url @$url$) (empty? @$err$))
+                   (do (when (nil? ?silent)
+                         (do (prn (str "Getting " log-name " data from cache:"))
+                             (prn url)))
+                       (put! =res= @$res$))
+                   :else
+                   (do (when (nil? ?silent)
+                         (do (prn (str "Getting " log-name " data from source:"))
+                             (prn url)))
+                       (let [cfg {:error-handler
+                                  (fn [{:keys [status status-text failure response original-text]}]
+                                    (do (prn (str "Response: " response
+                                                  " STATUS: " status
+                                                  " URL: " url))
+                                        (reset! $url$ url)
+                                        (->> (reset! $err$
+                                                     (str "Response: " response
+                                                          " STATUS: " status
                                                    ;" Text: " status-text
-                                                           " URL: " url))
+                                                          " URL: " url))
                                                    ;" Failure: " failure))
-                                              (put! =err=))))
-                                   :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
-                              CORS-URL (if (nil? ?cors)
-                                         (str cors-proxy url)
-                                         url)]
-                          (case format
-                            :json
-                            (let [json
-                                  (merge cfg {:response-format :json
-                                              :keywords?       true
-                                              :handler
-                                              (fn [res]
-                                                (do (reset! $err$ {})
-                                                    (reset! $url$ url)
-                                                    (->> (reset! $res$ res)
-                                                         (put! =res=))))})]
-                              (GET CORS-URL json))
-                            :edn
-                            (let [edn
-                                  (merge cfg {:handler
-                                              (fn [res]
-                                                (do (reset! $err$ {})
-                                                    (reset! $url$ url)
-                                                    (->> (reset! $res$ (read-string res))
-                                                         (put! =res=))))})]
-                              (GET CORS-URL edn))
-                            :raw
-                            (let [raw
-                                  (merge cfg {:response-format :raw
-                                              :handler
-                                              (fn [res]
-                                                (do (reset! $err$ {})
-                                                    (reset! $url$ url)
-                                                    (->> (reset! $res$ res)
-                                                         (put! =res=))))})]
-                              (GET CORS-URL raw)))))))))))))
+                                             (put! =err=))))
+                                  :headers {"X-Requested-With" "XMLHttpRequest"}} ; TODO
+                             CORS-URL (if (nil? ?cors)
+                                        (str cors-proxy url)
+                                        url)]
+                         (case format
+                           :json
+                           (let [json
+                                 (merge cfg {:response-format :json
+                                             :keywords?       true
+                                             :handler
+                                             (fn [res]
+                                               (do (reset! $err$ {})
+                                                   (reset! $url$ url)
+                                                   (->> (reset! $res$ res)
+                                                        (put! =res=))))})]
+                             (GET CORS-URL json))
+                           :edn
+                           (let [edn
+                                 (merge cfg {:handler
+                                             (fn [res]
+                                               (do (reset! $err$ {})
+                                                   (reset! $url$ url)
+                                                   (->> (reset! $res$ (read-string res))
+                                                        (put! =res=))))})]
+                             (GET CORS-URL edn))
+                           :raw
+                           (let [raw
+                                 (merge cfg {:response-format :raw
+                                             :handler
+                                             (fn [res]
+                                               (do (reset! $err$ {})
+                                                   (reset! $url$ url)
+                                                   (->> (reset! $res$ res)
+                                                        (put! =res=))))})]
+                             (GET CORS-URL raw)))))))))))))
 
 
 
