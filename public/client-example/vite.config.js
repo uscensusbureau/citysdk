@@ -6,16 +6,16 @@ import inject from '@rollup/plugin-inject'
 export default defineConfig({
     base: '',
     define: {
-        global: 'globalThis',
+        //global: 'globalThis',
         //'process.version': null,
-        //process: null,
+        process: null,
     },
     resolve: {
         alias: {
-            process: 'process/browser',
+            //process: 'process/browser',
             stream: 'stream-browserify',
-            zlib: 'browserify-zlib',
-            util: 'util',
+            //zlib: 'browserify-zlib',
+            //util: 'util',
         },
     },
     plugins: [react()],
