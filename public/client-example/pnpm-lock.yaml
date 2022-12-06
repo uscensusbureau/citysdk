@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@esbuild-plugins/node-globals-polyfill': ^0.1.1
   '@rollup/plugin-inject': ^5.0.2
   '@types/react': ^18.0.17
   '@types/react-dom': ^18.0.6
@@ -8,6 +9,7 @@ specifiers:
   browserify-zlib: ^0.2.0
   buffer: ^6.0.3
   citysdk: ^2.3.0
+  esbuild: ^0.15.18
   events: ^3.3.0
   process: ^0.11.10
   react: ^18.2.0
@@ -15,6 +17,7 @@ specifiers:
   stream-browserify: ^3.0.0
   util: ^0.12.5
   vite: ^3.2.5
+  vite-plugin-notifier: ^0.1.5
 
 dependencies:
   citysdk: 2.3.1
@@ -22,17 +25,20 @@ dependencies:
   react-dom: 18.2.0_react@18.2.0
 
 devDependencies:
+  '@esbuild-plugins/node-globals-polyfill': 0.1.1_esbuild@0.15.18
   '@rollup/plugin-inject': 5.0.2
   '@types/react': 18.0.26
   '@types/react-dom': 18.0.9
   '@vitejs/plugin-react': 2.2.0_vite@3.2.5
   browserify-zlib: 0.2.0
   buffer: 6.0.3
+  esbuild: 0.15.18
   events: 3.3.0
   process: 0.11.10
   stream-browserify: 3.0.0
   util: 0.12.5
   vite: 3.2.5
+  vite-plugin-notifier: 0.1.5
 
 packages:
 
@@ -301,6 +307,14 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+    dev: true
+
+  /@esbuild-plugins/node-globals-polyfill/0.1.1_esbuild@0.15.18:
+    resolution: {integrity: sha512-MR0oAA+mlnJWrt1RQVQ+4VYuRJW/P2YmRTv1AsplObyvuBMnPHiizUF95HHYiSsMGLhyGtWufaq2XQg6+iurBg==}
+    peerDependencies:
+      esbuild: '*'
+    dependencies:
+      esbuild: 0.15.18
     dev: true
 
   /@esbuild/android-arm/0.15.18:
@@ -1069,6 +1083,10 @@ packages:
       is-generator-function: 1.0.10
       is-typed-array: 1.1.10
       which-typed-array: 1.1.9
+    dev: true
+
+  /vite-plugin-notifier/0.1.5:
+    resolution: {integrity: sha512-9QFEHIAkZ7VeunDkVFjPNLOIAiOgxExHO2An9BtyduXq2M7XPX2d0tTDG31ywPBdSjDg987LzWsHvmA0+c8PXQ==}
     dev: true
 
   /vite/3.2.5:

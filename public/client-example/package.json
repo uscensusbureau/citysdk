@@ -13,16 +13,19 @@
         "react-dom": "^18.2.0"
     },
     "devDependencies": {
+        "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
         "@rollup/plugin-inject": "^5.0.2",
         "@types/react": "^18.0.17",
         "@types/react-dom": "^18.0.6",
         "@vitejs/plugin-react": "^2.1.0",
         "browserify-zlib": "^0.2.0",
         "buffer": "^6.0.3",
+        "esbuild": "^0.15.18",
         "events": "^3.3.0",
         "process": "^0.11.10",
         "stream-browserify": "^3.0.0",
         "util": "^0.12.5",
-        "vite": "^3.2.5"
+        "vite": "^3.2.5",
+        "vite-plugin-notifier": "^0.1.5"
     }
 }
