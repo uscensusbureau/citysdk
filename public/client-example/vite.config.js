@@ -6,6 +6,7 @@ import notifier from 'vite-plugin-notifier'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    base: '',
     plugins: [react(), notifier()],
     server: {
         port: 4000,
