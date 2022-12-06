@@ -21,7 +21,7 @@ export default defineConfig({
     plugins: [react()],
     build: {
         rollupOptions: {
-            plugins: [inject({ Buffer: ['Buffer', 'Buffer'] })],
+            //plugins: [inject({ Buffer: ['Buffer', 'Buffer'] })],
             output: {
                 manualChunks: {
                     citysdk: ['citysdk'],
