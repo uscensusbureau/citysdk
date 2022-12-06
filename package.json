@@ -3,7 +3,8 @@
     "version": "2.0.0",
     "description": "Convenience functions for working with Census APIs: Statistics, Cartographic GeoJSON, lat/lng -> FIPS, and other niceties.",
     "scripts": {
-        "build": "shadow-cljs release lib"
+        "build": "shadow-cljs release lib",
+        "example": "cp -a public/client-example/dist/* docs"
     },
     "type": "module",
     "repository": {
