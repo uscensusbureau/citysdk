@@ -7,7 +7,8 @@ export default defineConfig({
     base: '',
     define: {
         global: {},
-        'process.version': null,
+        //'process.version': null,
+        process: null,
     },
     resolve: {
         alias: {
