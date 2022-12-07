@@ -1,13 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import inject from '@rollup/plugin-inject'
-import GlobalsPolyfills from '@esbuild-plugins/node-globals-polyfill'
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import notifier from 'vite-plugin-notifier'
+import builtins from 'rollup-plugin-node-builtins'
+import globals from 'rollup-plugin-node-globals'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    base: '',
-    plugins: [react(), notifier()],
+    base: '/census-geojson/',
+    plugins: [
+        react(),
+        //notifier()
+    ],
     server: {
         port: 4000,
     },
@@ -25,7 +30,7 @@ export default defineConfig({
             },
             // Enable esbuild polyfill plugins
             plugins: [
-                GlobalsPolyfills({
+                NodeGlobalsPolyfillPlugin({
                     process: true,
                     buffer: true,
                 }),
@@ -34,12 +39,15 @@ export default defineConfig({
     },
     build: {
         rollupOptions: {
-            plugins: [
-                GlobalsPolyfills({
-                    process: true,
-                    buffer: true,
-                }),
-            ],
+            output: {
+                manualChunks: {
+                    citysdk: ['citysdk'],
+                },
+            },
+            plugins: [globals()],
+        },
+        commonjsOptions: {
+            transformMixedEsModules: true,
         },
     },
 })
