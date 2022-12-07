@@ -98,7 +98,9 @@
     (throw x)
     x))
 
-(def isNode #? (:cljs (not (exists? js/fetch))
+(def isNode #? (:cljs (and (exists? js/process)
+                           (exists? js/process.versions)
+                           (exists? js/process.versions.node))
                 :clj false))
 
 (def isServer
@@ -110,7 +112,8 @@
 (def cors-proxy
   "URL proxy string prereq if not node"
   (cond isServer ""
-        :else "https://oggmitpm5y54hh6o6dp7ilp2vu0rejkm.lambda-url.us-east-1.on.aws/"))
+        ;;:else "https://oggmitpm5y54hh6o6dp7ilp2vu0rejkm.lambda-url.us-east-1.on.aws/"))
+        :else "https://gakhg4d2j5lvt2psofswlr2ucm0dtitc.lambda-url.us-east-1.on.aws/"))
 
 
 #?(:clj (defn $GET$
