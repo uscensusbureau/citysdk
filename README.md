@@ -712,5 +712,5 @@ through the remaining vintages:
 # Community
 
 -   Join us on
-    [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/enQtMjQ3NzUyNTM3NDU3LTZmNGI1MmQzY2Y2ZTU1ODJhNDQwMmY2YmZiNmFkNzg4YmJkYmQzZjQyNDhkNDYxN2JhYjkxZDEwMGI2OGU5NzQ)
+    [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/zt-optzh7xs-ApNgf5Yqbo_u2ANXQv67cQ)
 -   Send us an email: [cnmp.developers.list@census.gov](mailto:cnmp.developers.list@census.gov)
