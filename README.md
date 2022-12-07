@@ -40,12 +40,7 @@ ES Modules aren't currently supported in native ClojureScript. The Cljs
 ecosystem still uses `require` (instead of `import`), so in order for this
 library to play nice in modern ES environments, some compromises were made:
 
--   An older version of `node-fetch` is used in development (`@2.6.7`), which is
-    the last secure patch to the commonjs version of the library. This is listed
-    as a development dependency, so it's not automatically included when you
-    `npm install` the library
-    -   see [`devDependencies` in package.json](./package.json#L31) and notice
-        the version number there
+-   `isomorphic-unfetch` uses an older version of `node-fetch` which uses require.
 -   In [./src/census/utils/core.cljc](./src/census/utils/core.cljc#L12) you'll see
     in all caps `FIXME: when bundling for ESM, use the $default version`. This
     needs to be done before the next step, but during development (when using the
@@ -54,26 +49,6 @@ library to play nice in modern ES environments, some compromises were made:
 ## 2. Build Time: `shadow-cljs release lib`
 
 Before building for `npm`, add the `$default` flag back to the require statement
-for `node-fetch`
+for `isomorphic-unfetch`
 
 Once this is done you can `npm run build`
-
-## 3. Publish Time: `npm version patch && npm publish`
-
--   In the [bundled output directory](./public/census/package.json), which is
-    the actual `citysdk` NPM library, you'll notice a newer `node-fetch` version
-    in those `devDependencies`. That's because we've built the library using
-    the handy `$default` trigger that tells `shadow-cljs` to use ESM ( `import x from "x"`). So we no longer need to reference the older version.
-
-## 4. Use in Node
-
-You'll have to `npm i node-fetch` to use the `citysdk` in Node. Everything
-should work fine once this is done.
-
-## 5. Test in Browser
-
-I used the `vite` js bundler to run my browser example. You might be wondering
-why I used `devDependencies` instead of `peerDependencies`. This is a bit of a
-perversion of what `devDependencies` are meant to be used for. This is the only
-way I could find to ensure `node-fetch` wasn't installed - by default - when
-leveraging the CitySDK in the browser (with `vite` in my case)

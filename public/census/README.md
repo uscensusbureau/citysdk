@@ -1,3 +1,11 @@
+> # Breaking Change (November 2022)
+>
+> ### Due to free Dynos - which were used to proxy CORS requests - being deprecated by Heroku, pre `2.3` versions of CitySDK will cease to work client-side.
+>
+> ### Additionally, the migration to AWS has forced us to migrate core config files which cause breaks in server-side code in the near future
+>
+> ### Please update to the latest version of CitySDK (`2.3`) to fix
+
 # CitySDK v2
 
 #### Thank You's due to some very generous Clojurians:
@@ -665,7 +673,7 @@ through the remaining vintages:
 [500k set]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 [`103` through `110`]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 
-| Geographic Area Type                                            | 1990 | 2000 | 2010 | 2012 | 2013 - 2015 | 2016 - 2020 |
+| Geographic Area Type                                            | 1990 | 2000 | 2010 | 2012 | 2013 - 2015 | 2016 - 2021 |
 | --------------------------------------------------------------- | :--: | :--: | :--: | :--: | :---------: | :---------: |
 | `"alaska native regional corporation"`                          |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"american indian-area/alaska native area/hawaiian home land"`  |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
@@ -706,16 +714,6 @@ through the remaining vintages:
 
 # Community
 
--   Join us on [Gitter](https://gitter.im/uscensusbureau/citysdk)
 -   Join us on
-    [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/enQtMjQ3NzUyNTM3NDU3LTZmNGI1MmQzY2Y2ZTU1ODJhNDQwMmY2YmZiNmFkNzg4YmJkYmQzZjQyNDhkNDYxN2JhYjkxZDEwMGI2OGU5NzQ)
+    [Slack](https://join.slack.com/t/uscensusbureau/shared_invite/zt-optzh7xs-ApNgf5Yqbo_u2ANXQv67cQ)
 -   Send us an email: [cnmp.developers.list@census.gov](mailto:cnmp.developers.list@census.gov)
-
-# Dedicated Data Experts
-
-If you're new to Census data and need some help figuring out which of the many products Census
-curates for public use, don't hesitate to reach out to these contacts for help:
-
--   Ryan Dolan: ryan.s.dolan@census.gov
--   Gerson Vasquez: gerson.d.vasquez@census.gov
--   Alexandra Barker: alexandra.s.barker@census.gov
