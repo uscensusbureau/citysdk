@@ -32,11 +32,11 @@ export default defineConfig({
     },
     build: {
         rollupOptions: {
-            output: {
-                manualChunks: {
-                    citysdk: ['citysdk'],
-                },
-            },
+            //output: {
+            //    manualChunks: {
+            //        citysdk: ['citysdk'],
+            //    },
+            //},
             // enable Rollup node global polyfills
             plugins: [globals()],
         },

@@ -2,7 +2,7 @@ import { useState, useEffect, useLayoutEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import citysdk from 'citysdk'
+import citysdk from '../../census/census'
 
 const getSompn = new Promise((resolve, reject) =>
     citysdk(
