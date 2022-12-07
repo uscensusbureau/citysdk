@@ -1,5 +1,5 @@
 > # Breaking Change (November 2022)
-> ### Due to free Dynos being deprecated by Heroku, pre `2.3` versions of CitySDK will cease to work client-side. 
+> ### Due to free Dynos - which were used to proxy CORS requests - being deprecated by Heroku, pre `2.3` versions of CitySDK will cease to work client-side. 
 > ### Additionally, the migration to AWS has forced us to migrate core config files which cause breaks in server-side code in the near future
 > ### Please update to the latest version of CitySDK (`2.3`) to fix
 
