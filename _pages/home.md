@@ -35,7 +35,7 @@ census(
 `npm install citysdk`
 
 ```js
-const census = require("citysdk")
+import census from "citysdk"
 
 //get the ACS5 2017 population for all counties in the California
 census(

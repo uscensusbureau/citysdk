@@ -21,7 +21,7 @@ npm install citysdk
 ```
 
 ```javascript
-const census = require("citysdk");
+import census from "citysdk"
 ```
 
 If you would like to just run small queries, you can use the [try it out app]({{ '/docs/try/' | relative_url }})

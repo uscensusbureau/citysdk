@@ -1,6 +1,8 @@
 .idea
 *node_modules
-
+.clj-kondo
+.lsp
+v2
 _site
 _temp
 .sass-cache

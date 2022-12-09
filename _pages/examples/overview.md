@@ -65,7 +65,7 @@ census({
 ### Saving the file locally in Node.js using [`fs`]
 
 ```js
-var fs = require("fs");
+import fs from "fs"
 
 census(
   {
