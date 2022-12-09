@@ -1,3 +1,6 @@
 .idea
+.clj-kondo
+.lsp
+.vscode
 *node_modules
 
