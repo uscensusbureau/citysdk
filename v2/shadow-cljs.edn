@@ -20,4 +20,8 @@
                       :output-to        "public/geo/batch_convert.js"
                       :compiler-options {:optimizations :simple
                                          :cross-chunk-method-motion false}
-                      :exports-var      configs.geojson.core/batch_convert}}}
+                      :exports-var      configs.geojson.core/batch_convert}
+                :cjs {:target :node-script
+                      :output-dir "public/cjs"
+                      :output-to "public/cjs/census.js"
+                      :main census.core/census}}}

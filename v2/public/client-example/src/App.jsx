@@ -1,67 +1,55 @@
 import { useState, useEffect, useLayoutEffect } from 'react'
 import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './App.css'
-import citysdk from 'citysdk'
+import citysdk from '../../census/census'
 
-const getSompn = new Promise((resolve, reject) => {
-    try {
-        citysdk(
-            {
-                vintage: 2016,
-                geoHierarchy: {
-                    state: {
-                        lat: 38.8482,
-                        lng: -76.932,
-                    },
-                    //state: null,
-                    // FIXME: hypothesis: needs the specified components in geoHeirarchy for lens
-                    county: '*',
+const getSompn = new Promise((resolve, reject) =>
+    citysdk(
+        {
+            vintage: 2016,
+            geoHierarchy: {
+                state: {
+                    lat: 38.8482,
+                    lng: -76.932,
                 },
-                sourcePath: ['acs', 'acs5', 'profile'],
-
-                values: ['DP03_0007E', 'DP03_0007PE'],
-                //values: ["DP03_0007E"],
-                geoResolution: '500k',
+                //state: null,
+                county: '*',
             },
-            (err, res) => {
-                if (err) {
-                    console.warn('ERROR:', err)
-                    throw err
-                }
-                //console.log("DONE: \n");
-                console.log(res)
-                resolve(JSON.stringify(res, null, 2))
-                //return promises
-                //  .writeFile("./data/response-big.json", JSON.stringify(res, null, 2))
-                //  .then(console.log("COMPLETE"));
+            sourcePath: ['acs', 'acs5', 'profile'],
+
+            values: ['DP03_0007E', 'DP03_0007PE'],
+            geoResolution: '500k',
+        },
+        (err, res) => {
+            if (err) {
+                console.warn('ERROR:', err)
+                reject(JSON.stringify(err, null, 2))
             }
-        )
-    } catch (err) {
-        reject(err)
-    }
-})
+            //console.log(res)
+            resolve(JSON.stringify(res, null, 2))
+        }
+    )
+)
 
 function App() {
     const [count, setCount] = useState(0)
-    const [payload, setPayload] = useState('THIS IS JUST A PLACEHOLDER')
+    const [payload, setPayload] = useState('LOADING ...')
 
     useEffect(() => {
-        getSompn.then((res) => {
-            //console.log(res)
-            setPayload(res)
-        })
+        getSompn.then(setPayload)
     }, [])
     return (
         <div className="App">
             <div>
                 <a href="https://vitejs.dev" target="_blank">
-                    <img src="/vite.svg" className="logo" alt="Vite logo" />
+                    <img src={viteLogo} className="logo" alt="Vite logo" />
                 </a>
                 <a href="https://reactjs.org" target="_blank">
                     <img src={reactLogo} className="logo react" alt="React logo" />
                 </a>
             </div>
-            <h1>Vite + React</h1>
+            <h1>Vite + React + CitySDK</h1>
             <div className="card">
                 <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
                 <p>
@@ -69,7 +57,7 @@ function App() {
                 </p>
             </div>
             <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-            <pre>{payload}</pre>
+            <pre style={{ fontSize: '1rem' }}>{payload}</pre>
         </div>
     )
 }

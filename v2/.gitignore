@@ -5,9 +5,11 @@ shadow-idea-notes.md
 .env
 .gitattributes
 .nrepl-port
-.shadow-cljs/*
-.clj-kondo/*
-.calva/*
+.shadow-cljs
+.clj-kondo
+.calva
+.lsp
+.vscode
 pom.xml
 *cljs-runtime
 public/census/data/
