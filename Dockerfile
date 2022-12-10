@@ -1,4 +1,4 @@
-FROM ruby:2.6.5-alpine3.11
+FROM ruby:3.1.3-alpine3.17
 
 RUN apk add --no-cache g++ musl-dev make git \
 	&& gem install eventmachine

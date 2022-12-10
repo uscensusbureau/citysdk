@@ -35,6 +35,7 @@ If you have Docker Compose
 docker-compose up
 ```
 
+Access the site at [http://0.0.0.0:4000/](0.0.0.0:4000)
 ---
 
 #### Other notes

@@ -7,3 +7,4 @@ _site
 _temp
 .sass-cache
 .jekyll-metadata
+vendor/
