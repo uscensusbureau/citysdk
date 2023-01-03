@@ -27,7 +27,7 @@ Starting with v2.3.0, CitySDK ships as an ESM export
 Migration:
 
 ```js
-// 2.2.x or below
+// 2.2.5 or below
 const census = require('citysdk')
 // 2.3.x or above
 import census from 'citysdk'
