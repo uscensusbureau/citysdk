@@ -2,18 +2,16 @@
   (:require
    [cljs.core.async           :refer [>! <! chan promise-chan close! take! put! pipeline-async]
     :refer-macros [go go-loop]]
-   [cuerdas.core              :refer [join]
-    :as s]
+   [cuerdas.core              :refer [join] :as s]
    [clojure.set               :refer [map-invert]]
    [defun.core                :refer-macros [defun]]
    [configs.promised.async    :refer [value-port]] ; Fixme: Need this dependency -< move configs to separate project
    [census.utils.core         :refer [map-target error err-type]]
-   [clojure.reader            :refer [read-string]]
+  ;; [clojure.reader            :refer [read-string]]
    [configs.utils.core        :refer [read-edn FileSaver]]
    [configs.geojson.filepaths :refer [paths]]
-     ;[configs.geojson.filepaths :refer [paths]]
-     ;["path" :as path]
    ["fs" :as fs]
+   ["path" :as path]
    ["shpjs" :as shpjs]))
      ;["mkdirp" :as mkdirp]))
 
@@ -21,7 +19,7 @@
 ;(prn "hello")
 
 
-(def geoKeyMap (read-edn "./src/configs/geojson/index.edn"))
+(def geoKeyMap (read-edn "./GeoJSON/index.edn"))
 
 ;; NOTE: If you need to increase memory of Node in Shadow... Eval in REPL:
 ;;(shadow.cljs.devtools.api/node-repl {:node-args ["--max-old-space-size=8192"]})
@@ -35,6 +33,7 @@
 ;; 888  "88_/  "88___/  888  888  888      888  "88___/      Y      '88___/  888
 ;;
 
+;;(prn paths)
 
 (defn map-xx->vin
   "
@@ -102,7 +101,7 @@
   (apply str (remove nil? (map #(vin+lev=?key vintage level %)
                                (seq (map-invert geoKeyMap))))))
 
-(keySearch "2019" "zcta")
+;(keySearch "2019" "zcta")
 
 (defn config-geoPath
   "
@@ -130,7 +129,7 @@
 
 (defn scope-geoPath
   "
-  Creates a filepath determined by whether or not the input contains a state
+  Creates a filepath determined by whether the input contains a state
   (e.g., '01') or national code ('99'/'us'). If the value returned from the
   `keySearch` function = `` (empty string) returns `nil`.
   "
@@ -155,17 +154,17 @@
   Pattern matches against incoming file structures to create a harmonized
   directory ontology in which to store the file.
   "
-  ([[lev sco] [vin]       _      _]                                       (scope-geoPath [lev       "500" "k" vin    sco])) ; 90-00
-  ([_         [vin]       [sco]  ["outline"] [res mes] _]                (scope-geoPath ["outline" res   mes vin    sco])) ; 2010
-  ([_         [vin]       [sco]  ["uac" "10"] [res mes] _]                (scope-geoPath ["uac"     res   mes vin    sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev _] [res mes] _]                (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
-  ([_         ["rd" "13"] [sco]  [lev]      [res mes] _]                (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
-  ([_         [vin]       [sco]  [lev _] [res mes] _]                (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
-  ([_         [vin]       [sco]  [lev]      [res mes] _]                (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
-  ([_         _           _      ["all"]      _         _]                nil) ;; abandon ship (all geos packed together)
-  ([_         ["2010"]    ["us"] ["860"]      _         ["500" "k"] _]    nil) ;; abandon ship (500k zctas)
-  ([_         [vin]       [sco]  [lev]      _         [res   mes] _]    (scope-geoPath [lev       res   mes vin    sco])) ; 2010
-  ([& anything-else]                                                      nil))
+  ([[lev sco] [vin]       _      _]                          (scope-geoPath [lev       "500" "k" vin    sco])) ; 90-00
+  ([_         [vin]       [sco]  ["outline"]  [res mes]   _] (scope-geoPath ["outline" res   mes vin    sco])) ; 2010
+  ([_         [vin]       [sco]  ["uac" "10"] [res mes]   _] (scope-geoPath ["uac"     res   mes vin    sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev _]      [res mes]   _] (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
+  ([_         ["rd" "13"] [sco]  [lev]        [res mes]   _] (scope-geoPath [lev       res   mes "2012" sco])) ; 2012
+  ([_         [vin]       [sco]  [lev _]      [res mes]   _] (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
+  ([_         [vin]       [sco]  [lev]        [res mes]   _] (scope-geoPath [lev       res   mes vin    sco])) ; 2013+
+  ([_         _           _      ["all"]      _           _] nil) ;; abandon ship (all geos packed together)
+  ([_         ["2010"]    ["us"] ["860"] _    ["500" "k"] _] nil) ;; abandon ship (500k zctas)
+  ([_         [vin]       [sco]  [lev]   _    [res   mes] _] (scope-geoPath [lev       res   mes vin    sco])) ; 2010
+  ([& anything-else]                                         nil))
 
 (defn filename->>geopath
   "
@@ -246,6 +245,8 @@
   (filename->>geopath "cd36_103_shp.zip")
   ;; => "500k/103/36/congressional-district.json"
 
+  (filename->>geopath "cb_2020_02_puma20_500k.zip")
+
   (filename->>geopath "cb_rd13_us_cd113_500k.zip")
   ;; => "500k/2012/congressional-district.json"
 
@@ -275,6 +276,7 @@
 ;"There"
 ;; ==================================================
 
+;(.normalize path "/Users/logan.powell/OneDrive - Vertex, Inc/projects/census-downloads/www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_50_sldu_500k.zip")
 
 (defn fsCheck->put!
   "
@@ -283,7 +285,7 @@
   not. Used to ensure files aren't saved twice (and thus needed to be recommited)
   "
   [val, =port=]
-  (fs/access val
+  (fs/access (.normalize path val)
              fs/constants.F_OK
              (fn [err] (if (nil? err)
                          (do (put! =port= (str "there")) (close! =port=))
@@ -296,7 +298,7 @@
   "
   [val, =port=]
   (prn (str "fsRead'ing: " val))
-  (fs/readFile val
+  (fs/readFile (.normalize path val)
                (fn [err, file]
                  (if (= (type err) err-type)
                    (throw (error err))
@@ -305,10 +307,10 @@
 ;; Examples =========================================
 
 #_(let [c (chan 1)]
-    (go (fsR-file->put!
-         "D:\\projects\\census\\cartography-files\\www2.census.gov\\geo\\tiger\\GENZ2020\\shp\\cb_2020_01_sldu_500k.zip"
-         c)
-        (prn (<! c))))
+      (go (fsR-file->put!
+           "/Users/logan.powell/OneDrive - Vertex, Inc/projects/census-downloads/www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_50_sldu_500k.zip"
+           c)
+          (prn (<! c))))
 
 ;;=> #object[cljs.core.async.impl.channels.ManyToManyChannel]
 ;"fsRead'ing: C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2013\\cb_2013_01_cousub_500k.zip"
@@ -345,8 +347,8 @@
 #_(let [=zip= (chan 1)
         =json= (chan 1)]
     (go (fsR-file->put!
-          ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
-         "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"
+            ;"C:\\Users\\Surface\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2010\\gz_2010_us_860_00_500k.zip"
+         "/Users/logan.powell/OneDrive - Vertex, Inc/projects/census-downloads/www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_50_sldu_500k.zip"
          =zip=)
         (pipeline-async 1 =json= zip->geojson->put! =zip=)
         (js/console.log (<! =json=))))
@@ -432,20 +434,20 @@
   "
   [=path=]
   (go-loop []
-    (let [path (<! =path=)]
-      (if-let [{:keys [directory filepath]} (->> (s/split path #"\\") (last) (filename->>geopath))]
+    (let [_path (<! =path=)]
+      (if-let [{:keys [directory filepath]} (->> (s/split _path (. path -sep)) (last) (filename->>geopath))]
         (let [=test-path= (chan 1)]
           (do (fsCheck->put! filepath =test-path=)
               (if (not= "there" (<! =test-path=))
                 (let [=zip=  (chan 1)
                       =json= (chan 1 (x-geojson-config directory filepath))]
-                  (do (fsR-file->put! path =zip=)
+                  (do (fsR-file->put! _path =zip=)
                       (pipeline-async 1 =json= zip->geojson->put! =zip=)
                       (FileSaver (<! =json=))
                       (recur)))
                 (do (prn (str "GeoJSON already exists: " filepath))
                     (recur)))))
-        (do (prn (str "No :geoKeyMap match found for: " path))
+        (do (prn (str "No :geoKeyMap match found for: " _path))
             (recur))))))
 
 ;(let [path "C:\\Users\\logan\\Downloads\\www2.census.gov\\geo\\tiger\\GENZ2019\\shp\\cb_2019_01_bg_500k.zip"]
