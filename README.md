@@ -1,6 +1,9 @@
 > # Breaking Change (November 2022)
-> ### Due to free Dynos - which were used to proxy CORS requests - being deprecated by Heroku, pre `2.3` versions of CitySDK will cease to work client-side. 
+>
+> ### Due to free Dynos - which were used to proxy CORS requests - being deprecated by Heroku, pre `2.3` versions of CitySDK will cease to work client-side.
+>
 > ### Additionally, the migration to AWS has forced us to migrate core config files which cause breaks in server-side code in the near future
+>
 > ### Please update to the latest version of CitySDK (`2.3`) to fix
 
 # CitySDK v2
@@ -27,7 +30,7 @@ Starting with v2.3.0, CitySDK ships as an ESM export
 Migration:
 
 ```js
-// 2.2.5 or below
+// 2.2.x or below
 const census = require('citysdk')
 // 2.3.x or above
 import census from 'citysdk'
@@ -456,7 +459,7 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-const fs = require('fs')
+import fs from 'fs'
 
 census(
     {
@@ -670,7 +673,7 @@ through the remaining vintages:
 [500k set]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 [`103` through `110`]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 
-| Geographic Area Type                                            | 1990 | 2000 | 2010 | 2012 | 2013 - 2015 | 2016 - 2021 |
+| Geographic Area Type                                            | 1990 | 2000 | 2010 | 2012 | 2013 - 2015 | 2016 - 2022 |
 | --------------------------------------------------------------- | :--: | :--: | :--: | :--: | :---------: | :---------: |
 | `"alaska native regional corporation"`                          |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"american indian-area/alaska native area/hawaiian home land"`  |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |

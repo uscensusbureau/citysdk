@@ -459,7 +459,7 @@ See the full available Cartographic GeoJSON in the [Geographies Available by Vin
 RETURN TYPE: `JSON STRING`
 
 ```js
-const fs = require('fs')
+import fs from 'fs'
 
 census(
     {
@@ -673,7 +673,7 @@ through the remaining vintages:
 [500k set]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 [`103` through `110`]: https://github.com/uscensusbureau/citysdk/tree/master/v2/GeoJSON/500k
 
-| Geographic Area Type                                            | 1990 | 2000 | 2010 | 2012 | 2013 - 2015 | 2016 - 2021 |
+| Geographic Area Type                                            | 1990 | 2000 | 2010 | 2012 | 2013 - 2015 | 2016 - 2022 |
 | --------------------------------------------------------------- | :--: | :--: | :--: | :--: | :---------: | :---------: |
 | `"alaska native regional corporation"`                          |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"american indian-area/alaska native area/hawaiian home land"`  |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |

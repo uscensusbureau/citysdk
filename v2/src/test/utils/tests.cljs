@@ -1,11 +1,8 @@
 (ns test.utils.tests
   (:require
-   [cljs.core.async     :refer [chan >! <! take! put! close! promise-chan
-                                timeout]
-    :refer-macros [go alt!]]
-;;   [ajax.core           :refer [GET POST]]
-   [cljs.test           :refer-macros [are deftest is are testing run-tests]]
-;;   [cljs.reader         :refer [read-string]]
+   [cljs.core.async     :refer [chan >! <! close! timeout]
+    :refer-macros [go]]
+   [cljs.test           :refer-macros [are deftest is are run-tests]]
    [test.fixtures.core  :refer [test-async]]
    [census.utils.core   :refer [map-rename-keys
                                 map-over-keys
@@ -18,7 +15,6 @@
                                 xf<<
                                 xf!<<
                                 educt<<
-                                polyfetch
                                 map-target
                                 map-idcs-range
                                 $GET$

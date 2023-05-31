@@ -1,11 +1,3 @@
-export const $APP = {};
-export const shadow$provide = {};
-export const $jscomp = {};
-/*
-
- Copyright The Closure Library Authors.
- SPDX-License-Identifier: Apache-2.0
-*/
 import*as esm_import$isomorphic_unfetch from"isomorphic-unfetch";
 var h,w=function(a){var b=typeof a;return"object"!=b?b:a?Array.isArray(a)?"array":b:"null"},ca=function(a){return Object.prototype.hasOwnProperty.call(a,aa)&&a[aa]||(a[aa]=++ba)},da=function(a,b,c){return a.call.apply(a.bind,arguments)},ea=function(a,b,c){if(!a)throw Error();if(2<arguments.length){var d=Array.prototype.slice.call(arguments,2);return function(){var e=Array.prototype.slice.call(arguments);Array.prototype.unshift.apply(e,d);return a.apply(b,e)}}return function(){return a.apply(b,arguments)}},
 fa=function(a,b,c){fa=Function.prototype.bind&&-1!=Function.prototype.bind.toString().indexOf("native code")?da:ea;return fa.apply(null,arguments)},ha=function(a){const b=[];let c=0;for(const d in a)b[c++]=d;return b},ka=function(a,b){a.sort(b||ia)},ma=function(a){var b=la();const c=Array(a.length);for(let e=0;e<a.length;e++)c[e]={index:e,value:a[e]};const d=b||ia;ka(c,function(e,f){return d(e.value,f.value)||e.index-f.index});for(b=0;b<a.length;b++)a[b]=c[b].value},ia=function(a,b){return a>b?1:
