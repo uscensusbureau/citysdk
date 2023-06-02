@@ -702,6 +702,7 @@ through the remaining vintages:
 | `"zip code tabulation area"`                                    |      |  ✔   |      |      |      ✔      |      ✔      |
 
 > * = [discontinued in 2022](https://www.federalregister.gov/documents/2021/07/16/2021-15159/2020-standards-for-delineating-core-based-statistical-areas#p-72)
+>
 > † = unavailable in 2022  
 
 ## More Information about Cartography Files
