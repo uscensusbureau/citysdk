@@ -678,15 +678,15 @@ through the remaining vintages:
 | `"alaska native regional corporation"`                          |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"american indian-area/alaska native area/hawaiian home land"`  |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"block group"`                                                 |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
-| `"combined new england city and town area"`                     |      |      |  ✔   |      |             |      ✔      |
-| `"combined statistical area"`                                   |      |      |  ✔   |      |      ✔      |      ✔      |
+| `"combined new england city and town area"`                     |      |      |  ✔   |      |             |      ✔*     |
+| `"combined statistical area"`                                   |      |      |  ✔   |      |      ✔      |      ✔†     |
 | `"congressional district"`                                      |      |      |  ✔   |  ✔   |      ✔      |      ✔      |
 | `"consolidated cities"`                                         |      |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"county"`                                                      |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"county subdivision"`                                          |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"division"`                                                    |      |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"metropolitan statistical area/micropolitan statistical area"` |      |      |  ✔   |      |      ✔      |      ✔      |
-| `"new england city and town area"`                              |      |      |  ✔   |      |      ✔      |      ✔      |
+| `"new england city and town area"`                              |      |      |  ✔   |      |      ✔      |      ✔*     |
 | `"place"`                                                       |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"public use microdata area"`                                   |      |      |      |      |      ✔      |      ✔      |
 | `"region"`                                                      |      |  ✔   |  ✔   |      |      ✔      |      ✔      |
@@ -699,11 +699,10 @@ through the remaining vintages:
 | `"tract"`                                                       |  ✔   |  ✔   |  ✔   |      |      ✔      |      ✔      |
 | `"urban area"`                                                  |  ✔   |  ✔   |      |  ✔   |      ✔      |      ✔      |
 | `"us"`                                                          |      |      |  ✔   |      |      ✔      |      ✔      |
-| `"zip code tabulation area"`                                    |      |  ✔   |      |      |      ✔      |     ✔\*     |
+| `"zip code tabulation area"`                                    |      |  ✔   |      |      |      ✔      |      ✔      |
 
-```
-* = not available until Dec 2020
-```
+> * = [discontinued in 2022](https://www.federalregister.gov/documents/2021/07/16/2021-15159/2020-standards-for-delineating-core-based-statistical-areas#p-72)
+> † = unavailable in 2022  
 
 ## More Information about Cartography Files
 
