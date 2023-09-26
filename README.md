@@ -346,7 +346,7 @@ RETURN TYPE: `JSON`
 ##### `predicates`
 
 Predicates are used to create a sub-selection of statistical
-values based on a given range or categorical qualifyer.
+values based on a given range or categorical qualifier.
 
 ```js
 census(
@@ -589,7 +589,7 @@ It is so large, in fact that it currently only works on Node
 and only if you increase your `node --max-old-space-size=4096`. With large merges (such as all
 counties or zctas), it is recommended not to try to use
 `citysdk` dynamically, but - rather - to munge your data
-before hand with `citysdk` and then serve it statically to
+beforehand with `citysdk` and then serve it statically to
 your mapping library, as was done here:
 
 [![Zip Code Tabulation Areas](https://raw.githubusercontent.com/uscensusbureau/citysdk/master/examples/assets/images/zctas.PNG)](https://uscensusbureau.github.io/citysdk/assets/examples/mapbox/zip-code-tabulation-areas_static/index.html)
